@@ -1,5 +1,3 @@
 # naphatwx-tools
 
-AGENT
-COMMAND
-TOOL
+AGENT, COMMAND, TOOL
