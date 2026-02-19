@@ -1,0 +1,11 @@
+{
+  "name": "naphatwx-marketplace",
+  "owner": { "name": "Naphat" },
+  "plugins": [
+    {
+      "name": "naphatwx-tools",
+      "source": ".", 
+      "description": "My personal tools"
+    }
+  ]
+}
