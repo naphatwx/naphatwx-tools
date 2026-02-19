@@ -1,0 +1,8 @@
+{
+  "name": "tools",
+  "version": "1.0.0",
+  "description": "My personal commands shared across PCs",
+  "commands": [
+    "commands/commit-message.md"
+  ]
+}
