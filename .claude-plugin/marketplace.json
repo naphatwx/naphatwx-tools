@@ -4,8 +4,9 @@
   "plugins": [
     {
       "name": "naphatwx-tools",
-      "source": ".", 
-      "description": "My personal tools"
+      "source": "./plugins/naphatwx-tools",
+      "description": "My personal tools",
+      "version": "1.0.0"
     }
   ]
 }
