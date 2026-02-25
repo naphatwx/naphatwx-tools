@@ -1,6 +1,6 @@
 ---
 
-description: Generate a conventional commit message from staged changes. Analyzes diffs and recent history to produce a well-structured commit message.
+description: Generate a conventional commit message from staged changes and create the commit.
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
@@ -104,13 +104,26 @@ Follow the **Conventional Commits** format:
    - `BREAKING CHANGE: <description>` (starts with `BREAKING CHANGE: `).
    - Ticket references (e.g., `Refs: TICKET-123`).
 
-### 7. Output Format
+### 7. Create the Commit
 
-Output **ONLY** the commit message inside a fenced code block. Do not provide explanations, conversational text, or git commands.
+After generating the commit message, **immediately create the commit** using `git commit`. Use a HEREDOC to pass the message:
 
-```
+```bash
+git commit -m "$(cat <<'EOF'
 <the generated commit message>
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+EOF
+)"
 ```
+
+Then run `git status` to verify the commit succeeded.
+
+### 8. Output
+
+After the commit is created, show:
+1. The commit hash and message summary (from the git output)
+2. The `git status` result confirming success
 
 ## Examples
 
@@ -143,5 +156,3 @@ UPPER_SNAKE_CASE. Clients must update their payload validation.
 
 Refs: API-4000
 ```
-
-
