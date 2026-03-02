@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "My personal commands shared across PCs",
   "commands": [
-    "commands/commit-message.md"
+    {
+      "name": "commit-message",
+      "description": "Generate commit messages",
+      "path": "commands/commit-message.md"
+    }
   ]
 }
