@@ -1,6 +1,7 @@
 ---
-description: Review code for style, bugs, security, performance, and best practices. Reviews staged changes or specific files against project guidelines.
-allowed-tools: Read, Glob, Grep, Bash, Task, Edit
+name: review-code-boss
+description: Review code like a boss
+allowed-tools: Read, Glob, Grep
 ---
 
 # Code Review Agent

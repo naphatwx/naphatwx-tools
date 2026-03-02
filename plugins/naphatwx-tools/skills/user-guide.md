@@ -1,8 +1,11 @@
 ---
 name: user-guide
-description: Generate user-facing documentation for features with annotated screenshot placeholders, step-by-step instructions, and troubleshooting. Follows 2026 best practices for user guides.
+description: Generate user-facing documentation for features
 allowed-tools: Read, Glob, Grep, WebSearch, AskUserQuestion, Write
 ---
+
+# Your skill content here...
+
 
 # User Guide Generator
 
