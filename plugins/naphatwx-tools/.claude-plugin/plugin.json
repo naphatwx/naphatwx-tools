@@ -4,5 +4,8 @@
   "description": "My personal commands shared across PCs",
   "commands": [
     "./commands/commit.md"
+  ],
+  "skills": [
+    "./skills/user-guide.md"
   ]
 }
