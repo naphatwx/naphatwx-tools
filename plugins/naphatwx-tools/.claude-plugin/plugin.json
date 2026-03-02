@@ -1,12 +1,12 @@
 {
-  "name": "c",
-  "version": "1.0.0",
-  "description": "My personal commands shared across PCs",
-  "commands": [
-    "./commands/commit.md",
-    "./commands/review-code.md"
-  ],
-  "skills": [
-    "./skills/user-guide"
-  ]
+	"name": "c",
+	"version": "1.0.0",
+	"description": "My personal commands shared across PCs",
+	"commands": [
+		"./commands/c-commit.md",
+		"./commands/c-review-code.md"
+	],
+	"skills": [
+		"./skills/c-user-guide"
+	]
 }

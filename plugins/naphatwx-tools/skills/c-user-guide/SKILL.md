@@ -1,5 +1,5 @@
 ---
-name: user-guide
+name: c-user-guide
 description: Generate user-facing documentation for features
 ---
 
@@ -34,10 +34,12 @@ If output path was provided in arguments, skip this step.
 ### 1. Read Feature Documentation
 
 Use Glob and Grep to find and read relevant docs for the feature domain:
+
 - README, architecture, spec, or any markdown files under `docs/`
 - Frontend UI files related to the feature
 
 Extract:
+
 - Feature purpose and overview
 - What users can do (user stories)
 - Key concepts and terms
@@ -52,36 +54,46 @@ Use this structure:
 # [Feature Name] User Guide
 
 ## What is [Feature Name]?
+
 [2-3 simple sentences about what it does and why it's useful]
 
 ## Key Concepts
+
 [Table or list explaining important terms]
 
 ## How To: [Main Task 1]
+
 📸 **[SCREENSHOT PLACEHOLDER]**
-*Show: [what to highlight and where]*
+_Show: [what to highlight and where]_
 
 1. [Step]
 2. [Step]
 3. [Step]
 
 ## How To: [Main Task 2]
+
 [Repeat pattern...]
 
 ## Common Scenarios
+
 ### "[User goal]"
+
 [Steps to achieve it]
 
 ## Troubleshooting
+
 ### "[Problem]"
+
 - **Cause:** [Why it happens]
 - **Solution:** [How to fix it]
 
 ## Quick Reference
+
 | Action | Where | Permission |
-|--------|-------|------------|
+| ------ | ----- | ---------- |
 
 ## Tips
+
 ✅ [Tip 1]
 ✅ [Tip 2]
 ```

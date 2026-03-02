@@ -1,5 +1,5 @@
 ---
-name: commit
+name: c-commit
 description: Generate a conventional commit message from staged changes and create the commit.
 allowed-tools: Bash, Read, Glob, Grep
 ---
@@ -42,18 +42,18 @@ If `$ARGUMENTS` contains a specific scope override, use that instead.
 
 Analyze the diff to determine the commit **type**:
 
-| Type | When to use |
-|---|---|
-| `feat` | New feature or capability |
-| `fix` | Bug fix |
-| `refactor` | Code restructuring without behavior change |
-| `chore` | Build, config, dependency, or tooling changes |
-| `docs` | Documentation only |
-| `test` | Adding or updating tests only |
-| `style` | Formatting, whitespace, linting (no logic change) |
-| `perf` | Performance improvement |
-| `ci` | CI/CD pipeline changes |
-| `revert` | Reverting a previous commit |
+| Type       | When to use                                       |
+| ---------- | ------------------------------------------------- |
+| `feat`     | New feature or capability                         |
+| `fix`      | Bug fix                                           |
+| `refactor` | Code restructuring without behavior change        |
+| `chore`    | Build, config, dependency, or tooling changes     |
+| `docs`     | Documentation only                                |
+| `test`     | Adding or updating tests only                     |
+| `style`    | Formatting, whitespace, linting (no logic change) |
+| `perf`     | Performance improvement                           |
+| `ci`       | CI/CD pipeline changes                            |
+| `revert`   | Reverting a previous commit                       |
 
 If `$ARGUMENTS` contains a type override, use that instead.
 

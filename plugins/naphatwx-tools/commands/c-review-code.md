@@ -1,5 +1,5 @@
 ---
-name: review-code
+name: c-review-code
 description: Review code changes
 allowed-tools: Read, Glob, Grep
 ---
