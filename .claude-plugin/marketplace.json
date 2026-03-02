@@ -1,6 +1,9 @@
 {
   "name": "naphatwx-marketplace",
-  "owner": { "name": "Naphat" },
+  "owner": {
+    "name": "naphatwx"
+  },
+  "autoUpdate": true,
   "plugins": [
     {
       "name": "naphatwx-tools",
