@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "My personal commands shared across PCs",
   "commands": [
-    "./commands/commit.md"
+    "./commands/commit.md",
+    "./commands/review-code-boss.md"
   ],
   "skills": [
     "./skills/user-guide.md"
