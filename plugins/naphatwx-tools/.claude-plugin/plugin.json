@@ -7,6 +7,6 @@
     "./commands/review-code.md"
   ],
   "skills": [
-    "./skills/user-guide.md"
+    "./skills/user-guide"
   ]
 }

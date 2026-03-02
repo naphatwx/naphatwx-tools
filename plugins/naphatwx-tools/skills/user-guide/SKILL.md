@@ -2,6 +2,7 @@
 name: user-guide
 description: Generate user-facing documentation for features
 allowed-tools: Read, Glob, Grep, WebSearch, AskUserQuestion, Write
+user-invocable: true
 ---
 
 # User Guide Generator
