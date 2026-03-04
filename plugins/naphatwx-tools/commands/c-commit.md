@@ -18,10 +18,12 @@ $ARGUMENTS
 
 ### 1. Gather Context
 
+**IMPORTANT**: Only analyze staged changes. Do NOT check unstaged changes or suggest staging files. The user manages staging themselves.
+
 Run the following commands to understand the current state:
 
 1. `git diff --staged` — get the full staged diff.
-2. `git diff --staged --stat` — get a summary of changed files to help identify scope.
+2. `git diff --staged --stat` — get a summary of staged files to help identify scope.
 3. `git branch --show-current` — check the branch name for issue tickets.
 4. `git log --oneline -5` — get recent commit messages to match the project's existing style.
 
