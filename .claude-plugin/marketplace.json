@@ -6,10 +6,10 @@
 	"autoUpdate": true,
 	"plugins": [
 		{
-			"name": "c",
+			"name": "naphatwx-tools",
 			"source": "./plugins/naphatwx-tools",
 			"description": "My personal tools",
-			"version": "1.1.0"
+			"version": "1.2.0"
 		}
 	]
 }
