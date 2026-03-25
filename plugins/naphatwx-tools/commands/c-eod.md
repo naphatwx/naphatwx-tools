@@ -1,4 +1,10 @@
-Create a work log for the next workday and finalize today's log.
+---
+name: c-eod
+description: Finalize today's work log and create the next workday log with carry-over items
+allowed-tools: Bash, Read, Write, Edit, Glob
+---
+
+Finalize today's work log and create the next workday log with carry-over items.
 
 ## Steps
 
