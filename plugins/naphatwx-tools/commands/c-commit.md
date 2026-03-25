@@ -27,3 +27,10 @@ Generate a conventional commit from staged changes. Arguments: `$ARGUMENTS` (opt
    )"
    ```
 5. Show the commit result.
+6. Update daily log (if it exists):
+   - Check if `PRIVATE/LOG/{today's date}.md` exists
+   - If **not found** → skip, do nothing
+   - If **found** → append the new commit to the `## Commits today` table
+     - Get the short hash and message from the commit just created
+     - Add a new row: `| \`{hash}\` | {message} |`
+     - Keep existing rows intact — only append
