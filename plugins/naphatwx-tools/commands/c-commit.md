@@ -30,7 +30,13 @@ Generate a conventional commit from staged changes. Arguments: `$ARGUMENTS` (opt
 6. Update daily log (if it exists):
    - Check if `PRIVATE/LOG/{today's date}.md` exists
    - If **not found** → skip, do nothing
-   - If **found** → append the new commit to the `## Commits today` table
-     - Get the short hash and message from the commit just created
-     - Add a new row: `| \`{hash}\` | {message} |`
-     - Keep existing rows intact — only append
+   - If **found**:
+     a. Append the new commit to the `## Commits today` table
+        - Get the short hash and message from the commit just created
+        - Add a new row: `| \`{hash}\` | {message} |`
+        - Keep existing rows intact — only append
+     b. Summarize what was done since the last commit entry in the log
+        - Compare `git diff HEAD~1` to get changes in this commit
+        - Write a short one-line summary under a `## Work log` section
+        - Format: `- {short summary of what changed and why}`
+        - Create the `## Work log` section if it doesn't exist (place it between `## Commits today` and `## Still todo`)
