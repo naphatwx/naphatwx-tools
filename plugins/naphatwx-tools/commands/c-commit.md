@@ -27,4 +27,3 @@ Generate a conventional commit from staged changes. Arguments: `$ARGUMENTS` (opt
    )"
    ```
 5. Show the commit result.
-6. Update daily log by invoking the `daily-log` skill with action `commit`.
