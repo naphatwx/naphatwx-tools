@@ -1,15 +1,15 @@
 {
 	"name": "naphatwx-tools",
-	"version": "1.6.0",
+	"version": "1.7.0",
 	"description": "My personal commands shared across PCs",
 	"commands": [
 		"./commands/c-commit.md",
 		"./commands/c-eod.md",
-		"./commands/c-init-log.md",
 		"./commands/c-plugin-info.md",
 		"./commands/c-review-code.md"
 	],
 	"skills": [
-		"./skills/c-user-guide"
+		"./skills/c-user-guide",
+		"./skills/daily-log"
 	]
 }
