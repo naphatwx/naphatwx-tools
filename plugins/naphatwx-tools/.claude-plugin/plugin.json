@@ -1,6 +1,6 @@
 {
 	"name": "naphatwx-tools",
-	"version": "1.7.0",
+	"version": "1.8.0",
 	"description": "My personal commands shared across PCs",
 	"commands": [
 		"./commands/c-commit.md",
@@ -9,7 +9,7 @@
 		"./commands/c-review-code.md"
 	],
 	"skills": [
-		"./skills/c-user-guide",
-		"./skills/daily-log"
+		"./skills/c-daily-log",
+		"./skills/c-user-guide"
 	]
 }
