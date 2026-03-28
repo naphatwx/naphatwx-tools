@@ -1,5 +1,5 @@
 ---
-name: daily-log
+name: c-troubleshoot
 description: Log troubleshooting issues encountered during work — problems, causes, and fixes.
 ---
 
