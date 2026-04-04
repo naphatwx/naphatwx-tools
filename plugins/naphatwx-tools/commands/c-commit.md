@@ -26,4 +26,7 @@ Generate a conventional commit from staged changes. Arguments: `$ARGUMENTS` (opt
    EOF
    )"
    ```
-5. Show the commit result.
+5. After a successful commit, display the result in this format:
+   - **Committed `<short-hash>`:**
+   - The full commit message (subject, body, footers) in a code block
+   - The diffstat summary (e.g. "3 files changed, 45 insertions(+), 12 deletions(-)")
