@@ -8,12 +8,12 @@ Commit staged changes with a conventional commit message. Arguments: `$ARGUMENTS
 
 ## Flags
 
-- `--result` — print full commit details after commit.
-- Default — print nothing on success (silent).
+- `--result` — wait for commit, then print full commit details.
+- Default — fire-and-forget. Trigger commit in background and exit immediately.
 
 ## Steps
 
-1. Run `git diff --staged` in background.
+1. Run `git diff --staged`.
     - If output is empty → stop. Do nothing. Do not print anything.
     - Do **not** run `git log`, `git status`, or any history command.
 2. Generate a commit message from the diff only:
@@ -22,22 +22,23 @@ Commit staged changes with a conventional commit message. Arguments: `$ARGUMENTS
     - Scope: infer from changed paths; omit if changes span many areas
     - Subject: imperative, lowercase after colon, no period, max 72 chars
     - Add body only when subject alone is unclear
-3. Commit in background:
-    ```bash
-    git commit -m "$(cat <<'EOF'
-    <message>
-    )"
-    ```
-4. Output rules:
-    - If `$ARGUMENTS` contains `--result`:
-        - Print `**Committed `<short-hash>`:**`
-        - Print full commit message in a code block
-        - Print diffstat (`git show --stat --format=`)
-    - Otherwise: print nothing.
+3. Run the commit based on flag:
+    - **Default (no `--result`)**:
+        - Run `git commit` with `run_in_background: true`.
+        - Do **not** read the background output.
+        - Do **not** wait for completion.
+        - Print nothing. Exit immediately.
+    - **With `--result`**:
+        - Run `git commit` normally (foreground, **no** `run_in_background`).
+        - Read the command output directly.
+        - On success, print:
+            - `**Committed `<short-hash>`:**`
+            - Full commit message in a code block
+            - Diffstat from `git show --stat --format=`
+        - On failure (hook error, etc.) → print the error and stop.
 
 ## Rules
 
 - Never run `git log` or fetch commit history — wastes tokens.
 - Never run `git status` — `git diff --staged` is enough.
-- All `git` calls use `run_in_background: true`.
-- If commit fails (hook error, etc.) → print the error and stop.
+- Default mode is trigger-and-forget. Never poll or read background output.
