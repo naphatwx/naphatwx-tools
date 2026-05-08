@@ -1,15 +1,15 @@
 {
-	"name": "naphatwx-marketplace",
-	"owner": {
-		"name": "naphatwx"
-	},
-	"autoUpdate": true,
-	"plugins": [
-		{
-			"name": "naphatwx-tools",
-			"source": "./plugins/naphatwx-tools",
-			"description": "My personal tools",
-			"version": "1.9.3"
-		}
-	]
+    "name": "naphatwx-marketplace",
+    "owner": {
+        "name": "naphatwx"
+    },
+    "autoUpdate": true,
+    "plugins": [
+        {
+            "name": "naphatwx-tools",
+            "source": "./plugins/naphatwx-tools",
+            "description": "My personal tools",
+            "version": "1.9.3"
+        }
+    ]
 }
