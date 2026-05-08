@@ -27,11 +27,12 @@ Commit staged changes with a conventional commit message.
 - Use the **full message you generated in step 2** for the body — do not re-derive from `git commit` output (it only shows the subject).
 - **Do not** run `git show`, `git log`, or any extra command.
 
-Print exactly this:
+Print exactly this (note the inner fenced block around the message):
 
-```
+````
 **Committed `<short-hash>`:**
 
+```
 <subject line>
 
 <body paragraph 1>
@@ -39,15 +40,17 @@ Print exactly this:
 <body paragraph 2>
 
 ...
+```
 
 - <X> files changed, <Y> insertions(+), <Z> deletions(-)
-```
+````
 
 Rules for the message block:
 
 - Include subject, body, and any trailers (e.g. `Refs: MUT-4691`) exactly as committed.
 - Preserve blank lines between paragraphs.
-- No leading `> ` quote, no code fence around the message.
+- Wrap the message block (subject + body + trailers) in a fenced code block with no language tag.
+- No leading `> ` quote.
 
 Example `git commit` output to parse for hash + diffstat:
 
@@ -60,9 +63,10 @@ Example `git commit` output to parse for hash + diffstat:
 
 Example final output:
 
-```
+````
 **Committed `f45ddaf`:**
 
+```
 feat(monorepo-build): re-enable MISSING apps when they reappear in manifest
 
 Add reEnableMissingApps() function to ntb_monorepo_build.groovy that
@@ -71,9 +75,10 @@ turbo-manifest.yaml and updates them to ENABLED. DISABLED apps are
 never touched.
 
 Refs: MUT-4691
+```
 
 - 8 files changed, 475 insertions(+), 2 deletions(-)
-```
+````
 
 ## Rules
 
