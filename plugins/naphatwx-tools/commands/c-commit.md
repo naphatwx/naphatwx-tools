@@ -16,7 +16,14 @@ Commit staged changes with a conventional commit message.
     - Types: `feat` `fix` `refactor` `chore` `docs` `test` `style` `perf` `ci`
     - Scope: infer from changed paths; omit if changes span many areas
     - Subject: imperative, lowercase after colon, no period, max 72 chars
-    - Add body only when subject alone is unclear
+    - **Always** include a body. Structure:
+        - One short paragraph (1–3 sentences) explaining **what** changed and **why**.
+        - Blank line.
+        - Bullet list of notable changes — one bullet per file, feature, or logical change.
+            - Each bullet starts with `- ` and uses imperative voice.
+            - Reference file/path or function name when helpful.
+        - Wrap body lines at ~72 chars.
+    - Add trailers (e.g. `Refs: TICKET-123`) only if a ticket id appears in the diff.
 3. Run `git commit -m "<message>"`.
     - On failure (hook error, etc.) → print the error and stop.
     - On success → print result (see below).
@@ -47,7 +54,7 @@ Print exactly this (note the inner fenced block around the message):
 
 Rules for the message block:
 
-- Include subject, body, and any trailers (e.g. `Refs: MUT-4691`) exactly as committed.
+- Include subject, body, and any trailers (e.g. `Refs: TICKET-123`) exactly as committed.
 - Preserve blank lines between paragraphs.
 - Wrap the message block (subject + body + trailers) in a fenced code block with no language tag.
 - No leading `> ` quote.
@@ -55,29 +62,30 @@ Rules for the message block:
 Example `git commit` output to parse for hash + diffstat:
 
 ```
-[main f45ddaf] feat(monorepo-build): re-enable MISSING apps...
- 8 files changed, 475 insertions(+), 2 deletions(-)
+[main abc1234] <type>(<scope>): <subject>
+ <X> files changed, <Y> insertions(+), <Z> deletions(-)
 ```
 
-→ short hash = `f45ddaf`, diffstat = `8 files changed, 475 insertions(+), 2 deletions(-)`.
+→ short hash = `abc1234`, diffstat = `<X> files changed, <Y> insertions(+), <Z> deletions(-)`.
 
 Example final output:
 
 ````
-**Committed `f45ddaf`:**
+**Committed `abc1234`:**
 
 ```
-feat(monorepo-build): re-enable MISSING apps when they reappear in manifest
+<type>(<scope>): <subject>
 
-Add reEnableMissingApps() function to ntb_monorepo_build.groovy that
-detects apps with MISSING status in Thanos whose names are back in
-turbo-manifest.yaml and updates them to ENABLED. DISABLED apps are
-never touched.
+<Short paragraph explaining what changed and why. Keep it focused
+on the motivation, not a restatement of the diff. Wrap around 72
+characters per line.>
 
-Refs: MUT-4691
+- <Notable change 1 — file, function, or feature>
+- <Notable change 2>
+- <Notable change 3>
 ```
 
-- 8 files changed, 475 insertions(+), 2 deletions(-)
+- <X> files changed, <Y> insertions(+), <Z> deletions(-)
 ````
 
 ## Rules
