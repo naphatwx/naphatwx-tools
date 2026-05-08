@@ -23,19 +23,33 @@ Commit staged changes with a conventional commit message.
 
 ## Output format
 
-Parse the short hash and diffstat directly from `git commit` output. **Do not** run `git show`, `git log`, or any extra command.
+- Parse the short hash and diffstat from `git commit` output.
+- Use the **full message you generated in step 2** for the body — do not re-derive from `git commit` output (it only shows the subject).
+- **Do not** run `git show`, `git log`, or any extra command.
 
 Print exactly this:
 
 ```
 **Committed `<short-hash>`:**
 
-<full commit message>
+<subject line>
+
+<body paragraph 1>
+
+<body paragraph 2>
+
+...
 
 - <X> files changed, <Y> insertions(+), <Z> deletions(-)
 ```
 
-Example `git commit` output to parse:
+Rules for the message block:
+
+- Include subject, body, and any trailers (e.g. `Refs: MUT-4691`) exactly as committed.
+- Preserve blank lines between paragraphs.
+- No leading `> ` quote, no code fence around the message.
+
+Example `git commit` output to parse for hash + diffstat:
 
 ```
 [main f45ddaf] feat(monorepo-build): re-enable MISSING apps...
@@ -43,6 +57,23 @@ Example `git commit` output to parse:
 ```
 
 → short hash = `f45ddaf`, diffstat = `8 files changed, 475 insertions(+), 2 deletions(-)`.
+
+Example final output:
+
+```
+**Committed `f45ddaf`:**
+
+feat(monorepo-build): re-enable MISSING apps when they reappear in manifest
+
+Add reEnableMissingApps() function to ntb_monorepo_build.groovy that
+detects apps with MISSING status in Thanos whose names are back in
+turbo-manifest.yaml and updates them to ENABLED. DISABLED apps are
+never touched.
+
+Refs: MUT-4691
+
+- 8 files changed, 475 insertions(+), 2 deletions(-)
+```
 
 ## Rules
 
