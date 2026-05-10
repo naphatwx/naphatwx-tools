@@ -18,3 +18,4 @@ Open Claude Code in your terminal and run the following command to register this
 
 ```bash
 /plugin marketplace add https://github.com/naphatwx/naphatwx-tools.git
+```
