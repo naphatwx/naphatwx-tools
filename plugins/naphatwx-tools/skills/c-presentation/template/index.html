@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: #0f172a;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  /* 16:9 stage, centered, scales to fit viewport */
+  .stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 56.25vw;        /* 16:9 */
+    max-height: 100vh;
+    max-width: 177.78vh;    /* 16:9 */
+    background: #1e293b;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease;
+    color: #f1f5f9;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .slide h1 {
+    font-size: 4vw;
+    margin-bottom: 2vw;
+    line-height: 1.15;
+  }
+
+  .slide h2 {
+    font-size: 2.6vw;
+    margin-bottom: 1.5vw;
+  }
+
+  .slide p {
+    font-size: 1.6vw;
+    max-width: 70%;
+    line-height: 1.6;
+    color: #cbd5e1;
+  }
+
+  .slide ul,
+  .slide ol {
+    font-size: 1.6vw;
+    line-height: 1.9;
+    color: #cbd5e1;
+    text-align: left;
+    padding-left: 1.5em;
+  }
+
+  .slide ul { list-style: disc; }
+  .slide ol { list-style: decimal; }
+
+  .slide li { padding-left: 0.3em; }
+  .slide li::marker { color: #38bdf8; }
+
+  .badge {
+    font-size: 1.1vw;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #38bdf8;
+    margin-bottom: 1.5vw;
+  }
+
+  /* per-slide background accents */
+  #s0 { background: linear-gradient(135deg, #0f172a, #1e3a8a); }
+  #s1 { background: linear-gradient(135deg, #1e293b, #312e81); }
+  #s2 { background: linear-gradient(135deg, #0f172a, #134e4a); }
+  #s3 { background: linear-gradient(135deg, #1e1b4b, #7c2d12); }
+  #s4 { background: linear-gradient(135deg, #0f172a, #581c87); }
+
+  /* click zones */
+  .nav-zone {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 35%;
+    z-index: 10;
+    cursor: pointer;
+  }
+  .nav-zone.left { left: 0; }
+  .nav-zone.right { right: 0; }
+
+  .counter {
+    position: absolute;
+    bottom: 2.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.1vw;
+    color: #64748b;
+    z-index: 20;
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 2.5%;
+    font-size: 0.95vw;
+    color: #475569;
+    z-index: 20;
+  }
+  .hint.left { left: 3%; }
+  .hint.right { right: 3%; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <section class="slide active" id="s0">
+      <div class="badge">Quarterly Review</div>
+      <h1>Project Aurora</h1>
+      <p>Building tomorrow's tools, one iteration at a time.</p>
+    </section>
+
+    <section class="slide" id="s1">
+      <h2>Where We Started</h2>
+      <ul>
+        <li>Three scattered services</li>
+        <li>Manual deploy every Friday</li>
+        <li>Coffee-fueled debugging nights</li>
+      </ul>
+    </section>
+
+    <section class="slide" id="s2">
+      <h2>The Numbers</h2>
+      <p>Page loads dropped from 4.2s to 0.8s. Error rate fell by 73%. Users stayed twice as long.</p>
+    </section>
+
+    <section class="slide" id="s3">
+      <h2>What Surprised Us</h2>
+      <ol>
+        <li>Small fixes beat big rewrites</li>
+        <li>Docs saved more time than code</li>
+        <li>The cat in the team photo got the most likes</li>
+      </ol>
+    </section>
+
+    <section class="slide" id="s4">
+      <div class="badge">Thank You</div>
+      <h1>Questions?</h1>
+      <p>Click left to revisit. Click right to wrap up.</p>
+    </section>
+
+    <div class="nav-zone left" onclick="prev()"></div>
+    <div class="nav-zone right" onclick="next()"></div>
+
+    <div class="hint left">◀ prev</div>
+    <div class="hint right">next ▶</div>
+    <div class="counter"><span id="cur">1</span> / <span id="total">5</span></div>
+  </div>
+
+<script>
+  const slides = document.querySelectorAll(".slide");
+  const curEl = document.getElementById("cur");
+  const leftHint = document.querySelector(".hint.left");
+  const rightHint = document.querySelector(".hint.right");
+  let i = 0;
+
+  document.getElementById("total").textContent = slides.length;
+
+  function show(n) {
+    // clamp: no wrap-around at first/last page
+    n = Math.max(0, Math.min(n, slides.length - 1));
+    if (n === i) return;
+    slides[i].classList.remove("active");
+    i = n;
+    slides[i].classList.add("active");
+    curEl.textContent = i + 1;
+    updateHints();
+  }
+
+  function updateHints() {
+    leftHint.style.visibility = i === 0 ? "hidden" : "visible";
+    rightHint.style.visibility = i === slides.length - 1 ? "hidden" : "visible";
+  }
+
+  function next() { show(i + 1); }
+  function prev() { show(i - 1); }
+
+  // keyboard support
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") next();
+    if (e.key === "ArrowLeft") prev();
+  });
+
+  updateHints();
+</script>
+</body>
+</html>
