@@ -7,6 +7,8 @@ description: Create an HTML slide presentation (16:9, click-zone navigation, fad
 
 Create a single-file HTML slide presentation from a bundled template.
 
+The template uses a minimal style on a light grey background (`#d3d3d3`).
+
 ## User Input
 
 ```text
@@ -41,7 +43,8 @@ The output **must** keep all of these:
 - If the user gave a topic, replace the slide content with that topic.
 - If not, keep the placeholder random content.
 - Keep 4-6 slides unless the user asks otherwise.
-- Only edit text inside `<section class="slide">` blocks and the per-slide background colors.
+- Only edit text inside `<section class="slide">` blocks.
+- Keep the minimal style and the light grey `#d3d3d3` background.
 - Do not change the navigation script or the layout CSS.
 
 ### 3. Write the file

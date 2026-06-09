@@ -9,7 +9,7 @@
 
   html, body {
     height: 100%;
-    background: #0f172a;
+    background: #d3d3d3;
     font-family: "Segoe UI", system-ui, sans-serif;
     overflow: hidden;
   }
@@ -24,9 +24,8 @@
     height: 56.25vw;        /* 16:9 */
     max-height: 100vh;
     max-width: 177.78vh;    /* 16:9 */
-    background: #1e293b;
+    background: #d3d3d3;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   }
 
   .slide {
@@ -41,7 +40,8 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.6s ease;
-    color: #f1f5f9;
+    color: #1a1a1a;
+    background: #d3d3d3;
   }
 
   .slide.active {
@@ -51,12 +51,14 @@
 
   .slide h1 {
     font-size: 4vw;
+    font-weight: 600;
     margin-bottom: 2vw;
     line-height: 1.15;
   }
 
   .slide h2 {
     font-size: 2.6vw;
+    font-weight: 600;
     margin-bottom: 1.5vw;
   }
 
@@ -64,14 +66,14 @@
     font-size: 1.6vw;
     max-width: 70%;
     line-height: 1.6;
-    color: #cbd5e1;
+    color: #333;
   }
 
   .slide ul,
   .slide ol {
     font-size: 1.6vw;
     line-height: 1.9;
-    color: #cbd5e1;
+    color: #333;
     text-align: left;
     padding-left: 1.5em;
   }
@@ -80,22 +82,15 @@
   .slide ol { list-style: decimal; }
 
   .slide li { padding-left: 0.3em; }
-  .slide li::marker { color: #38bdf8; }
+  .slide li::marker { color: #555; }
 
   .badge {
     font-size: 1.1vw;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: #38bdf8;
+    color: #666;
     margin-bottom: 1.5vw;
   }
-
-  /* per-slide background accents */
-  #s0 { background: linear-gradient(135deg, #0f172a, #1e3a8a); }
-  #s1 { background: linear-gradient(135deg, #1e293b, #312e81); }
-  #s2 { background: linear-gradient(135deg, #0f172a, #134e4a); }
-  #s3 { background: linear-gradient(135deg, #1e1b4b, #7c2d12); }
-  #s4 { background: linear-gradient(135deg, #0f172a, #581c87); }
 
   /* click zones */
   .nav-zone {
@@ -115,7 +110,7 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 1.1vw;
-    color: #64748b;
+    color: #888;
     z-index: 20;
   }
 
@@ -123,7 +118,7 @@
     position: absolute;
     bottom: 2.5%;
     font-size: 0.95vw;
-    color: #475569;
+    color: #999;
     z-index: 20;
   }
   .hint.left { left: 3%; }
