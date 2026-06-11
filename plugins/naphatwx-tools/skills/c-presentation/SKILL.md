@@ -18,7 +18,9 @@ $ARGUMENTS
 **Expected format:** `<topic>` or `<topic> <output-path>` (both optional)
 
 - No topic → use placeholder random content.
-- No output path → write `index.html` at the project root.
+- No output path → write `<topic>.html` at the project root.
+  - Use the topic as the file name, in kebab-case.
+  - No topic → write `presentation.html`.
 
 ## Hard Rules
 
@@ -49,7 +51,9 @@ The output **must** keep all of these:
 
 ### 3. Write the file
 
-- Default: `index.html` at the project root.
+- Default: `<topic>.html` at the project root.
+  - Use the topic as the file name, in kebab-case.
+  - No topic → use `presentation.html`.
 - Custom: write to the path the user gave.
 
 ### 4. Confirm
