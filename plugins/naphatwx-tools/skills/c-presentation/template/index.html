@@ -1,17 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Presentation</title>
 <style>
+  /* dark theme (default) */
+  :root,
+  [data-theme="dark"] {
+    --bg: #1a1a1a;
+    --heading: #f5f5f5;
+    --text: #cfcfcf;
+    --badge: #999;
+    --marker: #aaa;
+    --counter: #777;
+    --hint: #666;
+    --toggle-bg: rgba(255, 255, 255, 0.08);
+    --toggle-fg: #ddd;
+  }
+
+  /* light theme */
+  [data-theme="light"] {
+    --bg: #d3d3d3;
+    --heading: #1a1a1a;
+    --text: #333;
+    --badge: #666;
+    --marker: #555;
+    --counter: #888;
+    --hint: #999;
+    --toggle-bg: rgba(0, 0, 0, 0.06);
+    --toggle-fg: #333;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
     height: 100%;
-    background: #d3d3d3;
+    background: var(--bg);
     font-family: "Segoe UI", system-ui, sans-serif;
     overflow: hidden;
+    transition: background 0.4s ease;
   }
 
   /* 16:9 stage, centered, scales to fit viewport */
@@ -24,8 +52,9 @@
     height: 56.25vw;        /* 16:9 */
     max-height: 100vh;
     max-width: 177.78vh;    /* 16:9 */
-    background: #d3d3d3;
+    background: var(--bg);
     overflow: hidden;
+    transition: background 0.4s ease;
   }
 
   .slide {
@@ -40,8 +69,8 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.6s ease;
-    color: #1a1a1a;
-    background: #d3d3d3;
+    color: var(--heading);
+    background: var(--bg);
   }
 
   .slide.active {
@@ -66,14 +95,14 @@
     font-size: 1.6vw;
     max-width: 70%;
     line-height: 1.6;
-    color: #333;
+    color: var(--text);
   }
 
   .slide ul,
   .slide ol {
     font-size: 1.6vw;
     line-height: 1.9;
-    color: #333;
+    color: var(--text);
     text-align: left;
     padding-left: 1.5em;
   }
@@ -82,13 +111,13 @@
   .slide ol { list-style: decimal; }
 
   .slide li { padding-left: 0.3em; }
-  .slide li::marker { color: #555; }
+  .slide li::marker { color: var(--marker); }
 
   .badge {
     font-size: 1.1vw;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: #666;
+    color: var(--badge);
     margin-bottom: 1.5vw;
   }
 
@@ -110,7 +139,7 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 1.1vw;
-    color: #888;
+    color: var(--counter);
     z-index: 20;
   }
 
@@ -118,11 +147,31 @@
     position: absolute;
     bottom: 2.5%;
     font-size: 0.95vw;
-    color: #999;
+    color: var(--hint);
     z-index: 20;
   }
   .hint.left { left: 3%; }
   .hint.right { right: 3%; }
+
+  /* theme toggle */
+  .theme-toggle {
+    position: absolute;
+    top: 2.5%;
+    right: 3%;
+    z-index: 30;
+    border: none;
+    border-radius: 50%;
+    width: 3vw;
+    height: 3vw;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 1.3vw;
+    line-height: 1;
+    cursor: pointer;
+    background: var(--toggle-bg);
+    color: var(--toggle-fg);
+    transition: background 0.3s ease;
+  }
 </style>
 </head>
 <body>
@@ -162,6 +211,8 @@
       <p>Click left to revisit. Click right to wrap up.</p>
     </section>
 
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (t)">🌙</button>
+
     <div class="nav-zone left" onclick="prev()"></div>
     <div class="nav-zone right" onclick="next()"></div>
 
@@ -175,6 +226,7 @@
   const curEl = document.getElementById("cur");
   const leftHint = document.querySelector(".hint.left");
   const rightHint = document.querySelector(".hint.right");
+  const toggleBtn = document.querySelector(".theme-toggle");
   let i = 0;
 
   document.getElementById("total").textContent = slides.length;
@@ -198,10 +250,19 @@
   function next() { show(i + 1); }
   function prev() { show(i - 1); }
 
+  // dark is default; toggle swaps to light and back
+  function toggleTheme() {
+    const root = document.documentElement;
+    const dark = root.getAttribute("data-theme") !== "light";
+    root.setAttribute("data-theme", dark ? "light" : "dark");
+    toggleBtn.textContent = dark ? "☀️" : "🌙";
+  }
+
   // keyboard support
   document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") next();
     if (e.key === "ArrowLeft") prev();
+    if (e.key === "t" || e.key === "T") toggleTheme();
   });
 
   updateHints();

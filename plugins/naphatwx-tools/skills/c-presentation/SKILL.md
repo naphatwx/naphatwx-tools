@@ -7,7 +7,11 @@ description: Create an HTML slide presentation (16:9, click-zone navigation, fad
 
 Create a single-file HTML slide presentation from a bundled template.
 
-The template uses a minimal style on a light grey background (`#d3d3d3`).
+The template uses a minimal style with two themes.
+
+- Dark theme is the default (`#1a1a1a` background).
+- Light theme uses a light grey background (`#d3d3d3`).
+- A toggle button (top right) or the `t` key switches themes.
 
 ## User Input
 
@@ -32,6 +36,7 @@ The output **must** keep all of these:
 4. First slide → cannot go to previous.
 5. Last slide → cannot go to next.
 6. Single self-contained file. No external CSS, JS, or images.
+7. Dark theme is the default. Light theme reachable through the toggle.
 
 ## Workflow
 
@@ -46,8 +51,9 @@ The output **must** keep all of these:
 - If not, keep the placeholder random content.
 - Keep 4-6 slides unless the user asks otherwise.
 - Only edit text inside `<section class="slide">` blocks.
-- Keep the minimal style and the light grey `#d3d3d3` background.
-- Do not change the navigation script or the layout CSS.
+- Keep the minimal style and the two themes.
+- Keep dark theme as the default.
+- Do not change the navigation script, theme toggle, or the layout CSS.
 
 ### 3. Write the file
 
@@ -60,3 +66,4 @@ The output **must** keep all of these:
 
 - Output: `✅ Presentation created at: {path}`
 - Remind the user: click left or right to move, arrow keys also work.
+- Remind the user: click the toggle or press `t` to switch dark and light themes.
