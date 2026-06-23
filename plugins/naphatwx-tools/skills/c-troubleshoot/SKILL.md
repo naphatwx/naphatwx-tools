@@ -39,6 +39,7 @@ Record a problem encountered during work.
     - **Cause:** Why did it happen?
     - **Fix:** How was it resolved?
 4. Append to the `## Issues encountered` section:
+
     ```markdown
     ### {short problem title}
 
@@ -46,6 +47,7 @@ Record a problem encountered during work.
     - **Cause:** {why it happened}
     - **Fix:** {how it was resolved}
     ```
+
 5. If the user provides only a short description, ask follow-up questions to fill in cause and fix.
 
 ---

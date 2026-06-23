@@ -23,8 +23,8 @@ $ARGUMENTS
 
 - No topic → use placeholder random content.
 - No output path → write `<topic>.html` at the project root.
-  - Use the topic as the file name, in kebab-case.
-  - No topic → write `presentation.html`.
+    - Use the topic as the file name, in kebab-case.
+    - No topic → write `presentation.html`.
 
 ## Hard Rules
 
@@ -58,8 +58,8 @@ The output **must** keep all of these:
 ### 3. Write the file
 
 - Default: `<topic>.html` at the project root.
-  - Use the topic as the file name, in kebab-case.
-  - No topic → use `presentation.html`.
+    - Use the topic as the file name, in kebab-case.
+    - No topic → use `presentation.html`.
 - Custom: write to the path the user gave.
 
 ### 4. Confirm

@@ -18,13 +18,13 @@ $ARGUMENTS
 **Expected format:** `<topic>` plus a source location, both optional.
 
 - Source is whatever the user points to.
-  - A file, a folder, or a `docs/` path.
-  - The user tells you where it is.
+    - A file, a folder, or a `docs/` path.
+    - The user tells you where it is.
 - No source given → ask once where the content should come from.
-  - Offer to use placeholder content if they have no source.
+    - Offer to use placeholder content if they have no source.
 - No output path → write `<topic>.html` at the project root.
-  - Use the topic as the file name, in kebab-case.
-  - No topic → write `docs.html`.
+    - Use the topic as the file name, in kebab-case.
+    - No topic → write `docs.html`.
 
 ## Hard Rules
 
@@ -42,9 +42,9 @@ The output **must** keep all of these:
 
 - Use Glob and Grep to find and read the files the user pointed to.
 - Extract:
-  - Topic and overview.
-  - Main sections and sub-sections.
-  - Steps, code samples, terms, tables, and warnings.
+    - Topic and overview.
+    - Main sections and sub-sections.
+    - Steps, code samples, terms, tables, and warnings.
 - No source → ask where it is, or use placeholder content.
 
 ### 2. Copy the template
@@ -57,19 +57,19 @@ The output **must** keep all of these:
 
 - Replace the `<title>`, the brand name, and the `badge` text.
 - Rewrite the sidebar `nav` to match the real sections.
-  - Group links under `nav-group-title` headings.
-  - Each `nav-link` `href="#id"` must point to a heading with that `id`.
+    - Group links under `nav-group-title` headings.
+    - Each `nav-link` `href="#id"` must point to a heading with that `id`.
 - Rewrite the `article.content` with the real documentation.
 - Reuse the components already in the template:
 
-| Component | Markup to copy |
-| --------- | -------------- |
-| Section heading | `<h2 id="...">` (must match a nav link) |
-| Card grid | `<div class="card-grid"> … <a class="card">` |
-| Callout | `<div class="callout">`, `.warn`, or `.danger` |
-| Numbered steps | `<ol class="steps"> <li><strong>…</strong>…</li>` |
-| Code block | `<pre><code>…</code></pre>` |
-| Table | `<div class="table-wrap"><table>…</table></div>` |
+| Component       | Markup to copy                                    |
+| --------------- | ------------------------------------------------- |
+| Section heading | `<h2 id="...">` (must match a nav link)           |
+| Card grid       | `<div class="card-grid"> … <a class="card">`      |
+| Callout         | `<div class="callout">`, `.warn`, or `.danger`    |
+| Numbered steps  | `<ol class="steps"> <li><strong>…</strong>…</li>` |
+| Code block      | `<pre><code>…</code></pre>`                       |
+| Table           | `<div class="table-wrap"><table>…</table></div>`  |
 
 - Keep the dark default and the theme toggle.
 
