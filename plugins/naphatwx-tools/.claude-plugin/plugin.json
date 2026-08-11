@@ -1,13 +1,13 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.22",
+    "version": "1.9.23",
     "description": "My personal commands shared across PCs",
     "commands": [
         "./commands/c-commit.md",
         "./commands/c-parallel.md",
         "./commands/c-plugins.md",
         "./commands/c-review-code.md",
-        "./commands/c-describe-mr.md",
+        "./commands/c-describe-merge-request.md",
         "./commands/c-changelog.md"
     ],
     "skills": [
