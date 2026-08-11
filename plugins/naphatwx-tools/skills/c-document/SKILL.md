@@ -1,5 +1,5 @@
 ---
-name: c-docs
+name: c-document
 description: Generate a styled single-file HTML documentation page (dark mode by default, light/dark toggle, sidebar nav, search). Use when the user asks to build or generate HTML docs, a docs page, or styled documentation instead of plain markdown.
 ---
 

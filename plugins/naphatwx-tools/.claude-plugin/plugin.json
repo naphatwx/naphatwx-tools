@@ -1,20 +1,20 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.21",
+    "version": "1.9.22",
     "description": "My personal commands shared across PCs",
     "commands": [
         "./commands/c-commit.md",
         "./commands/c-parallel.md",
-        "./commands/c-plugin-info.md",
+        "./commands/c-plugins.md",
         "./commands/c-review-code.md",
-        "./commands/c-mr-desc.md",
+        "./commands/c-describe-mr.md",
         "./commands/c-changelog.md"
     ],
     "skills": [
         "./skills/c-troubleshoot",
         "./skills/c-user-guide",
         "./skills/c-presentation",
-        "./skills/c-docs",
+        "./skills/c-document",
         "./skills/c-multi-column-sort",
         "./skills/c-work-log"
     ]
