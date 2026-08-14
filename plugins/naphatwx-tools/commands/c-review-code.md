@@ -1,7 +1,8 @@
 ---
 name: c-review-code
-description: Review code changes
-allowed-tools: Read, Glob, Grep
+description: Review code changes (staged changes or a GitLab merge request)
+argument-hint: [staged | <merge-request-url> | file paths...]
+allowed-tools: Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__get_file_contents
 ---
 
 # Code Review Agent
@@ -18,32 +19,45 @@ $ARGUMENTS
 
 ### 1. Determine Review Target
 
-If `$ARGUMENTS` is empty or contains "staged":
-- Review staged changes using `git diff --cached`
+**A. Staged changes** — `$ARGUMENTS` is empty or contains "staged":
+- Run `git diff --cached`.
+- If the diff is empty → do NOT review. Tell the user there are no staged
+  changes and to stage files first (`git add`), then stop.
 
-If `$ARGUMENTS` contains file paths or directory names:
-- Review the specified files/directories
+**B. GitLab merge request** — `$ARGUMENTS` contains an MR URL like
+`https://<host>/<group>/<project>/-/merge_requests/<iid>`:
+- Extract `project_id = <group>/<project>` and `merge_request_iid = <iid>`.
+- Fetch the MR via the gitlab MCP tool `get_merge_request`. Note
+  `diff_refs.base_sha` and `diff_refs.head_sha`.
+- If the fetch fails (bad URL, no access) → report the error and stop. Do not
+  guess another target.
+- Review only the SHA range `base_sha..head_sha`, NOT the whole branch (the
+  branch tip may be ahead of the MR head). Get changes via
+  `get_merge_request_diffs`, or `git diff <base_sha>..<head_sha>` when the
+  local checkout is the same repo.
+- If the diff is large, read it file by file — do NOT dump the whole diff.
 
-### 2. Detect App Context
+**C. Files / directories** — `$ARGUMENTS` contains file paths or directory
+names:
+- Review the specified files/directories.
 
-Based on the files being reviewed, identify the language and framework:
-- `.go` files → Go
-- `.ts`, `.tsx`, `.js`, `.jsx` files → JavaScript / TypeScript
-- `.py` files → Python
-- `.java`, `.kt` files → Java / Kotlin
-- `.rs` files → Rust
-- Detect framework from config files (e.g., `next.config.*`, `package.json`, `go.mod`, `pyproject.toml`)
+### 2. Load Guidelines
 
-### 3. Load Guidelines
+Default (staged, files, or an MR of the repo currently checked out — compare
+the MR project path with `git remote get-url origin`):
 
-Read the following files if they exist:
 1. `CONTRIBUTING.md` (root level)
 2. `AGENTS.md` (root level)
 3. `CONTRIBUTING.md` inside the affected app or module directory
 4. `AGENTS.md` inside the affected app or module directory
-5. Any `docs/` markdown files relevant to the changed files (e.g., design system, architecture)
+5. Only the `docs/` files that the guidelines above explicitly reference —
+   do not scan the whole `docs/` folder.
 
-### 4. Perform Review
+Rare case — the MR belongs to a different repo than the local checkout:
+- Fetch `CONTRIBUTING.md` and `AGENTS.md` from the MR's repo via
+  `get_file_contents` (ref = the MR target branch).
+
+### 3. Perform Review
 
 Review the code for:
 
@@ -82,7 +96,7 @@ Review the code for:
 - Test coverage considerations
 - Documentation needs
 
-### 5. Output Format
+### 4. Output Format
 
 **Files Reviewed**: [list of files]
 **Language / Framework**: [detected language and framework]
@@ -105,6 +119,9 @@ Review the code for:
 
 - PASS: No critical issues, ready to commit
 - FAIL: Critical issues found, must be fixed before commit
+
+Reference every finding as `file:line`. For an MR review, use line numbers
+from the MR head so findings map to the MR diff.
 
 ## Review Severity Levels
 
