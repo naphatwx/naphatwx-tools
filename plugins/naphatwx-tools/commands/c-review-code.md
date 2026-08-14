@@ -2,7 +2,7 @@
 name: c-review-code
 description: Review code changes (staged changes or a GitLab merge request)
 argument-hint: [staged | <merge-request-url> | file paths...]
-allowed-tools: Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__get_file_contents
+allowed-tools: Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__get_file_contents
 ---
 
 # Code Review Agent
@@ -122,6 +122,28 @@ Review the code for:
 
 Reference every finding as `file:line`. For an MR review, use line numbers
 from the MR head so findings map to the MR diff.
+
+### 5. Save Review to Spec PRIVATE Folder
+
+After generating the report, save a copy into the related spec's `PRIVATE`
+folder **if one exists**:
+
+1. **Find the related spec folder** under `specs/`:
+   - MR review → use the MR's source branch; staged/file review → use the
+     current git branch (`git branch --show-current`).
+   - Match the branch name to a `specs/<folder>/` (exact name, or the `NNN-`
+     prefixed variant).
+   - If no spec folder matches, skip this step silently.
+2. **Check for `specs/<folder>/PRIVATE/`**:
+   - Exists → write the full review report there. Missing → skip this step
+     (do NOT create the folder).
+3. **File naming** — always include the round number:
+   - MR review: `review-mr-<iid>-round-<n>.md` (e.g., `review-mr-1325-round-1.md`)
+   - Staged/file review: `review-<target>-round-<n>.md` (e.g.,
+     `review-staged-round-1.md`)
+   - `<n>` starts at 1. Never overwrite: use the next unused round number.
+4. Still print the report in the chat response as usual; the file is an
+   extra copy.
 
 ## Review Severity Levels
 
