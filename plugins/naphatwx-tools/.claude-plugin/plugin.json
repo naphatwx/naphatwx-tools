@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.25",
+    "version": "1.9.27",
     "description": "My personal commands shared across PCs",
     "commands": [
         "./commands/c-commit.md",
@@ -16,6 +16,7 @@
         "./skills/c-presentation",
         "./skills/c-document",
         "./skills/c-multi-column-sort",
-        "./skills/c-work-log"
+        "./skills/c-work-log",
+        "./skills/c-test-scenario"
     ]
 }
