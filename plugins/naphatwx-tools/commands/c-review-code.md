@@ -134,9 +134,8 @@ folder **if one exists**:
    - Match the branch name to a `specs/<folder>/` (exact name, or the `NNN-`
      prefixed variant).
    - If no spec folder matches, skip this step silently.
-2. **Check for `specs/<folder>/PRIVATE/`**:
-   - Exists → write the full review report there. Missing → skip this step
-     (do NOT create the folder).
+2. **Write the report to `specs/<folder>/PRIVATE/review-code/`**:
+   - Create `PRIVATE/` and `review-code/` if they do not exist.
 3. **File naming** — always include the round number:
    - MR review: `review-mr-<iid>-round-<n>.md` (e.g., `review-mr-1325-round-1.md`)
    - Staged/file review: `review-<target>-round-<n>.md` (e.g.,
