@@ -1,5 +1,5 @@
 ---
-name: troubleshoot
+name: issue-log
 description: Log troubleshooting issues encountered during work — problems, causes, and fixes.
 ---
 

@@ -1,22 +1,22 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.29",
+    "version": "1.9.31",
     "description": "My personal commands shared across PCs",
     "commands": [
-        "./commands/commit.md",
-        "./commands/parallel.md",
-        "./commands/plugins.md",
+        "./commands/create-commit.md",
+        "./commands/run-parallel.md",
+        "./commands/list-plugins.md",
         "./commands/review-code.md",
         "./commands/describe-merge-request.md",
-        "./commands/changelog.md"
+        "./commands/generate-changelog.md"
     ],
     "skills": [
-        "./skills/troubleshoot",
+        "./skills/issue-log",
         "./skills/user-guide",
-        "./skills/presentation",
-        "./skills/document",
+        "./skills/html-presentation",
+        "./skills/html-document",
         "./skills/multi-column-sort",
-        "./skills/work-log",
-        "./skills/test-scenario"
+        "./skills/weekly-work-log",
+        "./skills/generate-test-scenario"
     ]
 }

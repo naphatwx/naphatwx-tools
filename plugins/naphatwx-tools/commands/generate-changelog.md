@@ -31,11 +31,11 @@ Optional flags (anywhere in `$ARGUMENTS`):
 If `$ARGUMENTS` is empty, print usage and stop:
 
 ```text
-Usage: /changelog <mr-url | project!iid | iid> [--tiny|--full]
+Usage: /generate-changelog <mr-url | project!iid | iid> [--tiny|--full]
 Examples:
-  /changelog https://git.ntbx.tech/avengers/thanos/-/merge_requests/1307
-  /changelog avengers/thanos!1307 --tiny
-  /changelog 1307 --full
+  /generate-changelog https://git.ntbx.tech/avengers/thanos/-/merge_requests/1307
+  /generate-changelog avengers/thanos!1307 --tiny
+  /generate-changelog 1307 --full
 ```
 
 ## Workflow

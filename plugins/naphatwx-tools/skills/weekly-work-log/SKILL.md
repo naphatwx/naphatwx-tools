@@ -1,5 +1,5 @@
 ---
-name: work-log
+name: weekly-work-log
 description: Summarize the user's git commits into weekly achievement items (max 5 items, 140 chars each, numbered fenced code blocks). Use when the user asks to log work, summarize weekly achievements, or fill the "My Weekly Achievements" page. Accepts a date range like "29 June - 5 July"; defaults to the current week (Mon-Sun).
 ---
 

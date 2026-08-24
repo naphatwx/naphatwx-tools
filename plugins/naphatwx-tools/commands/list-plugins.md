@@ -1,5 +1,5 @@
 ---
-name: plugins
+name: list-plugins
 description: Show installed Claude Code plugin and marketplace details
 allowed-tools: Bash, Read, Glob
 ---

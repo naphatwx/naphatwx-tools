@@ -1,5 +1,5 @@
 ---
-name: test-scenario
+name: generate-test-scenario
 description: Generate an AI-runnable test scenario file from a spec folder, targeting MCP tools or backend APIs. Use when the user gives a spec number or spec folder path and asks for test scenarios, test cases, or a test plan. Generates only — it never executes the tests.
 ---
 
@@ -25,8 +25,8 @@ $ARGUMENTS
 Examples:
 
 ```text
-/test-scenario <repo>/specs/127-app-env-deploy-status
-/test-scenario 127
+/generate-test-scenario <repo>/specs/127-app-env-deploy-status
+/generate-test-scenario 127
 ```
 
 ---

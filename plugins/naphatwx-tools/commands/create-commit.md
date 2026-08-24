@@ -1,5 +1,5 @@
 ---
-name: commit
+name: create-commit
 description: Generate a conventional commit message from staged changes and create the commit.
 allowed-tools: Bash
 ---
