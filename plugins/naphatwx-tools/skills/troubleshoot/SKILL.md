@@ -1,5 +1,5 @@
 ---
-name: c-troubleshoot
+name: troubleshoot
 description: Log troubleshooting issues encountered during work — problems, causes, and fixes.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: c-parallel
+name: parallel
 description: Split a task into independent sub-tasks and run them in parallel using multiple sub-agents.
 allowed-tools: Agent, Read, Glob, Grep
 ---

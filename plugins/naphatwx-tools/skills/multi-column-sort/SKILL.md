@@ -1,5 +1,5 @@
 ---
-name: c-multi-column-sort
+name: multi-column-sort
 description: >-
   Implement multi-column table sorting with a tri-state per-column toggle
   (none -> ASC -> DESC -> none) and a sort priority stack. Ships a

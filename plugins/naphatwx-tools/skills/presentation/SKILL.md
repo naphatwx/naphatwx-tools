@@ -1,5 +1,5 @@
 ---
-name: c-presentation
+name: presentation
 description: Create an HTML slide presentation (16:9, click-zone navigation, fade transitions). Use when the user asks to build or generate an HTML presentation, slides, or slideshow.
 ---
 

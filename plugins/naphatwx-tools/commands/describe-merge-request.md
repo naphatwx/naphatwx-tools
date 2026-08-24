@@ -1,5 +1,5 @@
 ---
-name: c-describe-merge-request
+name: describe-merge-request
 description: Generate an updated title and description for a GitLab merge request
 argument-hint: <merge-request-url-or-iid>
 ---

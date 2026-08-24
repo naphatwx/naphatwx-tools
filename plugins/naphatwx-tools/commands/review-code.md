@@ -1,5 +1,5 @@
 ---
-name: c-review-code
+name: review-code
 description: Review code changes (staged changes or a GitLab merge request)
 argument-hint: [staged | <merge-request-url> | file paths...]
 allowed-tools: Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__get_file_contents

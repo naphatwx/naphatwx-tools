@@ -1,5 +1,5 @@
 ---
-name: c-user-guide
+name: user-guide
 description: Generate user-facing documentation for features
 ---
 
