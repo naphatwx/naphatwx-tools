@@ -3,7 +3,7 @@
     "version": "1.9.31",
     "description": "My personal commands shared across PCs",
     "commands": [
-        "./commands/create-commit.md",
+        "./commands/commit.md",
         "./commands/run-parallel.md",
         "./commands/list-plugins.md",
         "./commands/review-code.md",
