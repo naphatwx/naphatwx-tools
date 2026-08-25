@@ -1,13 +1,13 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.32",
+    "version": "1.9.34",
     "description": "My personal commands shared across PCs",
     "commands": [
         "./commands/commit.md",
         "./commands/run-parallel.md",
         "./commands/list-plugins.md",
         "./commands/review-code.md",
-        "./commands/describe-merge-request.md",
+        "./commands/update-merge-request.md",
         "./commands/generate-changelog.md"
     ],
     "skills": [

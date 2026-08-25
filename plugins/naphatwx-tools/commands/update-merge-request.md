@@ -1,12 +1,13 @@
 ---
-name: describe-merge-request
-description: Generate an updated title and description for a GitLab merge request
+name: update-merge-request
+description: Generate an updated title and description for a GitLab merge request and apply them to the MR
 argument-hint: <merge-request-url-or-iid>
 ---
 
 # Update MR Title & Description
 
-Generate a clean, updated **title** and **description** for a GitLab merge request.
+Generate a clean, updated **title** and **description** for a GitLab merge request,
+then apply them to the MR automatically.
 
 Target MR: `$ARGUMENTS`
 
@@ -47,9 +48,13 @@ Target MR: `$ARGUMENTS`
    - Scope everything to what is in `base_sha..head_sha` only. If the branch has
      later commits not in the MR head, mention that they are not yet part of the MR.
 
-6. **Present** the title and description as copy-paste-ready blocks. Then **ask**
-   whether to apply them to the MR via the API or just hand over the text — do not
-   edit the MR without confirmation.
+6. **Apply to the MR** via the gitlab MCP tool `update_merge_request`
+   (project_id + merge_request_iid + `title` + `description`) — no confirmation
+   needed.
+   - If the tool call fails or the tool is unavailable, fall back to presenting the
+     title and description as copy-paste-ready blocks and say why it was not applied.
+
+7. **Report** the applied title, a short summary of the description, and the MR URL.
 
 ## Rules
 
