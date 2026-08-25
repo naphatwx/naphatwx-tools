@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.31",
+    "version": "1.9.32",
     "description": "My personal commands shared across PCs",
     "commands": [
         "./commands/commit.md",
