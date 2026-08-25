@@ -80,7 +80,7 @@ Then the grouped bullets.
 - default: title line + one bullet per area, each with a brief detail.
 - `--full`: title line + a header per area, each with sub-bullets.
 
-Before the code block, add one short chat note (in Thai) saying which MR and its
+Before the code block, add one short chat note saying which MR and its
 state. Put nothing else inside the code block except the changelog itself — no
 labels that would get copied by accident.
 

@@ -34,7 +34,7 @@ Target MR: `$ARGUMENTS`
    read that `spec.md` to understand the feature, phase, and scope. Otherwise infer
    intent from the commits and diff.
 
-5. **Write the output** in English (chat reply in Thai per user rules):
+5. **Write the output**:
    - **Title**: conventional-commit style, one line, states the change and its
      scope/phase. Drop the `Draft:` prefix from the suggested title, but tell the
      user the MR is still a Draft if it is.

@@ -70,11 +70,10 @@ that in the reply.
    ```
    ````
 
-5. After the blocks, add a 1-2 sentence week overview. Chat reply in Thai; the
-   items themselves in English.
+5. After the blocks, add a 1-2 sentence week overview.
 
 ## Notes
 
 - If a repo has zero commits in range, say so briefly — do not fabricate items.
-- If the user asks for fewer/more items or Thai items, regenerate accordingly;
+- If the user asks for fewer/more items, regenerate accordingly;
   the 140-char cap always applies.
