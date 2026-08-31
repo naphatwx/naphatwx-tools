@@ -15,8 +15,7 @@ Commit staged changes with a conventional commit message.
         - Scope: infer from paths; omit if changes span many areas.
         - Imperative, lowercase after colon, no period, max 72 chars.
     - Body (always include):
-        - 1–3 sentence paragraph on **what** and **why**.
-        - Blank line, then bullets (`- `, imperative) for notable changes.
+        - Bullets only (`- `, imperative) for notable changes.
         - Wrap at ~72 chars.
     - Trailer `Refs: TICKET-123` only if a ticket id appears in the diff.
 3. Run `git commit -m "<message>"`. On failure → print error and stop.
@@ -32,8 +31,6 @@ Parse short hash and diffstat from `git commit` output. Use the message you gene
 
 ```
 <subject>
-
-<body paragraph>
 
 - <bullet 1>
 - <bullet 2>
