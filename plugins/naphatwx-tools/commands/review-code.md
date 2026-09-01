@@ -2,7 +2,7 @@
 name: review-code
 description: Review code changes (staged changes or a GitLab merge request)
 argument-hint: [staged | <merge-request-url> | file paths...]
-allowed-tools: Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), Bash(git fetch:*), Bash(git -C:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__get_file_contents
+allowed-tools: Skill, Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), Bash(git fetch:*), Bash(git -C:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__get_file_contents
 ---
 
 # Code Review Agent
@@ -26,24 +26,11 @@ $ARGUMENTS
 
 **B. GitLab merge request** — `$ARGUMENTS` contains an MR URL like
 `https://<host>/<group>/<project>/-/merge_requests/<iid>`:
-- Extract `project_id = <group>/<project>` and `merge_request_iid = <iid>`.
-- Fetch the MR via the gitlab MCP tool `get_merge_request`. Note
-  `diff_refs.base_sha` and `diff_refs.head_sha`.
-- If the fetch fails (bad URL, no access) → report the error and stop. Do not
-  guess another target.
-- Review only the SHA range `base_sha..head_sha`, NOT the whole branch (the
-  branch tip may be ahead of the MR head). Get the diff **local-first, MCP
-  fallback**:
-  1. **Locate the repo locally**: if `git remote get-url origin` matches the
-     MR's project path, use the current repo. Otherwise scan sibling folders of
-     the current repo's parent directory for one whose `origin` matches. Do not
-     search beyond that.
-  2. **Local (preferred)**: `git -C <repo> fetch origin`, then
-     `git -C <repo> diff <base_sha>..<head_sha>` (scope by path when large).
-  3. **MCP fallback** (repo not found locally, or fetch/SHAs fail):
-     `get_merge_request_diffs`; if too large, `list_merge_request_changed_files`
-     then `get_merge_request_file_diff` per file. Do NOT exclude test files —
-     the review must see them.
+- Invoke the `naphatwx-tools:get-mr-diffs` skill with the MR URL. It resolves
+  the project/IID, fetches metadata, and gets the diff (local git first, MCP
+  fallback).
+- Command-specific rule: do NOT exclude test files from the diff — the review
+  must see them.
 - If the diff is large, read it file by file — do NOT dump the whole diff.
 
 **C. Files / directories** — `$ARGUMENTS` contains file paths or directory

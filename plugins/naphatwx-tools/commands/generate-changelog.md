@@ -1,6 +1,6 @@
 ---
 description: Generate a short, copy-paste changelog from a GitLab merge request. Outputs a single code block grouped by spec/area.
-allowed-tools: Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests
+allowed-tools: Skill, Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests
 ---
 
 # Changelog Writer
@@ -42,34 +42,18 @@ Examples:
 
 ### 1. Parse input
 
-1. Strip the flags from `$ARGUMENTS`; keep the MR reference.
-2. Resolve `project_id` and `merge_request_iid`:
-   - Full URL → parse group/project path and the trailing number.
-   - `project!iid` → split on `!`.
-   - Bare `iid` / `!iid` → run `git remote get-url origin` to derive the project
-     path, then use that as `project_id`.
-3. If you cannot resolve both, print what is missing and stop.
+Strip the flags from `$ARGUMENTS`; keep the MR reference.
 
 ### 2. Fetch the MR changes
 
-- `mcp__gitlab__get_merge_request` — only for metadata: state, IID, project
-  path, and `diff_refs` (base/head SHA). Do NOT use the MR title or description
-  as a summarizing source. The diff is the ONLY source for changelog content.
+Invoke the `naphatwx-tools:get-mr-diffs` skill with the MR reference. It
+resolves the project/IID, fetches metadata, and gets the diff (local git
+first, MCP fallback).
 
-Get the diff **local-first, MCP fallback**:
+Command-specific rules:
 
-1. **Locate the repo locally**: if `git remote get-url origin` matches the MR's
-   project path, use the current repo. Otherwise scan sibling folders of the
-   current repo's parent directory for one whose `origin` matches. Do not
-   search beyond that.
-2. **Local (preferred)**: `git -C <repo> fetch origin`, then
-   `git -C <repo> diff --stat <base_sha>..<head_sha>` for the file list and
-   `git -C <repo> diff <base_sha>..<head_sha> -- <paths>` to read specific
-   areas. Do not dump the whole diff if it is large.
-3. **MCP fallback** (repo not found locally, or fetch/SHAs fail): use
-   `mcp__gitlab__get_merge_request_diffs`. If still too large, use
-   `mcp__gitlab__list_merge_request_changed_files` then
-   `mcp__gitlab__get_merge_request_file_diff` on the files that matter.
+- Do NOT use the MR title or description as a summarizing source — the diff is
+  the ONLY source for changelog content.
 
 ### 3. Summarize
 

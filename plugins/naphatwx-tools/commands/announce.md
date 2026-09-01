@@ -1,6 +1,6 @@
 ---
 description: Draft a Thanos announcement from a GitLab merge request. Analyzes the MR and produces a ready-to-paste title + markdown content (+ popup recommendation).
-allowed-tools: Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests, mcp__thanos-mcp__AnnouncementService_CreateAnnouncement
+allowed-tools: Skill, Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests, mcp__thanos-mcp__AnnouncementService_CreateAnnouncement
 ---
 
 # Announcement Writer
@@ -79,44 +79,26 @@ about. When in doubt, keep the title short and put detail in the content.
 
 ### 1. Parse input
 
-1. Strip the flags from `$ARGUMENTS`; keep the MR reference.
-2. Resolve `project_id` and `merge_request_iid`:
-   - Full URL → parse group/project path and the trailing number.
-   - `project!iid` → split on `!`.
-   - Bare `iid` / `!iid` → run `git remote get-url origin` to derive the project
-     path, then use that as `project_id`.
-3. If you cannot resolve both, print what is missing and stop.
+Strip the flags from `$ARGUMENTS`; keep the MR reference.
 
 ### 2. Fetch the MR changes
 
-- `mcp__gitlab__get_merge_request` — use it ONLY to confirm the MR exists and to
-  read metadata (state, project path, source/target branch, merge status,
-  `diff_refs`). **Ignore the title and description entirely** — do not read them
-  as content, do not let them shape the analysis or the draft.
-- The **file diffs are the sole content source** — derive every claim in the
-  announcement from them.
+Invoke the `naphatwx-tools:get-mr-diffs` skill with the MR reference. It
+resolves the project/IID, fetches metadata, and gets the diff (local git
+first, MCP fallback).
 
-Get the diff **local-first, MCP fallback**:
+Command-specific rules:
 
-1. **Locate the repo locally**: if `git remote get-url origin` matches the MR's
-   project path, use the current repo. Otherwise scan sibling folders of the
-   current repo's parent directory for one whose `origin` matches. Do not
-   search beyond that.
-2. **Local (preferred)**: `git -C <repo> fetch origin`, then
-   `git -C <repo> diff --stat <base_sha>..<head_sha>` for the file list and
-   `git -C <repo> diff <base_sha>..<head_sha> -- <paths>` per area. Skip noise
-   paths (tests, lockfiles, generated code, `docs/`, `specs/`) when reading.
-3. **MCP fallback** (repo not found locally, or fetch/SHAs fail):
-   `mcp__gitlab__get_merge_request_diffs` with `excluded_file_patterns` to drop
-   noise, e.g.
-   `["_test\\.go$", "\\.spec\\.ts$", "package-lock\\.json", "/gen/", "\\.pb\\.go$", "\\.feature$", "^docs/", "^specs/"]`.
-   If still too large, use `mcp__gitlab__list_merge_request_changed_files` then
-   `mcp__gitlab__get_merge_request_file_diff` per area.
-
-If the diff is still too large to read inline (common for release MRs), it is
-saved to a file — read that file in chunks, or hand it to a subagent
-(general-purpose) with an explicit instruction to read 100% of it and return a
-grouped, quote-grounded summary of every meaningful change across all apps.
+- **Ignore the MR title and description entirely** — do not read them as
+  content, do not let them shape the analysis or the draft. The file diffs are
+  the sole content source; derive every claim in the announcement from them.
+- **Filter noise**: skip tests, lockfiles, generated code, `docs/`, `specs/`
+  when reading locally; on the MCP fallback pass `excluded_file_patterns`, e.g.
+  `["_test\\.go$", "\\.spec\\.ts$", "package-lock\\.json", "/gen/", "\\.pb\\.go$", "\\.feature$", "^docs/", "^specs/"]`.
+- If the diff is still too large to read inline (common for release MRs), read
+  it in chunks, or hand it to a subagent (general-purpose) with an explicit
+  instruction to read 100% of it and return a grouped, quote-grounded summary
+  of every meaningful change across all apps.
 
 If the MR is not found or not yet merged, still proceed but note its state in
 chat (draft announcements for open MRs are fine, just flag it).
