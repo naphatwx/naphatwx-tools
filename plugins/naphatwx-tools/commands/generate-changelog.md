@@ -1,6 +1,6 @@
 ---
 description: Generate a short, copy-paste changelog from a GitLab merge request. Outputs a single code block grouped by spec/area.
-allowed-tools: Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_requests
+allowed-tools: Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests
 ---
 
 # Changelog Writer
@@ -50,21 +50,38 @@ Examples:
      path, then use that as `project_id`.
 3. If you cannot resolve both, print what is missing and stop.
 
-### 2. Fetch the MR
+### 2. Fetch the MR changes
 
-- `mcp__gitlab__get_merge_request` — title, description, state, spec references.
-- `mcp__gitlab__get_merge_request_diffs` — only if the description is thin; use
-  the changed files to fill gaps. Skip if the description already covers changes.
+- `mcp__gitlab__get_merge_request` — only for metadata: state, IID, project
+  path, and `diff_refs` (base/head SHA). Do NOT use the MR title or description
+  as a summarizing source. The diff is the ONLY source for changelog content.
+
+Get the diff **local-first, MCP fallback**:
+
+1. **Locate the repo locally**: if `git remote get-url origin` matches the MR's
+   project path, use the current repo. Otherwise scan sibling folders of the
+   current repo's parent directory for one whose `origin` matches. Do not
+   search beyond that.
+2. **Local (preferred)**: `git -C <repo> fetch origin`, then
+   `git -C <repo> diff --stat <base_sha>..<head_sha>` for the file list and
+   `git -C <repo> diff <base_sha>..<head_sha> -- <paths>` to read specific
+   areas. Do not dump the whole diff if it is large.
+3. **MCP fallback** (repo not found locally, or fetch/SHAs fail): use
+   `mcp__gitlab__get_merge_request_diffs`. If still too large, use
+   `mcp__gitlab__list_merge_request_changed_files` then
+   `mcp__gitlab__get_merge_request_file_diff` on the files that matter.
 
 ### 3. Summarize
 
-Group changes by spec or area (the MR description's own sections are the best
-source). For each group write a short, plain-language line of what changed —
-what a reader of the changelog cares about, not implementation trivia.
+Group changes by spec or area, derived from the diff itself: changed file
+paths (app/module folders) and `specs/NNN-*` folders touched or referenced in
+the changed code. For each group write a short, plain-language line of what
+changed — what a reader of the changelog cares about, not implementation
+trivia.
 
 Rules:
 - Lead each area with a short label; append the spec number in parentheses when
-  the MR names one, e.g. `(spec 101)` or `(specs 103, 107)`.
+  the diff shows one, e.g. `(spec 101)` or `(specs 103, 107)`.
 - Plain everyday words, short lines. Cut filler.
 - Never paste raw local paths, dev sandbox names (`dev00`), or internal branch
   names.
@@ -73,8 +90,8 @@ Rules:
 ### 4. Output
 
 Print exactly **one** code block (language tag `text`) so the whole changelog
-copies in one action. First line is a title: `<mr-title-or-summary> (MR !<iid>)`.
-Then the grouped bullets.
+copies in one action. First line is a title: a short summary of the changes,
+written from the diff, ending with `(MR !<iid>)`. Then the grouped bullets.
 
 - `--tiny`: title line + one flat bullet per area.
 - default: title line + one bullet per area, each with a brief detail.
@@ -87,6 +104,6 @@ labels that would get copied by accident.
 ## Notes
 
 - Reads a real MR over the GitLab MCP server; if that server is not authorized,
-  tell the user and ask them to paste the MR title + description, then continue
-  from step 3.
+  tell the user and ask them to paste the MR diff or changed-file list, then
+  continue from step 3.
 - One MR → one changelog.

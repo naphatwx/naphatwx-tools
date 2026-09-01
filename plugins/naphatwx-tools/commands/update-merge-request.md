@@ -24,11 +24,21 @@ Target MR: `$ARGUMENTS`
    and target branch, current title/description, and whether it is a Draft.
 
 3. **Find what the MR actually changes** — use the SHA range `base_sha..head_sha`,
-   NOT the whole branch (the branch tip may be ahead of the MR head):
-   - `git log --oneline <base_sha>..<head_sha>` for commits.
-   - `git diff --stat <base_sha>..<head_sha>` for changed files.
-   - If a diff is too large to read inline, skim it with `git diff` on specific
-     paths or grep the saved tool-result file — do NOT dump the whole diff.
+   NOT the whole branch (the branch tip may be ahead of the MR head).
+   Get the diff **local-first, MCP fallback**:
+   - **Locate the repo locally**: if `git remote get-url origin` matches the MR's
+     project path, use the current repo. Otherwise scan sibling folders of the
+     current repo's parent directory for one whose `origin` matches. Do not
+     search beyond that.
+   - **Local (preferred)**: `git -C <repo> fetch origin`, then
+     `git -C <repo> log --oneline <base_sha>..<head_sha>` for commits and
+     `git -C <repo> diff --stat <base_sha>..<head_sha>` for changed files.
+     If a diff is too large to read inline, skim it with `git -C <repo> diff`
+     on specific paths — do NOT dump the whole diff.
+   - **MCP fallback** (repo not found locally, or fetch/SHAs fail): use
+     `get_merge_request_diffs`. If still too large, use
+     `list_merge_request_changed_files` then `get_merge_request_file_diff`
+     on the files that matter.
 
 4. **Read the driving spec/context.** If commits reference a `specs/NNN-*` folder,
    read that `spec.md` to understand the feature, phase, and scope. Otherwise infer

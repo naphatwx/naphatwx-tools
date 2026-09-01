@@ -2,7 +2,7 @@
 name: review-code
 description: Review code changes (staged changes or a GitLab merge request)
 argument-hint: [staged | <merge-request-url> | file paths...]
-allowed-tools: Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__get_file_contents
+allowed-tools: Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), Bash(git fetch:*), Bash(git -C:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__get_file_contents
 ---
 
 # Code Review Agent
@@ -32,9 +32,18 @@ $ARGUMENTS
 - If the fetch fails (bad URL, no access) → report the error and stop. Do not
   guess another target.
 - Review only the SHA range `base_sha..head_sha`, NOT the whole branch (the
-  branch tip may be ahead of the MR head). Get changes via
-  `get_merge_request_diffs`, or `git diff <base_sha>..<head_sha>` when the
-  local checkout is the same repo.
+  branch tip may be ahead of the MR head). Get the diff **local-first, MCP
+  fallback**:
+  1. **Locate the repo locally**: if `git remote get-url origin` matches the
+     MR's project path, use the current repo. Otherwise scan sibling folders of
+     the current repo's parent directory for one whose `origin` matches. Do not
+     search beyond that.
+  2. **Local (preferred)**: `git -C <repo> fetch origin`, then
+     `git -C <repo> diff <base_sha>..<head_sha>` (scope by path when large).
+  3. **MCP fallback** (repo not found locally, or fetch/SHAs fail):
+     `get_merge_request_diffs`; if too large, `list_merge_request_changed_files`
+     then `get_merge_request_file_diff` per file. Do NOT exclude test files —
+     the review must see them.
 - If the diff is large, read it file by file — do NOT dump the whole diff.
 
 **C. Files / directories** — `$ARGUMENTS` contains file paths or directory
