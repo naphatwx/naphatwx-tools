@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.39",
+    "version": "1.9.40",
     "description": "My personal commands shared across PCs",
     "commands": [
         "./commands/commit.md",
@@ -8,7 +8,8 @@
         "./commands/list-plugins.md",
         "./commands/review-code.md",
         "./commands/update-merge-request.md",
-        "./commands/generate-changelog.md"
+        "./commands/generate-changelog.md",
+        "./commands/check-job.md"
     ],
     "skills": [
         "./skills/issue-log",
