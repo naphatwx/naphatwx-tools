@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-fs="normal">
 
 <head>
     <meta charset="UTF-8">
@@ -65,9 +65,18 @@
             background: var(--selection);
         }
 
+        /* base font size — every rem token scales from here */
         html {
-            font-size: 16px;
+            font-size: 18px;
             scroll-behavior: smooth;
+        }
+
+        html[data-fs="small"] {
+            font-size: 16px;
+        }
+
+        html[data-fs="big"] {
+            font-size: 20px;
         }
 
         body {
@@ -204,6 +213,61 @@
             background: color-mix(in srgb, var(--bg) 80%, transparent);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .fs-picker {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 2px;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            border-radius: 8px;
+        }
+
+        .fs-btn {
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border: none;
+            border-radius: 6px;
+            background: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            line-height: 1;
+            transition: background 0.12s, color 0.12s;
+        }
+
+        /* px, not rem: the picker must not resize itself when it changes the root size */
+        .fs-btn[data-fs="small"] {
+            font-size: 12px;
+        }
+
+        .fs-btn[data-fs="normal"] {
+            font-size: 15px;
+        }
+
+        .fs-btn[data-fs="big"] {
+            font-size: 18px;
+        }
+
+        .fs-btn:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .fs-btn.active {
+            background: var(--accent-soft);
+            color: var(--accent);
         }
 
         .theme-toggle {
@@ -551,7 +615,14 @@
         <div class="main">
             <header class="topbar">
                 <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+                <div class="topbar-actions">
+                    <div class="fs-picker" id="fsPicker" role="group" aria-label="Base font size">
+                        <button class="fs-btn" data-fs="small" title="Small text (16px)" aria-label="Small text">A</button>
+                        <button class="fs-btn" data-fs="normal" title="Normal text (18px)" aria-label="Normal text">A</button>
+                        <button class="fs-btn" data-fs="big" title="Big text (20px)" aria-label="Big text">A</button>
+                    </div>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+                </div>
             </header>
 
             <article class="content">
@@ -663,6 +734,21 @@ example init</code></pre>
             localStorage.setItem("docs-theme", next);
             paintToggle();
         });
+
+        // ===== Base font size (small 16 / normal 18 / big 20, remembers choice) =====
+        const fsButtons = [...document.querySelectorAll(".fs-btn")];
+        const savedFs = localStorage.getItem("docs-fs");
+        if (savedFs && fsButtons.some(b => b.dataset.fs === savedFs)) root.setAttribute("data-fs", savedFs);
+        function paintFs() {
+            const current = root.getAttribute("data-fs") || "normal";
+            fsButtons.forEach(b => b.classList.toggle("active", b.dataset.fs === current));
+        }
+        paintFs();
+        fsButtons.forEach(b => b.addEventListener("click", () => {
+            root.setAttribute("data-fs", b.dataset.fs);
+            localStorage.setItem("docs-fs", b.dataset.fs);
+            paintFs();
+        }));
 
         // ===== Mobile sidebar =====
         const sidebar = document.getElementById("sidebar");
