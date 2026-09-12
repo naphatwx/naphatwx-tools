@@ -7,7 +7,7 @@ description: Generate a styled single-file HTML documentation page (dark mode by
 
 Generate a single-file HTML documentation page from a bundled template.
 
-The template is a dark-mode docs layout with a left sidebar, search box, a light/dark theme toggle, and a base font size picker (small 16px / normal 18px / big 20px, default normal). The style is inspired by the Clerk docs.
+The template is a dark-mode docs layout with a left sidebar, search box, a light/dark theme toggle, and a base font size picker (small 14px / normal 16px / big 18px, default normal). The style is inspired by the Clerk docs.
 
 ## User Input
 
@@ -33,7 +33,7 @@ The output **must** keep all of these:
 1. Single self-contained file. No external CSS, JS, fonts, or images.
 2. Dark mode is the default theme.
 3. The light/dark toggle button stays and works.
-4. The base font size picker stays and works. Default is normal (18px).
+4. The base font size picker stays and works. Default is normal (16px).
 5. The sidebar nav, search box, and active-section highlight stay and work.
 6. Every `nav-link` `href` matches a real heading `id` in the content.
 
