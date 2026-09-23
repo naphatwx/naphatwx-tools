@@ -56,7 +56,7 @@ The output **must** keep all of these:
 
 ### 3. Fill in content
 
-- Replace the `<title>`, the brand name, and the `badge` text.
+- Replace the `<title>` and the brand name. Keep the brand to the topic only — no badge or spec number.
 - Rewrite the sidebar `nav` to match the real sections.
     - Group links under `nav-group-title` headings.
     - Each `nav-link` `href="#id"` must point to a heading with that `id`.

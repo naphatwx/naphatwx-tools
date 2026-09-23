@@ -23,6 +23,9 @@
             --card-bg: #202024;
             --card-hover: #26262b;
             --selection: rgba(139, 92, 246, 0.3);
+            --scrollbar: #3a3a42;
+            --scrollbar-hover: #4a4a54;
+            color-scheme: dark;
         }
 
         [data-theme="light"] {
@@ -40,6 +43,9 @@
             --card-bg: #dddddd;
             --card-hover: #cccccc;
             --selection: rgba(124, 58, 237, 0.2);
+            --scrollbar: #a8a8a8;
+            --scrollbar-hover: #959595;
+            color-scheme: light;
         }
 
         /* ============ TYPE SCALE ============ */
@@ -63,6 +69,30 @@
 
         ::selection {
             background: var(--selection);
+        }
+
+        /* themed scrollbars — default ones render a white track in dark mode */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar) transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar);
+            border-radius: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-hover);
         }
 
         /* base font size — every rem token scales from here */
@@ -118,8 +148,11 @@
         }
 
         .brand .logo {
+            /* fixed square — never squeezed by a long brand name */
+            flex: 0 0 24px;
             width: 24px;
             height: 24px;
+            aspect-ratio: 1;
             border-radius: 6px;
             background: var(--accent);
             display: grid;
@@ -127,15 +160,6 @@
             color: #fff;
             font-size: var(--fs-sm);
             font-weight: 700;
-        }
-
-        .brand .badge {
-            font-size: var(--fs-label);
-            color: var(--text-faint);
-            border: 1px solid var(--border-strong);
-            border-radius: 5px;
-            padding: 1px 6px;
-            font-weight: 500;
         }
 
         .nav-search {
@@ -587,7 +611,6 @@
             <div class="brand">
                 <span class="logo">D</span>
                 <span>Docs</span>
-                <span class="badge">v1</span>
             </div>
 
             <input class="nav-search" id="navSearch" placeholder="Search…" />
