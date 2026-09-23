@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.43",
+    "version": "1.9.44",
     "description": "My personal commands shared across PCs",
     "commands": [
         "./commands/commit.md",
@@ -19,5 +19,29 @@
         "./skills/multi-column-sort",
         "./skills/weekly-work-log",
         "./skills/generate-test-scenario"
-    ]
+    ],
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/response-rules.sh\" session",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/response-rules.sh\" prompt",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ]
+    }
 }

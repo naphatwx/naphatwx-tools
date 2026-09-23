@@ -19,3 +19,22 @@ Open Claude Code in your terminal and run the following command to register this
 ```bash
 /plugin marketplace add https://github.com/naphatwx/naphatwx-tools.git
 ```
+
+---
+
+## 🧩 Response Rules Hook
+
+The plugin ships a hook that injects chat formatting rules (lists only, `&nbsp;` between blocks). It is **on by default**.
+
+To disable it, add this to your `~/.claude/settings.json` and start a new session:
+
+```json
+{
+    "env": {
+        "NAPHATWX_RESPONSE_RULES": "0"
+    }
+}
+```
+
+- Full rules: `plugins/naphatwx-tools/hooks/response-rules.md` (loaded once at session start).
+- A short reminder is added to every prompt.
