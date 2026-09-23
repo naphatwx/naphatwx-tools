@@ -13,6 +13,8 @@ Store troubleshooting issues at `PRIVATE/LOG/{YYYY-MM-DD}.md`.
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 **Expected format:** `<problem description>` or omit to view today's log.
 
 ---

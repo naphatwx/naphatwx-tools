@@ -1,0 +1,19 @@
+{
+    "name": "naphatwx-marketplace",
+    "interface": {
+        "displayName": "naphatwx marketplace"
+    },
+    "plugins": [
+        {
+            "name": "naphatwx-tools",
+            "source": {
+                "source": "local",
+                "path": "./plugins/naphatwx-tools"
+            },
+            "policy": {
+                "installation": "AVAILABLE"
+            },
+            "category": "Productivity"
+        }
+    ]
+}

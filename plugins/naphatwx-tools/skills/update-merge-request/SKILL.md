@@ -1,5 +1,6 @@
 ---
 name: update-merge-request
+disable-model-invocation: true
 description: Generate an updated title and description for a GitLab merge request and apply them to the MR
 argument-hint: <merge-request-url-or-iid>
 ---
@@ -11,10 +12,12 @@ then apply them to the MR automatically.
 
 Target MR: `$ARGUMENTS`
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 ## Steps
 
-1. **Get the MR data and diff** — invoke the `naphatwx-tools:get-mr-diffs`
-   skill with `$ARGUMENTS` as the MR reference. It resolves the project/IID,
+1. **Get the MR data and diff** — invoke the `get-mr-diffs` skill
+   (`naphatwx-tools:get-mr-diffs` in Claude Code) with `$ARGUMENTS` as the MR reference. It resolves the project/IID,
    fetches metadata, and gets the diff (local git first, MCP fallback).
    Note from its result: current title/description, Draft status, and the
    commits + changed files in `base_sha..head_sha`.

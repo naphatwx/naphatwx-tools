@@ -15,6 +15,8 @@ The template is a dark-mode docs layout with a left sidebar, search box, a light
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 **Expected format:** `<topic>` plus a source location, both optional.
 
 - Source is whatever the user points to.

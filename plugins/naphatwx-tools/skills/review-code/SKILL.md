@@ -28,6 +28,8 @@ CONTRIBUTING.md.
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 ## Workflow
 
 ### 1. Determine Review Target
@@ -39,7 +41,7 @@ $ARGUMENTS
 
 **B. GitLab merge request** — `$ARGUMENTS` contains an MR URL like
 `https://<host>/<group>/<project>/-/merge_requests/<iid>`:
-- Invoke the `naphatwx-tools:get-mr-diffs` skill with the MR URL. It resolves
+- Invoke the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code) with the MR URL. It resolves
   the project/IID, fetches metadata, and gets the diff (local git first, MCP
   fallback).
 - Command-specific rule: do NOT exclude test files from the diff — the review

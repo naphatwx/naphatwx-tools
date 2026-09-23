@@ -13,13 +13,15 @@ Generate user-friendly documentation for a given feature.
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 **Expected format:** `<feature-domain>` or `<feature-domain> <output-path>`
 
 ## Workflow
 
 ### 0. Ask Output Preference (if no output path provided)
 
-Use AskUserQuestion to ask:
+Ask the user (use AskUserQuestion when the agent has it):
 
 ```
 Question: "How would you like to receive the user guide?"

@@ -19,6 +19,8 @@ The template uses a minimal style with two themes.
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 **Expected format:** `<topic>` or `<topic> <output-path>` (both optional)
 
 - No topic → use placeholder random content.

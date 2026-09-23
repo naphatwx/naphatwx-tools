@@ -17,6 +17,8 @@ decides what to do next.
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 ## Hard Rules
 
 - Never call `build_item`, `stop_build`, `cancel_queue_item`,

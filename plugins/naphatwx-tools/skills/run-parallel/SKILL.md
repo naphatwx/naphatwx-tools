@@ -14,6 +14,8 @@ Run a task by splitting it into independent sub-tasks and dispatching them to mu
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 ## Workflow
 
 ### 1. Validate Input
@@ -103,7 +105,7 @@ After all sub-agents return:
 
 ## Rules
 
-- Never run sub-agents sequentially when they are independent — always one message, multiple `Agent` calls.
+- Never run sub-agents sequentially when they are independent — always dispatch them together (Claude Code: one message, multiple `Agent` calls). If the agent has no sub-agents, run the sub-tasks yourself in order.
 - Never spawn more than 6 agents in one run — split into rounds if needed.
 - Never delegate the final synthesis — you must merge results yourself.
 - Never spawn an agent for a task you can finish with a single tool call.

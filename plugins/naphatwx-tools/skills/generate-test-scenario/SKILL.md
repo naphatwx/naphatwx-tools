@@ -20,6 +20,8 @@ request. The spec plus the code it points to is the only source.
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 **Expected format:** a spec folder path, or a spec number.
 
 Examples:

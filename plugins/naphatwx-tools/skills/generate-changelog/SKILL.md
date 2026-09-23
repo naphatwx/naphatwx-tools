@@ -1,4 +1,5 @@
 ---
+name: generate-changelog
 description: Generate a short, copy-paste changelog from a GitLab merge request. Outputs a single code block grouped by spec/area.
 allowed-tools: Skill, Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests
 ---
@@ -13,6 +14,8 @@ block.
 ```text
 $ARGUMENTS
 ```
+
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
 `$ARGUMENTS` is the MR to summarize, plus optional flags. Accepted forms:
 
@@ -46,7 +49,7 @@ Strip the flags from `$ARGUMENTS`; keep the MR reference.
 
 ### 2. Fetch the MR changes
 
-Invoke the `naphatwx-tools:get-mr-diffs` skill with the MR reference. It
+Invoke the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code) with the MR reference. It
 resolves the project/IID, fetches metadata, and gets the diff (local git
 first, MCP fallback).
 

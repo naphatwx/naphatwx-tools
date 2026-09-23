@@ -1,0 +1,16 @@
+{
+    "name": "naphatwx-tools",
+    "version": "1.9.46",
+    "description": "My personal commands shared across PCs",
+    "author": {
+        "name": "naphatwx"
+    },
+    "repository": "https://github.com/naphatwx/naphatwx-tools",
+    "skills": "./skills/",
+    "interface": {
+        "displayName": "naphatwx-tools",
+        "shortDescription": "Commit, code review, MR, changelog, Jenkins and docs skills",
+        "developerName": "naphatwx",
+        "category": "Productivity"
+    }
+}
