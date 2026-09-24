@@ -1,5 +1,5 @@
 // Draws sequence diagrams defined in sibling files (one flow per file) as inline SVG: <div class="seq" data-flow="NN-slug">.
-// Steps: phase | call | ret | hot | note | alt | else | opt | loop | end. Labels are the name only (≤ 40 chars);
+// Steps: phase | call | ret | hot | note | alt | else | opt | loop | end. Labels are the name only (≤ 40 chars, or one bare name);
 // an optional last `detail` string shows on hover and in the "Step details" list under the diagram.
 
 var SeqDiagrams = (function () {
@@ -14,7 +14,7 @@ var SeqDiagrams = (function () {
         const X = Object.fromEntries(actors.map(([k], i) => [k, margin + i * gap]));
         const body = [], frames = [], stack = [], details = [];
         const tip = d => d ? `<title>${esc(d)}</title>` : '';
-        const long = (kind, text) => { if (text.length > MAX) console.warn(`[seq] ${kind} over ${MAX} chars, move the rest to detail: ${text}`); };
+        const long = (kind, text) => { if (text.length > MAX && /\s/.test(text)) console.warn(`[seq] ${kind} over ${MAX} chars, move the rest to detail: ${text}`); };
         let y = TOP + HEAD + 26, num = 0;
         for (const s of steps) {
             const [t] = s;

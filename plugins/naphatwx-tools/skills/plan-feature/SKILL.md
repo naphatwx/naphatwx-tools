@@ -95,7 +95,7 @@ SeqDiagrams.define("01-cut-new-version", {
 | `["opt", cond]` / `["loop", cond]` … `["end"]` | Optional or repeated block |
 
 - Labels are the name only, ≤ 40 chars: RPC (`TriggerRedeployment`), endpoint (`POST /things`), table op (`INSERT infra.redeployment`), queue (`publish infra.redeployment.create`), job (`build app-redeployment`), status or error code (`FAILED_PRECONDITION`).
-- Put arguments, example values, messages and reasons in `detail`. It shows on hover and in the "Step details" list under the diagram. `render.js` warns in the console for any label, note or condition over 40 chars.
+- Put arguments, example values, messages and reasons in `detail`. It shows on hover and in the "Step details" list under the diagram. `render.js` warns in the console for any label, note or condition over 40 chars (a single long name such as an RPC is fine).
 - Notes and `alt` / `else` conditions are a short phrase too (`guards`, `environment not AVAILABLE`); the rule itself goes in `detail` or in "Rules this flow must keep".
 - Use `hot` only for writes that leave the service or must be audited, so readers can scan for side effects.
 
