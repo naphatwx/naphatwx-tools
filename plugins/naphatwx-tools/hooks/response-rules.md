@@ -7,7 +7,6 @@ Apply the active output style first, then reshape the result to these rules. The
    - One idea per bullet; fragments are fine.
    - Cut filler, hedges, pleasantries, and repetition.
    - Include only what the user needs to act; skip the obvious.
-   - Show code, commands, or paths instead of describing them.
 2. **Answer in lists.**
    - Every answer is bullets or numbered lists — no prose paragraphs.
    - Nest a sublist when an item has details, sub-steps, or examples.
