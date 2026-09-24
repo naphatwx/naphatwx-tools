@@ -773,6 +773,8 @@
         .erd-row .type { color: var(--text-faint); white-space: nowrap; }
         .erd-row .key { font-size: var(--fs-label); font-weight: 700; color: var(--accent); min-width: 22px; max-width: 180px; text-align: right; }
         .erd-row.more { grid-template-columns: 1fr; color: var(--text-faint); font-style: italic; }
+        .erd-row.drop .col, .erd-row.drop .type { text-decoration: line-through; color: var(--text-faint); }
+        .erd-row.drop .key { color: #ef4444; }
 
         .erd-rel {
             list-style: none;
@@ -814,7 +816,7 @@
                 <div class="nav-group">
                     <div class="nav-group-title">Design</div>
                     <a class="nav-link" href="#mock">Mock UI</a>
-                    <a class="nav-link" href="#database">Database structure</a>
+                    <a class="nav-link" href="#database">Database changes</a>
                     <a class="nav-link" href="#errors">Errors</a>
                 </div>
                 <div class="nav-group">
@@ -856,7 +858,7 @@
                     <div class="card">
                         <div class="ic">🗄️</div>
                         <h4>Data impact</h4>
-                        <p>New tables, changed columns, or "zero schema change".</p>
+                        <p>New tables and changed columns, or "no schema change" (then the Database changes section is removed).</p>
                     </div>
                     <div class="card">
                         <div class="ic">🧩</div>
@@ -910,29 +912,28 @@
                     </a>
                 </div>
 
-                <h2 id="database">Database structure</h2>
-                <p>Solid border = existing table, read only. Accent border = table this feature writes. Dashed border = external table, read through an API.</p>
+                <!-- ===== schema changes only: new tables and changed columns. No schema change → delete this section and its nav link ===== -->
+                <h2 id="database">Database changes</h2>
+                <p>Only tables whose schema changes. Accent border = new table · solid border = existing table, changed columns only. Migration: <code>path/to/migration.sql</code>.</p>
                 <div class="erd">
-                    <div class="erd-table">
-                        <div class="erd-head">schema.table_a <span class="erd-tag">read</span></div>
-                        <div class="erd-row"><span class="col">id</span><span class="type">int</span><span class="key">PK</span></div>
-                        <div class="erd-row"><span class="col">name</span><span class="type">text</span><span class="key">UQ</span></div>
-                    </div>
                     <div class="erd-table write">
-                        <div class="erd-head">schema.table_b <span class="erd-tag">write</span></div>
-                        <div class="erd-row"><span class="col">id</span><span class="type">int</span><span class="key">PK</span></div>
-                        <div class="erd-row"><span class="col">table_a_id</span><span class="type">int</span><span class="key">FK</span></div>
-                        <div class="erd-row more"><span>+ other columns …</span></div>
+                        <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
+                        <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="erd-row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                        <div class="erd-row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
                     </div>
-                    <div class="erd-table external">
-                        <div class="erd-head">external.table_c <span class="erd-tag">external</span></div>
-                        <div class="erd-row"><span class="col">id</span><span class="type">int</span><span class="key">PK</span></div>
+                    <div class="erd-table">
+                        <div class="erd-head">schema.table_a <span class="erd-tag">altered</span></div>
+                        <div class="erd-row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
+                        <div class="erd-row"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                        <div class="erd-row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
+                        <div class="erd-row add"><span class="col">new_column</span><span class="type">index</span><span class="key">+ add</span></div>
                     </div>
                 </div>
                 <ul class="erd-rel">
-                    <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_b.table_a_id</li>
-                    <li>schema.table_a.id <span class="card-n">1 ┄┄ *</span> external.table_c.id <span class="faint">(cross-system)</span></li>
+                    <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_b.table_a_id <span class="faint">(new FK)</span></li>
                 </ul>
+                <!-- ===== end schema changes ===== -->
 
                 <h2 id="errors">Errors</h2>
                 <div class="table-wrap">

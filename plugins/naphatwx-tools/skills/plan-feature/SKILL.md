@@ -1,6 +1,6 @@
 ---
 name: plan-feature
-description: Plan a feature as a browsable HTML folder — overview.html with scope, one sequence diagram per flow (each in its own file), database structure, errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
+description: Plan a feature as a browsable HTML folder — overview.html with scope, one sequence diagram per flow (each in its own file), database changes, errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 
@@ -111,7 +111,12 @@ SeqDiagrams.define("01-cut-new-version", {
         - "Rules this flow must keep" — 3–5 bullets from the spec.
         - "Try it in the mock" cards — only if a mock exists or will be built; each opens in a new tab.
     4. **Mock UI**: link cards into `mock/` (new tab). No mock → replace with one line saying the feature has no UI.
-    5. **Database structure**: `.erd` cards — `.erd-table` read, `.erd-table.write` written, `.erd-table.external` read through an API. Then `.erd-rel` relation lines with cardinality.
+    5. **Database changes**: schema changes only (copy the block between the `schema changes only` comments).
+        - One `.erd` card per table whose schema changes: `.erd-table.write` + tag `new table` for a new table (all its columns), `.erd-table` + tag `altered` for an existing table (only the changed columns).
+        - Changed rows: `.erd-row.add` (`+ add`), `~ type` / `~ null` for a change (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the section intro.
+        - Leave out tables that are only read, only get rows inserted or updated, or are external. Those belong in the diagrams.
+        - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
+        - No schema change → delete the section and its nav link, and say "no schema change" in the Overview data-impact card.
     6. **Errors**: cause → code → user-facing text.
     7. **Open questions**: blocker callout, then numbered steps.
 - Add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
