@@ -9,7 +9,7 @@ case "${1:-}" in
         cat "$(dirname "$0")/response-rules.md"
         ;;
     prompt)
-        echo 'RESPONSE RULES ACTIVE. Format this reply: lists only (no prose paragraphs); headers are plain bold lines, never list items; an `&nbsp;` line between every block (lead, header+list, closing note), never between bullets of one list. Chat only, never in files.'
+        echo 'RESPONSE RULES ACTIVE. Format this reply: concise — answer first, no preamble or filler; lists only (no prose paragraphs); headers are plain bold lines, never list items; an `&nbsp;` line between every block (lead, header+list, closing note), never between bullets of one list. Chat only, never in files.'
         ;;
 esac
 exit 0
