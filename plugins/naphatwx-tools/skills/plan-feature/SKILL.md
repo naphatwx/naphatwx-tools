@@ -1,6 +1,6 @@
 ---
 name: plan-feature
-description: Plan a feature as a browsable HTML folder — overview.html with scope, one sequence diagram per flow (each in its own file), database changes, errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
+description: Plan a feature as a browsable HTML folder — overview.html with scope, one sequence diagram per flow (each in its own file), database changes, API changes, errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 
@@ -117,8 +117,15 @@ SeqDiagrams.define("01-cut-new-version", {
         - Leave out tables that are only read, only get rows inserted or updated, or are external. Those belong in the diagrams.
         - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
         - No schema change → delete the section and its nav link, and say "no schema change" in the Overview data-impact card.
-    6. **Errors**: cause → code → user-facing text.
-    7. **Open questions**: blocker callout, then numbered steps.
+    6. **API changes**: request / response changes only (copy the block between the `request / response changes only` comments).
+        - Source: the proto / OpenAPI / DTO diff in the spec's contracts. Name the file(s) and say whether the change is wire-compatible.
+        - **New RPCs** table: RPC → route → permission (`none · system caller` when it has none).
+        - **Messages**: one `.erd` card per message. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add, `~ N` change (type `old → new`), `− N` remove. New enums count as new messages.
+        - **Behaviour changes, same signature**: RPCs whose rules change without a proto change. Leave out a subsection that has no rows.
+        - Leave out untouched messages. When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
+        - No API change → delete the section and its nav link.
+    7. **Errors**: cause → code → user-facing text.
+    8. **Open questions**: blocker callout, then numbered steps.
 - Add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the sidebar nav to match: one link per flow under "Sequence diagrams".
 

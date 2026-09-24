@@ -761,7 +761,7 @@
 
         .erd-row {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto auto;
+            grid-template-columns: minmax(45%, 1fr) minmax(0, auto) auto;
             gap: 10px;
             padding: 5px 12px;
             border-bottom: 1px solid var(--border);
@@ -770,7 +770,7 @@
 
         .erd-row:last-child { border-bottom: none; }
         .erd-row .col { font-family: "SF Mono", "Cascadia Code", Consolas, monospace; color: var(--text); overflow-wrap: anywhere; }
-        .erd-row .type { color: var(--text-faint); white-space: nowrap; }
+        .erd-row .type { color: var(--text-faint); text-align: right; overflow-wrap: anywhere; }
         .erd-row .key { font-size: var(--fs-label); font-weight: 700; color: var(--accent); min-width: 22px; max-width: 180px; text-align: right; }
         .erd-row.more { grid-template-columns: 1fr; color: var(--text-faint); font-style: italic; }
         .erd-row.drop .col, .erd-row.drop .type { text-decoration: line-through; color: var(--text-faint); }
@@ -817,6 +817,7 @@
                     <div class="nav-group-title">Design</div>
                     <a class="nav-link" href="#mock">Mock UI</a>
                     <a class="nav-link" href="#database">Database changes</a>
+                    <a class="nav-link" href="#api">API changes</a>
                     <a class="nav-link" href="#errors">Errors</a>
                 </div>
                 <div class="nav-group">
@@ -934,6 +935,48 @@
                     <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_b.table_a_id <span class="faint">(new FK)</span></li>
                 </ul>
                 <!-- ===== end schema changes ===== -->
+
+                <!-- ===== request / response changes only (proto, OpenAPI, DTO). No API change → delete this section and its nav link ===== -->
+                <h2 id="api">API changes</h2>
+                <p>Only messages that change. File: <code>path/to/service.proto</code> · additive, wire-compatible. Accent border = new message · solid border = existing message, changed fields only.</p>
+                <h3>New RPCs</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>RPC</th><th>Route</th><th>Permission</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>CreateThing</code></td><td><code>POST /api/v1/things</code></td><td><code>things.create</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>Messages</h3>
+                <div class="erd">
+                    <div class="erd-table write">
+                        <div class="erd-head">CreateThingRequest <span class="erd-tag">new message</span></div>
+                        <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
+                        <div class="erd-row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
+                        <div class="erd-row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
+                    </div>
+                    <div class="erd-table">
+                        <div class="erd-head">ThingResponse <span class="erd-tag">altered</span></div>
+                        <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
+                        <div class="erd-row"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
+                        <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
+                    </div>
+                </div>
+                <h3>Behaviour changes, same signature</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>RPC</th><th>Change</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>GetThings</code></td><td>Honours the new filter; empty means no filter.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- ===== end API changes ===== -->
 
                 <h2 id="errors">Errors</h2>
                 <div class="table-wrap">
