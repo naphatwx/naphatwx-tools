@@ -1,5 +1,5 @@
 // Flow 01 · Example flow (US1 · P1). Rendered by render.js into <div class="seq" data-flow="01-example-flow">.
-// Steps: [phase, text] · [call|ret|hot, from, to, label] · [note, at, text, (to)] · [alt|opt|loop, cond] … [else, cond] … [end].
+// Steps: [phase, text] · [call|ret|hot, from, to, label, (detail)] · [note, at, text, (to), (detail)] · [alt|opt|loop, cond] … [else, cond] … [end].
 SeqDiagrams.define("01-example-flow", {
     actors: [
         ["user", "User", "browser"],
@@ -10,22 +10,22 @@ SeqDiagrams.define("01-example-flow", {
     ],
     steps: [
         ["phase", "1 · Load"],
-        ["call", "user", "web", "open the screen"],
-        ["call", "web", "api", "GetThing(id)"],
-        ["call", "api", "db", "load row"],
-        ["note", "api", "permission check · validation"],
-        ["ret", "api", "web", "thing"],
+        ["call", "user", "web", "/things/:id"],
+        ["call", "web", "api", "GetThing", "id from the route"],
+        ["call", "api", "db", "SELECT schema.thing"],
+        ["note", "api", "guards", null, "permission check · validation"],
+        ["ret", "api", "web", "ThingResponse"],
         ["phase", "2 · Act"],
         ["call", "user", "web", "Confirm"],
-        ["call", "web", "api", "CreateThing(...)"],
+        ["call", "web", "api", "CreateThing", "name, ownerId"],
         ["alt", "upstream accepts"],
-        ["hot", "api", "ext", "POST /things · ≤ 10 s"],
-        ["ret", "ext", "api", "200 { id }"],
-        ["hot", "api", "db", "INSERT audit row"],
-        ["ret", "api", "web", "created"],
+        ["hot", "api", "ext", "POST /things", "timeout 10 s"],
+        ["ret", "ext", "api", "200"],
+        ["hot", "api", "db", "INSERT schema.audit_log"],
+        ["ret", "api", "web", "ThingResponse"],
         ["else", "upstream refuses"],
-        ["ret", "ext", "api", "400 reason"],
-        ["ret", "api", "web", "FailedPrecondition + reason"],
+        ["ret", "ext", "api", "400"],
+        ["ret", "api", "web", "FAILED_PRECONDITION", "upstream reason passed through"],
         ["end"],
     ],
 });

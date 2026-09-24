@@ -684,6 +684,12 @@
         .seq .ah { fill: var(--text-muted); }
         .seq .ah.ret { fill: var(--text-faint); }
         .seq .ah.hot { fill: var(--accent); }
+        .seq .step { cursor: default; }
+        .seq-steps { margin-top: 10px; font-size: var(--fs-sm); color: var(--text-muted); }
+        .seq-steps summary { cursor: pointer; color: var(--text-faint); font-weight: 600; }
+        .seq-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
+        .seq-steps li { display: grid; grid-template-columns: 22px auto 1fr; gap: 8px; align-items: baseline; padding: 4px 0; border-top: 1px solid var(--border); }
+        .seq-steps .n { color: var(--text-faint); font-weight: 600; text-align: right; }
 
         .seq-legend {
             display: flex;
@@ -709,7 +715,7 @@
         /* ============ DATABASE STRUCTURE (.erd) ============ */
         .erd {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
             gap: 14px;
             margin: 18px 0;
         }
@@ -763,7 +769,7 @@
         .erd-row:last-child { border-bottom: none; }
         .erd-row .col { font-family: "SF Mono", "Cascadia Code", Consolas, monospace; color: var(--text); }
         .erd-row .type { color: var(--text-faint); }
-        .erd-row .key { font-size: var(--fs-label); font-weight: 700; color: var(--accent); min-width: 22px; text-align: right; }
+        .erd-row .key { font-size: var(--fs-label); font-weight: 700; color: var(--accent); min-width: 22px; max-width: 180px; text-align: right; }
         .erd-row.more { grid-template-columns: 1fr; color: var(--text-faint); font-style: italic; }
 
         .erd-rel {

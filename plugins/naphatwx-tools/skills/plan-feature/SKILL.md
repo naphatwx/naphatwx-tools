@@ -76,9 +76,9 @@ SeqDiagrams.define("01-cut-new-version", {
     actors: [["eng", "Engineer", "browser"], ["api", "api-service", "VersionService"]],
     steps: [
         ["phase", "1 · Open the form"],
-        ["call", "eng", "api", "GetBases(1204)"],
-        ["ret", "api", "eng", "latestVersion"],
-        ["note", "api", "permission check"],
+        ["call", "eng", "api", "GetBases", "repositoryId 1204"],
+        ["ret", "api", "eng", "GetBasesResponse", "latestVersion 2.3.2-1"],
+        ["note", "api", "guards", null, "permission check · eligibility"],
         ["alt", "upstream accepts"], ["hot", "api", "db", "INSERT audit"], ["else", "refused"], ["ret", "api", "eng", "reason"], ["end"],
     ],
 });
@@ -87,14 +87,16 @@ SeqDiagrams.define("01-cut-new-version", {
 | Step | Meaning |
 |------|---------|
 | `["phase", text]` | Section band across the diagram |
-| `["call", from, to, label]` | Request (solid arrow) |
-| `["ret", from, to, label]` | Response (dashed arrow) |
-| `["hot", from, to, label]` | Side effect: external write, audit, job trigger (accent arrow) |
-| `["note", at, text]` / `["note", a, text, b]` | Note over one participant or spanning two |
+| `["call", from, to, label, detail?]` | Request (solid arrow) |
+| `["ret", from, to, label, detail?]` | Response (dashed arrow) |
+| `["hot", from, to, label, detail?]` | Side effect: external write, audit, job trigger (accent arrow) |
+| `["note", at, text, to?, detail?]` | Note over one participant, or spanning to `to` (`null` for none) |
 | `["alt", cond]` … `["else", cond]` … `["end"]` | Branches |
 | `["opt", cond]` / `["loop", cond]` … `["end"]` | Optional or repeated block |
 
-- Labels: real names with example values (`GetLegacyRepositoryVersions(1204, page 1)`), not prose.
+- Labels are the name only, ≤ 40 chars: RPC (`TriggerRedeployment`), endpoint (`POST /things`), table op (`INSERT infra.redeployment`), queue (`publish infra.redeployment.create`), job (`build app-redeployment`), status or error code (`FAILED_PRECONDITION`).
+- Put arguments, example values, messages and reasons in `detail`. It shows on hover and in the "Step details" list under the diagram. `render.js` warns in the console for any label, note or condition over 40 chars.
+- Notes and `alt` / `else` conditions are a short phrase too (`guards`, `environment not AVAILABLE`); the rule itself goes in `detail` or in "Rules this flow must keep".
 - Use `hot` only for writes that leave the service or must be audited, so readers can scan for side effects.
 
 ### 4. Fill in `overview.html`
@@ -124,7 +126,7 @@ SeqDiagrams.define("01-cut-new-version", {
 ### 6. Verify
 
 - Every `nav-link` hash matches a heading id; every `data-flow` has a loaded flow file.
-- Open `overview.html` in a headless browser when one is available, and check each diagram draws (no "Missing diagram file" text) and labels are not clipped.
+- Open `overview.html` in a headless browser when one is available, and check each diagram draws (no "Missing diagram file" text), labels are not clipped, and the console has no `[seq]` length warnings.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 7. Confirm
