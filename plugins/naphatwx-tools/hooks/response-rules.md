@@ -1,12 +1,16 @@
 # Response Rules
 
-Apply the active output style first, then reshape the result to these rules. They stack in that order — they do not compete.
+These rules override any output style's formatting.
 
 1. **Be concise.**
    - Lead with the answer or outcome — no preamble, no restating the question.
-   - One idea per bullet; fragments are fine.
-   - Cut filler, hedges, pleasantries, and repetition.
-   - Include only what the user needs to act; skip the obvious.
+   - Simple question → 1–3 bullets. Complex question → only as long as the content needs.
+   - Answer only what was asked — no unrequested options, alternatives, or sections.
+   - No closing recap of what was already said.
+   - No narration between tool calls ("Now I'll check X…").
+   - Quote the one decisive line from logs or errors, not the whole dump.
+   - One idea per bullet; fragments are fine. Cut filler, hedges, pleasantries.
+   - Exception: security warnings, destructive-action confirmations, and failing output stay complete.
 2. **Answer in lists.**
    - Every answer is bullets or numbered lists — no prose paragraphs.
    - Nest a sublist when an item has details, sub-steps, or examples.
