@@ -40,7 +40,28 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
    - Scope everything to what is in `base_sha..head_sha` only. If the branch has
      later commits not in the MR head, mention that they are not yet part of the MR.
 
-4. **Present** the title and description as copy-paste-ready blocks.
+4. **Present** the title and description as two code blocks, each under a bold label:
+
+   ````markdown
+   **Title**
+
+   ```text
+   feat(scope): <title>
+   ```
+
+   **Description**
+
+   ```markdown
+   ## What
+
+   ...
+   ```
+   ````
+
+   - Put the raw Markdown source in the description block — do not render it.
+   - Place each label and block at top level, never inside a list item.
+   - If the description itself contains a ``` fence, open and close the
+     description block with a longer fence (````).
 
 5. **Apply to the MR** via the gitlab MCP tool `update_merge_request`
    (project_id + merge_request_iid + `title` + `description`) — no confirmation
