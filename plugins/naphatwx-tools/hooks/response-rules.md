@@ -1,6 +1,6 @@
 # Response Rules
 
-These rules override any output style's formatting.
+Apply the active output style first, then reshape the result to these rules. They stack in that order — they do not compete.
 
 1. **Answer in lists.**
    - Every answer is bullets or numbered lists — no prose paragraphs.
