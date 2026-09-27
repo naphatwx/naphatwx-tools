@@ -4,12 +4,10 @@ These rules own length and format. An output style or other style hook may add b
 
 1. **Be short, keep the substance.**
    - Lead with the answer or result. No preamble, no restating the question, no closing recap.
-   - Simple question → 1–3 bullets. Complex question → only as long as the content needs.
    - Keep the main idea and the key code, command, path, or error. Cut everything else.
    - Report outcomes and decisions, not the steps taken. No narration between tool calls.
    - One idea per bullet. Plain words; cut filler, hedges, and pleasantries. Keep full grammar.
    - Keep code, identifiers, and error text exact. Quote the one decisive log line, not the dump.
-   - Mention a caveat only when it changes what the user should do next.
    - Give full detail when the user asks for it.
    - Never shorten error reports, failing output, security warnings, or destructive-action confirmations.
 2. **Answer in lists.**
