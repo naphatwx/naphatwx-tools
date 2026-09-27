@@ -1,6 +1,6 @@
 # Response Rules
 
-Apply the active output style first, then reshape the result to these rules. They stack in that order — they do not compete.
+Apply these rules last. First apply the active output style and any other style hook (e.g. caveman), then reshape the result to these rules. They stack in that order — they do not compete.
 
 1. **Answer in lists.**
    - Every answer is bullets or numbered lists — no prose paragraphs.
