@@ -688,8 +688,9 @@
 
         .flowchart img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
 
-        /* iframe of a standalone diagram-design HTML file (default dark theme, paper #2d3142); set its height inline */
-        .diagram-frame { display: block; width: 100%; height: 560px; border: 0; border-radius: 8px; background: #2d3142; }
+        /* iframe of a standalone diagram-design HTML file (default dark theme, paper #2d3142).
+           The file posts its real height (its SVG shrinks with the width); the script below applies it. */
+        .diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #2d3142; }
 
         /* ============ SEQUENCE DIAGRAM (.seq) ============ */
         .seq {
@@ -938,7 +939,7 @@
 
                 <!-- ===== one block per flow: h3 id="flow-NN" + flowchart + sequence diagram (both in closed <details>) + rules + try links.
                      Manual: <img src="flowchart/NN-slug.svg"> and .seq[data-flow="NN-slug"].
-                     diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" style="height:NNNpx" loading="lazy"></iframe>,
+                     diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" loading="lazy"></iframe>,
                      and <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></iframe></div> ===== -->
                 <h3 id="flow-01">1. Example flow</h3>
                 <p><span class="pill accent">US1 · P1</span><span class="pill">FR-001 · FR-002</span><span class="pill">flowchart/01-example-flow.svg</span><span class="pill">sequence-diagram/01-example-flow.js</span></p>
@@ -1124,6 +1125,13 @@
         diagramAll?.addEventListener("click", () => {
             const open = !toggles.every(d => d.open);
             toggles.forEach(d => { d.open = open; });
+        });
+
+        // ===== Fit each diagram-design iframe to the height its file posts (works on file://) =====
+        window.addEventListener("message", (e) => {
+            if (!e.data || e.data.type !== "diagram-height") return;
+            const frame = [...document.querySelectorAll(".diagram-frame")].find(f => f.contentWindow === e.source);
+            if (frame) frame.style.height = Math.ceil(e.data.height) + "px";
         });
 
         // ===== Sidebar search filter =====

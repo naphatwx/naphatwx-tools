@@ -115,6 +115,17 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - A sequence diagram shows how the flow's services talk: who calls whom, in what order, what comes back, and which writes leave the service. Every branch in the flowchart that reaches a service shows up here as an `alt` / `opt`.
 
 - diagram-design mode: ask it for a Sequence diagram per flow, with the same labels and detail rules as below; save to `sequence-diagram/NN-<slug>.html`. Skip the `.js` format.
+- diagram-design mode, both diagram kinds: add this height reporter just before `</body>` of every saved `.html`. The SVG shrinks with the iframe width, so a fixed height from the `viewBox` leaves empty space; the template's `message` listener sizes the iframe instead.
+
+```html
+<script>
+  // Report the real height to overview.html so its iframe fits (postMessage works on file://).
+  // body, not documentElement: documentElement.scrollHeight never drops below the iframe's current height.
+  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.scrollHeight }, "*");
+  addEventListener("load", postHeight);
+  new ResizeObserver(postHeight).observe(document.body);
+</script>
+```
 - Manual mode: write one `.js` file per flow, as follows.
 
 - Name: `NN-<flow-slug>.js`, numbered in reading order (`01-cut-new-version.js`).
@@ -159,7 +170,7 @@ SeqDiagrams.define("01-cut-new-version", {
         - `<h3 id="flow-NN">`, pills (user story, requirement ids, both file names), what + trigger.
         - Flowchart in a closed `<details class="diagram-toggle">`, summary `Flowchart · flow logic`:
             - Manual: `<div class="flowchart"><img src="flowchart/NN-<slug>.svg" alt="…"></div>`.
-            - diagram-design: `<div class="flowchart"><iframe class="diagram-frame" src="flowchart/NN-<slug>.html" title="…" style="height:…px" loading="lazy"></iframe></div>`, height from the diagram's `viewBox`.
+            - diagram-design: `<div class="flowchart"><iframe class="diagram-frame" src="flowchart/NN-<slug>.html" title="…" loading="lazy"></iframe></div>`. No inline height: the iframe fits the height its file posts (see step 5).
         - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
             - Manual: `<div class="seq" data-flow="NN-<slug>"></div>`.
             - diagram-design: `<div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-<slug>.html" …></iframe></div>`.
@@ -196,7 +207,7 @@ SeqDiagrams.define("01-cut-new-version", {
 - Every `nav-link` hash matches a heading id; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
 - Every flow has both a flowchart and a sequence diagram file, and every `.diagram-toggle` is closed by default.
 - Every flowchart diamond has two labelled exits and every path reaches an end pill or loops back.
-- Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, iframes don't cut the diagram off, and the console has no `[seq]` length warnings.
+- Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), and the console has no `[seq]` length warnings.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 9. Confirm
