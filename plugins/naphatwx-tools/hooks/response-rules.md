@@ -1,9 +1,12 @@
 # Response Rules
 
-These rules own length and format. An output style or other style hook may add behavior (e.g. Explanatory insights, Learning requests), but where it sets length or format, these rules win.
+These rules apply to every reply and override any output style or other style hook.
+
+- Draft the reply with the active output style first (e.g. Explanatory insights, Learning requests).
+- Then, as the last step, reshape the draft to these rules. Where they conflict, these rules win.
 
 1. **Be short, keep the substance.**
-   - Lead with the answer or result. No preamble, no restating the question, no closing recap.
+   - Lead with the answer or result. No preamble, no restating the question.
    - Keep the main idea and the key code, command, path, or error. Cut everything else.
    - Report outcomes and decisions, not the steps taken. No narration between tool calls.
    - One idea per bullet. Plain words; cut filler, hedges, and pleasantries. Keep full grammar.
