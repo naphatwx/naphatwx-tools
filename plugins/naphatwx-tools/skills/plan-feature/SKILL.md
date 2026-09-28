@@ -80,7 +80,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 2. Pick the mode and copy the template
 
 - Mode: the `diagram-design` skill is available (`diagram-design:diagram-design` in Claude Code; any agent: listed in its skills) → diagram-design; otherwise manual. Pass it to every `generate-diagram` run.
-- Copy `template/overview.html` → `<output>/overview.html`.
+- Copy `template/overview.html` → `<output>/overview.html`. The template's `flowchart/` and `sequence-diagram/` files exist only to preview it; don't copy them — `generate-diagram` writes the real ones.
 - diagram-design mode: remove the `render.js` `<script>` lines and `SeqDiagrams.renderAll()` from the output `overview.html`.
 
 ### 3. Fan out section agents
