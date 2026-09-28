@@ -645,22 +645,24 @@
         .flow-nav small { display: block; color: var(--text-faint); font-size: var(--fs-label); }
 
         /* ============ DIAGRAM TOGGLES (closed by default) ============ */
-        .diagram-toggle {
+        /* .full-toggle: the "full details" block under Database / API changes, same look */
+        .diagram-toggle, .full-toggle {
             border: 1px solid var(--border);
             border-radius: 12px;
             margin: 12px 0;
             padding: 0 14px;
         }
 
-        .diagram-toggle > summary {
+        .diagram-toggle > summary, .full-toggle > summary {
             cursor: pointer;
             padding: 10px 0;
             font-weight: 600;
             color: var(--text);
         }
 
-        .diagram-toggle > summary:hover { color: var(--accent); }
-        .diagram-toggle[open] > summary { border-bottom: 1px solid var(--border); }
+        .diagram-toggle > summary:hover, .full-toggle > summary:hover { color: var(--accent); }
+        .diagram-toggle[open] > summary, .full-toggle[open] > summary { border-bottom: 1px solid var(--border); }
+        .full-toggle > h4:first-of-type { margin-top: 14px; }
         .diagram-toggle > .flowchart, .diagram-toggle > .seq { margin: 12px 0 14px; }
 
         .diagram-all {
@@ -778,6 +780,7 @@
 
         .erd-table.external { border-style: dashed; }
         .erd-table.write { border-color: var(--accent); }
+        .erd-row.none { grid-template-columns: 1fr; color: var(--text-faint); }
 
         .erd-head {
             display: flex;
@@ -962,9 +965,11 @@
                 </div>
                 <!-- ===== end flow block ===== -->
 
-                <!-- ===== schema changes only: new tables and changed columns. No schema change → keep this section, replace its body with "This feature has no database changes." ===== -->
+                <!-- ===== Database: changes first, then the full schema of every related table in a closed .full-toggle.
+                     No related table at all → keep this section, replace its body with "This feature has no database changes." ===== -->
                 <h2 id="database">Database changes</h2>
                 <p>Only tables whose schema changes. Accent border = new table · solid border = existing table, changed columns only. Migration: <code>path/to/migration.sql</code>.</p>
+                <p><a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a> <span class="faint">every related table and relation, on its own page</span></p>
                 <div class="erd">
                     <div class="erd-table write">
                         <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
@@ -983,49 +988,125 @@
                 <ul class="erd-rel">
                     <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_b.table_a_id <span class="faint">(new FK)</span></li>
                 </ul>
-                <!-- ===== end schema changes ===== -->
+                <details class="full-toggle">
+                    <summary>Full schema <span class="faint">· every related table, all columns</span></summary>
+                    <p>Every table this feature reads or writes. Changed rows keep their <code>+ add</code> / <code>~</code> / <code>− drop</code> marks. Dashed border = external (another service owns it).</p>
+                    <div class="erd">
+                        <div class="erd-table write">
+                            <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
+                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                            <div class="erd-row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                            <div class="erd-row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                        </div>
+                        <div class="erd-table">
+                            <div class="erd-head">schema.table_a <span class="erd-tag">altered</span></div>
+                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                            <div class="erd-row"><span class="col">name</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                            <div class="erd-row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
+                            <div class="erd-row"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                            <div class="erd-row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
+                            <div class="erd-row"><span class="col">created_at</span><span class="type">timestamptz</span><span class="key"></span></div>
+                        </div>
+                        <div class="erd-table">
+                            <div class="erd-head">schema.table_c <span class="erd-tag">read</span></div>
+                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                            <div class="erd-row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                            <div class="erd-row"><span class="col">enabled</span><span class="type">boolean</span><span class="key"></span></div>
+                        </div>
+                        <div class="erd-table external">
+                            <div class="erd-head">other.table_x <span class="erd-tag">external</span></div>
+                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                            <div class="erd-row"><span class="col">code</span><span class="type">text</span><span class="key"></span></div>
+                        </div>
+                    </div>
+                    <ul class="erd-rel">
+                        <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_b.table_a_id <span class="faint">(new FK)</span></li>
+                        <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_c.table_a_id</li>
+                    </ul>
+                </details>
+                <!-- ===== end Database ===== -->
 
-                <!-- ===== request / response changes only (proto, OpenAPI, DTO). No API change → keep this section, replace its body with "This feature has no API changes." ===== -->
+                <!-- ===== API: one block per API (request changes + response changes), then the full request / response of every related API
+                     in a closed .full-toggle. No related API at all → keep this section, replace its body with "This feature has no API changes." ===== -->
                 <h2 id="api">API changes</h2>
-                <p>Only messages that change. File: <code>path/to/service.proto</code> · additive, wire-compatible. Accent border = new message · solid border = existing message, changed fields only.</p>
-                <h3>New RPCs</h3>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>RPC</th><th>Route</th><th>Permission</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>CreateThing</code></td><td><code>POST /api/v1/things</code></td><td><code>things.create</code></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <h3>Messages</h3>
+                <p>Each API with its request and response changes. File: <code>path/to/service.proto</code> · additive, wire-compatible. Accent border = new message · solid border = existing message, changed fields only.</p>
+
+                <!-- ===== one block per changed API ===== -->
+                <h3><code>CreateThing</code></h3>
+                <p><span class="pill accent">new</span><span class="pill"><code>POST /api/v1/things</code></span><span class="pill">permission <code>things.create</code></span></p>
                 <div class="erd">
                     <div class="erd-table write">
-                        <div class="erd-head">CreateThingRequest <span class="erd-tag">new message</span></div>
+                        <div class="erd-head">Request · CreateThingRequest <span class="erd-tag">new message</span></div>
                         <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
                         <div class="erd-row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
                         <div class="erd-row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
                     </div>
                     <div class="erd-table">
-                        <div class="erd-head">ThingResponse <span class="erd-tag">altered</span></div>
+                        <div class="erd-head">Response · ThingResponse <span class="erd-tag">altered</span></div>
                         <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
                         <div class="erd-row"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
                         <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
                     </div>
                 </div>
-                <h3>Behaviour changes, same signature</h3>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>RPC</th><th>Change</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>GetThings</code></td><td>Honours the new filter; empty means no filter.</td></tr>
-                        </tbody>
-                    </table>
+
+                <h3><code>GetThings</code></h3>
+                <p><span class="pill">behaviour change</span><span class="pill"><code>GET /api/v1/things</code></span><span class="pill">permission <code>things.read</code></span></p>
+                <div class="erd">
+                    <div class="erd-table">
+                        <div class="erd-head">Request · GetThingsRequest <span class="erd-tag">unchanged</span></div>
+                        <div class="erd-row none">No field change.</div>
+                    </div>
+                    <div class="erd-table">
+                        <div class="erd-head">Response · GetThingsResponse <span class="erd-tag">unchanged</span></div>
+                        <div class="erd-row none">No field change.</div>
+                    </div>
                 </div>
-                <!-- ===== end API changes ===== -->
+                <p><strong>Behaviour:</strong> honours the new filter; empty means no filter.</p>
+                <!-- ===== end API block ===== -->
+
+                <h3>Shared types</h3>
+                <div class="erd">
+                    <div class="erd-table write">
+                        <div class="erd-head">RepositorySource <span class="erd-tag">new enum</span></div>
+                        <div class="erd-row"><span class="col">REPOSITORY_SOURCE_UNSPECIFIED</span><span class="type"></span><span class="key">0</span></div>
+                        <div class="erd-row"><span class="col">GITLAB</span><span class="type"></span><span class="key">1</span></div>
+                    </div>
+                </div>
+
+                <details class="full-toggle">
+                    <summary>Full contracts <span class="faint">· every related API, full request and response</span></summary>
+                    <p>Every API this feature adds, changes or calls. Changed fields keep their <code>+</code> / <code>~</code> / <code>−</code> marks.</p>
+                    <h4><code>CreateThing</code> <span class="faint">· POST /api/v1/things · new</span></h4>
+                    <div class="erd">
+                        <div class="erd-table write">
+                            <div class="erd-head">Request · CreateThingRequest <span class="erd-tag">new message</span></div>
+                            <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
+                            <div class="erd-row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
+                            <div class="erd-row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
+                        </div>
+                        <div class="erd-table">
+                            <div class="erd-head">Response · ThingResponse <span class="erd-tag">altered</span></div>
+                            <div class="erd-row"><span class="col">id</span><span class="type">int64</span><span class="key">1</span></div>
+                            <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">2</span></div>
+                            <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
+                            <div class="erd-row"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
+                            <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
+                        </div>
+                    </div>
+                    <h4><code>GetOwner</code> <span class="faint">· GET /api/v1/owners/{id} · called, unchanged</span></h4>
+                    <div class="erd">
+                        <div class="erd-table external">
+                            <div class="erd-head">Request · GetOwnerRequest <span class="erd-tag">unchanged</span></div>
+                            <div class="erd-row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
+                        </div>
+                        <div class="erd-table external">
+                            <div class="erd-head">Response · Owner <span class="erd-tag">unchanged</span></div>
+                            <div class="erd-row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
+                            <div class="erd-row"><span class="col">displayName</span><span class="type">string</span><span class="key">2</span></div>
+                        </div>
+                    </div>
+                </details>
+                <!-- ===== end API ===== -->
 
                 <h2 id="errors">Errors</h2>
                 <div class="table-wrap">
