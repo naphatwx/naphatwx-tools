@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequence diagrams · Feature Name</title>
+    <style>
+        /* Standalone viewer for manual-mode sequence files; same tokens and .seq styles as plan-feature's overview.html. */
+        :root,
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --bg-elevated: #222227;
+            --border: #2e2e34;
+            --border-strong: #3a3a42;
+            --text: #f5f5f5;
+            --text-muted: #b0b0b8;
+            --text-faint: #80808a;
+            --accent: #8b5cf6;
+            --accent-soft: rgba(139, 92, 246, 0.16);
+            --code-bg: #242429;
+            --card-bg: #202024;
+            --fs-label: 0.75rem;
+            --fs-sm: 0.875rem;
+            color-scheme: dark;
+        }
+
+        [data-theme="light"] {
+            --bg: #d3d3d3;
+            --bg-elevated: #e4e4e4;
+            --border: #b9b9b9;
+            --border-strong: #a8a8a8;
+            --text: #1a1a1a;
+            --text-muted: #444444;
+            --text-faint: #666666;
+            --accent: #7c3aed;
+            --accent-soft: rgba(124, 58, 237, 0.12);
+            --code-bg: #c6c6c6;
+            --card-bg: #dddddd;
+            color-scheme: light;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", system-ui, sans-serif; padding: 24px 16px 40px; }
+        main { max-width: 1200px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+        h1 { font-size: 1.4rem; }
+        h2 { font-size: 1.1rem; margin-top: 28px; }
+        code { font-family: "SF Mono", "Cascadia Code", Consolas, monospace; font-size: 0.88em; }
+        .btn { font: inherit; font-size: var(--fs-sm); color: var(--text-muted); background: var(--card-bg); border: 1px solid var(--border-strong); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+
+        /* ============ SEQUENCE DIAGRAM (.seq) ============ */
+        .seq {
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 8px;
+            margin: 18px 0;
+            overflow-x: auto;
+        }
+
+        .seq svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+        }
+
+        .seq .actor rect { fill: var(--bg-elevated); stroke: var(--border-strong); }
+        .seq .actor text { fill: var(--text); font-size: 13px; font-weight: 600; }
+        .seq .actor .sub { fill: var(--text-faint); font-size: 10.5px; font-weight: 400; }
+        .seq .life { stroke: var(--border-strong); stroke-dasharray: 3 4; }
+        .seq .msg { stroke: var(--text-muted); stroke-width: 1.4; fill: none; }
+        .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-faint); }
+        .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
+        .seq .lbl { fill: var(--text-muted); font-size: 12px; }
+        .seq .lbl.hot { fill: var(--accent); font-weight: 600; }
+        .seq .num { fill: var(--text-faint); font-size: 10px; font-weight: 600; }
+        .seq .phase line { stroke: var(--border); }
+        .seq .phase rect { fill: var(--accent-soft); }
+        .seq .phase text { fill: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+        .seq .note rect { fill: var(--code-bg); stroke: var(--border-strong); }
+        .seq .note text { fill: var(--text-muted); font-size: 11px; }
+        .seq .frame rect.box { fill: none; stroke: var(--border-strong); stroke-width: 1.2; }
+        .seq .frame rect.tab { fill: var(--bg-elevated); stroke: var(--border-strong); }
+        .seq .frame text { fill: var(--text); font-size: 11px; font-weight: 700; }
+        .seq .frame .cond { fill: var(--text-faint); font-weight: 500; font-style: italic; }
+        .seq .frame line { stroke: var(--border-strong); stroke-dasharray: 6 4; }
+        .seq .ah { fill: var(--text-muted); }
+        .seq .ah.ret { fill: var(--text-faint); }
+        .seq .ah.hot { fill: var(--accent); }
+        .seq .step { cursor: default; }
+        .seq-steps { margin-top: 10px; font-size: var(--fs-sm); color: var(--text-muted); }
+        .seq-steps summary { cursor: pointer; color: var(--text-faint); font-weight: 600; }
+        .seq-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
+        .seq-steps li { display: grid; grid-template-columns: 22px auto 1fr; gap: 8px; align-items: baseline; padding: 4px 0; border-top: 1px solid var(--border); }
+        .seq-steps .n { color: var(--text-faint); font-weight: 600; text-align: right; }
+
+        .seq-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-size: var(--fs-sm);
+            color: var(--text-faint);
+            margin-top: -6px;
+        }
+
+        .seq-legend span::before {
+            content: "";
+            display: inline-block;
+            width: 26px;
+            vertical-align: middle;
+            margin-right: 6px;
+            border-top: 2px solid var(--text-muted);
+        }
+
+        .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-faint); }
+        .seq-legend .hot::before { border-color: var(--accent); }
+    </style>
+</head>
+
+<body>
+    <main>
+        <header>
+            <h1>Sequence diagrams · Feature Name</h1>
+            <button class="btn" id="themeToggle" type="button" aria-label="Toggle theme">🌙</button>
+        </header>
+        <div class="seq-legend" style="margin:10px 0 0">
+            <span>call</span>
+            <span class="ret">response</span>
+            <span class="hot">side effect (external write / audit)</span>
+        </div>
+
+        <!-- one h2 + .seq per flow file -->
+        <h2>1. Example flow</h2>
+        <div class="seq" data-flow="01-example-flow"></div>
+    </main>
+
+    <script src="render.js"></script>
+    <script src="01-example-flow.js"></script>
+    <script>
+        SeqDiagrams.renderAll();
+        const root = document.documentElement, toggle = document.getElementById("themeToggle");
+        const saved = localStorage.getItem("docs-theme");
+        if (saved) root.setAttribute("data-theme", saved);
+        const paint = () => { toggle.textContent = root.getAttribute("data-theme") === "light" ? "☀️" : "🌙"; };
+        paint();
+        toggle.addEventListener("click", () => {
+            const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+            root.setAttribute("data-theme", next);
+            localStorage.setItem("docs-theme", next);
+            paint();
+        });
+    </script>
+</body>
+
+</html>

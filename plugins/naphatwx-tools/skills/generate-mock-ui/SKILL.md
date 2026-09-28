@@ -55,7 +55,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 1. Read the feature
 
-- From the plan folder: `overview.html` (scope, errors) and each `sequence-diagram/NN-*.js` (operations, participants, branches).
+- From the plan folder: `overview.html` (scope, errors) and each `sequence-diagram/NN-*` file, `.js` or `.html` (operations, participants, branches).
 - From the spec: data model, contracts (proto, OpenAPI, upstream API), field mapping tables, error mapping, edge cases.
 - List:
     - **Screens** the feature adds or changes → one `page/*.html` each.
