@@ -879,7 +879,7 @@
                     <div class="card">
                         <div class="ic">🗄️</div>
                         <h4>Data impact</h4>
-                        <p>New tables and changed columns, or "no schema change" (then the Database changes section is removed).</p>
+                        <p>New tables and changed columns, or "no schema change" (the Database changes section then says so in one sentence).</p>
                     </div>
                     <div class="card">
                         <div class="ic">🧩</div>
@@ -935,7 +935,7 @@
                 </div>
                 <!-- ===== end flow block ===== -->
 
-                <!-- ===== schema changes only: new tables and changed columns. No schema change → delete this section and its nav link ===== -->
+                <!-- ===== schema changes only: new tables and changed columns. No schema change → keep this section, replace its body with "This feature has no database changes." ===== -->
                 <h2 id="database">Database changes</h2>
                 <p>Only tables whose schema changes. Accent border = new table · solid border = existing table, changed columns only. Migration: <code>path/to/migration.sql</code>.</p>
                 <div class="erd">
@@ -958,7 +958,7 @@
                 </ul>
                 <!-- ===== end schema changes ===== -->
 
-                <!-- ===== request / response changes only (proto, OpenAPI, DTO). No API change → delete this section and its nav link ===== -->
+                <!-- ===== request / response changes only (proto, OpenAPI, DTO). No API change → keep this section, replace its body with "This feature has no API changes." ===== -->
                 <h2 id="api">API changes</h2>
                 <p>Only messages that change. File: <code>path/to/service.proto</code> · additive, wire-compatible. Accent border = new message · solid border = existing message, changed fields only.</p>
                 <h3>New RPCs</h3>

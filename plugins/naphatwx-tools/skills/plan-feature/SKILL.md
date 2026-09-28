@@ -146,7 +146,7 @@ SeqDiagrams.define("01-cut-new-version", {
 ### 6. Fill in `overview.html`
 
 - Replace the title, brand and eyebrow (spec number, ticket, status).
-- Sections, in order. Drop a section only when it truly does not apply, and remove its nav link too:
+- Sections, in order. Always keep every section and its nav link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
     1. **Overview**: lead sentence + 3–4 cards (key decision, data impact, UI impact, eligibility/scale).
     2. **Scope**: in / out table.
     3. **Flowcharts**: one block per chart file (copy the block between the `one block per flowchart` comments):
@@ -163,17 +163,17 @@ SeqDiagrams.define("01-cut-new-version", {
         - Changed rows: `.erd-row.add` (`+ add`), `~ type` / `~ null` for a change (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the section intro.
         - Leave out tables that are only read, only get rows inserted or updated, or are external. Those belong in the diagrams.
         - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
-        - No schema change → delete the section and its nav link, and say "no schema change" in the Overview data-impact card.
+        - No schema change → keep the section with one sentence: "This feature has no database changes." Also say "no schema change" in the Overview data-impact card.
     6. **API changes**: request / response changes only (copy the block between the `request / response changes only` comments).
         - Source: the proto / OpenAPI / DTO diff in the spec's contracts. Name the file(s) and say whether the change is wire-compatible.
         - **New RPCs** table: RPC → route → permission (`none · system caller` when it has none).
         - **Messages**: one `.erd` card per message. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add, `~ N` change (type `old → new`), `− N` remove. New enums count as new messages.
         - **Behaviour changes, same signature**: RPCs whose rules change without a proto change. Leave out a subsection that has no rows.
         - Leave out untouched messages. When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
-        - No API change → delete the section and its nav link.
-    7. **Errors**: cause → code → user-facing text.
+        - No API change → keep the section with one sentence: "This feature has no API changes."
+    7. **Errors**: cause → code → user-facing text. No new errors → one sentence saying so.
     8. **Mock UI**: link cards into `mock/` (new tab). No mock → replace with one line saying the feature has no UI.
-    9. **Open questions**: blocker callout, then numbered steps.
+    9. **Open questions**: blocker callout, then numbered steps. None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the sidebar nav to match: one link per chart under "Flowcharts", one per flow under "Sequence diagrams".
 
@@ -181,7 +181,7 @@ SeqDiagrams.define("01-cut-new-version", {
 
 - Ask whether to build an interactive mock (use AskUserQuestion when the agent has it). Skip the question when the feature has no UI.
 - Yes → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder. It adds `mock/` and fills the "Try it in the mock" cards.
-- No → remove the "Try it in the mock" blocks and the Mock UI nav link.
+- No → remove the "Try it in the mock" blocks. Keep the Mock UI section and nav link with one sentence saying no mock was built.
 
 ### 8. Verify
 
