@@ -1,6 +1,6 @@
 ---
 name: plan-feature
-description: Plan a feature as a browsable HTML folder — overview.html with scope, flowcharts of the decision logic, one sequence diagram per flow (each in its own file), database changes, API changes, errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
+description: Plan a feature as a browsable HTML folder — overview.html with scope, a Flows section where every flow has a flowchart (its logic) and a sequence diagram (how services talk), each in its own file and hidden until opened, database changes, API changes, errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 
@@ -11,11 +11,12 @@ Turn a spec, ticket or idea into a plan folder people can open in a browser.
 ```
 <output>/
 ├── overview.html              entry page: every topic, every diagram
-├── flowchart/
-│   └── 01-<chart-slug>.svg    one chart = one file (.html when drawn by diagram-design)
-├── sequence-diagram/
+├── flowchart/                 flow logic: steps, decisions, loops
+│   ├── 01-<flow-slug>.svg     one flow = one file (.html when drawn by diagram-design)
+│   └── 02-<flow-slug>.svg
+├── sequence-diagram/          how the flow's services talk
 │   ├── render.js              draws each flow as inline SVG (copied as-is; manual mode only)
-│   ├── 01-<flow-slug>.js      one flow = one file (.html when drawn by diagram-design)
+│   ├── 01-<flow-slug>.js      same NN-<flow-slug> as its flowchart (.html when drawn by diagram-design)
 │   └── 02-<flow-slug>.js
 └── mock/                      optional, built by the generate-mock-ui skill
 ```
@@ -46,12 +47,14 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Hard Rules
 
 1. `overview.html` starts from `template/overview.html`. Keep its `<style>` block, theme toggle, font-size picker, sidebar search and the template's `<script>` block unchanged.
-2. **One flow = one diagram file**; one flowchart = one file. Never paste SVG into `overview.html`.
-3. Manual mode: every flow file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">` inside its own `<h3 id="flow-NN">` block. diagram-design mode: each flow and flowchart `.html` is embedded by an `<iframe class="diagram-frame">` in its own `<h3>` block.
+2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
+3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default).
+    - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
+    - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
 4. Every sidebar `nav-link` `href="#id"` matches a real heading `id`.
 5. Every link into `mock/` opens in a new tab: `target="_blank" rel="noopener"`.
 6. No external scripts, styles or fonts in `overview.html`. `render.js` and the flow files are local.
-7. At most 7 participants per sequence diagram, at most 12 nodes per flowchart. More than that → split it. In diagram-design mode its own, tighter budgets win.
+7. At most 7 participants per sequence diagram, at most 12 nodes per flowchart. More than that → split the flow. In diagram-design mode its own, tighter budgets win.
 8. Every name in a diagram (RPC, endpoint, table, job) comes from the source. Unknown → write `TBD` in the label.
 
 ## Workflow
@@ -73,8 +76,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Check whether the `diagram-design` skill is available (`diagram-design:diagram-design` in Claude Code; any agent: listed in its skills).
 - Available → **diagram-design mode**: draw every flowchart and sequence diagram with that skill.
-    - One standalone `.html` per diagram, written straight into `flowchart/` or `sequence-diagram/`. Use its minimal template and its Flowchart / Sequence types.
-    - If it asks its first-run style-guide question, pass it to the user once; don't answer it for them.
+    - One standalone `.html` per diagram, written straight into `flowchart/` or `sequence-diagram/`. Use its Flowchart / Sequence types.
+    - Always use its **default dark theme**: the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) with the shipped default tokens. No light copy, no custom brand.
+    - Skip its first-run style-guide question: the answer is always "proceed with the default".
 - Not available → **manual mode**: draw flowcharts as hand-written SVG (step 4) and sequence diagrams with `render.js` (step 5).
 - Say which mode is used in the confirm step.
 
@@ -86,11 +90,11 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Read `template/flowchart/01-example-flow.svg` and `template/sequence-diagram/01-example-flow.js` for the formats; don't copy the examples to the output.
 - diagram-design mode: don't copy `render.js`, and remove its `<script>` lines and `SeqDiagrams.renderAll()` from the output `overview.html`.
 
-### 4. Draw the flowcharts
+### 4. Draw one flowchart per flow
 
-- What a flowchart shows: the decision logic a user or the system walks through — not the calls between services (that is the sequence diagram).
-- Start with one flowchart for the whole feature (entry → every branch → each end state). Add one per flow only when a flow has its own branching and the feature chart would pass 12 nodes.
-- Name: `NN-<chart-slug>`, numbered in reading order (`01-login.svg`).
+- A flowchart shows the flow's logic: its steps, yes / no decisions, loops and end states. It does not show services or calls; that is the sequence diagram's job.
+- Name: `NN-<flow-slug>`, the same as the flow's sequence diagram, numbered in reading order (`01-login.svg`).
+- A flow with no decision still gets a flowchart: a straight line from start pill to end pill.
 - Shapes:
 
 | Shape | Use for | Manual SVG |
@@ -107,6 +111,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - diagram-design mode: ask it for a Flowchart of the same content and save to `flowchart/NN-<slug>.html`.
 
 ### 5. Draw one sequence diagram per flow
+
+- A sequence diagram shows how the flow's services talk: who calls whom, in what order, what comes back, and which writes leave the service. Every branch in the flowchart that reaches a service shows up here as an `alt` / `opt`.
 
 - diagram-design mode: ask it for a Sequence diagram per flow, with the same labels and detail rules as below; save to `sequence-diagram/NN-<slug>.html`. Skip the `.js` format.
 - Manual mode: write one `.js` file per flow, as follows.
@@ -149,33 +155,35 @@ SeqDiagrams.define("01-cut-new-version", {
 - Sections, in order. Always keep every section and its nav link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
     1. **Overview**: lead sentence + 3–4 cards (key decision, data impact, UI impact, eligibility/scale).
     2. **Scope**: in / out table.
-    3. **Flowcharts**: one block per chart file (copy the block between the `one block per flowchart` comments):
-        - `<h3 id="chart-NN">`, file-name pill, one sentence on which decision it answers.
-        - Manual: `<div class="flowchart"><img src="flowchart/NN-<slug>.svg" alt="…"></div>`.
-        - diagram-design: `<div class="flowchart"><iframe class="diagram-frame" src="flowchart/NN-<slug>.html" title="…" style="height:…px"></iframe></div>`, height from the diagram's `viewBox`.
-    4. **Sequence diagrams**: one flow block per diagram file (copy the block between the `one block per flow` comments):
-        - `<h3 id="flow-NN">`, pills (user story, requirement ids, file name), what + trigger.
-        - Manual: `<div class="seq" data-flow="NN-<slug>"></div>`. diagram-design: `<div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-<slug>.html" …></iframe></div>`.
+    3. **Flows**: one block per flow (copy the block between the `one block per flow` comments):
+        - `<h3 id="flow-NN">`, pills (user story, requirement ids, both file names), what + trigger.
+        - Flowchart in a closed `<details class="diagram-toggle">`, summary `Flowchart · flow logic`:
+            - Manual: `<div class="flowchart"><img src="flowchart/NN-<slug>.svg" alt="…"></div>`.
+            - diagram-design: `<div class="flowchart"><iframe class="diagram-frame" src="flowchart/NN-<slug>.html" title="…" style="height:…px" loading="lazy"></iframe></div>`, height from the diagram's `viewBox`.
+        - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
+            - Manual: `<div class="seq" data-flow="NN-<slug>"></div>`.
+            - diagram-design: `<div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-<slug>.html" …></iframe></div>`.
+        - Keep the section's "Show all diagrams" button; it opens and closes every toggle.
         - "Rules this flow must keep" — 3–5 bullets from the spec.
         - "Try it in the mock" cards — only if a mock exists or will be built; each opens in a new tab.
-    5. **Database changes**: schema changes only (copy the block between the `schema changes only` comments).
+    4. **Database changes**: schema changes only (copy the block between the `schema changes only` comments).
         - One `.erd` card per table whose schema changes: `.erd-table.write` + tag `new table` for a new table (all its columns), `.erd-table` + tag `altered` for an existing table (only the changed columns).
         - Changed rows: `.erd-row.add` (`+ add`), `~ type` / `~ null` for a change (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the section intro.
         - Leave out tables that are only read, only get rows inserted or updated, or are external. Those belong in the diagrams.
         - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
         - No schema change → keep the section with one sentence: "This feature has no database changes." Also say "no schema change" in the Overview data-impact card.
-    6. **API changes**: request / response changes only (copy the block between the `request / response changes only` comments).
+    5. **API changes**: request / response changes only (copy the block between the `request / response changes only` comments).
         - Source: the proto / OpenAPI / DTO diff in the spec's contracts. Name the file(s) and say whether the change is wire-compatible.
         - **New RPCs** table: RPC → route → permission (`none · system caller` when it has none).
         - **Messages**: one `.erd` card per message. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add, `~ N` change (type `old → new`), `− N` remove. New enums count as new messages.
         - **Behaviour changes, same signature**: RPCs whose rules change without a proto change. Leave out a subsection that has no rows.
         - Leave out untouched messages. When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
         - No API change → keep the section with one sentence: "This feature has no API changes."
-    7. **Errors**: cause → code → user-facing text. No new errors → one sentence saying so.
-    8. **Mock UI**: link cards into `mock/` (new tab). No mock → replace with one line saying the feature has no UI.
-    9. **Open questions**: blocker callout, then numbered steps. None → one sentence saying there are no open questions.
+    6. **Errors**: cause → code → user-facing text. No new errors → one sentence saying so.
+    7. **Mock UI**: link cards into `mock/` (new tab). No mock → replace with one line saying the feature has no UI.
+    8. **Open questions**: blocker callout, then numbered steps. None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
-- Rewrite the sidebar nav to match: one link per chart under "Flowcharts", one per flow under "Sequence diagrams".
+- Rewrite the sidebar nav to match: one link per flow under "Flows".
 
 ### 7. Offer the mock
 
@@ -186,13 +194,14 @@ SeqDiagrams.define("01-cut-new-version", {
 ### 8. Verify
 
 - Every `nav-link` hash matches a heading id; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
+- Every flow has both a flowchart and a sequence diagram file, and every `.diagram-toggle` is closed by default.
 - Every flowchart diamond has two labelled exits and every path reaches an end pill or loops back.
-- Open `overview.html` in a headless browser when one is available, and check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, iframes don't cut the diagram off, and the console has no `[seq]` length warnings.
+- Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, iframes don't cut the diagram off, and the console has no `[seq]` length warnings.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 9. Confirm
 
 - Output: `✅ Plan created at: {output}/overview.html`
 - Say the diagram mode (diagram-design or manual).
-- List the flowcharts and flows (one line each) and whether a mock was built.
+- List the flows (one line each) and whether a mock was built.
 - Remind the user: each diagram is edited in its own file under `flowchart/` or `sequence-diagram/`; the overview picks up the change on reload.
