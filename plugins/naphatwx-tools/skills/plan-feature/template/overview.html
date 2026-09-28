@@ -644,6 +644,21 @@
         .flow-nav a.next { text-align: right; }
         .flow-nav small { display: block; color: var(--text-faint); font-size: var(--fs-label); }
 
+        /* ============ FLOWCHART (.flowchart) + diagram-design embeds ============ */
+        .flowchart {
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 18px 0;
+            overflow-x: auto;
+        }
+
+        .flowchart img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+
+        /* iframe of a standalone diagram-design HTML file; set its height inline from the diagram */
+        .diagram-frame { display: block; width: 100%; height: 560px; border: 0; border-radius: 8px; background: #fff; }
+
         /* ============ SEQUENCE DIAGRAM (.seq) ============ */
         .seq {
             border: 1px solid var(--border);
@@ -809,16 +824,21 @@
                     <a class="nav-link" href="#scope">Scope</a>
                 </div>
                 <div class="nav-group">
+                    <div class="nav-group-title">Flowcharts</div>
+                    <a class="nav-link" href="#flowchart">All flowcharts</a>
+                    <a class="nav-link" href="#chart-01">1. Example flowchart</a>
+                </div>
+                <div class="nav-group">
                     <div class="nav-group-title">Sequence diagrams</div>
                     <a class="nav-link" href="#sequence">All flows</a>
                     <a class="nav-link" href="#flow-01">1. Example flow</a>
                 </div>
                 <div class="nav-group">
                     <div class="nav-group-title">Design</div>
-                    <a class="nav-link" href="#mock">Mock UI</a>
                     <a class="nav-link" href="#database">Database changes</a>
                     <a class="nav-link" href="#api">API changes</a>
                     <a class="nav-link" href="#errors">Errors</a>
+                    <a class="nav-link" href="#mock">Mock UI</a>
                 </div>
                 <div class="nav-group">
                     <div class="nav-group-title">Plan</div>
@@ -880,6 +900,17 @@
                     </table>
                 </div>
 
+                <h2 id="flowchart">Flowcharts</h2>
+                <p>The decision logic the user walks through: start and end, steps, decisions with Yes / No branches, and loops back. Each chart lives in its own file under <code>flowchart/</code>.</p>
+
+                <!-- ===== one block per flowchart. Manual: <img src="flowchart/NN-slug.svg">.
+                     diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" style="height:NNNpx"></iframe> ===== -->
+                <h3 id="chart-01">1. Example flowchart</h3>
+                <p><span class="pill">flowchart/01-example-flow.svg</span></p>
+                <p>Which decision this chart answers, in one sentence.</p>
+                <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check the input, save it or show an error and retry"></div>
+                <!-- ===== end flowchart block ===== -->
+
                 <h2 id="sequence">Sequence diagrams</h2>
                 <p>One diagram per flow. Each diagram lives in its own file under <code>sequence-diagram/</code> and is drawn here by <code>render.js</code>.</p>
                 <div class="seq-legend" style="margin:10px 0 0">
@@ -888,7 +919,8 @@
                     <span class="hot">side effect (external write / audit)</span>
                 </div>
 
-                <!-- ===== one block per flow: h3 id="flow-NN" + .seq[data-flow] + rules + try links ===== -->
+                <!-- ===== one block per flow: h3 id="flow-NN" + .seq[data-flow] + rules + try links.
+                     diagram-design: replace .seq[data-flow] with <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></div> ===== -->
                 <h3 id="flow-01">1. Example flow</h3>
                 <p><span class="pill accent">US1 · P1</span><span class="pill">FR-001 · FR-002</span><span class="pill">sequence-diagram/01-example-flow.js</span></p>
                 <p>What this flow achieves, in one or two sentences. <strong>Trigger:</strong> where the user starts it.</p>
@@ -902,16 +934,6 @@
                     <a class="card" href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener"><h4>Happy path ↗</h4><p><code>page/example.html?scenario=normal</code></p></a>
                 </div>
                 <!-- ===== end flow block ===== -->
-
-                <h2 id="mock">Mock UI</h2>
-                <p>Links open the mock in a new tab. Built from the app's real design system; pages call a fake API with the real operation names.</p>
-                <div class="card-grid">
-                    <a class="card" href="mock/index.html" target="_blank" rel="noopener">
-                        <div class="ic">🖥️</div>
-                        <h4>Mock index ↗</h4>
-                        <p>Every page × scenario link, the fake API console.</p>
-                    </a>
-                </div>
 
                 <!-- ===== schema changes only: new tables and changed columns. No schema change → delete this section and its nav link ===== -->
                 <h2 id="database">Database changes</h2>
@@ -988,6 +1010,16 @@
                             <tr><td>Upstream refuses</td><td><code>FailedPrecondition</code></td><td>A reason the user can act on.</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <h2 id="mock">Mock UI</h2>
+                <p>Links open the mock in a new tab. Built from the app's real design system; pages call a fake API with the real operation names.</p>
+                <div class="card-grid">
+                    <a class="card" href="mock/index.html" target="_blank" rel="noopener">
+                        <div class="ic">🖥️</div>
+                        <h4>Mock index ↗</h4>
+                        <p>Every page × scenario link, the fake API console.</p>
+                    </a>
                 </div>
 
                 <h2 id="open-questions">Open questions</h2>
