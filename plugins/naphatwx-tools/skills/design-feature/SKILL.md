@@ -1,6 +1,6 @@
 ---
-name: plan-feature
-description: Plan a feature as a browsable HTML folder — overview.html with scope, a Flows section where every flow has a flowchart (its logic) and a sequence diagram (how services talk) showing real permission keys, RPCs, fields and codes, each in its own file and hidden until opened along with the flow's rules, database changes with an ER diagram page, API changes (each API's request / response changes, with the full schema and full contracts hidden until opened), errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
+name: design-feature
+description: Design a feature as a browsable HTML folder — overview.html with scope, a Flows section where every flow has a flowchart (its logic) and a sequence diagram (how services talk) showing real permission keys, RPCs, fields and codes, each in its own file and hidden until opened along with the flow's rules, database changes with an ER diagram page, API changes (each API's request / response changes, with the full schema and full contracts hidden until opened), errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 
@@ -99,7 +99,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - The main agent keeps the short sections: Overview, Scope, Errors, Mock UI, Open questions.
 - Each sub-agent prompt gives:
     - The path of this `SKILL.md` and the rules to follow, the path of `.parts/brief.md`, the mode and `<output>`.
-    - For diagrams: run the `generate-diagram` skill with the type, `.parts/brief.md` as source, the output path above, the mode, and "embedded in plan-feature's `overview.html`" (manual sequence then skips its standalone viewer).
+    - For diagrams: run the `generate-diagram` skill with the type, `.parts/brief.md` as source, the output path above, the mode, and "embedded in design-feature's `overview.html`" (manual sequence then skips its standalone viewer).
     - The exact files it may write. It must not edit `overview.html` or any other file.
     - The fragment format: the section's block copied from `template/overview.html` (between its `<!-- =====` comments), filled in with the embed snippets `generate-diagram` returned, ready to paste.
     - Its reply: the files written, plus every TBD and open question it found.

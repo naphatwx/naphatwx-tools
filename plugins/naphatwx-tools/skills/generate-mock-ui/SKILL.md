@@ -1,6 +1,6 @@
 ---
 name: generate-mock-ui
-description: Build an interactive, clickable mock UI for a planned feature in the target app's real design system — typed contract (real types, spec rules, realistic data), a fake API with the real operation names, one page per screen, and a scenario switcher for every edge state. Use when the user asks for a mock UI, UI prototype, clickable mock or wireframe for a feature, or when the plan-feature skill offers one.
+description: Build an interactive, clickable mock UI for a planned feature in the target app's real design system — typed contract (real types, spec rules, realistic data), a fake API with the real operation names, one page per screen, and a scenario switcher for every edge state. Use when the user asks for a mock UI, UI prototype, clickable mock or wireframe for a feature, or when the design-feature skill offers one.
 argument-hint: <plan-folder | spec-folder> [frontend-app-path]
 ---
 
@@ -34,7 +34,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 **Expected format:** `<plan-folder | spec-folder> [frontend-app-path]`
 
-- Plan folder (has `overview.html` + `sequence-diagram/`, from the `plan-feature` skill) → write `<plan-folder>/mock/`, and read its flows.
+- Plan folder (has `overview.html` + `sequence-diagram/`, from the `design-feature` skill) → write `<plan-folder>/mock/`, and read its flows.
 - Spec folder only → write `<spec-folder>/plan/mock/`.
 - No frontend path → find the app: look for `package.json` with a UI framework, a `components/` folder, or ask once (use AskUserQuestion when the agent has it).
 - No frontend exists at all → ask whether to use plain Tailwind defaults instead of a real design system.

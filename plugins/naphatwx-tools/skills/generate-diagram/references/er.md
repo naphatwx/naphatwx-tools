@@ -4,7 +4,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
 
 ## What to include
 
-- The tables the source names. From a feature (such as a plan-feature brief): every table the feature reads or writes, including external ones another service owns.
+- The tables the source names. From a feature (such as a design-feature brief): every table the feature reads or writes, including external ones another service owns.
 - From migrations, DDL, ORM models or a live database: the tables the user asked for, or every table in the schema. Read a live database with read-only schema queries only.
 - Every FK between the included tables.
 - Changes, when the source has them: new table, added / changed / dropped columns, new or changed FKs. Tags: `new table`, `altered`, `read` (read or written without a schema change), `external`.
@@ -20,7 +20,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
     - `tables`: `{ id, name, tag, at: [col, row], cols: [[name, type, key, mark?]] }`. `key` is `PK`, `FK`, `UQ`, `NN` or empty; `mark` is `add`, `change` or `drop`, with `+ add` / `~ type` / `− drop` as the key.
     - `rels`: `[from "table.col", to "table.col", fromCard, toCard, isNew?]`, from the FK column to the column it references.
     - Layout: at most 4 grid columns; put a child next to its parent; keep FK lines short and avoid lines that cross a table.
-- The `← Overview` link points at `../overview.html#database` for plan-feature. No such page → remove the link.
+- The `← Overview` link points at `../overview.html#database` for design-feature. No such page → remove the link.
 - It draws any number of tables; split by area only when one page gets hard to read (more than about 12 tables).
 
 ## Checks

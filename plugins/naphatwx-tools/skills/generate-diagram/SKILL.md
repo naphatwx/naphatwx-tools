@@ -1,6 +1,6 @@
 ---
 name: generate-diagram
-description: Draw one diagram as a local file — a flowchart (a flow's logic), a sequence diagram (how services talk) or an ER diagram (tables, columns, foreign keys) — with the diagram-design skill when it is installed, otherwise from this skill's own templates. Use when the user asks for a flowchart, sequence diagram, ER diagram or database schema diagram from a spec, brief, migrations or database, or when the plan-feature skill needs one.
+description: Draw one diagram as a local file — a flowchart (a flow's logic), a sequence diagram (how services talk) or an ER diagram (tables, columns, foreign keys) — with the diagram-design skill when it is installed, otherwise from this skill's own templates. Use when the user asks for a flowchart, sequence diagram, ER diagram or database schema diagram from a spec, brief, migrations or database, or when the design-feature skill needs one.
 argument-hint: <flowchart | sequence | er> <source> [output-path] [mode=diagram-design|manual]
 ---
 
@@ -25,14 +25,14 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 **Expected format:** `<flowchart | sequence | er> <source> [output-path] [mode=diagram-design|manual]`
 
 - **Type**: missing → infer it from the request ("ER", "schema", "tables" → `er`; "who calls", "services" → `sequence`; "logic", "steps", "decisions" → `flowchart`). Still unclear → ask once (use AskUserQuestion when the agent has it).
-- **Source**: a brief (such as plan-feature's `.parts/brief.md`), a spec folder or file, or a plain description. For `er` also: migration files, DDL, ORM models, or a live database read with read-only schema queries when the agent has a database tool.
+- **Source**: a brief (such as design-feature's `.parts/brief.md`), a spec folder or file, or a plain description. For `er` also: migration files, DDL, ORM models, or a live database read with read-only schema queries when the agent has a database tool.
 - **Output path**: a file or a folder. Missing → `diagrams/` at the project root. Name files `NN-<slug>` in reading order (`01-login.svg`); an ER page is `er-diagram.html`.
 - **Mode**: a caller that draws several diagrams passes it so they all match. Missing → pick it in step 2.
 
 ## Hard Rules
 
 1. Every name in a diagram (RPC, endpoint, table, column, job, screen) comes from the source. Unknown → write `TBD`. Never invent one.
-2. Write only the output files. Never edit the caller's page (for example plan-feature's `overview.html`); give it the embed snippet instead.
+2. Write only the output files. Never edit the caller's page (for example design-feature's `overview.html`); give it the embed snippet instead.
 3. Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split into several diagrams and say so. In diagram-design mode its own, tighter budgets win.
 4. diagram-design mode always uses its **default dark theme**: the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) with the shipped default tokens. No light copy, no custom brand. Skip its first-run style-guide question: the answer is always "proceed with the default".
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
@@ -54,7 +54,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 3. Draw
 
 - Read the reference for the type and follow it: [flowchart](references/flowchart.md), [sequence](references/sequence.md), [er](references/er.md).
-- diagram-design mode, `flowchart` and `sequence`: add this height reporter just before `</body>` of every saved `.html`. The SVG shrinks with an iframe's width, so a fixed height leaves empty space; a host page that listens for `diagram-height` (plan-feature's `overview.html` does) sizes the iframe instead. It does nothing when the file is opened on its own.
+- diagram-design mode, `flowchart` and `sequence`: add this height reporter just before `</body>` of every saved `.html`. The SVG shrinks with an iframe's width, so a fixed height leaves empty space; a host page that listens for `diagram-height` (design-feature's `overview.html` does) sizes the iframe instead. It does nothing when the file is opened on its own.
 
 ```html
 <script>

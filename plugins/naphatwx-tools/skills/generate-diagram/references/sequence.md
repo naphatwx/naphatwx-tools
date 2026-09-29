@@ -45,7 +45,7 @@ SeqDiagrams.define("01-cut-new-version", {
 | `["alt", cond]` … `["else", cond]` … `["end"]` | Branches |
 | `["opt", cond]` / `["loop", cond]` … `["end"]` | Optional or repeated block |
 
-- The `.js` files need a host page. A caller with its own page (plan-feature's `overview.html`) loads them there.
+- The `.js` files need a host page. A caller with its own page (design-feature's `overview.html`) loads them there.
 - No host page → also copy `template/sequence-diagram/index.html` to the output folder: set its title, and add one `<h2>` + `<div class="seq" data-flow="NN-<slug>">` and one `<script src="NN-<slug>.js">` per flow.
 
 ## Checks

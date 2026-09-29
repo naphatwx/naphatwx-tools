@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.77",
+    "version": "1.9.78",
     "description": "My personal commands shared across PCs",
     "commands": [],
     "skills": [
@@ -18,7 +18,7 @@
         "./skills/multi-column-sort",
         "./skills/weekly-work-log",
         "./skills/generate-test-scenario",
-        "./skills/plan-feature",
+        "./skills/design-feature",
         "./skills/generate-diagram",
         "./skills/generate-mock-ui"
     ],
