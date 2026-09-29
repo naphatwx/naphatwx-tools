@@ -639,13 +639,9 @@
                 transform: translateX(0);
             }
 
-            /* the edge button only closes the open drawer; ☰ opens it */
+            /* no edge button on mobile: ☰ opens the drawer, a tap outside it closes it */
             .sidebar-collapse {
                 display: none;
-            }
-
-            .sidebar.open ~ .sidebar-collapse {
-                display: grid;
             }
 
             .topbar {
@@ -1249,12 +1245,17 @@
             paintFs();
         }));
 
-        // ===== Mobile sidebar (☰ opens the drawer; edge button or a nav click closes it) =====
+        // ===== Mobile sidebar (☰ opens the drawer; a nav click or a tap outside it closes it) =====
         const sidebar = document.getElementById("sidebar");
         const small = matchMedia("(max-width: 880px)");
-        document.getElementById("menuBtn")?.addEventListener("click", () => sidebar.classList.toggle("open"));
+        const menuBtn = document.getElementById("menuBtn");
+        menuBtn?.addEventListener("click", () => sidebar.classList.toggle("open"));
         sidebar.addEventListener("click", (e) => {
             if (e.target.classList.contains("nav-link")) sidebar.classList.remove("open");
+        });
+        document.addEventListener("click", (e) => {
+            if (!sidebar.classList.contains("open") || sidebar.contains(e.target) || menuBtn?.contains(e.target)) return;
+            sidebar.classList.remove("open");
         });
 
         // ===== Desktop sidebar collapse (edge button or "[" key, remembers choice) =====
