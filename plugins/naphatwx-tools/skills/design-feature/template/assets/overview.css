@@ -87,18 +87,9 @@
     background: var(--scrollbar-hover);
 }
 
-/* base font size — every rem token scales from here */
 html {
     font-size: 16px;
     scroll-behavior: smooth;
-}
-
-html[data-fs="small"] {
-    font-size: 14px;
-}
-
-html[data-fs="big"] {
-    font-size: 18px;
 }
 
 body {
@@ -296,54 +287,6 @@ html {
     align-items: center;
     gap: 10px;
     margin-left: auto;
-}
-
-.fs-picker {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    padding: 2px;
-    border: 1px solid var(--border);
-    background: var(--bg-elevated);
-    border-radius: 8px;
-}
-
-.fs-btn {
-    min-width: 28px;
-    height: 28px;
-    padding: 0 6px;
-    border: none;
-    border-radius: 6px;
-    background: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-family: inherit;
-    font-weight: 600;
-    line-height: 1;
-    transition: background 0.12s, color 0.12s;
-}
-
-/* px, not rem: the picker must not resize itself when it changes the root size */
-.fs-btn[data-fs="small"] {
-    font-size: 12px;
-}
-
-.fs-btn[data-fs="normal"] {
-    font-size: 15px;
-}
-
-.fs-btn[data-fs="big"] {
-    font-size: 18px;
-}
-
-.fs-btn:hover {
-    background: var(--card-hover);
-    color: var(--text);
-}
-
-.fs-btn.active {
-    background: var(--accent-soft);
-    color: var(--accent);
 }
 
 .theme-toggle {

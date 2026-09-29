@@ -51,7 +51,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## Hard Rules
 
-1. `overview.html` starts from `template/overview.html`. Its styles and script live in `template/assets/overview.css` and `overview.js`: copy them unchanged, and keep the theme toggle, font-size picker, diagram zoom switch and sidebar search markup. The script makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the bottom right resets); the `Zoom` switch after the font-size picker turns this on or off (off by default).
+1. `overview.html` starts from `template/overview.html`. Its styles and script live in `template/assets/overview.css` and `overview.js`: copy them unchanged, and keep the theme toggle, diagram zoom switch and sidebar search markup. The script makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the bottom right resets); the `Zoom` switch in the top bar turns this on or off (off by default).
 2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
 3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default). The flow's rules sit in a closed `<details class="rules-toggle">` too.
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).

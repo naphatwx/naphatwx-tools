@@ -14,21 +14,6 @@ toggle.addEventListener("click", () => {
     paintToggle();
 });
 
-// ===== Base font size (small 14 / normal 16 / big 18, remembers choice) =====
-const fsButtons = [...document.querySelectorAll(".fs-btn")];
-const savedFs = localStorage.getItem("docs-fs");
-if (savedFs && fsButtons.some(b => b.dataset.fs === savedFs)) root.setAttribute("data-fs", savedFs);
-function paintFs() {
-    const current = root.getAttribute("data-fs") || "normal";
-    fsButtons.forEach(b => b.classList.toggle("active", b.dataset.fs === current));
-}
-paintFs();
-fsButtons.forEach(b => b.addEventListener("click", () => {
-    root.setAttribute("data-fs", b.dataset.fs);
-    localStorage.setItem("docs-fs", b.dataset.fs);
-    paintFs();
-}));
-
 // ===== Mobile sidebar (☰ opens the drawer; a nav click or a tap outside it closes it) =====
 const sidebar = document.getElementById("sidebar");
 const small = matchMedia("(max-width: 880px)");
