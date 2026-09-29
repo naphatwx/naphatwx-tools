@@ -60,7 +60,13 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 <script>
   // Report the real height to the host page so its iframe fits (postMessage works on file://).
   // body, not documentElement: documentElement.scrollHeight never drops below the iframe's current height.
-  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.scrollHeight }, "*");
+  // Fractional rect height, not scrollHeight (rounds down): a 0.1px overflow shows a scrollbar strip.
+  if (parent !== window) {
+    // Embedded: the host sizes the height, and a slimmer padding keeps the SVG's min-width inside a narrow column.
+    document.documentElement.style.overflowY = "hidden";
+    document.body.style.padding = "1rem";
+  }
+  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
   addEventListener("load", postHeight);
   new ResizeObserver(postHeight).observe(document.body);
 </script>
