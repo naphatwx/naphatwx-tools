@@ -127,15 +127,75 @@
 
         /* ============ SIDEBAR ============ */
         .sidebar {
-            width: 270px;
+            width: var(--sidebar-w);
             flex-shrink: 0;
             background: var(--sidebar-bg);
             border-right: 1px solid var(--border);
             height: 100vh;
             position: sticky;
             top: 0;
+            overflow-x: hidden;
             overflow-y: auto;
             padding: 20px 14px 40px;
+            transition: width 0.2s ease, padding 0.2s ease, visibility 0.2s;
+        }
+
+        html {
+            --sidebar-w: 270px;
+        }
+
+        /* fixed inner width so the nav never re-wraps while the width animates */
+        .sidebar > * {
+            min-width: 242px;
+        }
+
+        /* round button riding the sidebar's right edge; fixed so the sidebar's scroll can't clip it */
+        .sidebar-collapse {
+            position: fixed;
+            top: 50%;
+            left: max(calc(var(--sidebar-w) - 24px), 8px);
+            transform: translateY(-50%);
+            z-index: 40;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--border-strong);
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: left 0.2s ease, background 0.12s, color 0.12s;
+        }
+
+        .sidebar-collapse:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .sidebar-collapse svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        /* desktop collapsed = fully hidden; only the edge button stays */
+        @media (min-width: 881px) {
+            html[data-sidebar="collapsed"] {
+                --sidebar-w: 0px;
+            }
+
+            html[data-sidebar="collapsed"] .sidebar {
+                padding-left: 0;
+                padding-right: 0;
+                border-right-width: 0;
+                visibility: hidden;
+            }
+
+            html[data-sidebar="collapsed"] .sidebar-collapse svg {
+                transform: rotate(180deg);
+            }
         }
 
         .brand {
@@ -579,6 +639,15 @@
                 transform: translateX(0);
             }
 
+            /* the edge button only closes the open drawer; ☰ opens it */
+            .sidebar-collapse {
+                display: none;
+            }
+
+            .sidebar.open ~ .sidebar-collapse {
+                display: grid;
+            }
+
             .topbar {
                 justify-content: space-between;
                 padding: 12px 18px;
@@ -881,6 +950,12 @@
                 </div>
             </nav>
         </aside>
+        <button class="sidebar-collapse" id="collapseBtn" aria-controls="sidebar" aria-expanded="true" title="Hide sidebar ( [ )" aria-label="Hide sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="11 17 6 12 11 7" />
+                <polyline points="18 17 13 12 18 7" />
+            </svg>
+        </button>
 
         <!-- ============ MAIN ============ -->
         <div class="main">
@@ -1174,11 +1249,36 @@
             paintFs();
         }));
 
-        // ===== Mobile sidebar =====
+        // ===== Mobile sidebar (☰ opens the drawer; edge button or a nav click closes it) =====
         const sidebar = document.getElementById("sidebar");
+        const small = matchMedia("(max-width: 880px)");
         document.getElementById("menuBtn")?.addEventListener("click", () => sidebar.classList.toggle("open"));
         sidebar.addEventListener("click", (e) => {
             if (e.target.classList.contains("nav-link")) sidebar.classList.remove("open");
+        });
+
+        // ===== Desktop sidebar collapse (edge button or "[" key, remembers choice) =====
+        const collapseBtn = document.getElementById("collapseBtn");
+        if (localStorage.getItem("docs-sidebar") === "collapsed") root.setAttribute("data-sidebar", "collapsed");
+        function paintCollapse() {
+            const collapsed = root.getAttribute("data-sidebar") === "collapsed";
+            const label = collapsed ? "Show sidebar" : "Hide sidebar";
+            collapseBtn.setAttribute("aria-expanded", String(!collapsed));
+            collapseBtn.setAttribute("aria-label", label);
+            collapseBtn.title = label + " ( [ )";
+        }
+        function toggleCollapse() {
+            if (small.matches) return sidebar.classList.toggle("open");
+            const next = root.getAttribute("data-sidebar") === "collapsed" ? "expanded" : "collapsed";
+            root.setAttribute("data-sidebar", next);
+            localStorage.setItem("docs-sidebar", next);
+            paintCollapse();
+        }
+        paintCollapse();
+        collapseBtn.addEventListener("click", toggleCollapse);
+        document.addEventListener("keydown", (e) => {
+            const typing = e.target.closest("input, textarea, [contenteditable]");
+            if (e.key === "[" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) toggleCollapse();
         });
 
         // ===== Active section highlight on scroll =====
