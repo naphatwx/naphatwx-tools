@@ -365,7 +365,7 @@ html {
     color: var(--text);
 }
 
-/* diagram zoom switch; .on = wheel zoom enabled (default) */
+/* diagram zoom switch; .on = wheel zoom enabled (off by default) */
 .zoom-toggle {
     height: 34px;
     padding: 0 10px;

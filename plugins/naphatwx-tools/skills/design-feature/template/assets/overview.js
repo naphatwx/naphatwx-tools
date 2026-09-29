@@ -105,7 +105,7 @@ window.addEventListener("message", (e) => {
 const zoomToggle = document.getElementById("zoomToggle");
 const zooms = [];
 const zoomOn = () => root.getAttribute("data-zoom") === "on";
-root.setAttribute("data-zoom", localStorage.getItem("docs-zoom") === "off" ? "off" : "on");
+root.setAttribute("data-zoom", localStorage.getItem("docs-zoom") === "on" ? "on" : "off");
 function paintZoomToggle() {
     const on = zoomOn();
     zoomToggle.classList.toggle("on", on);
