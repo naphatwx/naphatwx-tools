@@ -764,15 +764,15 @@ td {
 .zoom-reset {
     display: none;
     position: absolute;
-    right: 8px;
-    bottom: 8px;
+    right: 10px;
+    bottom: 10px;
     z-index: 2;
-    padding: 4px 8px;
+    padding: 8px 14px;
     border: 1px solid var(--border-strong);
-    border-radius: 6px;
+    border-radius: 8px;
     background: var(--bg-elevated);
     color: var(--text-muted);
-    font: 600 12px/1.2 -apple-system, "Segoe UI", system-ui, sans-serif;
+    font: 600 15px/1.2 -apple-system, "Segoe UI", system-ui, sans-serif;
     cursor: pointer;
 }
 [data-zoom="on"] .zoom-reset { display: block; }
