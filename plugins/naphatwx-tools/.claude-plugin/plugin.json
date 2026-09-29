@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.79",
+    "version": "1.9.80",
     "description": "My personal commands shared across PCs",
     "commands": [],
     "skills": [
@@ -20,7 +20,8 @@
         "./skills/generate-test-scenario",
         "./skills/design-feature",
         "./skills/generate-diagram",
-        "./skills/generate-mock-ui"
+        "./skills/generate-mock-ui",
+        "./skills/announce"
     ],
     "hooks": {
         "SessionStart": [

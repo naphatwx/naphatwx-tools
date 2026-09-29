@@ -6,7 +6,6 @@
 - Frontmatter: `name` + `description` are required by every agent. Claude-only keys (`allowed-tools`, `argument-hint`, `disable-model-invocation`) are allowed; other agents ignore them.
 - Keep skill bodies agent-neutral: name a Claude-only tool as an option ("use AskUserQuestion when the agent has it"), and give a fallback for `$ARGUMENTS`.
 - Refer to other skills by bare name, e.g. the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code).
-- `plugins/naphatwx-tools/commands/` holds Claude-only commands that are not shipped (not listed in `plugin.json`).
 - `plugins/naphatwx-tools/hooks/` holds the response-rules hook. It is Claude Code only, wired inline in the Claude `plugin.json`. Don't add a `hooks/hooks.json`: Claude auto-loads it too, and the hook would run twice.
 
 ## Manifests

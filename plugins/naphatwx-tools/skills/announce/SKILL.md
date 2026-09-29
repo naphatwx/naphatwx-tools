@@ -1,4 +1,5 @@
 ---
+name: announce
 description: Draft a Thanos announcement from a GitLab merge request. Analyzes the MR and produces a ready-to-paste title + markdown content (+ popup recommendation).
 allowed-tools: Skill, Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests, mcp__thanos-mcp__AnnouncementService_CreateAnnouncement
 ---
@@ -20,6 +21,8 @@ source of truth for what changed.
 $ARGUMENTS
 ```
 
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
 `$ARGUMENTS` is the MR to analyze, plus optional flags. Accepted forms:
 
 | Input | Meaning |
@@ -32,7 +35,7 @@ Optional flags (anywhere in `$ARGUMENTS`):
 
 - `--en` — write the announcement in English (default is **Thai**).
 - `--popup` / `--no-popup` — force the popup recommendation instead of deciding.
-- `--publish` — after drafting, create + publish it via the Announcement MCP tool.
+- `--publish` — after drafting, create + publish it via the Thanos Announcement MCP tool.
 
 If `$ARGUMENTS` is empty, print usage and stop:
 
@@ -83,11 +86,11 @@ Strip the flags from `$ARGUMENTS`; keep the MR reference.
 
 ### 2. Fetch the MR changes
 
-Invoke the `naphatwx-tools:get-mr-diffs` skill with the MR reference. It
+Invoke the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code) with the MR reference. It
 resolves the project/IID, fetches metadata, and gets the diff (local git
 first, MCP fallback).
 
-Command-specific rules:
+Skill-specific rules:
 
 - **Ignore the MR title and description entirely** — do not read them as
   content, do not let them shape the analysis or the draft. The file diffs are
@@ -96,7 +99,7 @@ Command-specific rules:
   when reading locally; on the MCP fallback pass `excluded_file_patterns`, e.g.
   `["_test\\.go$", "\\.spec\\.ts$", "package-lock\\.json", "/gen/", "\\.pb\\.go$", "\\.feature$", "^docs/", "^specs/"]`.
 - If the diff is still too large to read inline (common for release MRs), read
-  it in chunks, or hand it to a subagent (general-purpose) with an explicit
+  it in chunks, or hand it to a subagent (when the agent has one) with an explicit
   instruction to read 100% of it and return a grouped, quote-grounded summary
   of every meaningful change across all apps.
 
@@ -201,8 +204,8 @@ override the decision.
   shorten and re-check until it passes.
 - Title and content non-empty after trimming.
 
-Print to chat (chat notes in Thai per the user's global rule; the announcement
-fields themselves follow the language flag — Thai by default, `--en` for English).
+Print to chat. The announcement fields follow the language flag — Thai by
+default, `--en` for English.
 
 1. A one-line note of what the MR does and whether it is user-facing.
 2. A bold **Title** label, then the title in its own code block, so it can be
@@ -233,15 +236,16 @@ to tell apart. Do NOT put labels *inside* the blocks (they would get copied too)
 
 ### 6. Publish (only if `--publish`)
 
-If `--publish` was passed, call
-`mcp__thanos-mcp__AnnouncementService_CreateAnnouncement` with
+If `--publish` was passed, call the Thanos MCP `AnnouncementService`
+`CreateAnnouncement` operation
+(`mcp__thanos-mcp__AnnouncementService_CreateAnnouncement` in Claude Code) with
 `{ title, content, popupEnabled }`. Report the created announcement id.
 Without `--publish`, do NOT create anything — just hand back the draft.
 
 ## Notes
 
-- This command reads a real MR over the GitLab MCP server; if that server is not
+- This skill reads a real MR over the GitLab MCP server; if that server is not
   authorized in this session, tell the user and ask them to paste the MR diff
   instead, then continue from step 3.
-- One MR → one announcement. For several MRs, run the command once each and
+- One MR → one announcement. For several MRs, run the skill once each and
   merge the drafts by hand.
