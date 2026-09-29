@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ER diagram · Feature Name</title>
     <style>
-        :root,
-        [data-theme="dark"] {
+        :root {
             --bg: #1a1a1a;
             --bg-elevated: #222227;
             --border: #2e2e34;
@@ -20,21 +19,6 @@
             --card-bg: #202024;
             --drop: #ef4444;
             color-scheme: dark;
-        }
-
-        [data-theme="light"] {
-            --bg: #d3d3d3;
-            --bg-elevated: #e4e4e4;
-            --border: #b9b9b9;
-            --border-strong: #a8a8a8;
-            --text: #1a1a1a;
-            --text-muted: #444444;
-            --text-faint: #666666;
-            --accent: #7c3aed;
-            --accent-soft: rgba(124, 58, 237, 0.12);
-            --card-bg: #dddddd;
-            --drop: #dc2626;
-            color-scheme: light;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -134,7 +118,6 @@
         </div>
         <div class="actions">
             <a class="btn" href="../overview.html#database">← Overview</a>
-            <button class="btn" id="themeToggle" type="button" aria-label="Toggle theme">🌙</button>
         </div>
     </header>
 
@@ -266,19 +249,6 @@
                 g.addEventListener("mouseleave", () => el.querySelectorAll(".dim").forEach(n => n.classList.remove("dim")));
             });
         })(ER);
-
-        // Theme: shares the overview's saved choice.
-        const root = document.documentElement, toggle = document.getElementById("themeToggle");
-        const saved = localStorage.getItem("docs-theme");
-        if (saved) root.setAttribute("data-theme", saved);
-        const paint = () => { toggle.textContent = root.getAttribute("data-theme") === "light" ? "☀️" : "🌙"; };
-        paint();
-        toggle.addEventListener("click", () => {
-            const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-            root.setAttribute("data-theme", next);
-            localStorage.setItem("docs-theme", next);
-            paint();
-        });
     </script>
 </body>
 

@@ -1,6 +1,5 @@
 /* ============ THEME TOKENS ============ */
-:root,
-[data-theme="dark"] {
+:root {
     --bg: #1a1a1a;
     --bg-elevated: #222227;
     --sidebar-bg: #161618;
@@ -18,26 +17,6 @@
     --scrollbar: #3a3a42;
     --scrollbar-hover: #4a4a54;
     color-scheme: dark;
-}
-
-[data-theme="light"] {
-    --bg: #d3d3d3;
-    --bg-elevated: #e4e4e4;
-    --sidebar-bg: #c9c9c9;
-    --border: #b9b9b9;
-    --border-strong: #a8a8a8;
-    --text: #1a1a1a;
-    --text-muted: #444444;
-    --text-faint: #666666;
-    --accent: #7c3aed;
-    --accent-soft: rgba(124, 58, 237, 0.12);
-    --code-bg: #c6c6c6;
-    --card-bg: #dddddd;
-    --card-hover: #cccccc;
-    --selection: rgba(124, 58, 237, 0.2);
-    --scrollbar: #a8a8a8;
-    --scrollbar-hover: #959595;
-    color-scheme: light;
 }
 
 /* ============ TYPE SCALE ============ */
@@ -287,25 +266,6 @@ html {
     align-items: center;
     gap: 10px;
     margin-left: auto;
-}
-
-.theme-toggle {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-elevated);
-    color: var(--text-muted);
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    font-size: var(--fs-icon);
-    transition: background 0.12s, color 0.12s;
-}
-
-.theme-toggle:hover {
-    background: var(--card-hover);
-    color: var(--text);
 }
 
 /* diagram zoom switch; .on = wheel zoom enabled (off by default) */

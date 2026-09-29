@@ -34,7 +34,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 1. Every name in a diagram (RPC, endpoint, table, column, job, screen) comes from the source. Unknown → write `TBD`. Never invent one.
 2. Write only the output files. Never edit the caller's page (for example design-feature's `overview.html`); give it the embed snippet instead.
 3. Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split into several diagrams and say so. In diagram-design mode its own, tighter budgets win.
-4. diagram-design mode always uses its **default dark theme**: the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) with the shipped default tokens. No light copy, no custom brand. Skip its first-run style-guide question: the answer is always "proceed with the default".
+4. Dark theme is the default. Use light only when the user or caller asks for it. In diagram-design mode, dark means the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`), and every diagram uses the shipped default tokens. Skip its first-run style-guide question: the answer is always "proceed with the default".
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
 
 ## Workflow

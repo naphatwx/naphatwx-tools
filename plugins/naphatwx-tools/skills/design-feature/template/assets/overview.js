@@ -1,18 +1,4 @@
-// ===== Theme toggle (default dark, remembers choice) =====
 const root = document.documentElement;
-const toggle = document.getElementById("themeToggle");
-const saved = localStorage.getItem("docs-theme");
-if (saved) root.setAttribute("data-theme", saved);
-function paintToggle() {
-    toggle.textContent = root.getAttribute("data-theme") === "light" ? "☀️" : "🌙";
-}
-paintToggle();
-toggle.addEventListener("click", () => {
-    const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-    root.setAttribute("data-theme", next);
-    localStorage.setItem("docs-theme", next);
-    paintToggle();
-});
 
 // ===== Mobile sidebar (☰ opens the drawer; a nav click or a tap outside it closes it) =====
 const sidebar = document.getElementById("sidebar");
