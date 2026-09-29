@@ -44,7 +44,7 @@
         <text x="380" y="59">/things/:id</text>
         <text x="380" y="180">thing.edit</text>
         <text x="660" y="179">read-only view</text>
-        <text x="380" y="340">name ≤ 64 chars</text>
+        <text x="380" y="340">name max 64 chars</text>
         <text x="120" y="340">INVALID_ARGUMENT</text>
         <text x="660" y="340">CreateThing</text>
         <text x="660" y="459">status = ACTIVE</text>

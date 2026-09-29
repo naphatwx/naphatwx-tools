@@ -710,7 +710,7 @@
         .flow-nav small { display: block; color: var(--text-faint); font-size: var(--fs-label); }
 
         /* ============ DIAGRAM TOGGLES (closed by default) ============ */
-        /* .full-toggle: the "full details" block under Database / API changes; .rules-toggle: a flow's rules. Same look */
+        /* .full-toggle: the "full details" block under Database / API changes; .rules-toggle: a flow's rules or an API's behaviour. Same look */
         .diagram-toggle, .full-toggle, .rules-toggle {
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -1135,7 +1135,12 @@
                         <div class="erd-row none">No field change.</div>
                     </div>
                 </div>
-                <p><strong>Behaviour:</strong> honours the new filter; empty means no filter.</p>
+                <details class="rules-toggle">
+                    <summary>Behaviour <span class="faint">· what changes at runtime</span></summary>
+                    <ul>
+                        <li>Honours the new filter; empty means no filter.</li>
+                    </ul>
+                </details>
                 <!-- ===== end API block ===== -->
 
                 <h3>Shared types</h3>

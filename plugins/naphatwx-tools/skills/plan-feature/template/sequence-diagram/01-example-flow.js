@@ -13,7 +13,7 @@ SeqDiagrams.define("01-example-flow", {
         ["call", "user", "web", "/things/:id"],
         ["call", "web", "api", "GetThing", "id from the route"],
         ["call", "api", "db", "SELECT schema.thing"],
-        ["note", "api", "perm thing.view", null, "permission thing.view · id must exist, else NOT_FOUND"],
+        ["note", "api", "permission thing.view", null, "needs permission thing.view; the id must exist, or NOT_FOUND"],
         ["ret", "api", "web", "ThingResponse"],
         ["phase", "2 · Act"],
         ["call", "user", "web", "Confirm"],

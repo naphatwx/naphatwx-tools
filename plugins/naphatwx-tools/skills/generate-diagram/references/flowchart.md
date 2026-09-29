@@ -24,8 +24,8 @@ A reader should see *what exactly* is checked or called without opening the spec
 | Node | Detail line holds | Example |
 |------|-------------------|---------|
 | Permission diamond | the permission key | `redeployment.redeploy` |
-| State / type diamond | the field and the values that pass | `status = AVAILABLE`, `type ∈ WEB·BACKEND·WORKER` |
-| Validation diamond | the rule | `name ≤ 64 chars` |
+| State / type diamond | the field and the values that pass | `status = AVAILABLE`, `type in WEB, BACKEND, WORKER` |
+| Validation diamond | the rule | `name max 64 chars` |
 | Feature flag / config diamond | the flag or key | `FF_LEGACY_REDEPLOY` |
 | Step that calls a service | the RPC or endpoint | `TriggerRedeployment`, `POST /things` |
 | Step that writes | the table op or queue | `INSERT infra.redeployment` |
@@ -33,10 +33,28 @@ A reader should see *what exactly* is checked or called without opening the spec
 | Start pill | the screen, route or trigger | `/repositories/:id` |
 | End pill | the resulting state | `status = QUEUED` |
 
-- Exit labels use real values too when they are not plain yes / no: `THANOS_LEGACY` / `THANOS`, `INACTIVE · FAILED`.
-- Several values → the most telling one, then `+N` (`WEB · BACKEND +1`); the full list goes in the caller's rules.
+- Exit labels use real values too when they are not plain yes / no: `THANOS_LEGACY` / `THANOS`, `INACTIVE or FAILED`.
+- Few symbols: say it in simple words (table below). Keep only `=` and the real names themselves (dots in `infra.redeployment`, `/` in routes).
+- Several values → the most telling ones, then `and N more` (`WEB, BACKEND and 1 more`); the full list goes in the caller's rules.
 - No real value in the source → `TBD`, never a made-up one. A node with nothing to name (e.g. `Done`) may skip the detail line.
 - Loops (retry, forgot password → reset → back to login) route around the side, never through other nodes.
+
+## Words, not symbols
+
+Every label, detail line and condition a reader sees:
+
+| Instead of | Write |
+|------------|-------|
+| `∈` / `∉` | `in` / `not in` |
+| `⊆` | `all in` |
+| `≠`, `!=` | `not` (`status not AVAILABLE`) |
+| `≠ ''`, `!= null` | `not empty`, `is set` |
+| `≤` / `≥` | `at most` / `at least` |
+| `&&` / `\|\|` | `and` / `or` |
+| `→` | `gives`, `then`, `maps to` |
+| `+N` | `and N more` |
+| `·` or `/` between values | `,` or `or` / `and` |
+| `(a)/(b)` | the plain name of each check |
 
 ## diagram-design mode
 
@@ -54,3 +72,4 @@ A reader should see *what exactly* is checked or called without opening the spec
 - Every diamond has two labelled exits; every path reaches an end pill or loops back.
 - No line crosses a node; no text overflows its shape.
 - Every permission, call, write, state check and error node has a detail line with a real value (or `TBD`).
+- No symbol from the "Words, not symbols" table is left in any label.

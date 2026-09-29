@@ -53,7 +53,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 1. `overview.html` starts from `template/overview.html`. Keep its `<style>` block, theme toggle, font-size picker, sidebar search and the template's `<script>` block unchanged.
 2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
 3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default). The flow's rules sit in a closed `<details class="rules-toggle">` too.
-    - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference).
+    - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
     - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
 4. Every sidebar `nav-link` `href="#id"` matches a real heading `id`.
@@ -138,7 +138,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
         - **One block per changed API** (always visible):
             - `<h3><code>RpcName</code></h3>` + pills: `new` / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none).
             - An `.erd` with two cards: `Request · <Message>` and `Response · <Message>`. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add, `~ N` change (type `old → new`), `− N` remove. No field change → tag `unchanged` and one `.erd-row.none` "No field change."
-            - A rule change without a contract change → `behaviour change` pill, both cards `unchanged`, plus a `Behaviour:` line.
+            - A rule change without a contract change → `behaviour change` pill, both cards `unchanged`.
+            - Any runtime rule change (with or without a contract change) → a closed `<details class="rules-toggle">` under the cards, summary `Behaviour · what changes at runtime`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain `Behaviour:` paragraph.
         - **Shared types**: new or changed enums and nested messages used by more than one API. Leave the subsection out when there are none.
         - When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
         - **Full contracts** (hidden, summary `Full contracts · every related API, full request and response`): every API the feature adds, changes or calls.
