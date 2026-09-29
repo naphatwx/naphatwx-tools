@@ -373,6 +373,32 @@
             color: var(--text);
         }
 
+        /* diagram zoom switch; .on = wheel zoom enabled (default) */
+        .zoom-toggle {
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background 0.12s, color 0.12s;
+        }
+
+        .zoom-toggle:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .zoom-toggle.on {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
         .content {
             max-width: 820px;
             margin: 0 auto;
@@ -760,6 +786,32 @@
            The file posts its real height (its SVG shrinks with the width); the script below applies it. */
         .diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #2d3142; }
 
+        /* ============ DIAGRAM ZOOM (wheel over a .flowchart / .seq, drag to pan, ↺ resets) ============ */
+        .zoomable { position: relative; }
+        [data-zoom="on"] .zoomable { overflow: hidden; touch-action: pan-y; }
+        [data-zoom="on"] .zoomable.zoomed { cursor: grab; }
+        [data-zoom="on"] .zoomable.panning { cursor: grabbing; user-select: none; }
+        .zoom-stage { transform-origin: 0 0; }
+        /* wheel events inside an iframe never reach this page, so a shield catches them while zoom is on */
+        .zoom-shield { display: none; position: absolute; inset: 0; }
+        [data-zoom="on"] .zoom-shield { display: block; }
+        .zoom-reset {
+            display: none;
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            z-index: 2;
+            padding: 4px 8px;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            font: 600 12px/1.2 -apple-system, "Segoe UI", system-ui, sans-serif;
+            cursor: pointer;
+        }
+        [data-zoom="on"] .zoom-reset { display: block; }
+        .zoom-reset:hover { background: var(--card-hover); color: var(--text); }
+
         /* ============ SEQUENCE DIAGRAM (.seq) ============ */
         .seq {
             border: 1px solid var(--border);
@@ -964,6 +1016,7 @@
                         <button class="fs-btn" data-fs="normal" title="Normal text (16px)" aria-label="Normal text">A</button>
                         <button class="fs-btn" data-fs="big" title="Big text (18px)" aria-label="Big text">A</button>
                     </div>
+                    <button class="zoom-toggle on" id="zoomToggle" type="button" aria-pressed="true" title="Scroll over a diagram to zoom">Zoom: on</button>
                     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
                 </div>
             </header>
@@ -1322,6 +1375,85 @@
             if (!e.data || e.data.type !== "diagram-height") return;
             const frame = [...document.querySelectorAll(".diagram-frame")].find(f => f.contentWindow === e.source);
             if (frame) frame.style.height = Math.ceil(e.data.height) + "px";
+        });
+
+        // ===== Diagram zoom (wheel over a diagram zooms at the cursor, drag pans, ↺ resets; switch remembers choice) =====
+        // Runs on DOMContentLoaded so SeqDiagrams.renderAll() has already drawn every .seq.
+        const zoomToggle = document.getElementById("zoomToggle");
+        const zooms = [];
+        const zoomOn = () => root.getAttribute("data-zoom") === "on";
+        root.setAttribute("data-zoom", localStorage.getItem("docs-zoom") === "off" ? "off" : "on");
+        function paintZoomToggle() {
+            const on = zoomOn();
+            zoomToggle.classList.toggle("on", on);
+            zoomToggle.setAttribute("aria-pressed", String(on));
+            zoomToggle.textContent = on ? "Zoom: on" : "Zoom: off";
+        }
+        paintZoomToggle();
+        zoomToggle.addEventListener("click", () => {
+            const next = zoomOn() ? "off" : "on";
+            root.setAttribute("data-zoom", next);
+            localStorage.setItem("docs-zoom", next);
+            if (next === "off") zooms.forEach(z => z.reset());
+            paintZoomToggle();
+        });
+
+        function makeZoomable(box) {
+            const stage = document.createElement("div");
+            stage.className = "zoom-stage";
+            stage.append(...box.childNodes);
+            box.append(stage);
+            box.classList.add("zoomable");
+            if (stage.querySelector("iframe")) box.insertAdjacentHTML("beforeend", '<div class="zoom-shield"></div>');
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "zoom-reset";
+            btn.title = "Reset zoom";
+            box.append(btn);
+
+            let s = 1, x = 0, y = 0;
+            const paint = () => {
+                stage.style.transform = s === 1 && !x && !y ? "" : `translate(${x}px, ${y}px) scale(${s})`;
+                box.classList.toggle("zoomed", s !== 1 || x !== 0 || y !== 0);
+                btn.textContent = `↺ ${Math.round(s * 100)}%`;
+            };
+            const reset = () => { s = 1; x = 0; y = 0; paint(); };
+            paint();
+
+            box.addEventListener("wheel", (e) => {
+                if (!zoomOn()) return;
+                e.preventDefault();
+                const r = box.getBoundingClientRect();
+                const px = e.clientX - r.left, py = e.clientY - r.top;
+                const next = Math.min(5, Math.max(0.5, s * Math.exp(-e.deltaY * 0.0015)));
+                // keep the point under the cursor fixed while scaling
+                x = px - (px - x) * next / s;
+                y = py - (py - y) * next / s;
+                s = next;
+                paint();
+            }, { passive: false });
+
+            let drag = null;
+            box.addEventListener("pointerdown", (e) => {
+                if (!zoomOn() || e.button !== 0 || e.target === btn || !box.classList.contains("zoomed")) return;
+                drag = { id: e.pointerId, sx: e.clientX - x, sy: e.clientY - y };
+                box.setPointerCapture(e.pointerId);
+                box.classList.add("panning");
+            });
+            box.addEventListener("pointermove", (e) => {
+                if (!drag || e.pointerId !== drag.id) return;
+                x = e.clientX - drag.sx;
+                y = e.clientY - drag.sy;
+                paint();
+            });
+            const endDrag = () => { drag = null; box.classList.remove("panning"); };
+            box.addEventListener("pointerup", endDrag);
+            box.addEventListener("pointercancel", endDrag);
+            btn.addEventListener("click", reset);
+            zooms.push({ reset });
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".flowchart, .seq").forEach(makeZoomable);
         });
 
         // ===== Sidebar search filter =====

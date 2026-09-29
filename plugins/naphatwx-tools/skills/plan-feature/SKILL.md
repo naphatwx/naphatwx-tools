@@ -50,7 +50,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## Hard Rules
 
-1. `overview.html` starts from `template/overview.html`. Keep its `<style>` block, theme toggle, font-size picker, sidebar search and the template's `<script>` block unchanged.
+1. `overview.html` starts from `template/overview.html`. Keep its `<style>` block, theme toggle, font-size picker, diagram zoom switch, sidebar search and the template's `<script>` block unchanged. The script makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the bottom right resets); the `Zoom` switch after the font-size picker turns this on or off (on by default).
 2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
 3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default). The flow's rules sit in a closed `<details class="rules-toggle">` too.
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
@@ -167,7 +167,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Every table in the Full schema appears on an ER diagram page, and every ER button points to a page that exists.
 - `.parts/` is deleted.
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
-- Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
+- Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), the wheel zooms each diagram and its `↺` button resets it, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 7. Confirm
