@@ -392,7 +392,7 @@ html {
 }
 
 .content {
-    max-width: 820px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 40px 40px 120px;
 }
@@ -686,7 +686,7 @@ td {
 }
 
 /* ============ PLAN EXTRAS ============ */
-.content.wide { max-width: 880px; }
+.content.wide { max-width: 1120px; }
 
 .pill {
     display: inline-block;
