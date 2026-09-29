@@ -114,7 +114,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     1. **Overview**: lead sentence + 3–4 cards (key decision, data impact, UI impact, eligibility/scale).
     2. **Scope**: in / out table.
     3. **Flows**: one block per flow (copy the block between the `one block per flow` comments):
-        - `<h3 id="flow-NN">`, pills (user story, requirement ids, both file names), what + trigger.
+        - `<h3 id="flow-NN">`, pills (user story, requirement ids; no file names, the diagram toggles below already link them), what + trigger.
         - Flowchart in a closed `<details class="diagram-toggle">`, summary `Flowchart · flow logic`:
             - `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
         - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
