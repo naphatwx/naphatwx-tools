@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Index</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+    <script src="contract/rules.js"></script>
+    <script src="contract/data.js"></script>
+    <script src="shared/scenarios.js"></script>
+    <script src="shared/components.js"></script>
+    <script src="shared/fake-api.js"></script>
+</head>
+
+<body class="antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div class="max-w-6xl mx-auto p-6 space-y-10">
+        <header class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+                <a href="../overview.html" class="text-sm text-purple-600 dark:text-purple-400 hover:underline">← Feature plan</a>
+                <h1 class="text-2xl font-bold mt-2">Mock UI</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">Pages call a fake API with the real operation names; data and rules live in <code class="font-mono">contract/</code>. Every state has its own link.</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="Theme()" class="min-h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-600">◐</button>
+                <button onclick="FakeApi.reset();renderLog()" class="min-h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-600 text-sm">Reset mock state</button>
+            </div>
+        </header>
+
+        <section>
+            <h2 class="text-lg font-bold mb-3">Pages × scenarios</h2>
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-300 dark:border-gray-600">
+                        <tr class="text-left text-xs font-semibold uppercase tracking-wider"><th class="px-4 py-3">Scenario</th><th class="px-4 py-3">Flow</th><th class="px-4 py-3">Open</th></tr>
+                    </thead>
+                    <tbody id="scenarioRows"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-lg font-bold mb-3">Contract</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <a href="contract/types.ts" class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 p-5 block"><div class="font-mono font-semibold">types.ts</div><p class="text-xs text-gray-500 mt-1">Real shapes to implement.</p></a>
+                <a href="contract/rules.js" class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 p-5 block"><div class="font-mono font-semibold">rules.js</div><p class="text-xs text-gray-500 mt-1">Spec rules as functions.</p></a>
+                <a href="contract/data.js" class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 p-5 block"><div class="font-mono font-semibold">data.js</div><p class="text-xs text-gray-500 mt-1">Mock data, typed against types.ts.</p></a>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-lg font-bold mb-1">Fake API console</h2>
+            <p class="text-xs text-gray-500 mb-3">Call the operations directly, as an API or MCP client would. Scenario faults apply.</p>
+            <div class="grid lg:grid-cols-2 gap-4">
+                <div class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="text-sm font-medium">Operation<select id="op" class="mt-1 w-full rounded-lg border border-gray-400 bg-white dark:bg-gray-800 px-3 py-2 text-sm"></select></label>
+                        <label class="text-sm font-medium">Scenario<select id="scen" class="mt-1 w-full rounded-lg border border-gray-400 bg-white dark:bg-gray-800 px-3 py-2 text-sm"></select></label>
+                    </div>
+                    <textarea id="reqBody" spellcheck="false" class="w-full h-56 font-mono text-xs bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg p-3"></textarea>
+                    <button id="runBtn" class="px-4 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 text-white">Run</button>
+                </div>
+                <pre id="resBody" class="rounded-lg bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 p-4 text-xs font-mono overflow-auto h-[22rem] whitespace-pre-wrap">Response appears here.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-lg font-bold mb-1">Side-effect log (this browser session)</h2>
+            <p class="text-xs text-gray-500 mb-3">What the real service would write: audit rows, events.</p>
+            <div id="log"></div>
+        </section>
+    </div>
+
+    <script>
+        const root = document.documentElement;
+        try { if (localStorage.getItem('mock:theme') === 'light') root.classList.remove('dark'); } catch { }
+        function Theme() { root.classList.toggle('dark'); try { localStorage.setItem('mock:theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch { } }
+
+        document.getElementById('scenarioRows').innerHTML = Scenarios.LIST.map(s => `
+          <tr class="border-t border-gray-200 dark:border-gray-700 align-top">
+            <td class="px-4 py-3"><div class="font-medium">${UI.esc(s.label)}</div><div class="text-xs text-gray-500">${UI.esc(s.hint)}</div></td>
+            <td class="px-4 py-3 text-xs">${s.flow}</td>
+            <td class="px-4 py-3 text-xs"><div class="flex flex-col gap-1">${Scenarios.PAGES.map(p =>
+                `<a href="${Scenarios.href(p.file, p.extra, s.id)}" class="text-purple-600 dark:text-purple-400 hover:underline">${UI.esc(p.label)}</a>`).join('')}</div></td>
+          </tr>`).join('');
+
+        const op = document.getElementById('op'), scen = document.getElementById('scen'), reqBody = document.getElementById('reqBody'), resBody = document.getElementById('resBody');
+        op.innerHTML = Object.keys(FakeApi.SAMPLES).map(k => `<option>${k}</option>`).join('');
+        scen.innerHTML = Scenarios.LIST.map(s => `<option value="${s.id}" ${s.id === Scenarios.current.id ? 'selected' : ''}>${UI.esc(s.label)}</option>`).join('');
+        const fill = () => { reqBody.value = JSON.stringify(FakeApi.SAMPLES[op.value], null, 2); };
+        op.onchange = fill; fill();
+        scen.onchange = () => { location.href = Scenarios.href('index.html', {}, scen.value); };
+        document.getElementById('runBtn').onclick = async () => {
+            const t = performance.now();
+            try { resBody.textContent = `// OK · ${Math.round(performance.now() - t)} ms\n` + JSON.stringify(await FakeApi[op.value](JSON.parse(reqBody.value)), null, 2); }
+            catch (e) { resBody.textContent = '// ERROR\n' + JSON.stringify(e instanceof Error ? { code: 'InvalidArgument', message: e.message } : e, null, 2); }
+            renderLog();
+        };
+
+        function renderLog() {
+            const rows = FakeApi.log();
+            document.getElementById('log').innerHTML = !rows.length
+                ? '<div class="text-sm text-gray-500 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">Nothing yet.</div>'
+                : `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-200 dark:divide-gray-700">${rows.map(r => `<div class="px-4 py-2 text-xs flex gap-4"><span class="text-gray-500 whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
+        }
+        renderLog();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock · Example</title>
+    <!-- same stack as the app; this default is Tailwind v4 from CDN (swap for the app's CSS if it is not Tailwind) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+    <script src="../contract/rules.js"></script>
+    <script src="../contract/data.js"></script>
+    <script src="../shared/scenarios.js"></script>
+    <script src="../shared/components.js"></script>
+    <script src="../shared/fake-api.js"></script>
+    <script src="../shared/shell.js"></script>
+</head>
+
+<body>
+    <script>
+        // One screen. State comes from ?scenario= (and any deep-link params); data only via FakeApi.
+        const { page: el, owner } = Shell.mount();
+        const S = window.S = { page: 1, loading: true, error: null, res: null };
+
+        async function load() {
+            S.loading = true; S.error = null; render();
+            try { S.res = await FakeApi.GetThings({ ownerId: owner.id, page: S.page, limit: 10 }); } catch (e) { S.error = e; }
+            S.loading = false; render();
+        }
+
+        function render() {
+            el.innerHTML = `
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold">Things</h2>
+                ${UI.btn('neutral', 'md', 'Refresh', 'onclick="load()"')}
+              </div>
+              ${S.loading ? UI.skel('h-24 w-full')
+                : S.error ? UI.emptyState('Could not load', UI.esc(S.error.message), UI.btn('neutral', 'md', 'Retry', 'onclick="load()"'))
+                : !S.res.entities.length ? UI.emptyState('Nothing yet', 'No things have been created.')
+                : S.res.entities.map(t => `<div class="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 mb-2">
+                    <span class="font-medium">${UI.esc(t.name)}</span>${UI.statusBadge(t.status)}<span class="text-xs text-gray-500 ml-auto">${UI.date(t.createdAt)}</span></div>`).join('')}`;
+        }
+        load();
+    </script>
+</body>
+
+</html>
