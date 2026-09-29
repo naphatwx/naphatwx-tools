@@ -11,6 +11,7 @@ Turn a spec, ticket or idea into a plan folder people can open in a browser.
 ```
 <output>/
 ├── overview.html              entry page: every topic, every diagram
+├── assets/                    overview.css + overview.js, copied from the template unchanged
 ├── flowchart/                 flow logic: steps, decisions, loops
 │   ├── 01-<flow-slug>.svg     one flow = one file (.html when drawn by diagram-design)
 │   └── 02-<flow-slug>.svg
@@ -50,7 +51,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## Hard Rules
 
-1. `overview.html` starts from `template/overview.html`. Keep its `<style>` block, theme toggle, font-size picker, diagram zoom switch, sidebar search and the template's `<script>` block unchanged. The script makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the bottom right resets); the `Zoom` switch after the font-size picker turns this on or off (on by default).
+1. `overview.html` starts from `template/overview.html`. Its styles and script live in `template/assets/overview.css` and `overview.js`: copy them unchanged, and keep the theme toggle, font-size picker, diagram zoom switch and sidebar search markup. The script makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the bottom right resets); the `Zoom` switch after the font-size picker turns this on or off (on by default).
 2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
 3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default). The flow's rules sit in a closed `<details class="rules-toggle">` too.
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
@@ -58,7 +59,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
 4. Every sidebar `nav-link` `href="#id"` matches a real heading `id`.
 5. Every link into `mock/` opens in a new tab: `target="_blank" rel="noopener"`.
-6. No external scripts, styles or fonts in `overview.html`. `render.js` and the flow files are local.
+6. No external scripts, styles or fonts in `overview.html`. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
 
@@ -82,7 +83,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 2. Pick the mode and copy the template
 
 - Mode: the `diagram-design` skill is available (`diagram-design:diagram-design` in Claude Code; any agent: listed in its skills) → diagram-design; otherwise manual. Pass it to every `generate-diagram` run.
-- Copy `template/overview.html` → `<output>/overview.html`. The template's `flowchart/`, `sequence-diagram/`, `database/` and `mock/` files exist only to preview it; don't copy them — `generate-diagram` and `generate-mock-ui` write the real ones.
+- Copy `template/overview.html` → `<output>/overview.html` and `template/assets/` → `<output>/assets/`. The template's `flowchart/`, `sequence-diagram/`, `database/` and `mock/` files exist only to preview it; don't copy them — `generate-diagram` and `generate-mock-ui` write the real ones.
 - diagram-design mode: remove the `render.js` `<script>` lines and `SeqDiagrams.renderAll()` from the output `overview.html`.
 
 ### 3. Fan out section agents
