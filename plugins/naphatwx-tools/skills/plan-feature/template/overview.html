@@ -710,23 +710,24 @@
         .flow-nav small { display: block; color: var(--text-faint); font-size: var(--fs-label); }
 
         /* ============ DIAGRAM TOGGLES (closed by default) ============ */
-        /* .full-toggle: the "full details" block under Database / API changes, same look */
-        .diagram-toggle, .full-toggle {
+        /* .full-toggle: the "full details" block under Database / API changes; .rules-toggle: a flow's rules. Same look */
+        .diagram-toggle, .full-toggle, .rules-toggle {
             border: 1px solid var(--border);
             border-radius: 12px;
             margin: 12px 0;
             padding: 0 14px;
         }
 
-        .diagram-toggle > summary, .full-toggle > summary {
+        .diagram-toggle > summary, .full-toggle > summary, .rules-toggle > summary {
             cursor: pointer;
             padding: 10px 0;
             font-weight: 600;
             color: var(--text);
         }
 
-        .diagram-toggle > summary:hover, .full-toggle > summary:hover { color: var(--accent); }
-        .diagram-toggle[open] > summary, .full-toggle[open] > summary { border-bottom: 1px solid var(--border); }
+        .diagram-toggle > summary:hover, .full-toggle > summary:hover, .rules-toggle > summary:hover { color: var(--accent); }
+        .diagram-toggle[open] > summary, .full-toggle[open] > summary, .rules-toggle[open] > summary { border-bottom: 1px solid var(--border); }
+        .rules-toggle > ul { margin: 12px 0 14px; }
         .full-toggle > h4:first-of-type { margin-top: 14px; }
         .diagram-toggle > .flowchart, .diagram-toggle > .seq { margin: 12px 0 14px; }
 
@@ -1011,7 +1012,7 @@
                     <span class="hot">side effect (external write / audit)</span>
                 </div>
 
-                <!-- ===== one block per flow: h3 id="flow-NN" + flowchart + sequence diagram (both in closed <details>) + rules + try links.
+                <!-- ===== one block per flow: h3 id="flow-NN" + flowchart + sequence diagram + rules (all three in closed <details>) + try links.
                      Manual: <img src="flowchart/NN-slug.svg"> and .seq[data-flow="NN-slug"].
                      diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" loading="lazy"></iframe>,
                      and <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></iframe></div> ===== -->
@@ -1020,16 +1021,18 @@
                 <p>What this flow achieves, in one or two sentences. <strong>Trigger:</strong> where the user starts it.</p>
                 <details class="diagram-toggle">
                     <summary>Flowchart <span class="faint">· flow logic</span></summary>
-                    <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check the input, save it or show an error and retry"></div>
+                    <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry"></div>
                 </details>
                 <details class="diagram-toggle">
                     <summary>Sequence diagram <span class="faint">· how the services talk</span></summary>
                     <div class="seq" data-flow="01-example-flow"></div>
                 </details>
-                <p><strong>Rules this flow must keep</strong></p>
-                <ul>
-                    <li>A rule from the spec that the implementation must not break.</li>
-                </ul>
+                <details class="rules-toggle">
+                    <summary>Rules <span class="faint">· what this flow must keep</span></summary>
+                    <ul>
+                        <li>A rule from the spec that the implementation must not break.</li>
+                    </ul>
+                </details>
                 <p><strong>Try it in the mock</strong> <span class="faint">(opens in a new tab)</span></p>
                 <div class="card-grid">
                     <a class="card" href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener"><h4>Happy path ↗</h4><p><code>page/example.html?scenario=normal</code></p></a>

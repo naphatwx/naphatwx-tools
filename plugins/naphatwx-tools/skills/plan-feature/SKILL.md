@@ -1,6 +1,6 @@
 ---
 name: plan-feature
-description: Plan a feature as a browsable HTML folder — overview.html with scope, a Flows section where every flow has a flowchart (its logic) and a sequence diagram (how services talk), each in its own file and hidden until opened, database changes with an ER diagram page, API changes (each API's request / response changes, with the full schema and full contracts hidden until opened), errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
+description: Plan a feature as a browsable HTML folder — overview.html with scope, a Flows section where every flow has a flowchart (its logic) and a sequence diagram (how services talk) showing real permission keys, RPCs, fields and codes, each in its own file and hidden until opened along with the flow's rules, database changes with an ER diagram page, API changes (each API's request / response changes, with the full schema and full contracts hidden until opened), errors and open questions, plus an optional interactive mock UI. Use when the user asks to plan a feature, design a feature, or generate feature docs/diagrams from a spec, ticket or idea.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 
@@ -52,7 +52,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 1. `overview.html` starts from `template/overview.html`. Keep its `<style>` block, theme toggle, font-size picker, sidebar search and the template's `<script>` block unchanged.
 2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
-3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default).
+3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default). The flow's rules sit in a closed `<details class="rules-toggle">` too.
+    - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference).
     - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
 4. Every sidebar `nav-link` `href="#id"` matches a real heading `id`.
@@ -69,7 +70,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Extract:
     - Summary, key decisions, in scope / out of scope.
     - **Flows**: each user story or use case that has its own trigger and its own sequence of calls. A refusal/timeout path shared by several flows is its own flow.
-    - Decisions: each yes / no point the user or system hits (member? valid? retry?), with where each branch goes.
+    - Decisions: each yes / no point the user or system hits (member? valid? retry?), with where each branch goes and the **real value** it checks: permission key (`redeployment.redeploy`), field + passing values (`status = AVAILABLE`), enum, flag or config key, validation rule.
+    - Per step: the real RPC / endpoint, table op, queue or job it runs, and the error code or reason constant each refusal returns. Diagrams print these on their nodes.
     - Participants: user, frontend, backend services, databases, external systems.
     - Tables read and written, relations, and any external (read-through) tables.
     - Error mapping: cause → code → what the user sees.
@@ -118,7 +120,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Manual: `<div class="seq" data-flow="NN-<slug>"></div>`.
             - diagram-design: `<div class="seq">` + the returned `<iframe class="diagram-frame">`.
         - Keep the section's "Show all diagrams" button; it opens and closes every toggle.
-        - "Rules this flow must keep" — 3–5 bullets from the spec.
+        - Rules in a third closed `<details class="rules-toggle">`, summary `Rules · what this flow must keep`: 3–5 bullets from the spec. Not opened by "Show all diagrams".
         - "Try it in the mock" cards — only if a mock exists or will be built; each opens in a new tab.
     4. **Database changes**: the ER diagram button, the changes, then the full schema hidden in a closed `<details class="full-toggle">` (copy the Database block).
         - **Open ER diagram ↗** button: `<a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one button per page (`Open ER diagram · catalog ↗`). No related table → no page and no button.
@@ -158,7 +160,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 6. Verify
 
 - Every `nav-link` hash matches a heading id; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
-- Every flow has both a flowchart and a sequence diagram file, and every `.diagram-toggle` and `.full-toggle` is closed by default.
+- Every flow has both a flowchart and a sequence diagram file, and every `.diagram-toggle`, `.rules-toggle` and `.full-toggle` is closed by default.
+- Every flowchart decision, call, write and error node shows a real value from the brief (or `TBD`); no sequence note or `alt` says only `guards` / `checks`.
 - Database "Full schema" lists every table in the sequence diagrams; API "Full contracts" lists every API in them.
 - Every table in the Full schema appears on an ER diagram page, and every ER button points to a page that exists.
 - `.parts/` is deleted.

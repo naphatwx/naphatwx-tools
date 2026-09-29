@@ -9,7 +9,8 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 - Labels are the name only, ≤ 40 chars: RPC (`TriggerRedeployment`), endpoint (`POST /things`), table op (`INSERT infra.redeployment`), queue (`publish infra.redeployment.create`), job (`build app-redeployment`), status or error code (`FAILED_PRECONDITION`).
 - Arguments, example values, messages and reasons go in `detail`. It shows on hover and in the "Step details" list under the diagram.
-- Notes and `alt` / `else` conditions are a short phrase too (`guards`, `environment not AVAILABLE`); the rule itself goes in `detail` or in the caller's rules list.
+- Notes and `alt` / `else` conditions are a short phrase that names the real value, not a generic word: `perm redeployment.redeploy`, not `guards`; `status != AVAILABLE`, not `env unavailable`. The full rule goes in `detail` or in the caller's rules list.
+- Every `detail` holds real values from the source: field names, permission keys, enum values, config keys, timeouts. Never a vague summary like `permission check · validation`.
 - Mark only writes that leave the service or must be audited as side effects (`hot`), so readers can scan for them.
 
 ## diagram-design mode
@@ -28,7 +29,7 @@ SeqDiagrams.define("01-cut-new-version", {
         ["phase", "1 · Open the form"],
         ["call", "eng", "api", "GetBases", "repositoryId 1204"],
         ["ret", "api", "eng", "GetBasesResponse", "latestVersion 2.3.2-1"],
-        ["note", "api", "guards", null, "permission check · eligibility"],
+        ["note", "api", "perm version.create", null, "permission version.create · base must be ACTIVE"],
         ["alt", "upstream accepts"], ["hot", "api", "db", "INSERT audit"], ["else", "refused"], ["ret", "api", "eng", "reason"], ["end"],
     ],
 });
