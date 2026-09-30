@@ -67,7 +67,7 @@
             <article class="content wide">
                 <div class="eyebrow">Spec NNN · TICKET-123 · Draft</div>
                 <h1 id="overview">Feature Name</h1>
-                <p class="lead">One or two sentences: what the feature lets a user do, and which system does the work.</p>
+                <p class="lead">One short sentence: what the feature lets a user do.</p>
 
                 <dl class="summary">
                     <dt>Key decision</dt>
@@ -89,7 +89,10 @@
                 </ul>
 
                 <h2 id="flows">Flows</h2>
-                <p>Each flow has a flowchart (its logic) and a sequence diagram (how the services talk).</p>
+                <ul>
+                    <li>Flowchart: the flow's logic.</li>
+                    <li>Sequence diagram: how the services talk.</li>
+                </ul>
                 <div class="seq-legend" style="margin:8px 0 0">
                     <span>call</span>
                     <span class="ret">response</span>
@@ -100,9 +103,11 @@
                      Manual: <img src="flowchart/NN-slug.svg"> and .seq[data-flow="NN-slug"].
                      diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" loading="lazy"></iframe>,
                      and <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></iframe></div> ===== -->
-                <h3 id="flow-01">1. Example flow</h3>
-                <p class="meta">US1 · P1 · FR-001 · FR-002</p>
-                <p>What this flow achieves, in one or two sentences. <strong>Trigger:</strong> where the user starts it.</p>
+                <h3 id="flow-01">1. Example flow <span class="meta">US1 · P1 · FR-001 · FR-002</span></h3>
+                <ul>
+                    <li><strong>What:</strong> what this flow achieves, in one short line.</li>
+                    <li><strong>Trigger:</strong> where the user starts it.</li>
+                </ul>
                 <details class="diagram-toggle">
                     <summary>Flowchart <span class="faint">· flow logic</span></summary>
                     <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry"></div>
@@ -123,7 +128,15 @@
                 <!-- ===== Database: changes first, then the full schema of every related table in a closed .full-toggle.
                      No related table at all → keep this section, replace its body with "This feature has no database changes." ===== -->
                 <h2 id="database">Database changes <a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a></h2>
-                <p>Only tables whose schema changes. Migration: <code>path/to/migration.sql</code>.</p>
+                <ul>
+                    <li><strong>Migration:</strong> <code>path/to/migration.sql</code></li>
+                    <li><strong>Changed tables:</strong> <code>schema.table_a</code> (altered), <code>schema.table_b</code> (new)</li>
+                    <li><strong>Not touched on purpose:</strong>
+                        <ul>
+                            <li><code>schema.table_c</code> — read only</li>
+                        </ul>
+                    </li>
+                </ul>
                 <p class="legend"><span class="new">▍ new table</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
                 <div class="erd">
                     <div class="erd-table write">
@@ -145,7 +158,10 @@
                 </ul>
                 <details class="full-toggle">
                     <summary>Full schema <span class="faint">· every related table, all columns</span></summary>
-                    <p>Every table this feature reads or writes. Dashed border = another service owns it.</p>
+                    <ul>
+                        <li>Every table this feature reads or writes.</li>
+                        <li>Dashed border = another service owns it.</li>
+                    </ul>
                     <div class="erd">
                         <div class="erd-table write">
                             <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
@@ -184,12 +200,22 @@
                 <!-- ===== API: one block per API (request changes + response changes), then the full request / response of every related API
                      in a closed .full-toggle. No related API at all → keep this section, replace its body with "This feature has no API changes." ===== -->
                 <h2 id="api">API changes</h2>
-                <p>File: <code>path/to/service.proto</code> · additive, wire-compatible.</p>
+                <ul>
+                    <li><strong>Summary:</strong> 1 new RPC, 1 behaviour change on <code>ThingService</code>.</li>
+                    <li><strong>Files:</strong>
+                        <ul>
+                            <li><code>path/to/service.proto</code> — +1 RPC, +1 message</li>
+                            <li><code>path/to/source.proto</code> — new file</li>
+                        </ul>
+                    </li>
+                    <li><strong>Compatibility:</strong> additive, wire-compatible.</li>
+                    <li><strong>Unchanged:</strong> <code>ThingResponse</code> gains no field.</li>
+                    <li><strong>Permissions:</strong> no new permission; add 1 entry to <code>path/to/method_permissions.go</code>.</li>
+                </ul>
                 <p class="legend"><span class="new">▍ new message</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
 
                 <!-- ===== one block per changed API ===== -->
-                <h3><code>CreateThing</code></h3>
-                <p class="meta"><span class="new">new</span> · POST /api/v1/things · permission things.create</p>
+                <h3><code>CreateThing</code> <span class="meta"><span class="new">new</span> · POST /api/v1/things · permission things.create</span></h3>
                 <div class="erd">
                     <div class="erd-table write">
                         <div class="erd-head">Request · CreateThingRequest <span class="erd-tag">new message</span></div>
@@ -205,8 +231,7 @@
                     </div>
                 </div>
 
-                <h3><code>GetThings</code></h3>
-                <p class="meta">behaviour change · GET /api/v1/things · permission things.read</p>
+                <h3><code>GetThings</code> <span class="meta">behaviour change · GET /api/v1/things · permission things.read</span></h3>
                 <div class="erd">
                     <div class="erd-table">
                         <div class="erd-head">Request · GetThingsRequest <span class="erd-tag">unchanged</span></div>
@@ -236,7 +261,9 @@
 
                 <details class="full-toggle">
                     <summary>Full contracts <span class="faint">· every related API, full request and response</span></summary>
-                    <p>Every API this feature adds, changes or calls.</p>
+                    <ul>
+                        <li>Every API this feature adds, changes or calls.</li>
+                    </ul>
                     <h4><code>CreateThing</code> <span class="faint">· POST /api/v1/things · new</span></h4>
                     <div class="erd">
                         <div class="erd-table write">
@@ -282,7 +309,10 @@
                 </div>
 
                 <h2 id="mock">Mock UI</h2>
-                <p>Built from the app's real design system; pages call a fake API with the real operation names.</p>
+                <ul>
+                    <li>Built from the app's real design system.</li>
+                    <li>Pages call a fake API with the real operation names.</li>
+                </ul>
                 <p><a href="mock/index.html" target="_blank" rel="noopener">Open the mock ↗</a> <span class="faint">· every page × scenario, fake API console</span></p>
 
                 <h2 id="open-questions">Open questions</h2>

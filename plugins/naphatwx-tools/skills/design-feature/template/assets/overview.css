@@ -389,6 +389,11 @@ html {
     margin: 6px 0;
 }
 
+.content li > ul,
+.content li > ol {
+    margin: 4px 0;
+}
+
 .content li::marker {
     color: var(--text-faint);
 }
@@ -531,6 +536,8 @@ td {
 }
 
 .meta code { background: none; padding: 0; color: inherit; }
+/* meta sits on the heading's own line, after its name */
+:is(h3, h4) > .meta { font-weight: 400; margin-left: 10px; white-space: normal; }
 .new { color: var(--accent); }
 .add { color: var(--add); }
 .change { color: var(--change); }

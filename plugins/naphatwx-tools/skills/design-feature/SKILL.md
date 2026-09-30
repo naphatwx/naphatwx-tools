@@ -62,6 +62,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 6. No external scripts, styles or fonts in `overview.html`. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
+9. **No prose paragraphs.** Readers scan; they don't read long text.
+    - Every section intro, flow description and toggle body is a `<ul>` / `<ol>`, with a nested sublist for an item's details (files, tables, names).
+    - One fact per bullet, about 15 words at most. Lead a bullet with a bold label when it names a fact (`<strong>Files:</strong>`).
+    - A run of 3+ names (files, tables, fields, RPCs) → a sublist, one name per item, not a comma-joined line.
+    - Only these `<p>` stay: the one-sentence `.lead`, `.legend`, `.try`, a `Blocker:` line, the mock link, and a one-sentence "no content" line.
+    - Tables (`<table>`, `.erd`) are fine for field rows.
 
 ## Workflow
 
@@ -111,10 +117,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Merge the sub-agent fragments from `.parts/` into their sections, add their open questions to Open questions, then delete `.parts/`.
 - Replace the title, brand and eyebrow (spec number, ticket, status).
 - Sections, in order. Always keep every section and its nav link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
-    1. **Overview**: lead sentence + a `<dl class="summary">` of 3–4 key facts (key decision, data impact, UI impact, eligibility/scale).
+    1. **Overview**: a one-sentence lead + a `<dl class="summary">` of 3–4 key facts (key decision, data impact, UI impact, eligibility/scale), each `<dd>` one short line.
     2. **Scope**: `<h3>In scope</h3>` and `<h3>Out of scope</h3>`, each a bullet list. Each out-of-scope item ends with its reason in `<span class="faint">— why</span>`.
     3. **Flows**: one block per flow (copy the block between the `one block per flow` comments):
-        - `<h3 id="flow-NN">`, a `<p class="meta">` line (user story, requirement ids joined by ` · `; no file names), what + trigger.
+        - `<h3 id="flow-NN">` with its tags on the same line: `<span class="meta">` after the name (user story, requirement ids joined by ` · `; no file names). Then a list: `What:` and `Trigger:` bullets.
         - Flowchart in a closed `<details class="diagram-toggle">`, summary `Flowchart · flow logic`:
             - `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
         - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
@@ -124,10 +130,11 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
         - Rules in a third closed `<details class="rules-toggle">`, summary `Rules · what this flow must keep`: 3–5 bullets from the spec. Not opened by "Show all diagrams".
         - One `<p class="try">` line of mock links (`Try in the mock: Happy path ↗ · Empty ↗`) — only if a mock exists or will be built; each opens in a new tab.
     4. **Database changes**: the ER diagram button, the changes, then the full schema hidden in a closed `<details class="full-toggle">` (copy the Database block).
+        - **Intro list** (copy the Database block): `Migration:`, `Changed tables:`, and `Not touched on purpose:` with one sublist item per table. Name indexes and constraints here too.
         - **Open ER diagram ↗** button, inside the `<h2 id="database">` right after its text: `<a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one button per page (`Open ER diagram · catalog ↗`). No related table → no page and no button.
         - **Changes** (always visible): one `.erd` card per table whose schema changes:
             - `.erd-table.write` + tag `new table` for a new table (all its columns); `.erd-table` + tag `altered` for an existing table (only the changed columns).
-            - Changed rows: `.erd-row.add` (`+ add`), `.erd-row.change` (`~ type` / `~ null`) (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the section intro.
+            - Changed rows: `.erd-row.add` (`+ add`), `.erd-row.change` (`~ type` / `~ null`) (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the intro list.
             - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
             - No schema change → one sentence in place of the cards: "This feature has no schema change." Also say "no schema change" in the Overview data-impact line.
         - **Full schema** (hidden, summary `Full schema · every related table, all columns`): every table the feature reads or writes, with all its columns.
@@ -135,9 +142,16 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - `.erd-rel` lines for every relation between the listed tables.
         - No related table at all → keep the section with one sentence: "This feature has no database changes."
     5. **API changes**: one block per API with its request and response changes, then the full contracts hidden in a closed `<details class="full-toggle">` (copy the API block).
-        - Source: the proto / OpenAPI / DTO diff in the spec's contracts. Name the file(s) and say whether the change is wire-compatible.
+        - Source: the proto / OpenAPI / DTO diff in the spec's contracts.
+        - **Intro list** (copy the API block), one bold-labelled bullet each; leave out a bullet with nothing to say:
+            - `Summary:` count of new / changed RPCs and the service.
+            - `Files:` sublist, one file per item with its change count (`+4 RPCs, +8 messages`) or `new file`.
+            - `Compatibility:` wire-compatible or not.
+            - `Unchanged:` existing messages that gain no field, as a sublist when there are several.
+            - `Permissions:` new permissions, seeds, permission-map entries, snapshots to update.
+            - Other notes (an RPC kept as-is, where it appears): one bullet each.
         - **One block per changed API** (always visible):
-            - `<h3><code>RpcName</code></h3>` + a `<p class="meta">` line: `new` (as `<span class="new">`) / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none), joined by ` · `.
+            - `<h3><code>RpcName</code> <span class="meta">…</span></h3>`, the meta on the heading's line, not a line below: `new` (as `<span class="new">`) / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none), joined by ` · `.
             - An `.erd` with two cards: `Request · <Message>` and `Response · <Message>`. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add (`.erd-row.add`), `~ N` change (`.erd-row.change`, type `old → new`), `− N` remove (`.erd-row.drop`). No field change → tag `unchanged` and one `.erd-row.none` "No field change."
             - A rule change without a contract change → `behaviour change` in the meta line, both cards `unchanged`.
             - Any runtime rule change (with or without a contract change) → a closed `<details class="rules-toggle">` under the cards, summary `Behaviour · what changes at runtime`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain `Behaviour:` paragraph.
@@ -169,6 +183,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - `.parts/` is deleted.
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
 - Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
+- No prose paragraph survives (Hard Rule 9): every plain `<p>` in `overview.html` is one of the allowed kinds and one sentence.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 7. Confirm
