@@ -90,7 +90,7 @@
 
                 <h2 id="flows">Flows</h2>
                 <p>Each flow has a flowchart (its logic) and a sequence diagram (how the services talk).</p>
-                <div class="seq-legend" style="margin:14px 0 0">
+                <div class="seq-legend" style="margin:8px 0 0">
                     <span>call</span>
                     <span class="ret">response</span>
                     <span class="hot">side effect</span>
@@ -122,10 +122,9 @@
 
                 <!-- ===== Database: changes first, then the full schema of every related table in a closed .full-toggle.
                      No related table at all → keep this section, replace its body with "This feature has no database changes." ===== -->
-                <h2 id="database">Database changes</h2>
+                <h2 id="database">Database changes <a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a></h2>
                 <p>Only tables whose schema changes. Migration: <code>path/to/migration.sql</code>.</p>
                 <p class="legend"><span class="new">▍ new table</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
-                <p><a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a></p>
                 <div class="erd">
                     <div class="erd-table write">
                         <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
