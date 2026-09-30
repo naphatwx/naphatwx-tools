@@ -41,6 +41,12 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* themed scrollbars — default ones render a white track on a dark page */
+        * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
+
         body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", system-ui, sans-serif; padding: 24px 16px 40px; }
         main { max-width: 1200px; margin: 0 auto; }
         header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }

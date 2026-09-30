@@ -39,6 +39,12 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* themed scrollbars — default ones render a white track on a dark page */
+        * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
+
         body {
             background: var(--bg);
             color: var(--text);

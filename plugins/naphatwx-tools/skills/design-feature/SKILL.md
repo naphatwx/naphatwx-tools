@@ -120,7 +120,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
         - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
             - Manual: `<div class="seq" data-flow="NN-<slug>"></div>`.
             - diagram-design: `<div class="seq">` + the returned `<iframe class="diagram-frame">`.
-        - Keep the section's "Show all diagrams" button; it opens and closes every toggle.
+        - The top bar's "Show all diagrams" button opens and closes every diagram toggle; keep it.
         - Rules in a third closed `<details class="rules-toggle">`, summary `Rules · what this flow must keep`: 3–5 bullets from the spec. Not opened by "Show all diagrams".
         - One `<p class="try">` line of mock links (`Try in the mock: Happy path ↗ · Empty ↗`) — only if a mock exists or will be built; each opens in a new tab.
     4. **Database changes**: the ER diagram button, the changes, then the full schema hidden in a closed `<details class="full-toggle">` (copy the Database block).

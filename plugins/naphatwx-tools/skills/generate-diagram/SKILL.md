@@ -61,10 +61,17 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
   // Report the real height to the host page so its iframe fits (postMessage works on file://).
   // body, not documentElement: documentElement.scrollHeight never drops below the iframe's current height.
   // Fractional rect height, not scrollHeight (rounds down): a 0.1px overflow shows a scrollbar strip.
+  // Thin scrollbars that match the dark paper; the default white track shows whenever the SVG overflows.
+  const style = document.createElement("style");
+  style.textContent = `* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 8px; }`;
+  document.head.append(style);
   if (parent !== window) {
-    // Embedded: the host sizes the height, and a slimmer padding keeps the SVG's min-width inside a narrow column.
+    // Embedded: the host sizes the height; slimmer padding and a 720px floor fit an 880px column without a scrollbar.
     document.documentElement.style.overflowY = "hidden";
     document.body.style.padding = "1rem";
+    document.querySelectorAll("svg").forEach(svg => { svg.style.minWidth = "min(720px, 100%)"; });
   }
   const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
   addEventListener("load", postHeight);

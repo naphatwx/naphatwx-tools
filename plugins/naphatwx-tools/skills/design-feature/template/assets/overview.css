@@ -583,6 +583,8 @@ td {
 /* iframe of a standalone diagram-design HTML file (default dark theme, paper #2d3142).
    The file posts its real height (its SVG shrinks with the width); the script below applies it. */
 .diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #2d3142; }
+/* an iframe brings its own paper: drop the host box around it so there is one frame, not two */
+.flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; background: none; }
 
 /* ============ DIAGRAM ZOOM (wheel over a .flowchart / .seq, drag to pan, ↺ resets) ============ */
 .zoomable { position: relative; }
