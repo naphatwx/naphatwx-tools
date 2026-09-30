@@ -1,26 +1,27 @@
 /* ============ THEME TOKENS ============ */
 :root {
-    --bg: #1a1a1a;
-    --bg-elevated: #222227;
-    --sidebar-bg: #161618;
-    --border: #2e2e34;
-    --border-strong: #3a3a42;
-    --text: #f5f5f5;
-    --text-body: #d8d8de;
-    --text-muted: #a0a0aa;
-    --text-faint: #7c7c86;
-    --accent: #8b5cf6;
-    --accent-soft: rgba(139, 92, 246, 0.16);
-    --code-bg: #242429;
-    --card-bg: #202024;
-    --card-hover: #26262b;
-    --selection: rgba(139, 92, 246, 0.3);
-    --scrollbar: #3a3a42;
-    --scrollbar-hover: #4a4a54;
+    /* lifted slate dark: surfaces sit well above black so the page reads bright */
+    --bg: #262a33;
+    --bg-elevated: #313641;
+    --sidebar-bg: #20242c;
+    --border: #3b414d;
+    --border-strong: #4b5260;
+    --text: #f8f9fb;
+    --text-body: #e2e5eb;
+    --text-muted: #b6bcc8;
+    --text-faint: #9ea5b3;
+    --accent: #b097fb;
+    --accent-soft: rgba(176, 151, 251, 0.18);
+    --code-bg: #333845;
+    --card-bg: #2c313b;
+    --card-hover: #373d49;
+    --selection: rgba(176, 151, 251, 0.35);
+    --scrollbar: #4b5260;
+    --scrollbar-hover: #5d6576;
     /* diff marks: + add / ~ change / − drop */
-    --add: #4ade80;
-    --change: #fbbf24;
-    --drop: #f87171;
+    --add: #5ee29a;
+    --change: #fcc94a;
+    --drop: #fb8585;
     color-scheme: dark;
 }
 
@@ -130,7 +131,7 @@ html {
     border: 1px solid var(--border-strong);
     background: var(--bg-elevated);
     color: var(--text-muted);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     display: grid;
     place-items: center;
@@ -185,7 +186,7 @@ html {
     background: var(--accent);
     display: grid;
     place-items: center;
-    color: #fff;
+    color: var(--sidebar-bg);
     font-size: var(--fs-sm);
     font-weight: 700;
 }
