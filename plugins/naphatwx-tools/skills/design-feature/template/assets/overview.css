@@ -254,6 +254,7 @@ html {
 .main {
     flex: 1;
     min-width: 0;
+    container-type: inline-size;
 }
 
 .topbar {
@@ -571,7 +572,7 @@ td {
 .diagram-toggle > summary:hover, .full-toggle > summary:hover, .rules-toggle > summary:hover { color: var(--accent); }
 .rules-toggle > ul { margin: 6px 0 14px; }
 .full-toggle > h4:first-of-type { margin-top: 12px; }
-.diagram-toggle > .flowchart, .diagram-toggle > .seq { margin: 6px 0 14px; }
+.diagram-toggle > .flowchart, .diagram-toggle > .seq { margin-top: 6px; margin-bottom: 14px; }
 
 .diagram-all {
     font: inherit;
@@ -605,6 +606,11 @@ td {
 .diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #2d3142; }
 /* an iframe brings its own paper: drop the host box around it so there is one frame, not two */
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; background: none; }
+/* diagrams break out of the 900px text column: up to 90% of the page (.main), centred on it */
+.flowchart, .seq {
+    width: max(100%, 90cqw);
+    margin-left: min(0px, calc(50% - 45cqw));
+}
 
 /* ============ DIAGRAM ZOOM (wheel over a .flowchart / .seq, drag to pan, ↺ resets) ============ */
 .zoomable { position: relative; }
