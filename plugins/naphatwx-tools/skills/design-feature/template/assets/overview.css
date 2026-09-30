@@ -122,11 +122,11 @@ html {
 .sidebar-collapse {
     position: fixed;
     top: 50%;
-    left: max(calc(var(--sidebar-w) - 18px), 8px);
+    left: max(calc(var(--sidebar-w) - 22px), 8px);
     transform: translateY(-50%);
     z-index: 40;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1px solid var(--border-strong);
     background: var(--bg-elevated);
@@ -144,8 +144,8 @@ html {
 }
 
 .sidebar-collapse svg {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     transition: transform 0.2s ease;
 }
 
