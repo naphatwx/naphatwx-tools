@@ -1,23 +1,23 @@
 /* ============ THEME TOKENS ============ */
 :root {
-    /* lifted slate dark: surfaces sit well above black so the page reads bright */
-    --bg: #262a33;
-    --bg-elevated: #313641;
-    --sidebar-bg: #20242c;
-    --border: #3b414d;
-    --border-strong: #4b5260;
+    /* slate dark: surfaces sit a little above black, text stays bright */
+    --bg: #1f232b;
+    --bg-elevated: #2a2f38;
+    --sidebar-bg: #1a1d24;
+    --border: #343945;
+    --border-strong: #444b58;
     --text: #f8f9fb;
     --text-body: #e2e5eb;
     --text-muted: #b6bcc8;
     --text-faint: #9ea5b3;
     --accent: #b097fb;
     --accent-soft: rgba(176, 151, 251, 0.18);
-    --code-bg: #333845;
-    --card-bg: #2c313b;
-    --card-hover: #373d49;
+    --code-bg: #2c313c;
+    --card-bg: #252a33;
+    --card-hover: #303641;
     --selection: rgba(176, 151, 251, 0.35);
-    --scrollbar: #4b5260;
-    --scrollbar-hover: #5d6576;
+    --scrollbar: #444b58;
+    --scrollbar-hover: #565e6e;
     /* diff marks: + add / ~ change / − drop */
     --add: #5ee29a;
     --change: #fcc94a;
