@@ -83,7 +83,7 @@ body {
     color: var(--text);
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
     font-size: var(--fs-body);
-    line-height: 1.5;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     transition: background 0.2s ease, color 0.2s ease;
 }
@@ -226,7 +226,7 @@ html {
 
 .nav-link {
     display: block;
-    padding: 3px 8px;
+    padding: 5px 8px;
     border-radius: 6px;
     color: var(--text-muted);
     text-decoration: none;
@@ -304,7 +304,7 @@ html {
 .content {
     max-width: 900px;
     margin: 0 auto;
-    padding: 24px 32px 80px;
+    padding: 32px 40px 96px;
 }
 
 /* ============ TYPOGRAPHY ============ */
@@ -320,41 +320,41 @@ html {
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.02em;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .content h2 {
     font-size: var(--fs-h2);
     font-weight: 650;
     letter-spacing: -0.01em;
-    margin: 40px 0 8px;
-    padding-top: 16px;
+    margin: 52px 0 12px;
+    padding-top: 20px;
     border-top: 3px solid var(--border-strong);
     scroll-margin-top: 56px;
 }
 
 /* each flow is its own unit: a lighter dashed rule than the section's */
 .content h3[id^="flow-"] {
-    margin-top: 28px;
-    padding-top: 14px;
+    margin-top: 36px;
+    padding-top: 18px;
     border-top: 1px dashed var(--border);
 }
 
 .content h3 {
     font-size: var(--fs-lead);
     font-weight: 600;
-    margin: 20px 0 6px;
+    margin: 26px 0 10px;
     scroll-margin-top: 56px;
 }
 
 .lead {
     font-size: var(--fs-lead);
     color: var(--text-body);
-    margin-bottom: 4px;
+    margin-bottom: 8px;
 }
 
 .content p {
-    margin: 8px 0;
+    margin: 12px 0;
     color: var(--text-body);
 }
 
@@ -378,13 +378,13 @@ html {
 
 .content ul,
 .content ol {
-    margin: 8px 0;
+    margin: 12px 0;
     padding-left: 20px;
     color: var(--text-body);
 }
 
 .content li {
-    margin: 2px 0;
+    margin: 6px 0;
 }
 
 .content li::marker {
@@ -410,9 +410,9 @@ pre {
     background: var(--code-bg);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 10px 14px;
+    padding: 14px 18px;
     overflow-x: auto;
-    margin: 10px 0;
+    margin: 14px 0;
 }
 
 pre code {
@@ -427,8 +427,8 @@ pre code {
 .summary {
     display: grid;
     grid-template-columns: max-content 1fr;
-    gap: 2px 20px;
-    margin: 14px 0;
+    gap: 8px 24px;
+    margin: 18px 0;
     max-width: var(--measure);
 }
 
@@ -445,7 +445,7 @@ pre code {
 /* ============ TABLE ============ */
 .table-wrap {
     overflow-x: auto;
-    margin: 10px 0;
+    margin: 14px 0;
 }
 
 table {
@@ -456,7 +456,7 @@ table {
 th,
 td {
     text-align: left;
-    padding: 6px 12px;
+    padding: 10px 14px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -501,7 +501,7 @@ td {
     }
 
     .content {
-        padding: 16px 14px 64px;
+        padding: 20px 16px 72px;
     }
 
     .menu-btn {
@@ -549,20 +549,20 @@ td {
 /* a run of toggles reads as one list: close it with a bottom hairline */
 :is(.diagram-toggle, .full-toggle, .rules-toggle):not(:has(+ :is(.diagram-toggle, .full-toggle, .rules-toggle))) {
     border-bottom: 1px solid var(--border);
-    margin-bottom: 8px;
+    margin-bottom: 14px;
 }
 
 .diagram-toggle > summary, .full-toggle > summary, .rules-toggle > summary {
     cursor: pointer;
-    padding: 5px 0;
+    padding: 9px 0;
     font-weight: 500;
     color: var(--text);
 }
 
 .diagram-toggle > summary:hover, .full-toggle > summary:hover, .rules-toggle > summary:hover { color: var(--accent); }
-.rules-toggle > ul { margin: 4px 0 8px; }
-.full-toggle > h4:first-of-type { margin-top: 8px; }
-.diagram-toggle > .flowchart, .diagram-toggle > .seq { margin: 4px 0 8px; }
+.rules-toggle > ul { margin: 6px 0 14px; }
+.full-toggle > h4:first-of-type { margin-top: 12px; }
+.diagram-toggle > .flowchart, .diagram-toggle > .seq { margin: 6px 0 14px; }
 
 .diagram-all {
     font: inherit;
@@ -584,8 +584,8 @@ td {
 .flowchart {
     background: var(--card-bg);
     border-radius: 8px;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 14px;
+    margin: 14px 0;
     overflow-x: auto;
 }
 
@@ -627,8 +627,8 @@ td {
 .seq {
     background: var(--card-bg);
     border-radius: 8px;
-    padding: 6px;
-    margin: 10px 0;
+    padding: 10px;
+    margin: 14px 0;
     overflow-x: auto;
 }
 
@@ -666,7 +666,7 @@ td {
 .seq-steps { margin-top: 6px; font-size: var(--fs-sm); color: var(--text-muted); }
 .seq-steps summary { cursor: pointer; color: var(--text-faint); font-weight: 600; }
 .seq-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
-.seq-steps li { display: grid; grid-template-columns: 22px auto 1fr; gap: 8px; align-items: baseline; padding: 2px 0; border-top: 1px solid var(--border); }
+.seq-steps li { display: grid; grid-template-columns: 22px auto 1fr; gap: 8px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--border); }
 .seq-steps .n { color: var(--text-faint); font-weight: 600; text-align: right; }
 
 .seq-legend {
@@ -694,8 +694,8 @@ td {
 .erd {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
-    gap: 10px;
-    margin: 10px 0;
+    gap: 14px;
+    margin: 14px 0;
 }
 
 .erd-table {
@@ -737,7 +737,7 @@ td {
     display: grid;
     grid-template-columns: minmax(45%, 1fr) minmax(0, auto) auto;
     gap: 10px;
-    padding: 2px 10px;
+    padding: 4px 12px;
     border-bottom: 1px solid var(--border);
     color: var(--text-muted);
 }
@@ -759,7 +759,7 @@ td {
     font-size: var(--fs-sm);
 }
 
-.erd-rel li { margin: 2px 0; }
+.erd-rel li { margin: 5px 0; }
 .erd-rel .card-n { color: var(--text-muted); font-weight: 600; }
 .faint { color: var(--text-faint); }
 .nav-link.current { color: var(--accent); font-weight: 600; }
