@@ -326,9 +326,17 @@ html {
     font-size: var(--fs-h2);
     font-weight: 650;
     letter-spacing: -0.01em;
-    margin: 44px 0 14px;
-    padding-top: 12px;
+    margin: 72px 0 14px;
+    padding-top: 28px;
+    border-top: 2px solid var(--border-strong);
     scroll-margin-top: 80px;
+}
+
+/* each flow is its own unit: a lighter dashed rule than the section's */
+.content h3[id^="flow-"] {
+    margin-top: 44px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--border);
 }
 
 .content h3 {
