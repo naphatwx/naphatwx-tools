@@ -212,7 +212,7 @@ html {
 }
 
 .nav-group {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 .nav-group-title {
@@ -220,15 +220,16 @@ html {
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-faint);
-    padding: 6px 10px;
+    padding: 4px 10px;
     font-weight: 600;
 }
 
 .nav-link {
     display: block;
-    padding: 8px 10px;
+    padding: 6px 10px;
     border-radius: 8px;
     font-size: 1.05rem;
+    line-height: 1.45;
     color: var(--text-muted);
     text-decoration: none;
     transition: background 0.12s, color 0.12s;
