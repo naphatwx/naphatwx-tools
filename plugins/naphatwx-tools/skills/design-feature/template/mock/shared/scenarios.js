@@ -1,5 +1,5 @@
 // Mock-only: pages and scenarios. A scenario picks an entity from data.js and optional upstream faults.
-// Selected with ?scenario=<id>, so every state has its own link (the plan's "Try it" cards use them).
+// Selected with ?scenario=<id>, so every state has its own link (the plan's "Try in the mock" lines use them).
 
 var Scenarios = (function () {
     /** One entry per screen under page/. `extra` = default query params for a deep link. */

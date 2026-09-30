@@ -68,43 +68,32 @@
                 <h1 id="overview">Feature Name</h1>
                 <p class="lead">One or two sentences: what the feature lets a user do, and which system does the work.</p>
 
-                <div class="card-grid">
-                    <div class="card">
-                        <div class="ic">🔀</div>
-                        <h4>Key decision</h4>
-                        <p>The one design choice a reader must know first.</p>
-                    </div>
-                    <div class="card">
-                        <div class="ic">🗄️</div>
-                        <h4>Data impact</h4>
-                        <p>New tables and changed columns, or "no schema change" (the Database changes section then says so in one sentence).</p>
-                    </div>
-                    <div class="card">
-                        <div class="ic">🧩</div>
-                        <h4>UI impact</h4>
-                        <p>Which screens change.</p>
-                    </div>
-                </div>
+                <dl class="summary">
+                    <dt>Key decision</dt>
+                    <dd>The one design choice a reader must know first.</dd>
+                    <dt>Data impact</dt>
+                    <dd>New tables and changed columns, or "no schema change".</dd>
+                    <dt>UI impact</dt>
+                    <dd>Which screens change.</dd>
+                </dl>
 
                 <h2 id="scope">Scope</h2>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>In scope</th><th>Out of scope</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Capability that ships</td><td>Capability left for later (why)</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <h3>In scope</h3>
+                <ul>
+                    <li>Capability that ships</li>
+                </ul>
+                <h3>Out of scope</h3>
+                <ul>
+                    <li>Capability left for later <span class="faint">— why</span></li>
+                </ul>
 
                 <h2 id="flows">Flows</h2>
-                <p>Each flow has two diagrams, hidden until you open them. <strong>Flowchart</strong>: the flow's logic (steps, Yes / No decisions, loops). <strong>Sequence diagram</strong>: how the services talk to carry it out. Files live under <code>flowchart/</code> and <code>sequence-diagram/</code>.</p>
+                <p>Each flow has a flowchart (its logic) and a sequence diagram (how the services talk).</p>
                 <p><button class="diagram-all" id="diagramAll" type="button">Show all diagrams</button></p>
-                <div class="seq-legend" style="margin:10px 0 0">
+                <div class="seq-legend" style="margin:14px 0 0">
                     <span>call</span>
                     <span class="ret">response</span>
-                    <span class="hot">side effect (external write / audit)</span>
+                    <span class="hot">side effect</span>
                 </div>
 
                 <!-- ===== one block per flow: h3 id="flow-NN" + flowchart + sequence diagram + rules (all three in closed <details>) + try links.
@@ -112,7 +101,7 @@
                      diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" loading="lazy"></iframe>,
                      and <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></iframe></div> ===== -->
                 <h3 id="flow-01">1. Example flow</h3>
-                <p><span class="pill accent">US1 · P1</span><span class="pill">FR-001 · FR-002</span></p>
+                <p class="meta">US1 · P1 · FR-001 · FR-002</p>
                 <p>What this flow achieves, in one or two sentences. <strong>Trigger:</strong> where the user starts it.</p>
                 <details class="diagram-toggle">
                     <summary>Flowchart <span class="faint">· flow logic</span></summary>
@@ -128,17 +117,15 @@
                         <li>A rule from the spec that the implementation must not break.</li>
                     </ul>
                 </details>
-                <p><strong>Try it in the mock</strong> <span class="faint">(opens in a new tab)</span></p>
-                <div class="card-grid">
-                    <a class="card" href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener"><h4>Happy path ↗</h4><p><code>page/example.html?scenario=normal</code></p></a>
-                </div>
+                <p class="try"><span class="faint">Try in the mock:</span> <a href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener">Happy path ↗</a></p>
                 <!-- ===== end flow block ===== -->
 
                 <!-- ===== Database: changes first, then the full schema of every related table in a closed .full-toggle.
                      No related table at all → keep this section, replace its body with "This feature has no database changes." ===== -->
                 <h2 id="database">Database changes</h2>
-                <p>Only tables whose schema changes. Accent border = new table · solid border = existing table, changed columns only. Migration: <code>path/to/migration.sql</code>.</p>
-                <p><a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a> <span class="faint">every related table and relation, on its own page</span></p>
+                <p>Only tables whose schema changes. Migration: <code>path/to/migration.sql</code>.</p>
+                <p class="legend"><span class="new">▍ new table</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
+                <p><a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a></p>
                 <div class="erd">
                     <div class="erd-table write">
                         <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
@@ -149,7 +136,7 @@
                     <div class="erd-table">
                         <div class="erd-head">schema.table_a <span class="erd-tag">altered</span></div>
                         <div class="erd-row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
-                        <div class="erd-row"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                        <div class="erd-row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
                         <div class="erd-row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
                         <div class="erd-row add"><span class="col">new_column</span><span class="type">index</span><span class="key">+ add</span></div>
                     </div>
@@ -159,7 +146,7 @@
                 </ul>
                 <details class="full-toggle">
                     <summary>Full schema <span class="faint">· every related table, all columns</span></summary>
-                    <p>Every table this feature reads or writes. Changed rows keep their <code>+ add</code> / <code>~</code> / <code>− drop</code> marks. Dashed border = external (another service owns it).</p>
+                    <p>Every table this feature reads or writes. Dashed border = another service owns it.</p>
                     <div class="erd">
                         <div class="erd-table write">
                             <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
@@ -172,7 +159,7 @@
                             <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
                             <div class="erd-row"><span class="col">name</span><span class="type">text</span><span class="key">NOT NULL</span></div>
                             <div class="erd-row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
-                            <div class="erd-row"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                            <div class="erd-row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
                             <div class="erd-row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
                             <div class="erd-row"><span class="col">created_at</span><span class="type">timestamptz</span><span class="key"></span></div>
                         </div>
@@ -198,11 +185,12 @@
                 <!-- ===== API: one block per API (request changes + response changes), then the full request / response of every related API
                      in a closed .full-toggle. No related API at all → keep this section, replace its body with "This feature has no API changes." ===== -->
                 <h2 id="api">API changes</h2>
-                <p>Each API with its request and response changes. File: <code>path/to/service.proto</code> · additive, wire-compatible. Accent border = new message · solid border = existing message, changed fields only.</p>
+                <p>File: <code>path/to/service.proto</code> · additive, wire-compatible.</p>
+                <p class="legend"><span class="new">▍ new message</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
 
                 <!-- ===== one block per changed API ===== -->
                 <h3><code>CreateThing</code></h3>
-                <p><span class="pill accent">new</span><span class="pill"><code>POST /api/v1/things</code></span><span class="pill">permission <code>things.create</code></span></p>
+                <p class="meta"><span class="new">new</span> · POST /api/v1/things · permission things.create</p>
                 <div class="erd">
                     <div class="erd-table write">
                         <div class="erd-head">Request · CreateThingRequest <span class="erd-tag">new message</span></div>
@@ -213,13 +201,13 @@
                     <div class="erd-table">
                         <div class="erd-head">Response · ThingResponse <span class="erd-tag">altered</span></div>
                         <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
-                        <div class="erd-row"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
+                        <div class="erd-row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
                         <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
                     </div>
                 </div>
 
                 <h3><code>GetThings</code></h3>
-                <p><span class="pill">behaviour change</span><span class="pill"><code>GET /api/v1/things</code></span><span class="pill">permission <code>things.read</code></span></p>
+                <p class="meta">behaviour change · GET /api/v1/things · permission things.read</p>
                 <div class="erd">
                     <div class="erd-table">
                         <div class="erd-head">Request · GetThingsRequest <span class="erd-tag">unchanged</span></div>
@@ -249,7 +237,7 @@
 
                 <details class="full-toggle">
                     <summary>Full contracts <span class="faint">· every related API, full request and response</span></summary>
-                    <p>Every API this feature adds, changes or calls. Changed fields keep their <code>+</code> / <code>~</code> / <code>−</code> marks.</p>
+                    <p>Every API this feature adds, changes or calls.</p>
                     <h4><code>CreateThing</code> <span class="faint">· POST /api/v1/things · new</span></h4>
                     <div class="erd">
                         <div class="erd-table write">
@@ -263,7 +251,7 @@
                             <div class="erd-row"><span class="col">id</span><span class="type">int64</span><span class="key">1</span></div>
                             <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">2</span></div>
                             <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
-                            <div class="erd-row"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
+                            <div class="erd-row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
                             <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
                         </div>
                     </div>
@@ -295,22 +283,13 @@
                 </div>
 
                 <h2 id="mock">Mock UI</h2>
-                <p>Links open the mock in a new tab. Built from the app's real design system; pages call a fake API with the real operation names.</p>
-                <div class="card-grid">
-                    <a class="card" href="mock/index.html" target="_blank" rel="noopener">
-                        <div class="ic">🖥️</div>
-                        <h4>Mock index ↗</h4>
-                        <p>Every page × scenario link, the fake API console.</p>
-                    </a>
-                </div>
+                <p>Built from the app's real design system; pages call a fake API with the real operation names.</p>
+                <p><a href="mock/index.html" target="_blank" rel="noopener">Open the mock ↗</a> <span class="faint">· every page × scenario, fake API console</span></p>
 
                 <h2 id="open-questions">Open questions</h2>
-                <div class="callout danger">
-                    <span class="ic">🚫</span>
-                    <div><strong>Blocker:</strong> anything that stops the feature shipping.</div>
-                </div>
-                <ol class="steps">
-                    <li><strong>Question</strong>What must be decided or verified, and by whom.</li>
+                <p><strong class="blocker">Blocker:</strong> anything that stops the feature shipping.</p>
+                <ol>
+                    <li><strong>Question</strong> — what must be decided or verified, and by whom.</li>
                 </ol>
             </article>
         </div>

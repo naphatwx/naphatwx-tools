@@ -111,10 +111,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Merge the sub-agent fragments from `.parts/` into their sections, add their open questions to Open questions, then delete `.parts/`.
 - Replace the title, brand and eyebrow (spec number, ticket, status).
 - Sections, in order. Always keep every section and its nav link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
-    1. **Overview**: lead sentence + 3–4 cards (key decision, data impact, UI impact, eligibility/scale).
-    2. **Scope**: in / out table.
+    1. **Overview**: lead sentence + a `<dl class="summary">` of 3–4 key facts (key decision, data impact, UI impact, eligibility/scale).
+    2. **Scope**: `<h3>In scope</h3>` and `<h3>Out of scope</h3>`, each a bullet list. Each out-of-scope item ends with its reason in `<span class="faint">— why</span>`.
     3. **Flows**: one block per flow (copy the block between the `one block per flow` comments):
-        - `<h3 id="flow-NN">`, pills (user story, requirement ids; no file names, the diagram toggles below already link them), what + trigger.
+        - `<h3 id="flow-NN">`, a `<p class="meta">` line (user story, requirement ids joined by ` · `; no file names), what + trigger.
         - Flowchart in a closed `<details class="diagram-toggle">`, summary `Flowchart · flow logic`:
             - `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
         - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
@@ -122,14 +122,14 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - diagram-design: `<div class="seq">` + the returned `<iframe class="diagram-frame">`.
         - Keep the section's "Show all diagrams" button; it opens and closes every toggle.
         - Rules in a third closed `<details class="rules-toggle">`, summary `Rules · what this flow must keep`: 3–5 bullets from the spec. Not opened by "Show all diagrams".
-        - "Try it in the mock" cards — only if a mock exists or will be built; each opens in a new tab.
+        - One `<p class="try">` line of mock links (`Try in the mock: Happy path ↗ · Empty ↗`) — only if a mock exists or will be built; each opens in a new tab.
     4. **Database changes**: the ER diagram button, the changes, then the full schema hidden in a closed `<details class="full-toggle">` (copy the Database block).
         - **Open ER diagram ↗** button: `<a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one button per page (`Open ER diagram · catalog ↗`). No related table → no page and no button.
         - **Changes** (always visible): one `.erd` card per table whose schema changes:
             - `.erd-table.write` + tag `new table` for a new table (all its columns); `.erd-table` + tag `altered` for an existing table (only the changed columns).
-            - Changed rows: `.erd-row.add` (`+ add`), `~ type` / `~ null` for a change (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the section intro.
+            - Changed rows: `.erd-row.add` (`+ add`), `.erd-row.change` (`~ type` / `~ null`) (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the section intro.
             - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
-            - No schema change → one sentence in place of the cards: "This feature has no schema change." Also say "no schema change" in the Overview data-impact card.
+            - No schema change → one sentence in place of the cards: "This feature has no schema change." Also say "no schema change" in the Overview data-impact line.
         - **Full schema** (hidden, summary `Full schema · every related table, all columns`): every table the feature reads or writes, with all its columns.
             - Tags: `new table` / `altered` (changed rows keep their marks), `read` for a table only read or only written to without a schema change, `external` + `.erd-table.external` for a table another service owns.
             - `.erd-rel` lines for every relation between the listed tables.
@@ -137,9 +137,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     5. **API changes**: one block per API with its request and response changes, then the full contracts hidden in a closed `<details class="full-toggle">` (copy the API block).
         - Source: the proto / OpenAPI / DTO diff in the spec's contracts. Name the file(s) and say whether the change is wire-compatible.
         - **One block per changed API** (always visible):
-            - `<h3><code>RpcName</code></h3>` + pills: `new` / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none).
-            - An `.erd` with two cards: `Request · <Message>` and `Response · <Message>`. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add, `~ N` change (type `old → new`), `− N` remove. No field change → tag `unchanged` and one `.erd-row.none` "No field change."
-            - A rule change without a contract change → `behaviour change` pill, both cards `unchanged`.
+            - `<h3><code>RpcName</code></h3>` + a `<p class="meta">` line: `new` (as `<span class="new">`) / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none), joined by ` · `.
+            - An `.erd` with two cards: `Request · <Message>` and `Response · <Message>`. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add (`.erd-row.add`), `~ N` change (`.erd-row.change`, type `old → new`), `− N` remove (`.erd-row.drop`). No field change → tag `unchanged` and one `.erd-row.none` "No field change."
+            - A rule change without a contract change → `behaviour change` in the meta line, both cards `unchanged`.
             - Any runtime rule change (with or without a contract change) → a closed `<details class="rules-toggle">` under the cards, summary `Behaviour · what changes at runtime`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain `Behaviour:` paragraph.
         - **Shared types**: new or changed enums and nested messages used by more than one API. Leave the subsection out when there are none.
         - When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
@@ -148,16 +148,16 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - An API another service owns → `.erd-table.external`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
     6. **Errors**: cause → code → user-facing text. No new errors → one sentence saying so.
-    7. **Mock UI**: link cards into `mock/` (new tab). No mock → replace with one line saying the feature has no UI.
-    8. **Open questions**: blocker callout, then numbered steps. None → one sentence saying there are no open questions.
+    7. **Mock UI**: one text link into `mock/index.html` (new tab). No mock → replace with one line saying the feature has no UI.
+    8. **Open questions**: a `<strong class="blocker">Blocker:</strong>` line per blocker, then a numbered list. None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the sidebar nav to match: one link per flow under "Flows".
 
 ### 5. Offer the mock
 
 - Ask whether to build an interactive mock (use AskUserQuestion when the agent has it). Skip the question when the feature has no UI.
-- Yes → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder. It adds `mock/` and fills the "Try it in the mock" cards.
-- No → remove the "Try it in the mock" blocks. Keep the Mock UI section and nav link with one sentence saying no mock was built.
+- Yes → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder. It adds `mock/` and fills the "Try in the mock" lines.
+- No → remove the "Try in the mock" lines. Keep the Mock UI section and nav link with one sentence saying no mock was built.
 
 ### 6. Verify
 

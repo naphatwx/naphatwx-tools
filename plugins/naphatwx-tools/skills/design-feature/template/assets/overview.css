@@ -6,8 +6,9 @@
     --border: #2e2e34;
     --border-strong: #3a3a42;
     --text: #f5f5f5;
-    --text-muted: #b0b0b8;
-    --text-faint: #80808a;
+    --text-body: #d8d8de;
+    --text-muted: #a0a0aa;
+    --text-faint: #7c7c86;
     --accent: #8b5cf6;
     --accent-soft: rgba(139, 92, 246, 0.16);
     --code-bg: #242429;
@@ -16,6 +17,10 @@
     --selection: rgba(139, 92, 246, 0.3);
     --scrollbar: #3a3a42;
     --scrollbar-hover: #4a4a54;
+    /* diff marks: + add / ~ change / − drop */
+    --add: #4ade80;
+    --change: #fbbf24;
+    --drop: #f87171;
     color-scheme: dark;
 }
 
@@ -25,6 +30,7 @@
     --fs-sm: 0.875rem;
     --fs-body: 1rem;
     --fs-lead: 1.15rem;
+    --measure: 72ch;
     --fs-h2: 1.5rem;
     --fs-h1: 2.2rem;
     --fs-icon: 1.25rem;
@@ -295,7 +301,7 @@ html {
 }
 
 .content {
-    max-width: 1000px;
+    max-width: 880px;
     margin: 0 auto;
     padding: 40px 40px 120px;
 }
@@ -303,8 +309,8 @@ html {
 /* ============ TYPOGRAPHY ============ */
 .eyebrow {
     font-size: var(--fs-sm);
-    color: var(--accent);
-    font-weight: 600;
+    color: var(--text-faint);
+    font-weight: 500;
     margin-bottom: 10px;
 }
 
@@ -333,14 +339,23 @@ html {
 }
 
 .lead {
-    font-size: var(--fs-body);
-    color: var(--text-muted);
+    font-size: var(--fs-lead);
+    color: var(--text-body);
     margin-bottom: 8px;
 }
 
 .content p {
     margin: 12px 0;
-    color: var(--text-muted);
+    color: var(--text-body);
+}
+
+/* prose keeps a readable line length; diagrams and tables still use the full width */
+.content > p,
+.content > ul,
+.content > ol,
+.content details > p,
+.content details > ul {
+    max-width: var(--measure);
 }
 
 .content a {
@@ -356,7 +371,7 @@ html {
 .content ol {
     margin: 12px 0;
     padding-left: 22px;
-    color: var(--text-muted);
+    color: var(--text-body);
 }
 
 .content li {
@@ -377,9 +392,8 @@ code {
     font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
     font-size: var(--fs-code);
     background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 1.5px 6px;
+    border-radius: 4px;
+    padding: 1px 5px;
     color: var(--text);
 }
 
@@ -400,79 +414,23 @@ pre code {
     line-height: 1.6;
 }
 
-/* ============ CALLOUT ============ */
-.callout {
-    display: flex;
-    gap: 12px;
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    background: var(--accent-soft);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin: 18px 0;
-    color: var(--text-muted);
-}
-
-.callout .ic {
-    flex-shrink: 0;
-    font-size: var(--fs-icon);
-}
-
-.callout.warn {
-    border-left-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
-}
-
-.callout.danger {
-    border-left-color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-}
-
-/* ============ CARD GRID ============ */
-.card-grid {
+/* ============ SUMMARY (overview key facts) ============ */
+.summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-    margin: 20px 0;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 24px;
+    margin: 24px 0;
+    max-width: var(--measure);
 }
 
-.card {
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 18px;
-    text-decoration: none;
-    color: inherit;
-    transition: background 0.12s, border-color 0.12s, transform 0.12s;
-}
-
-.card:hover {
-    background: var(--card-hover);
-    border-color: var(--border-strong);
-    transform: translateY(-2px);
-}
-
-.card .ic {
-    width: 38px;
-    height: 38px;
-    border-radius: 9px;
-    border: 1px solid var(--border);
-    display: grid;
-    place-items: center;
-    font-size: var(--fs-icon);
-    margin-bottom: 12px;
-}
-
-.card h4 {
-    font-size: var(--fs-body);
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.card p {
+.summary dt {
+    color: var(--text-faint);
     font-size: var(--fs-sm);
-    color: var(--text-muted);
-    margin: 0;
+    padding-top: 2px;
+}
+
+.summary dd {
+    color: var(--text-body);
 }
 
 /* ============ TABLE ============ */
@@ -500,44 +458,7 @@ th {
 }
 
 td {
-    color: var(--text-muted);
-}
-
-/* ============ STEPS ============ */
-.steps {
-    list-style: none;
-    padding: 0;
-    counter-reset: step;
-}
-
-.steps>li {
-    position: relative;
-    padding-left: 42px;
-    margin: 0 0 22px;
-    counter-increment: step;
-}
-
-.steps>li::before {
-    content: counter(step);
-    position: absolute;
-    left: 0;
-    top: -2px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--accent-soft);
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    display: grid;
-    place-items: center;
-    font-size: var(--fs-sm);
-    font-weight: 600;
-}
-
-.steps>li strong {
-    display: block;
-    color: var(--text);
-    margin-bottom: 2px;
+    color: var(--text-body);
 }
 
 /* ============ MOBILE ============ */
@@ -589,39 +510,47 @@ td {
 }
 
 /* ============ PLAN EXTRAS ============ */
-.content.wide { max-width: 1120px; }
+.content.wide { max-width: 880px; }
 
-.pill {
-    display: inline-block;
-    padding: 1px 9px;
-    border-radius: 999px;
-    border: 1px solid var(--border-strong);
-    font-size: var(--fs-label);
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-right: 6px;
+/* one quiet mono line under a heading: ids, route, permission */
+.meta {
+    font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+    font-size: var(--fs-sm);
+    color: var(--text-faint) !important;
 }
 
-.pill.accent { border-color: var(--accent); color: var(--accent); }
+.meta code { background: none; padding: 0; color: inherit; }
+.new { color: var(--accent); }
+.add { color: var(--add); }
+.change { color: var(--change); }
+.drop { color: var(--drop); }
+.blocker { color: var(--drop) !important; }
+
+/* small key under a section intro: "+ add  ~ change  − drop" */
+.legend { font-size: var(--fs-sm); color: var(--text-faint) !important; }
+.legend span + span { margin-left: 14px; }
 
 /* ============ DIAGRAM TOGGLES (closed by default) ============ */
 /* .full-toggle: the "full details" block under Database / API changes; .rules-toggle: a flow's rules or an API's behaviour. Same look */
 .diagram-toggle, .full-toggle, .rules-toggle {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin: 12px 0;
-    padding: 0 14px;
+    border-top: 1px solid var(--border);
+    margin: 0;
+}
+
+/* a run of toggles reads as one list: close it with a bottom hairline */
+:is(.diagram-toggle, .full-toggle, .rules-toggle):not(:has(+ :is(.diagram-toggle, .full-toggle, .rules-toggle))) {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
 }
 
 .diagram-toggle > summary, .full-toggle > summary, .rules-toggle > summary {
     cursor: pointer;
     padding: 10px 0;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
 }
 
 .diagram-toggle > summary:hover, .full-toggle > summary:hover, .rules-toggle > summary:hover { color: var(--accent); }
-.diagram-toggle[open] > summary, .full-toggle[open] > summary, .rules-toggle[open] > summary { border-bottom: 1px solid var(--border); }
 .rules-toggle > ul { margin: 12px 0 14px; }
 .full-toggle > h4:first-of-type { margin-top: 14px; }
 .diagram-toggle > .flowchart, .diagram-toggle > .seq { margin: 12px 0 14px; }
@@ -630,8 +559,9 @@ td {
     font: inherit;
     font-size: var(--fs-sm);
     color: var(--text-muted);
-    background: var(--card-bg);
-    border: 1px solid var(--border-strong);
+    background: none;
+    border: 1px solid var(--border);
+    text-decoration: none !important;
     border-radius: 8px;
     padding: 6px 12px;
     cursor: pointer;
@@ -641,9 +571,8 @@ td {
 
 /* ============ FLOWCHART (.flowchart) + diagram-design embeds ============ */
 .flowchart {
-    border: 1px solid var(--border);
     background: var(--card-bg);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 16px;
     margin: 18px 0;
     overflow-x: auto;
@@ -683,9 +612,8 @@ td {
 
 /* ============ SEQUENCE DIAGRAM (.seq) ============ */
 .seq {
-    border: 1px solid var(--border);
     background: var(--card-bg);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 8px;
     margin: 18px 0;
     overflow-x: auto;
@@ -759,14 +687,13 @@ td {
 
 .erd-table {
     border: 1px solid var(--border);
-    background: var(--card-bg);
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
     font-size: var(--fs-sm);
 }
 
 .erd-table.external { border-style: dashed; }
-.erd-table.write { border-color: var(--accent); }
+.erd-table.write { border-left: 2px solid var(--accent); }
 .erd-row.none { grid-template-columns: 1fr; color: var(--text-faint); }
 
 .erd-head {
@@ -775,7 +702,6 @@ td {
     align-items: center;
     gap: 8px;
     padding: 9px 12px;
-    background: var(--bg-elevated);
     border-bottom: 1px solid var(--border);
     font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
     font-weight: 600;
@@ -787,15 +713,12 @@ td {
     flex-shrink: 0;
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
     font-size: var(--fs-label);
-    font-weight: 600;
-    padding: 1px 7px;
-    border-radius: 999px;
-    border: 1px solid var(--border-strong);
+    font-weight: 500;
     color: var(--text-faint);
     white-space: nowrap;
 }
 
-.erd-table.write .erd-tag { border-color: var(--accent); color: var(--accent); }
+.erd-table.write .erd-tag { color: var(--accent); }
 
 .erd-row {
     display: grid;
@@ -809,10 +732,12 @@ td {
 .erd-row:last-child { border-bottom: none; }
 .erd-row .col { font-family: "SF Mono", "Cascadia Code", Consolas, monospace; color: var(--text); overflow-wrap: anywhere; }
 .erd-row .type { color: var(--text-faint); text-align: right; overflow-wrap: anywhere; }
-.erd-row .key { font-size: var(--fs-label); font-weight: 700; color: var(--accent); min-width: 22px; max-width: 180px; text-align: right; }
+.erd-row .key { font-size: var(--fs-label); font-weight: 600; color: var(--text-faint); min-width: 22px; max-width: 180px; text-align: right; }
 .erd-row.more { grid-template-columns: 1fr; color: var(--text-faint); font-style: italic; }
 .erd-row.drop .col, .erd-row.drop .type { text-decoration: line-through; color: var(--text-faint); }
-.erd-row.drop .key { color: #ef4444; }
+.erd-row.add .key { color: var(--add); }
+.erd-row.change .key { color: var(--change); }
+.erd-row.drop .key { color: var(--drop); }
 
 .erd-rel {
     list-style: none;
@@ -822,7 +747,10 @@ td {
 }
 
 .erd-rel li { margin: 4px 0; }
-.erd-rel .card-n { color: var(--accent); font-weight: 600; }
+.erd-rel .card-n { color: var(--text-muted); font-weight: 600; }
 .faint { color: var(--text-faint); }
 .nav-link.current { color: var(--accent); font-weight: 600; }
 .nav-link.current::before { content: "▸ "; }
+.content a.diagram-all { color: var(--text-muted); }
+.content a.diagram-all:hover { color: var(--text); }
+.content :is(h3, h4) code { background: none; padding: 0; }

@@ -104,7 +104,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 
 ### 7. Link the plan (when a plan folder exists)
 
-- In `overview.html`, fill each flow's "Try it in the mock" cards with `mock/page/<screen>.html?scenario=<id>` links (`target="_blank" rel="noopener"`), and the Mock UI section's cards.
+- In `overview.html`, fill each flow's "Try in the mock" line with `mock/page/<screen>.html?scenario=<id>` links joined by ` · ` (`target="_blank" rel="noopener"`), and the Mock UI section's link.
 - Flows with no UI (API / MCP only) link to `mock/index.html` — its console calls the same operations.
 
 ### 8. Verify
