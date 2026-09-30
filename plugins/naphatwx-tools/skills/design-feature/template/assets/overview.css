@@ -606,11 +606,6 @@ td {
 .diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #2d3142; }
 /* an iframe brings its own paper: drop the host box around it so there is one frame, not two */
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; background: none; }
-/* diagrams break out of the 900px text column: up to 90% of the page (.main), centred on it */
-.flowchart, .seq {
-    width: max(100%, 90cqw);
-    margin-left: min(0px, calc(50% - 45cqw));
-}
 
 /* ============ DIAGRAM ZOOM (wheel over a .flowchart / .seq, drag to pan, ↺ resets) ============ */
 .zoomable { position: relative; }
@@ -645,6 +640,14 @@ td {
     padding: 10px;
     margin: 14px 0;
     overflow-x: auto;
+}
+
+/* diagrams break out of the 900px text column: 90% of the page (.main), capped at 1200px, centred.
+   Kept after .flowchart and .seq so their margin shorthand does not reset margin-left */
+.flowchart, .seq {
+    --diagram-w: max(100%, min(90cqw, 1200px));
+    width: var(--diagram-w);
+    margin-left: calc((100% - var(--diagram-w)) / 2);
 }
 
 .seq svg {
