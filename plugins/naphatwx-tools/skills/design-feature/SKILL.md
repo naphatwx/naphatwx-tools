@@ -160,7 +160,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     8. **Open questions**: a `<strong class="blocker">Blocker:</strong>` line per blocker, then a numbered list. None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the sidebar nav to match: one link per flow under "Flows".
-- Database changes and API changes are `.nav-tree` accordions (copy them from the template), closed by default (`hidden` children, `.nav-parent` with `aria-expanded="false"`). Clicking the parent link jumps to its section and toggles its sub-links; opening one closes the other:
+- Database changes and API changes are `.nav-tree` accordions (copy them from the template), closed by default (`hidden` children, `.nav-parent` with `aria-expanded="false"`). Clicking the parent link jumps to its section and toggles its sub-links; clicking any other link closes every section it is not in:
     - Database changes: one sub-link per changed table card (`#db-<table>`, text = table name).
     - API changes: one sub-link per changed API (`#api-<kebab-name>`, text = RPC name), plus `Shared types` when that subsection exists.
     - No sub-items (no changes) → a plain `nav-link`, no `.nav-tree`.

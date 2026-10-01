@@ -37,7 +37,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "[" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) toggleCollapse();
 });
 
-// ===== Sidebar accordion (a parent click jumps to its section and toggles its sub-links; one open at a time) =====
+// ===== Sidebar accordion (a parent click jumps to its section and toggles its sub-links; any other link closes the rest) =====
 const trees = [...document.querySelectorAll(".nav-tree")];
 function setTreeOpen(tree, open) {
     tree.querySelector(".nav-children").hidden = !open;
@@ -46,6 +46,11 @@ function setTreeOpen(tree, open) {
 trees.forEach(t => t.querySelector(".nav-parent").addEventListener("click", () => {
     const open = t.querySelector(".nav-children").hidden;
     trees.forEach(o => setTreeOpen(o, o === t && open));
+}));
+// any other in-page link closes every section except the one it sits in
+document.querySelectorAll('.nav-link:not(.nav-parent)[href^="#"]').forEach(l => l.addEventListener("click", () => {
+    const own = l.closest(".nav-tree");
+    trees.forEach(t => setTreeOpen(t, t === own));
 }));
 // opened from a sub-link URL (#api-…) → start with its section open
 const startTree = [...document.querySelectorAll(".nav-children .nav-link")]
