@@ -57,7 +57,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
     - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
-4. Every sidebar `nav-link` `href="#id"` matches a real heading `id`.
+4. Every sidebar `nav-link` `href="#id"` (sub-links included) matches a real `id` on the page.
 5. Every link into `mock/` opens in a new tab: `target="_blank" rel="noopener"`.
 6. No external scripts, styles or fonts in `overview.html`. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
@@ -126,7 +126,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     4. **Database changes**: the ER diagram button, the changes, then the full schema hidden in a closed `<details class="full-toggle">` (copy the Database block).
         - **Intro list** (copy the Database block): `Migration:`, `Changed tables:`, and `Not touched on purpose:` with one sublist item per table. Name indexes and constraints here too.
         - **Open ER diagram ↗** button, inside the `<h2 id="database">` right after its text: `<a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one button per page (`Open ER diagram · catalog ↗`). No related table → no page and no button.
-        - **Changes** (always visible): one `.erd` card per table whose schema changes:
+        - **Changes** (always visible): one `.erd` card per table whose schema changes, each with `id="db-<table>"` for its sidebar sub-link:
             - `.erd-table.write` + tag `new table` for a new table (all its columns); `.erd-table` + tag `altered` for an existing table (only the changed columns).
             - Changed rows: `.erd-row.add` (`+ add`), `.erd-row.change` (`~ type` / `~ null`) (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the intro list.
             - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
@@ -145,11 +145,11 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - `Permissions:` new permissions, seeds, permission-map entries, snapshots to update.
             - Other notes (an RPC kept as-is, where it appears): one bullet each.
         - **One block per changed API** (always visible):
-            - `<h3><code>RpcName</code> <span class="meta">…</span></h3>`, the meta on the heading's line, not a line below: `new` (as `<span class="new">`) / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none), joined by ` · `.
+            - `<h3 id="api-<kebab-name>"><code>RpcName</code> <span class="meta">…</span></h3>`, the meta on the heading's line, not a line below: `new` (as `<span class="new">`) / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none), joined by ` · `.
             - An `.erd` with two cards: `Request · <Message>` and `Response · <Message>`. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add (`.erd-row.add`), `~ N` change (`.erd-row.change`, type `old → new`), `− N` remove (`.erd-row.drop`). No field change → tag `unchanged` and one `.erd-row.none` "No field change."
             - A rule change without a contract change → `behaviour change` in the meta line, both cards `unchanged`.
             - Any runtime rule change (with or without a contract change) → a closed `<details class="rules-toggle">` under the cards, summary `Behaviour · what changes at runtime`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain `Behaviour:` paragraph.
-        - **Shared types**: new or changed enums and nested messages used by more than one API. Leave the subsection out when there are none.
+        - **Shared types** (`<h3 id="api-shared-types">`): new or changed enums and nested messages used by more than one API. Leave the subsection out when there are none.
         - When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
         - **Full contracts** (hidden, summary `Full contracts · every related API, full request and response`): every API the feature adds, changes or calls.
             - `<h4>` per API (name · route · `new` / `changed` / `called, unchanged`), then full Request and Response cards with every field in field-number order. Changed fields keep their marks.
@@ -160,6 +160,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     8. **Open questions**: a `<strong class="blocker">Blocker:</strong>` line per blocker, then a numbered list. None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the sidebar nav to match: one link per flow under "Flows".
+- Database changes and API changes are `.nav-tree` accordions (copy them from the template), closed by default (`hidden` children, `.nav-parent` with `aria-expanded="false"`). Clicking the parent link jumps to its section and toggles its sub-links; opening one closes the other:
+    - Database changes: one sub-link per changed table card (`#db-<table>`, text = table name).
+    - API changes: one sub-link per changed API (`#api-<kebab-name>`, text = RPC name), plus `Shared types` when that subsection exists.
+    - No sub-items (no changes) → a plain `nav-link`, no `.nav-tree`.
 
 ### 5. Offer the mock
 
@@ -169,7 +173,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 6. Verify
 
-- Every `nav-link` hash matches a heading id; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
+- Every `nav-link` hash, sub-links included, matches an id on the page; every `.nav-tree` is closed by default; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
 - Every flow has both a flowchart and a sequence diagram file, and every `.diagram-toggle`, `.rules-toggle` and `.full-toggle` is closed by default.
 - Every flowchart decision, call, write and error node shows a real value from the brief (or `TBD`); no sequence note or `alt` says only `guards` / `checks`.
 - Database "Full schema" lists every table in the sequence diagrams; API "Full contracts" lists every API in them.

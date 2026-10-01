@@ -1,12 +1,12 @@
 const root = document.documentElement;
 
-// ===== Mobile sidebar (☰ opens the drawer; a nav click or a tap outside it closes it) =====
+// ===== Mobile sidebar (☰ opens the drawer; a nav click or a tap outside it closes it; a parent click keeps it open) =====
 const sidebar = document.getElementById("sidebar");
 const small = matchMedia("(max-width: 880px)");
 const menuBtn = document.getElementById("menuBtn");
 menuBtn?.addEventListener("click", () => sidebar.classList.toggle("open"));
 sidebar.addEventListener("click", (e) => {
-    if (e.target.classList.contains("nav-link")) sidebar.classList.remove("open");
+    if (e.target.matches(".nav-link:not(.nav-parent)")) sidebar.classList.remove("open");
 });
 document.addEventListener("click", (e) => {
     if (!sidebar.classList.contains("open") || sidebar.contains(e.target) || menuBtn?.contains(e.target)) return;
@@ -37,20 +37,47 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "[" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) toggleCollapse();
 });
 
+// ===== Sidebar accordion (a parent click jumps to its section and toggles its sub-links; one open at a time) =====
+const trees = [...document.querySelectorAll(".nav-tree")];
+function setTreeOpen(tree, open) {
+    tree.querySelector(".nav-children").hidden = !open;
+    tree.querySelector(".nav-parent").setAttribute("aria-expanded", String(open));
+}
+trees.forEach(t => t.querySelector(".nav-parent").addEventListener("click", () => {
+    const open = t.querySelector(".nav-children").hidden;
+    trees.forEach(o => setTreeOpen(o, o === t && open));
+}));
+// opened from a sub-link URL (#api-…) → start with its section open
+const startTree = [...document.querySelectorAll(".nav-children .nav-link")]
+    .find(l => l.getAttribute("href") === location.hash)?.closest(".nav-tree");
+if (startTree) setTreeOpen(startTree, true);
+
 // ===== Active section highlight on scroll =====
+// Active = the last section whose top has passed just under the top bar (the last one at the page bottom).
+// A clicked link stays active until the user scrolls again, so a section that can't reach the top still lights up.
 const links = [...document.querySelectorAll(".nav-link")];
 const byId = new Map(links.map(l => [l.getAttribute("href").slice(1), l]));
-const headings = [...document.querySelectorAll(".content h1, .content h2, .content h3")]
+const headings = [...document.querySelectorAll(".content [id]")]
     .filter(h => byId.has(h.id));
-const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-        if (e.isIntersecting) {
-            links.forEach(l => l.classList.remove("active"));
-            byId.get(e.target.id)?.classList.add("active");
-        }
-    });
-}, { rootMargin: "-10% 0px -80% 0px" });
-headings.forEach(h => obs.observe(h));
+const setActive = (link) => {
+    links.forEach(l => l.classList.toggle("active", l === link));
+};
+let pinned = false;
+function spy() {
+    if (pinned) return;
+    const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+    const passed = headings.filter(h => h.getBoundingClientRect().top <= 80);
+    const h = atBottom ? headings[headings.length - 1] : passed[passed.length - 1] || headings[0];
+    setActive(byId.get(h?.id));
+}
+links.forEach(l => l.addEventListener("click", () => {
+    if (!l.getAttribute("href").startsWith("#")) return;
+    pinned = true;
+    setActive(l);
+}));
+["wheel", "touchstart", "keydown"].forEach(ev => addEventListener(ev, () => { pinned = false; }, { passive: true }));
+addEventListener("scroll", spy, { passive: true });
+spy();
 
 // ===== Show / hide every flowchart and sequence diagram at once =====
 const diagramAll = document.getElementById("diagramAll");
@@ -156,5 +183,13 @@ document.getElementById("navSearch").addEventListener("input", (e) => {
     links.forEach(l => {
         const hit = l.textContent.toLowerCase().includes(q);
         l.classList.toggle("hidden", q && !hit);
+    });
+    // keep a section visible and open while one of its sub-links matches
+    trees.forEach(t => {
+        const kids = [...t.querySelectorAll(".nav-children .nav-link")];
+        const kidHit = q && kids.some(k => !k.classList.contains("hidden"));
+        const head = t.querySelector(".nav-parent");
+        if (kidHit) { head.classList.remove("hidden"); setTreeOpen(t, true); }
+        t.classList.toggle("hidden", q && !kidHit && head.classList.contains("hidden"));
     });
 });

@@ -32,8 +32,22 @@
                 </div>
                 <div class="nav-group">
                     <div class="nav-group-title">Design</div>
-                    <a class="nav-link" href="#database">Database changes</a>
-                    <a class="nav-link" href="#api">API changes</a>
+                    <!-- a section with sub-items: .nav-tree, closed by default. Clicking .nav-parent jumps there and toggles it -->
+                    <div class="nav-tree">
+                        <a class="nav-link nav-parent" href="#database" aria-expanded="false">Database changes</a>
+                        <div class="nav-children" hidden>
+                            <a class="nav-link" href="#db-table_b">schema.table_b</a>
+                            <a class="nav-link" href="#db-table_a">schema.table_a</a>
+                        </div>
+                    </div>
+                    <div class="nav-tree">
+                        <a class="nav-link nav-parent" href="#api" aria-expanded="false">API changes</a>
+                        <div class="nav-children" hidden>
+                            <a class="nav-link" href="#api-create-thing">CreateThing</a>
+                            <a class="nav-link" href="#api-get-things">GetThings</a>
+                            <a class="nav-link" href="#api-shared-types">Shared types</a>
+                        </div>
+                    </div>
                     <a class="nav-link" href="#errors">Errors</a>
                     <a class="nav-link" href="#mock">Mock UI</a>
                 </div>
@@ -139,13 +153,13 @@
                 </ul>
                 <p class="legend"><span class="new">▍ new table</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
                 <div class="erd">
-                    <div class="erd-table write">
+                    <div id="db-table_b" class="erd-table write">
                         <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
                         <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
                         <div class="erd-row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
                         <div class="erd-row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
                     </div>
-                    <div class="erd-table">
+                    <div id="db-table_a" class="erd-table">
                         <div class="erd-head">schema.table_a <span class="erd-tag">altered</span></div>
                         <div class="erd-row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
                         <div class="erd-row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
@@ -211,7 +225,7 @@
                 <p class="legend"><span class="new">▍ new message</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
 
                 <!-- ===== one block per changed API ===== -->
-                <h3><code>CreateThing</code> <span class="meta"><span class="new">new</span> · POST /api/v1/things · permission things.create</span></h3>
+                <h3 id="api-create-thing"><code>CreateThing</code> <span class="meta"><span class="new">new</span> · POST /api/v1/things · permission things.create</span></h3>
                 <div class="erd">
                     <div class="erd-table write">
                         <div class="erd-head">Request · CreateThingRequest <span class="erd-tag">new message</span></div>
@@ -227,7 +241,7 @@
                     </div>
                 </div>
 
-                <h3><code>GetThings</code> <span class="meta">behaviour change · GET /api/v1/things · permission things.read</span></h3>
+                <h3 id="api-get-things"><code>GetThings</code> <span class="meta">behaviour change · GET /api/v1/things · permission things.read</span></h3>
                 <div class="erd">
                     <div class="erd-table">
                         <div class="erd-head">Request · GetThingsRequest <span class="erd-tag">unchanged</span></div>
@@ -246,7 +260,7 @@
                 </details>
                 <!-- ===== end API block ===== -->
 
-                <h3>Shared types</h3>
+                <h3 id="api-shared-types">Shared types</h3>
                 <div class="erd">
                     <div class="erd-table write">
                         <div class="erd-head">RepositorySource <span class="erd-tag">new enum</span></div>

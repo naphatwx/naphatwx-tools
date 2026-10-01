@@ -250,6 +250,52 @@ html {
     display: none;
 }
 
+/* accordion: a parent link with a chevron, its sub-links indented on a guide line */
+.nav-parent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.nav-parent::after {
+    content: "";
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    /* clear of the collapse button riding the sidebar edge */
+    margin-right: 18px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    opacity: 0.6;
+    transform: rotate(-45deg);
+    transition: transform 0.15s;
+}
+
+.nav-parent[aria-expanded="true"]::after {
+    transform: translateY(-2px) rotate(45deg);
+}
+
+.nav-children {
+    margin: 2px 0 4px 18px;
+    padding-left: 6px;
+    border-left: 1px solid var(--border);
+}
+
+.nav-children .nav-link {
+    font-size: var(--fs-body);
+    padding: 4px 10px;
+    overflow-wrap: anywhere;
+}
+
+.nav-tree.hidden {
+    display: none;
+}
+
+.erd-table[id] {
+    scroll-margin-top: 56px;
+}
+
 /* ============ MAIN ============ */
 .main {
     flex: 1;
