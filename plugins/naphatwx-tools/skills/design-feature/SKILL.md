@@ -62,12 +62,6 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 6. No external scripts, styles or fonts in `overview.html`. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
-9. **No prose paragraphs.** Readers scan; they don't read long text.
-    - Every section intro, flow description and toggle body is a `<ul>` / `<ol>`, with a nested sublist for an item's details (files, tables, names).
-    - One fact per bullet, about 15 words at most. Lead a bullet with a bold label when it names a fact (`<strong>Files:</strong>`).
-    - A run of 3+ names (files, tables, fields, RPCs) → a sublist, one name per item, not a comma-joined line.
-    - Only these `<p>` stay: the one-sentence `.lead`, `.legend`, `.try`, a `Blocker:` line, the mock link, and a one-sentence "no content" line.
-    - Tables (`<table>`, `.erd`) are fine for field rows.
 
 ## Workflow
 
@@ -183,7 +177,6 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - `.parts/` is deleted.
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
 - Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
-- No prose paragraph survives (Hard Rule 9): every plain `<p>` in `overview.html` is one of the allowed kinds and one sentence.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 7. Confirm
