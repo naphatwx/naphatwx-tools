@@ -39,12 +39,30 @@ document.addEventListener("keydown", (e) => {
 
 // ===== Sidebar accordion (a parent click jumps to its section and toggles its sub-links; any other link closes the rest) =====
 const trees = [...document.querySelectorAll(".nav-tree")];
-function setTreeOpen(tree, open) {
-    tree.querySelector(".nav-children").hidden = !open;
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const isTreeOpen = (tree) => tree.querySelector(".nav-parent").getAttribute("aria-expanded") === "true";
+// aria-expanded is the state; `hidden` lags it until a close animation ends, so a mid-animation flip stays correct
+function setTreeOpen(tree, open, animate = true) {
+    if (isTreeOpen(tree) === open) return;
+    const kids = tree.querySelector(".nav-children");
     tree.querySelector(".nav-parent").setAttribute("aria-expanded", String(open));
+    kids.getAnimations({ subtree: true }).forEach(a => a.cancel());
+    if (!animate || reduceMotion.matches) { kids.hidden = !open; return; }
+    kids.hidden = false;
+    // the list grows from 0 while its links slide down from above, riding the bottom edge (reverse to close)
+    const h = kids.scrollHeight;
+    const timing = { duration: 250, easing: "cubic-bezier(0.2, 0, 0, 1)" };
+    const dir = (shut, full) => (open ? [shut, full] : [full, shut]);
+    const anim = kids.animate(dir(
+        { height: "0px", marginTop: "0px", marginBottom: "0px" },
+        { height: h + "px", marginTop: "2px", marginBottom: "4px" }), timing);
+    [...kids.children].forEach(l => l.animate(dir(
+        { transform: `translateY(-${h}px)`, opacity: 0 },
+        { transform: "translateY(0)", opacity: 1 }), timing));
+    if (!open) anim.onfinish = () => { kids.hidden = true; };
 }
 trees.forEach(t => t.querySelector(".nav-parent").addEventListener("click", () => {
-    const open = t.querySelector(".nav-children").hidden;
+    const open = !isTreeOpen(t);
     trees.forEach(o => setTreeOpen(o, o === t && open));
 }));
 // any other in-page link closes every section except the one it sits in
@@ -55,7 +73,7 @@ document.querySelectorAll('.nav-link:not(.nav-parent)[href^="#"]').forEach(l => 
 // opened from a sub-link URL (#api-…) → start with its section open
 const startTree = [...document.querySelectorAll(".nav-children .nav-link")]
     .find(l => l.getAttribute("href") === location.hash)?.closest(".nav-tree");
-if (startTree) setTreeOpen(startTree, true);
+if (startTree) setTreeOpen(startTree, true, false);
 
 // ===== Active section highlight on scroll =====
 // Active = the last section whose top has passed just under the top bar (the last one at the page bottom).

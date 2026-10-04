@@ -269,7 +269,7 @@ html {
     border-bottom: 2px solid currentColor;
     opacity: 0.6;
     transform: rotate(-45deg);
-    transition: transform 0.15s;
+    transition: transform 0.2s ease;
 }
 
 .nav-parent[aria-expanded="true"]::after {
@@ -280,6 +280,8 @@ html {
     margin: 2px 0 4px 18px;
     padding-left: 6px;
     border-left: 1px solid var(--border);
+    /* clips the sub-links while overview.js animates the height */
+    overflow: hidden;
 }
 
 .nav-children .nav-link {
