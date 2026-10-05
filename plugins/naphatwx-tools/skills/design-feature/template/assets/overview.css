@@ -330,7 +330,7 @@ html {
     margin-left: auto;
 }
 
-/* text size picker: small 14px / default 16px / large 18px */
+/* text size picker: small 14px / medium 16px / large 18px */
 .fs-picker {
     display: flex;
     align-items: center;
@@ -358,7 +358,7 @@ html {
 
 /* px, not rem: the picker must not resize itself when it changes the root size */
 .fs-btn[data-fs="small"] { font-size: 12px; }
-.fs-btn[data-fs="default"] { font-size: 15px; }
+.fs-btn[data-fs="medium"] { font-size: 15px; }
 .fs-btn[data-fs="large"] { font-size: 18px; }
 .fs-btn:hover { background: var(--card-hover); color: var(--text); }
 .fs-btn.active { background: var(--accent-soft); color: var(--accent); }

@@ -1,11 +1,11 @@
 const root = document.documentElement;
 
-// ===== Text size picker (small 14 / default 16 / large 18, remembers choice) =====
+// ===== Text size picker (small 14 / medium 16 / large 18, remembers choice) =====
 const fsButtons = [...document.querySelectorAll(".fs-btn")];
 const savedFs = localStorage.getItem("docs-fs");
 if (fsButtons.some(b => b.dataset.fs === savedFs)) root.setAttribute("data-fs", savedFs);
 function paintFs() {
-    const current = root.getAttribute("data-fs") || "default";
+    const current = root.getAttribute("data-fs") || "medium";
     fsButtons.forEach(b => {
         b.classList.toggle("active", b.dataset.fs === current);
         b.setAttribute("aria-pressed", String(b.dataset.fs === current));
