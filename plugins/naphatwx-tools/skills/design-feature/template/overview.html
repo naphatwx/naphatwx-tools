@@ -29,6 +29,7 @@
                     <div class="nav-group-title">Flows</div>
                     <a class="nav-link" href="#flows">All flows</a>
                     <a class="nav-link" href="#flow-01">1. Example flow</a>
+                    <a class="nav-link" href="#flow-02">2. Example flow · diagram-design</a>
                 </div>
                 <div class="nav-group">
                     <div class="nav-group-title">Design</div>
@@ -143,6 +144,22 @@
                 </details>
                 <p class="try"><span class="faint">Try in the mock:</span> <a href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener">Happy path ↗</a></p>
                 <!-- ===== end flow block ===== -->
+
+                <!-- Template preview only: flow 02 shows the same flow in diagram-design mode (iframe embeds).
+                     A real overview uses one mode for every flow. -->
+                <h3 id="flow-02">2. Example flow · diagram-design <span class="meta">US1 · P1 · FR-001 · FR-002</span></h3>
+                <ul>
+                    <li><strong>What:</strong> the same flow as 1, drawn by the diagram-design skill.</li>
+                    <li><strong>Trigger:</strong> where the user starts it.</li>
+                </ul>
+                <details class="diagram-toggle">
+                    <summary>Flowchart <span class="faint">· flow logic</span></summary>
+                    <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
+                </details>
+                <details class="diagram-toggle">
+                    <summary>Sequence diagram <span class="faint">· how the services talk</span></summary>
+                    <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
+                </details>
 
                 <!-- ===== Database: changes first, then the full schema of every related table in a closed .full-toggle.
                      No related table at all → keep this section, replace its body with "This feature has no database changes." ===== -->

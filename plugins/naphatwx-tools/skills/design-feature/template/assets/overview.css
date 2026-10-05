@@ -306,7 +306,6 @@ html {
 .main {
     flex: 1;
     min-width: 0;
-    container-type: inline-size;
 }
 
 .topbar {
@@ -699,21 +698,28 @@ td {
 /* an iframe brings its own paper: drop the host box around it so there is one frame, not two */
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; background: none; }
 
-/* ============ DIAGRAM ZOOM (wheel over a .flowchart / .seq, drag to pan, ↺ resets) ============ */
-.zoomable { position: relative; }
-[data-zoom="on"] .zoomable { overflow: hidden; touch-action: pan-y; }
-[data-zoom="on"] .zoomable.zoomed { cursor: grab; }
-[data-zoom="on"] .zoomable.panning { cursor: grabbing; user-select: none; }
+/* ============ DIAGRAM ZOOM (wheel over a .flowchart / .seq, drag to pan, ↺ resets, ⛶ full screen) ============ */
+/* a border marks the diagram's frame, so panned-away space never blends into the page */
+.zoomable { position: relative; border: 1px solid var(--border); border-radius: 8px; }
+:is([data-zoom="on"] .zoomable, .zoomable.in-lightbox) { overflow: hidden; touch-action: pan-y; }
+/* kept after .flowchart:has(.diagram-frame), which drops the background around an iframe */
+[data-zoom="on"] .zoomable { border-color: var(--border-strong); background: var(--card-bg); }
+:is([data-zoom="on"] .zoomable, .zoomable.in-lightbox).zoomed { cursor: grab; }
+:is([data-zoom="on"] .zoomable, .zoomable.in-lightbox).panning { cursor: grabbing; user-select: none; }
 .zoom-stage { transform-origin: 0 0; }
+.zoom-stage img { -webkit-user-drag: none; user-select: none; }
 /* wheel events inside an iframe never reach this page, so a shield catches them while zoom is on */
 .zoom-shield { display: none; position: absolute; inset: 0; }
-[data-zoom="on"] .zoom-shield { display: block; }
-.zoom-reset {
-    display: none;
+:is([data-zoom="on"] .zoomable, .zoomable.in-lightbox) .zoom-shield { display: block; }
+.zoom-tools {
     position: absolute;
     right: 10px;
-    bottom: 10px;
+    top: 10px;
     z-index: 2;
+    display: flex;
+    gap: 6px;
+}
+.zoom-tools button {
     padding: 7px 12px;
     border: 1px solid var(--border-strong);
     border-radius: 8px;
@@ -722,8 +728,70 @@ td {
     font: 600 14px/1.2 -apple-system, "Segoe UI", system-ui, sans-serif;
     cursor: pointer;
 }
-[data-zoom="on"] .zoom-reset { display: block; }
-.zoom-reset:hover { background: var(--card-hover); color: var(--text); }
+.zoom-tools button:hover { background: var(--card-hover); color: var(--text); }
+.zoom-tools .zoom-reset { display: none; }
+:is([data-zoom="on"] .zoomable, .zoomable.in-lightbox) .zoom-reset { display: block; }
+.in-lightbox .zoom-fullscreen { display: none; }
+
+/* lightbox: the page dims behind, one diagram sits centred on its own paper with a caption below, like an image viewer */
+.lightbox {
+    max-width: none;
+    max-height: none;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: hidden;
+}
+.lightbox[open] { display: flex; align-items: center; justify-content: center; }
+.lightbox::backdrop { background: rgba(0, 0, 0, 0.8); }
+/* the frame is always 90% x 90% of the window; the diagram sits centred in it */
+.lightbox .zoomable.in-lightbox {
+    box-sizing: border-box;
+    width: 90vw;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 10px;
+    border-color: var(--border-strong);
+    background: var(--card-bg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.zoomable.in-lightbox img { width: 100%; max-width: none; }
+.zoomable.in-lightbox .zoom-stage { flex: none; }
+/* the caption sits in the 5% strip below the frame */
+.lightbox-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    font-size: var(--fs-body);
+}
+.lightbox-caption:empty { display: none; }
+.lightbox-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--text);
+    font-size: 22px;
+    cursor: pointer;
+}
+.lightbox-close:hover { background: rgba(255, 255, 255, 0.1); }
 
 /* ============ SEQUENCE DIAGRAM (.seq) ============ */
 .seq {
@@ -732,14 +800,6 @@ td {
     padding: 10px;
     margin: 14px 0;
     overflow-x: auto;
-}
-
-/* diagrams break out of the 900px text column: 90% of the page (.main), capped at 1200px, centred.
-   Kept after .flowchart and .seq so their margin shorthand does not reset margin-left */
-.flowchart, .seq {
-    --diagram-w: max(100%, min(90cqw, 1200px));
-    width: var(--diagram-w);
-    margin-left: calc((100% - var(--diagram-w)) / 2);
 }
 
 .seq svg {

@@ -142,6 +142,7 @@ window.addEventListener("message", (e) => {
 });
 
 // ===== Diagram zoom (wheel over a diagram zooms at the cursor, drag pans, ↺ resets; switch remembers choice) =====
+// ⛶ opens one diagram in a lightbox over the page, where zoom works even with the switch off.
 // Runs on DOMContentLoaded so SeqDiagrams.renderAll() has already drawn every .seq.
 const zoomToggle = document.getElementById("zoomToggle");
 const zooms = [];
@@ -169,12 +170,19 @@ function makeZoomable(box) {
     box.append(stage);
     box.classList.add("zoomable");
     if (stage.querySelector("iframe")) box.insertAdjacentHTML("beforeend", '<div class="zoom-shield"></div>');
+    const tools = document.createElement("div");
+    tools.className = "zoom-tools";
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "zoom-reset";
     btn.title = "Reset zoom";
-    box.append(btn);
+    const fsBtn = document.createElement("button");
+    fsBtn.type = "button";
+    fsBtn.className = "zoom-fullscreen";
+    tools.append(btn, fsBtn);
+    box.append(tools);
 
+    const active = () => zoomOn() || box.classList.contains("in-lightbox");
     let s = 1, x = 0, y = 0;
     const paint = () => {
         stage.style.transform = s === 1 && !x && !y ? "" : `translate(${x}px, ${y}px) scale(${s})`;
@@ -185,10 +193,12 @@ function makeZoomable(box) {
     paint();
 
     box.addEventListener("wheel", (e) => {
-        if (!zoomOn()) return;
+        if (!active()) return;
         e.preventDefault();
         const r = box.getBoundingClientRect();
-        const px = e.clientX - r.left, py = e.clientY - r.top;
+        // from the stage's own corner: the lightbox centres the stage inside its frame
+        const px = e.clientX - r.left - box.clientLeft - stage.offsetLeft;
+        const py = e.clientY - r.top - box.clientTop - stage.offsetTop;
         const next = Math.min(5, Math.max(0.5, s * Math.exp(-e.deltaY * 0.0015)));
         // keep the point under the cursor fixed while scaling
         x = px - (px - x) * next / s;
@@ -197,26 +207,90 @@ function makeZoomable(box) {
         paint();
     }, { passive: false });
 
-    let drag = null;
+    // stop the browser's native image / SVG drag, which would grab the picture instead of panning it
+    stage.querySelectorAll("img").forEach(img => { img.draggable = false; });
+    box.addEventListener("dragstart", (e) => e.preventDefault());
+
+    // a pan starts only after the pointer moves, so a plain click still reaches links and "Step details"
+    let drag = null, dragged = false;
     box.addEventListener("pointerdown", (e) => {
-        if (!zoomOn() || e.button !== 0 || e.target === btn || !box.classList.contains("zoomed")) return;
-        drag = { id: e.pointerId, sx: e.clientX - x, sy: e.clientY - y };
-        box.setPointerCapture(e.pointerId);
-        box.classList.add("panning");
+        dragged = false;
+        if (!active() || e.button !== 0 || e.target.closest(".zoom-tools") || !box.classList.contains("zoomed")) return;
+        drag = { id: e.pointerId, cx: e.clientX, cy: e.clientY, sx: e.clientX - x, sy: e.clientY - y, on: false };
     });
     box.addEventListener("pointermove", (e) => {
         if (!drag || e.pointerId !== drag.id) return;
+        if (!drag.on) {
+            if (Math.hypot(e.clientX - drag.cx, e.clientY - drag.cy) < 4) return;
+            drag.on = true;
+            box.setPointerCapture(e.pointerId);
+            box.classList.add("panning");
+            getSelection().removeAllRanges();
+        }
         x = e.clientX - drag.sx;
         y = e.clientY - drag.sy;
         paint();
     });
-    const endDrag = () => { drag = null; box.classList.remove("panning"); };
+    const endDrag = () => { dragged = !!drag?.on; drag = null; box.classList.remove("panning"); };
+    // swallow the click that ends a pan, so releasing over a summary does not toggle it
+    box.addEventListener("click", (e) => {
+        if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; }
+    }, true);
     box.addEventListener("pointerup", endDrag);
     box.addEventListener("pointercancel", endDrag);
     btn.addEventListener("click", reset);
+
+    fsBtn.textContent = "⛶";
+    fsBtn.title = "Open in lightbox";
+    fsBtn.addEventListener("click", () => openLightbox(box, stage, reset));
     zooms.push({ reset });
 }
+// One shared <dialog>: the diagram moves into it while open (the top layer escapes .main's container), then back.
+// Moving an iframe reloads it; its height reporter posts again, so it still fits.
+const lightbox = document.createElement("dialog");
+lightbox.className = "lightbox";
+lightbox.innerHTML = '<button type="button" class="lightbox-close" title="Close (Esc)">✕</button><p class="lightbox-caption"></p>';
+let lit = null;
+function lightboxCaption(box) {
+    const toggle = box.closest("details");
+    let h = toggle;
+    while (h && !/^H[2-4]$/.test(h.tagName)) h = h.previousElementSibling;
+    const title = h ? [...h.childNodes].filter(n => !n.classList?.contains("meta")).map(n => n.textContent).join("").trim() : "";
+    const kind = toggle?.querySelector(":scope > summary")?.textContent.trim() || "";
+    return [title, kind].filter(Boolean).join(" — ");
+}
+function openLightbox(box, stage, reset) {
+    // the frame is always 90% of the window; the diagram fits inside it, capped by height over its aspect
+    const ratio = stage.offsetHeight / stage.offsetWidth || 1;
+    const spot = document.createElement("div");
+    spot.style.height = box.offsetHeight + "px";
+    lightbox.querySelector(".lightbox-caption").textContent = lightboxCaption(box);
+    box.replaceWith(spot);
+    lightbox.insertBefore(box, lightbox.querySelector(".lightbox-caption"));
+    box.classList.add("in-lightbox");
+    reset();
+    lit = { box, stage, spot, reset };
+    lightbox.showModal();
+    const cs = getComputedStyle(box);
+    const roomW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const roomH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    stage.style.width = Math.min(roomW, roomH / ratio) + "px";
+}
+lightbox.addEventListener("close", () => {
+    if (!lit) return;
+    const { box, stage, spot, reset } = lit;
+    lit = null;
+    box.classList.remove("in-lightbox");
+    stage.style.width = "";
+    spot.replaceWith(box);
+    reset();
+});
+lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
+// a click on the dim backdrop (the dialog itself, outside the diagram) closes it, like an image lightbox
+lightbox.addEventListener("click", (e) => { if (e.target === lightbox) lightbox.close(); });
+
 document.addEventListener("DOMContentLoaded", () => {
+    document.body.append(lightbox);
     document.querySelectorAll(".flowchart, .seq").forEach(makeZoomable);
 });
 
