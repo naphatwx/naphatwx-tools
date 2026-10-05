@@ -186,7 +186,6 @@ function makeZoomable(box) {
     let s = 1, x = 0, y = 0;
     const paint = () => {
         stage.style.transform = s === 1 && !x && !y ? "" : `translate(${x}px, ${y}px) scale(${s})`;
-        box.classList.toggle("zoomed", s !== 1 || x !== 0 || y !== 0);
         btn.textContent = `↺ ${Math.round(s * 100)}%`;
     };
     const reset = () => { s = 1; x = 0; y = 0; paint(); };
@@ -211,11 +210,11 @@ function makeZoomable(box) {
     stage.querySelectorAll("img").forEach(img => { img.draggable = false; });
     box.addEventListener("dragstart", (e) => e.preventDefault());
 
-    // a pan starts only after the pointer moves, so a plain click still reaches links and "Step details"
+    // a pan starts only after the pointer moves, so a plain click still reaches links
     let drag = null, dragged = false;
     box.addEventListener("pointerdown", (e) => {
         dragged = false;
-        if (!active() || e.button !== 0 || e.target.closest(".zoom-tools") || !box.classList.contains("zoomed")) return;
+        if (!active() || e.button !== 0 || e.target.closest(".zoom-tools")) return;
         drag = { id: e.pointerId, cx: e.clientX, cy: e.clientY, sx: e.clientX - x, sy: e.clientY - y, on: false };
     });
     box.addEventListener("pointermove", (e) => {
@@ -232,7 +231,7 @@ function makeZoomable(box) {
         paint();
     });
     const endDrag = () => { dragged = !!drag?.on; drag = null; box.classList.remove("panning"); };
-    // swallow the click that ends a pan, so releasing over a summary does not toggle it
+    // swallow the click that ends a pan, so releasing over a link does not follow it
     box.addEventListener("click", (e) => {
         if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; }
     }, true);

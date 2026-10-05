@@ -1,6 +1,6 @@
 // Draws sequence diagrams defined in sibling files (one flow per file) as inline SVG: <div class="seq" data-flow="NN-slug">.
 // Steps: phase | call | ret | hot | note | alt | else | opt | loop | end. Labels are the name only (≤ 40 chars, or one bare name);
-// an optional last `detail` string shows on hover and in the "Step details" list under the diagram.
+// an optional last `detail` string shows on hover and in the "Step details" list drawn after the .seq box.
 
 var SeqDiagrams = (function () {
     const flows = {};
@@ -71,15 +71,19 @@ var SeqDiagrams = (function () {
             const w = Math.min(gap - 12, Math.max(118, sub.length * 6.2 + 20, name.length * 8 + 20));
             out.push(`<g class="actor"><rect x="${X[k] - w / 2}" y="${TOP}" width="${w}" height="${HEAD}" rx="8"/><text x="${X[k]}" y="${TOP + 20}" text-anchor="middle">${esc(name)}</text><text class="sub" x="${X[k]}" y="${TOP + 36}" text-anchor="middle">${esc(sub)}</text></g>`);
         });
-        const list = !details.length ? '' : `<details class="seq-steps"><summary>Step details</summary><ol>${details.map(([n, label, d]) =>
-            `<li><span class="n">${n === 'note' ? '·' : n}</span><code>${esc(label)}</code> ${esc(d)}</li>`).join('')}</ol></details>`;
-        return out.concat(body, '</svg>', list).join('');
+        const list = !details.length ? '' : `<div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>${details.map(([n, label, d]) =>
+            `<li><span class="n">${n === 'note' ? '·' : n}</span><code>${esc(label)}</code> ${esc(d)}</li>`).join('')}</ol></div>`;
+        return [out.concat(body, '</svg>').join(''), list];
     }
 
     function renderAll(root = document) {
         root.querySelectorAll('.seq[data-flow]').forEach(el => {
             const spec = flows[el.dataset.flow];
-            el.innerHTML = spec ? svg(spec) : `<p>Missing diagram file for <code>${esc(el.dataset.flow)}</code>.</p>`;
+            const [drawing, list] = spec ? svg(spec) : [`<p>Missing diagram file for <code>${esc(el.dataset.flow)}</code>.</p>`, ''];
+            el.innerHTML = drawing;
+            // the list sits on the page after the box, so zoom and the lightbox leave it out
+            if (el.nextElementSibling?.classList.contains('seq-steps')) el.nextElementSibling.remove();
+            el.insertAdjacentHTML('afterend', list);
         });
     }
 

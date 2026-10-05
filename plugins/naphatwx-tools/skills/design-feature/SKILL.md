@@ -57,6 +57,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
     - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
+    - Step details never sit inside a diagram: they go on the page right after the `.seq` box (manual: `render.js` adds them).
 4. Every sidebar `nav-link` `href="#id"` (sub-links included) matches a real `id` on the page.
 5. Every link into `mock/` opens in a new tab: `target="_blank" rel="noopener"`.
 6. No external scripts, styles or fonts in `overview.html`. `assets/`, `render.js` and the flow files are local.
@@ -120,7 +121,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
         - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
             - Manual: `<div class="seq" data-flow="NN-<slug>"></div>`.
-            - diagram-design: `<div class="seq">` + the returned `<iframe class="diagram-frame">`.
+            - diagram-design: `<div class="seq">` + the returned `<iframe class="diagram-frame">`, then the returned `<div class="seq-steps">` right after the `.seq` box, not inside it.
         - The top bar's "Show all diagrams" button opens and closes every diagram toggle; keep it.
         - Rules in a third closed `<details class="rules-toggle">`, summary `Rules · what this flow must keep`: 3–5 bullets from the spec. Not opened by "Show all diagrams".
         - One `<p class="try">` line of mock links (`Try in the mock: Happy path ↗ · Empty ↗`) — only if a mock exists or will be built; each opens in a new tab.

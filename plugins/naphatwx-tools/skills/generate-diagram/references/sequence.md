@@ -8,14 +8,21 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 ## Labels (both modes)
 
 - Labels are the name only, ≤ 40 chars: RPC (`TriggerRedeployment`), endpoint (`POST /things`), table op (`INSERT infra.redeployment`), queue (`publish infra.redeployment.create`), job (`build app-redeployment`), status or error code (`FAILED_PRECONDITION`).
-- Arguments, example values, messages and reasons go in `detail`. It shows on hover and in the "Step details" list under the diagram.
+- Arguments, example values, messages and reasons go in `detail`. It shows on hover and in the "Step details" list on the page after the diagram, never inside it.
 - Notes and `alt` / `else` conditions are a short phrase that names the real value, not a generic word: `permission redeployment.redeploy`, not `guards`; `status not AVAILABLE`, not `env unavailable`. Use simple words, not symbols (`not in`, never `∉` or `!=`; see the table in the flowchart reference). The full rule goes in `detail` or in the caller's rules list.
 - Every `detail` holds real values from the source: field names, permission keys, enum values, config keys, timeouts. Never a vague summary like `permission check, validation`. Same words-not-symbols rule.
 - Mark only writes that leave the service or must be audited as side effects (`hot`), so readers can scan for them.
 
 ## diagram-design mode
 
-- Ask for a Sequence diagram with the labels above, dark theme; save to `NN-<slug>.html`; add the height reporter (SKILL.md step 3). Skip the `.js` format.
+- Ask for a Sequence diagram with the labels above, dark theme, with no step details list in the file; save to `NN-<slug>.html`; add the height reporter (SKILL.md step 3). Skip the `.js` format.
+- Return the step details as a fragment for the caller's page, in `render.js`'s markup. `n` is the step number the diagram shows; when it shows none, number the rows 1, 2, 3 in diagram order:
+
+```html
+<div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>
+    <li><span class="n">1</span><code>CreateThing</code> name, ownerId</li>
+</ol></div>
+```
 
 ## Manual mode
 

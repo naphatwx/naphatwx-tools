@@ -36,6 +36,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 3. Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split into several diagrams and say so. In diagram-design mode its own, tighter budgets win.
 4. Dark theme is the default. Use light only when the user or caller asks for it. In diagram-design mode, dark means the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`), and every diagram uses the shipped default tokens. Skip its first-run style-guide question: the answer is always "proceed with the default".
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
+6. A diagram file never holds a step details list. The caller's page shows it (see the sequence reference).
 
 ## Workflow
 
@@ -94,7 +95,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 |-------------|-------|
 | `flowchart` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>` (no inline height) |
 | `flowchart` · manual | `<img src="<dir>/NN-<slug>.svg" alt="…">` |
-| `sequence` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>` |
+| `sequence` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>`, plus its `<div class="seq-steps">` fragment (see the sequence reference) |
 | `sequence` · manual | `<div class="seq" data-flow="NN-<slug>"></div>`, plus `<script src="<dir>/render.js">` once, `<script src="<dir>/NN-<slug>.js">` per flow, then `SeqDiagrams.renderAll()` |
 | `er` · either | `<a href="<dir>/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a>` (one link per page when split) |
 

@@ -122,7 +122,8 @@
                 <!-- ===== one block per flow: h3 id="flow-NN" + flowchart + sequence diagram + rules (all three in closed <details>) + try links.
                      Manual: <img src="flowchart/NN-slug.svg"> and .seq[data-flow="NN-slug"].
                      diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" loading="lazy"></iframe>,
-                     and <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></iframe></div> ===== -->
+                     and <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></iframe></div>
+                     + the returned <div class="seq-steps"> right after it (manual: render.js adds it). ===== -->
                 <h3 id="flow-01">1. Example flow <span class="meta">US1 · P1 · FR-001 · FR-002</span></h3>
                 <ul>
                     <li><strong>What:</strong> what this flow achieves, in one short line.</li>
@@ -159,6 +160,13 @@
                 <details class="diagram-toggle">
                     <summary>Sequence diagram <span class="faint">· how the services talk</span></summary>
                     <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
+                    <div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>
+                        <li><span class="n">1</span><code>GetThing</code> id from the route</li>
+                        <li><span class="n">2</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
+                        <li><span class="n">3</span><code>CreateThing</code> name, ownerId</li>
+                        <li><span class="n">4</span><code>POST /things</code> timeout 10 s</li>
+                        <li><span class="n">5</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
+                    </ol></div>
                 </details>
 
                 <!-- ===== Database: changes first, then the full schema of every related table in a closed .full-toggle.
