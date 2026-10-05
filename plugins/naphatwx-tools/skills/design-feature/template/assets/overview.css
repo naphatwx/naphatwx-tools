@@ -73,10 +73,14 @@
     background: var(--scrollbar-hover);
 }
 
+/* base text size — every rem token scales from here */
 html {
     font-size: 16px;
     scroll-behavior: smooth;
 }
+
+html[data-fs="small"] { font-size: 14px; }
+html[data-fs="large"] { font-size: 18px; }
 
 body {
     background: var(--bg);
@@ -326,6 +330,39 @@ html {
     margin-left: auto;
 }
 
+/* text size picker: small 14px / default 16px / large 18px */
+.fs-picker {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+}
+
+.fs-btn {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 6px;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    line-height: 1;
+    transition: background 0.12s, color 0.12s;
+}
+
+/* px, not rem: the picker must not resize itself when it changes the root size */
+.fs-btn[data-fs="small"] { font-size: 12px; }
+.fs-btn[data-fs="default"] { font-size: 15px; }
+.fs-btn[data-fs="large"] { font-size: 18px; }
+.fs-btn:hover { background: var(--card-hover); color: var(--text); }
+.fs-btn.active { background: var(--accent-soft); color: var(--accent); }
+
 /* diagram zoom switch; .on = wheel zoom enabled (off by default) */
 .zoom-toggle {
     height: 36px;
@@ -554,6 +591,13 @@ td {
     .topbar {
         justify-content: space-between;
         padding: 8px 14px;
+    }
+
+    /* picker + two buttons outgrow a phone-width bar: let them wrap */
+    .topbar-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
     }
 
     .content {

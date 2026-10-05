@@ -1,5 +1,23 @@
 const root = document.documentElement;
 
+// ===== Text size picker (small 14 / default 16 / large 18, remembers choice) =====
+const fsButtons = [...document.querySelectorAll(".fs-btn")];
+const savedFs = localStorage.getItem("docs-fs");
+if (fsButtons.some(b => b.dataset.fs === savedFs)) root.setAttribute("data-fs", savedFs);
+function paintFs() {
+    const current = root.getAttribute("data-fs") || "default";
+    fsButtons.forEach(b => {
+        b.classList.toggle("active", b.dataset.fs === current);
+        b.setAttribute("aria-pressed", String(b.dataset.fs === current));
+    });
+}
+paintFs();
+fsButtons.forEach(b => b.addEventListener("click", () => {
+    root.setAttribute("data-fs", b.dataset.fs);
+    localStorage.setItem("docs-fs", b.dataset.fs);
+    paintFs();
+}));
+
 // ===== Mobile sidebar (☰ opens the drawer; a nav click or a tap outside it closes it; a parent click keeps it open) =====
 const sidebar = document.getElementById("sidebar");
 const small = matchMedia("(max-width: 880px)");
@@ -102,16 +120,18 @@ links.forEach(l => l.addEventListener("click", () => {
 addEventListener("scroll", spy, { passive: true });
 spy();
 
-// ===== Show / hide every flowchart and sequence diagram at once =====
+// ===== Show / hide every flowchart and sequence diagram at once (remembers choice) =====
 const diagramAll = document.getElementById("diagramAll");
 const toggles = [...document.querySelectorAll(".diagram-toggle")];
 const paintDiagramAll = () => {
     if (diagramAll) diagramAll.textContent = toggles.every(d => d.open) ? "Hide all diagrams" : "Show all diagrams";
 };
 toggles.forEach(d => d.addEventListener("toggle", paintDiagramAll));
+if (localStorage.getItem("docs-diagrams") === "open") toggles.forEach(d => { d.open = true; });
 diagramAll?.addEventListener("click", () => {
     const open = !toggles.every(d => d.open);
     toggles.forEach(d => { d.open = open; });
+    localStorage.setItem("docs-diagrams", open ? "open" : "closed");
 });
 
 // ===== Fit each diagram-design iframe to the height its file posts (works on file://) =====
