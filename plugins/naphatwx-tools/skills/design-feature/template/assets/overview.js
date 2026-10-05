@@ -260,7 +260,7 @@ function lightboxCaption(box) {
     return [title, kind].filter(Boolean).join(" — ");
 }
 function openLightbox(box, stage, reset) {
-    // the frame is always 90% of the window; the diagram fits inside it, capped by height over its aspect
+    // the frame is always 80% x 90% of the window; the diagram fits inside it, capped by height over its aspect
     const ratio = stage.offsetHeight / stage.offsetWidth || 1;
     const spot = document.createElement("div");
     spot.style.height = box.offsetHeight + "px";

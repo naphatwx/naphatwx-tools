@@ -747,10 +747,10 @@ td {
 }
 .lightbox[open] { display: flex; align-items: center; justify-content: center; }
 .lightbox::backdrop { background: rgba(0, 0, 0, 0.8); }
-/* the frame is always 90% x 90% of the window; the diagram sits centred in it */
+/* the frame is always 80% wide x 90% tall of the window; the diagram sits centred in it */
 .lightbox .zoomable.in-lightbox {
     box-sizing: border-box;
-    width: 90vw;
+    width: 80vw;
     height: 90vh;
     display: flex;
     align-items: center;
