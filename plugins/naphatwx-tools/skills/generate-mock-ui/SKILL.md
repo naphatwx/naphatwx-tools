@@ -1,12 +1,19 @@
 ---
 name: generate-mock-ui
-description: Build an interactive, clickable mock UI for a planned feature in the target app's real design system — typed contract (real types, spec rules, realistic data), a fake API with the real operation names, one page per screen, and a scenario switcher for every edge state. Use when the user asks for a mock UI, UI prototype, clickable mock or wireframe for a feature, or when the design-feature skill offers one.
-argument-hint: <plan-folder | spec-folder> [frontend-app-path]
+description: Build an interactive, clickable mock UI for a planned feature in the target app's real design system — either a standalone HTML folder (typed contract, fake API with the real operation names) or mock pages inside the real app under mock/spec<NNN>/ (real components and types, local data, no API calls) — with one page per screen and a scenario switcher for every edge state. Use when the user asks for a mock UI, UI prototype, clickable mock or wireframe for a feature, or when the design-feature skill offers one.
+argument-hint: <plan-folder | spec-folder> [frontend-app-path] [standalone | in-project]
 ---
 
 # Mock UI Generator
 
-Build `mock/` — a clickable mock that opens straight from disk and doubles as the frontend contract.
+Build a clickable mock of a planned feature, in one of two modes:
+
+| Mode | Where | Built from | Steps |
+|------|-------|-----------|-------|
+| standalone | `<plan-folder>/mock/` | plain HTML + copied class strings + fake API; opens from disk | this file |
+| in-project | `<routes-root>/mock/spec<NNN>/` in the real app | the app's real components and types; local data, no API / RPC calls; needs the app's dev server | [in-project](references/in-project.md) |
+
+Standalone mode builds `mock/` — a clickable mock that opens straight from disk and doubles as the frontend contract.
 
 ```
 mock/
@@ -32,14 +39,16 @@ $ARGUMENTS
 
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
-**Expected format:** `<plan-folder | spec-folder> [frontend-app-path]`
+**Expected format:** `<plan-folder | spec-folder> [frontend-app-path] [standalone | in-project]`
 
 - Plan folder (has `overview.html` + `sequence-diagram/`, from the `design-feature` skill) → write `<plan-folder>/mock/`, and read its flows.
 - Spec folder only → write `<spec-folder>/plan/mock/`.
 - No frontend path → find the app: look for `package.json` with a UI framework, a `components/` folder, or ask once (use AskUserQuestion when the agent has it).
-- No frontend exists at all → ask whether to use plain Tailwind defaults instead of a real design system.
+- No frontend exists at all → ask whether to use plain Tailwind defaults instead of a real design system. In-project needs a frontend, so this means standalone.
+- No mode → ask once (use AskUserQuestion when the agent has it): in-project is recommended when a frontend app is found, standalone otherwise.
+- **In-project → read [references/in-project.md](references/in-project.md) and follow it instead of the Hard Rules and Workflow below.** Its scan step reuses step 2 here.
 
-## Hard Rules
+## Hard Rules (standalone)
 
 1. **Opens from `file://`**: classic `<script src>` only — no `type="module"`, no `import`, no `fetch()`. Data is `.js` setting a global (`var MOCK_DATA = …`), never `.json`.
 2. **Real design system**: every class string in `components.js` and `shell.js` is copied from the app's components, with the source files listed in each file's header. Load only what the app itself loads (its CSS framework, icon set, font) — from a CDN when the app does.
@@ -51,7 +60,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 8. Wrap every `sessionStorage` / `localStorage` call in `try/catch`; the mock must still work when storage is blocked.
 9. No absolute local paths in any file. Code comments max 3 lines.
 
-## Workflow
+## Workflow (standalone)
 
 ### 1. Read the feature
 

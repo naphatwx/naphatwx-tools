@@ -21,7 +21,8 @@ Turn a spec, ticket or idea into a plan folder people can open in a browser.
 │   └── 02-<flow-slug>.js
 ├── database/
 │   └── er-diagram.html        every related table and FK, opened from the Database section
-└── mock/                      optional, built by the generate-mock-ui skill
+└── mock/                      optional, standalone mock by the generate-mock-ui skill
+                               (in-project mock lives in the app instead)
 ```
 
 Every diagram is drawn by the `generate-diagram` skill (`naphatwx-tools:generate-diagram` in Claude Code): it uses diagram-design when installed, else its own templates. This skill picks the **mode** once (step 2) so all diagrams match, and embeds what it returns:
@@ -64,7 +65,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
     - Step details never sit inside a diagram: they go on the page right after the `.seq` box (manual: `render.js` adds them).
 4. Every rail link `href="#id"` (`.rail-list a`, nested ones included) matches a real `id` on the page, and every `.slide` has a `data-title` (presentation mode labels its steps with it).
-5. Every link into `mock/` opens in a new tab: `target="_blank" rel="noopener"`.
+5. Every mock link (into `mock/`, or the app's `/mock/spec<NNN>` route) opens in a new tab: `target="_blank" rel="noopener"`.
 6. No external scripts, styles or fonts in `overview.html` or the diagram files: text uses the OS font. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
@@ -161,7 +162,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - An API another service owns → `.tbl.ext`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
     6. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
-    7. **Mock UI**: one muted line, then one `.side-link` into `mock/index.html` (new tab). No mock → replace with one line saying the feature has no UI.
+    7. **Mock UI**: one muted line, then one `.side-link` to the mock index (new tab): `mock/index.html` (standalone) or `http://localhost:<port>/mock/spec<NNN>` (in-project). No mock → replace with one line saying the feature has no UI.
     8. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker, then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the rail to match, one `<li>` per section in page order, numbers matching each `.sec-n`:
@@ -172,9 +173,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 5. Offer the mock
 
-- Ask whether to build an interactive mock (use AskUserQuestion when the agent has it). Skip the question when the feature has no UI.
-- Yes → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder. It adds `mock/` and fills the "Try in the mock" lines.
-- No → remove the "Try in the mock" lines. Keep the Mock UI section and nav link with one sentence saying no mock was built.
+- Ask which mock to build (use AskUserQuestion when the agent has it). Skip the question when the feature has no UI.
+    - **In project** (recommended when the frontend app is found): mock pages inside the real app at `<routes-root>/mock/spec<NNN>/` (e.g. `apps/<web-app>/app/(main)/mock/spec164/`), built from its real components and types, with local data and no API / RPC calls. The user manages the branch and ignores the folder.
+    - **Standalone HTML**: `<output>/mock/`, opens from disk, no app needed.
+    - **No mock**.
+- In project / Standalone → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder and the chosen mode (`in-project` / `standalone`). It writes the mock and fills the "Try in the mock" lines.
+- No mock → remove the "Try in the mock" lines. Keep the Mock UI section and nav link with one sentence saying no mock was built.
 
 ### 6. Verify
 
@@ -193,5 +197,5 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Output: `✅ Plan created at: {output}/overview.html`
 - Say the diagram mode (diagram-design or manual).
-- List the flows (one line each), the ER diagram page(s), and whether a mock was built.
+- List the flows (one line each), the ER diagram page(s), and which mock was built (standalone, in-project with its folder, or none).
 - Remind the user: each diagram is edited in its own file under `flowchart/`, `sequence-diagram/` or `database/`; the overview picks up the change on reload.
