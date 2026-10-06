@@ -170,8 +170,8 @@ h2 + .facts { margin-top: 0; }
     color: var(--text-2); font: 500 var(--fs-body) var(--sans); cursor: pointer;
     transition: background 0.16s var(--ease), color 0.16s var(--ease);
 }
-.views button:hover:not(:disabled) { color: var(--text); background: var(--surface-2); }
-.views button[aria-selected="true"] { background: var(--text); color: var(--bg); font-weight: 600; }
+.views button:hover:not(:disabled):not([aria-selected="true"]) { color: var(--text); background: var(--surface-2); }
+.views button[aria-selected="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
 .views button:disabled { color: var(--text-3); text-decoration: line-through; cursor: not-allowed; }
 .views kbd { font-size: 10px; color: inherit; opacity: 0.75; }
 html[data-all="on"] .views { display: none; }
