@@ -1,27 +1,27 @@
 /* ============ THEME TOKENS ============ */
 :root {
-    /* Rosé Pine (dark): plum base, iris accent; foam / gold / love mark diffs */
-    --bg: #191724;
-    --bg-elevated: #26233a;
-    --sidebar-bg: #13111e;
-    --border: #2e2a45;
-    --border-strong: #403d52;
-    --text: #e0def4;
-    --text-body: #cfcce6;
-    --text-muted: #b5b1cf;
-    --text-faint: #908caa;
-    --accent: #c4a7e7;
-    --accent-soft: rgba(196, 167, 231, 0.14);
-    --code-bg: #26233a;
-    --card-bg: #1f1d2e;
-    --card-hover: #26233a;
-    --selection: rgba(196, 167, 231, 0.3);
-    --scrollbar: #403d52;
-    --scrollbar-hover: #524f67;
+    /* Tokyo Night Moon (dark): navy base, blue accent; green / yellow / red mark diffs */
+    --bg: #222436;
+    --bg-elevated: #2f334d;
+    --sidebar-bg: #1e2030;
+    --border: #3b4261;
+    --border-strong: #444a73;
+    --text: #c8d3f5;
+    --text-body: #b8c0e8;
+    --text-muted: #a5aed8;
+    --text-faint: #8a92c0;
+    --accent: #82aaff;
+    --accent-soft: rgba(130, 170, 255, 0.14);
+    --code-bg: #2f334d;
+    --card-bg: #272a3f;
+    --card-hover: #2f334d;
+    --selection: rgba(130, 170, 255, 0.3);
+    --scrollbar: #444a73;
+    --scrollbar-hover: #545c7e;
     /* diff marks: + add / ~ change / − drop */
-    --add: #9ccfd8;
-    --change: #f6c177;
-    --drop: #eb6f92;
+    --add: #c3e88d;
+    --change: #ffc777;
+    --drop: #ff757f;
     color-scheme: dark;
 }
 
@@ -664,9 +664,9 @@ td {
 
 .flowchart img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
 
-/* iframe of a standalone diagram-design HTML file (Rosé Pine paper #191724, matching this page).
+/* iframe of a standalone diagram-design HTML file (Tokyo Night Moon paper #222436, matching this page).
    The file posts its real height (its SVG shrinks with the width); the script below applies it. */
-.diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #191724; }
+.diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #222436; }
 /* an iframe brings its own paper: drop the host box around it so there is one frame, not two */
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; background: none; }
 
