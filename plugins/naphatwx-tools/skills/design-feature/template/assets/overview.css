@@ -232,10 +232,11 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .seq .ah.ret { fill: var(--text-3); }
 .seq .ah.hot { fill: var(--accent); }
 
-.seq-steps { margin-top: 16px; font-size: var(--fs-sm); }
+/* sits in the wide panel but keeps the text column's measure, centred under the diagram */
+.seq-steps { max-width: var(--measure); margin: 16px auto 0; font-size: var(--fs-sm); }
 .seq-steps-title { color: var(--text-3); font-size: var(--fs-xs); margin-bottom: 6px; }
-.seq-steps ol { list-style: none; padding: 0; columns: 2 320px; column-gap: 32px; }
-.seq-steps li { display: flex; gap: 10px; break-inside: avoid; padding: 4px 0; margin: 0; }
+.seq-steps ol { list-style: none; padding: 0; }
+.seq-steps li { display: flex; gap: 10px; padding: 4px 0; margin: 0; }
 .seq-steps .n { flex: none; width: 18px; color: var(--text-3); font: var(--fs-xs)/1.9 var(--mono); }
 .seq-steps code { margin-right: 4px; white-space: nowrap; }
 
