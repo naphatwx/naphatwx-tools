@@ -288,7 +288,8 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 .legend .change { color: var(--change); }
 .legend .drop { color: var(--drop); }
 
-.tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 16px; }
+.tables { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.tables + p { margin-top: 14px; }
 .tbl { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; scroll-margin-top: 32px; }
 .tbl.new { border-color: var(--line-strong); }
 .tbl.ext { border-style: dashed; }
@@ -410,7 +411,6 @@ html[data-present="on"] .seq-steps { font-size: var(--fs-body); }
     .scope { grid-template-columns: 1fr; gap: 24px; }
     .facts { grid-template-columns: 1fr; gap: 2px; }
     .facts dd { margin-bottom: 12px; }
-    .tables { grid-template-columns: 1fr; }
     :root { --fs-h1: 2.1rem; --fs-h2: 1.5rem; }
     .tools { right: 12px; bottom: 12px; }
     #presentBtn { display: none; }
