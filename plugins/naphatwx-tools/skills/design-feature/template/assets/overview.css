@@ -1,27 +1,27 @@
 /* ============ THEME TOKENS ============ */
 :root {
-    /* graphite mono: neutral grays, hierarchy from lightness alone; hue only marks diffs */
-    --bg: #222222;
-    --bg-elevated: #2d2d2d;
-    --sidebar-bg: #1c1c1c;
-    --border: #363636;
-    --border-strong: #454545;
-    --text: #ededed;
-    --text-body: #d4d4d4;
-    --text-muted: #b0b0b0;
-    --text-faint: #969696;
-    --accent: #ffffff;
-    --accent-soft: rgba(255, 255, 255, 0.1);
-    --code-bg: #303030;
-    --card-bg: #282828;
-    --card-hover: #343434;
-    --selection: rgba(255, 255, 255, 0.22);
-    --scrollbar: #454545;
-    --scrollbar-hover: #585858;
-    /* diff marks: + add / ~ change / − drop — muted, the only hue on the page */
-    --add: #86c29c;
-    --change: #d4b46e;
-    --drop: #de8f8f;
+    /* Rosé Pine (dark): plum base, iris accent; foam / gold / love mark diffs */
+    --bg: #191724;
+    --bg-elevated: #26233a;
+    --sidebar-bg: #13111e;
+    --border: #2e2a45;
+    --border-strong: #403d52;
+    --text: #e0def4;
+    --text-body: #cfcce6;
+    --text-muted: #b5b1cf;
+    --text-faint: #908caa;
+    --accent: #c4a7e7;
+    --accent-soft: rgba(196, 167, 231, 0.14);
+    --code-bg: #26233a;
+    --card-bg: #1f1d2e;
+    --card-hover: #26233a;
+    --selection: rgba(196, 167, 231, 0.3);
+    --scrollbar: #403d52;
+    --scrollbar-hover: #524f67;
+    /* diff marks: + add / ~ change / − drop */
+    --add: #9ccfd8;
+    --change: #f6c177;
+    --drop: #eb6f92;
     color-scheme: dark;
 }
 
@@ -78,9 +78,6 @@ html {
     font-size: 16px;
     scroll-behavior: smooth;
 }
-
-html[data-fs="small"] { font-size: 14px; }
-html[data-fs="large"] { font-size: 18px; }
 
 body {
     background: var(--bg);
@@ -329,39 +326,6 @@ html {
     gap: 10px;
     margin-left: auto;
 }
-
-/* text size picker: small 14px / medium 16px / large 18px */
-.fs-picker {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    padding: 2px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-elevated);
-}
-
-.fs-btn {
-    min-width: 30px;
-    height: 30px;
-    padding: 0 6px;
-    border: none;
-    border-radius: 6px;
-    background: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-family: inherit;
-    font-weight: 600;
-    line-height: 1;
-    transition: background 0.12s, color 0.12s;
-}
-
-/* px, not rem: the picker must not resize itself when it changes the root size */
-.fs-btn[data-fs="small"] { font-size: 12px; }
-.fs-btn[data-fs="medium"] { font-size: 15px; }
-.fs-btn[data-fs="large"] { font-size: 18px; }
-.fs-btn:hover { background: var(--card-hover); color: var(--text); }
-.fs-btn.active { background: var(--accent-soft); color: var(--accent); }
 
 /* diagram zoom switch; .on = wheel zoom enabled (off by default) */
 .zoom-toggle {
@@ -700,9 +664,9 @@ td {
 
 .flowchart img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
 
-/* iframe of a standalone diagram-design HTML file (graphite paper #222222, matching this page).
+/* iframe of a standalone diagram-design HTML file (Rosé Pine paper #191724, matching this page).
    The file posts its real height (its SVG shrinks with the width); the script below applies it. */
-.diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #222222; }
+.diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #191724; }
 /* an iframe brings its own paper: drop the host box around it so there is one frame, not two */
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; background: none; }
 
