@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 490" role="img" aria-labelledby="t d" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14">
     <title id="t">Example flowchart</title>
     <desc id="d">Open the form, check the thing.edit permission, validate the name, save it with CreateThing or show INVALID_ARGUMENT and retry.</desc>
-    <!-- Shapes: terminal = gold pill · process = navy box · decision = red diamond. Connectors: grey, Yes/No labels on each branch.
+    <!-- Shapes: terminal = outlined pill · process = filled box · decision = accent diamond. Connectors: grey, Yes/No labels on each branch.
          Each node: a plain-words line, then a mono line with the real value from the source (permission, RPC, field rule, code, status). -->
     <defs>
         <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#636da6" />
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b6e78" />
         </marker>
     </defs>
-    <g fill="none" stroke="#636da6" stroke-width="2" marker-end="url(#ah)">
+    <g fill="none" stroke="#6b6e78" stroke-width="1.6" marker-end="url(#ah)">
         <path d="M380,70 V103" />
         <path d="M490,165 H578" />
         <path d="M380,225 V263" />
@@ -17,30 +17,30 @@
         <path d="M660,355 V418" />
         <path d="M120,295 V244 H378" />
     </g>
-    <g fill="#8a92c0" font-size="13" text-anchor="middle">
+    <g fill="#8d909a" font-size="13" text-anchor="middle">
         <text x="534" y="157">No</text>
         <text x="398" y="250">Yes</text>
         <text x="534" y="317">Yes</text>
         <text x="236" y="317">No</text>
         <text x="200" y="236">retry</text>
     </g>
-    <g fill="#fff" text-anchor="middle">
-        <rect x="300" y="20" width="160" height="50" rx="25" fill="#ffc777" />
+    <g fill="#ececef" text-anchor="middle" font-weight="600">
+        <rect x="300" y="20" width="160" height="50" rx="25" fill="#121316" stroke="#4a4d55" stroke-width="1.4" />
         <text x="380" y="41">Open the form</text>
-        <polygon points="380,105 490,165 380,225 270,165" fill="#914c54" />
+        <polygon points="380,105 490,165 380,225 270,165" fill="#1b2232" stroke="#8ab0ff" stroke-width="1.4" />
         <text x="380" y="160">Can edit?</text>
-        <rect x="580" y="140" width="160" height="50" rx="25" fill="#ffc777" />
+        <rect x="580" y="140" width="160" height="50" rx="25" fill="#121316" stroke="#4a4d55" stroke-width="1.4" />
         <text x="660" y="161">No Edit button</text>
-        <polygon points="380,265 490,325 380,385 270,325" fill="#914c54" />
+        <polygon points="380,265 490,325 380,385 270,325" fill="#1b2232" stroke="#8ab0ff" stroke-width="1.4" />
         <text x="380" y="320">Name valid?</text>
-        <rect x="40" y="295" width="160" height="60" fill="#3e68d7" />
+        <rect x="40" y="295" width="160" height="60" fill="#24262c" stroke="#363940" stroke-width="1.2" rx="8" />
         <text x="120" y="320">Show error</text>
-        <rect x="580" y="295" width="160" height="60" fill="#3e68d7" />
+        <rect x="580" y="295" width="160" height="60" fill="#24262c" stroke="#363940" stroke-width="1.2" rx="8" />
         <text x="660" y="320">Save record</text>
-        <rect x="580" y="420" width="160" height="50" rx="25" fill="#ffc777" />
+        <rect x="580" y="420" width="160" height="50" rx="25" fill="#121316" stroke="#4a4d55" stroke-width="1.4" />
         <text x="660" y="441">Saved</text>
     </g>
-    <g fill="#fff" fill-opacity="0.85" font-family="'SF Mono', 'Cascadia Code', Consolas, monospace" font-size="12" text-anchor="middle">
+    <g fill="#b9bbc2" font-family="'SF Mono', 'Cascadia Code', Consolas, monospace" font-size="12" text-anchor="middle">
         <text x="380" y="59">/things/:id</text>
         <text x="380" y="180">thing.edit</text>
         <text x="660" y="179">read-only view</text>

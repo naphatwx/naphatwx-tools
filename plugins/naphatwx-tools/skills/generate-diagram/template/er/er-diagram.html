@@ -8,17 +8,19 @@
     <style>
         :root,
         [data-theme="dark"] {
-            --bg: #222436;
-            --bg-elevated: #2f334d;
-            --border: #3b4261;
-            --border-strong: #444a73;
-            --text: #c8d3f5;
-            --text-muted: #a5aed8;
-            --text-faint: #8a92c0;
-            --accent: #82aaff;
-            --accent-soft: rgba(130, 170, 255, 0.16);
-            --card-bg: #272a3f;
-            --drop: #ff757f;
+            --bg: #121316;
+            --bg-elevated: #18191d;
+            --border: #26282e;
+            --border-strong: #363940;
+            --text: #ececef;
+            --text-muted: #b9bbc2;
+            --text-faint: #8d909a;
+            --accent: #8ab0ff;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+            --card-bg: #1f2025;
+            --add: #8fd694;
+            --change: #f0c26b;
+            --drop: #f28b8d;
             color-scheme: dark;
         }
 
@@ -33,6 +35,8 @@
             --accent: #7c3aed;
             --accent-soft: rgba(124, 58, 237, 0.12);
             --card-bg: #dddddd;
+            --add: #15803d;
+            --change: #b45309;
             --drop: #dc2626;
             color-scheme: light;
         }
@@ -49,7 +53,7 @@
             background: var(--bg);
             color: var(--text);
             font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-            padding: 24px 16px 40px;
+            padding: 40px 24px 48px;
         }
 
         header {
@@ -62,7 +66,7 @@
             margin: 0 auto 16px;
         }
 
-        h1 { font-size: 1.4rem; }
+        h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.015em; }
         .sub { color: var(--text-faint); font-size: 0.875rem; margin-top: 4px; }
         .actions { display: flex; gap: 8px; }
 
@@ -111,7 +115,7 @@
         .t-box { fill: var(--card-bg); stroke: var(--border-strong); stroke-width: 1.2; }
         .t-box.write { stroke: var(--accent); stroke-width: 1.6; }
         .t-box.external { stroke-dasharray: 5 4; }
-        .t-head { fill: var(--bg); }
+        .t-head { fill: var(--bg-elevated); }
         .t-name { fill: var(--text); font-size: 13px; font-weight: 600; font-family: "SF Mono", "Cascadia Code", Consolas, monospace; }
         .t-tag { fill: var(--text-faint); font-size: 10px; font-weight: 600; }
         .write .t-tag, .t-tag.write { fill: var(--accent); }
@@ -119,10 +123,11 @@
         .r-line { stroke: var(--border); }
         .r-col { fill: var(--text); font-size: 12px; font-family: "SF Mono", "Cascadia Code", Consolas, monospace; }
         .r-type { fill: var(--text-faint); font-size: 11px; }
-        .r-key { fill: var(--accent); font-size: 10px; font-weight: 700; }
-        .r-drop .r-col, .r-drop .r-type { fill: var(--text-faint); text-decoration: line-through; }
+        .r-key { fill: var(--text-faint); font-size: 10px; font-weight: 700; }
+        .r-drop .r-col, .r-drop .r-type { fill: var(--drop); text-decoration: line-through; }
         .r-drop .r-key { fill: var(--drop); }
-        .r-add .r-col { fill: var(--accent); }
+        .r-add .r-col, .r-add .r-key { fill: var(--add); }
+        .r-change .r-col, .r-change .r-key { fill: var(--change); }
         .fk { fill: none; stroke: var(--text-faint); stroke-width: 1.4; }
         .fk.new { stroke: var(--accent); stroke-width: 1.8; }
         .fk-card { fill: var(--text-muted); font-size: 10px; font-weight: 700; }

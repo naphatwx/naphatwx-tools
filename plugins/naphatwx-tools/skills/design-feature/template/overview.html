@@ -9,351 +9,367 @@
 </head>
 
 <body>
-    <div class="layout">
-        <!-- ============ SIDEBAR ============ -->
-        <aside class="sidebar" id="sidebar">
-            <div class="brand">
-                <span class="logo">F</span>
-                <span>Feature Name</span>
+    <!-- ============ INDEX RAIL: always open; the edge button or "[" hides it.
+         One <li> per section (01–08); flows, changed tables and changed APIs nest as 3.N / 4.N / 5.N. ============ -->
+    <nav class="rail" id="rail" aria-label="Sections">
+        <div class="rail-brand"><span class="rail-mark" aria-hidden="true">F</span><span class="rail-label">Feature Name</span></div>
+        <label class="rail-search">
+            <span class="sr-only">Search sections</span>
+            <input id="railSearch" type="search" placeholder="Search  /" autocomplete="off">
+        </label>
+        <ol class="rail-list" id="railList">
+            <li><a href="#overview"><span class="n">01</span><span class="rail-label">Overview</span></a></li>
+            <li><a href="#scope"><span class="n">02</span><span class="rail-label">Scope</span></a></li>
+            <li><a href="#flows"><span class="n">03</span><span class="rail-label">Flows</span></a>
+                <ol>
+                    <li><a href="#flow-01"><span class="n">3.1</span><span class="rail-label">Example flow</span></a></li>
+                    <li><a href="#flow-02"><span class="n">3.2</span><span class="rail-label">Example flow · diagram-design</span></a></li>
+                </ol>
+            </li>
+            <li><a href="#database"><span class="n">04</span><span class="rail-label">Database</span></a>
+                <ol>
+                    <li><a href="#db-table_b"><span class="n">4.1</span><span class="rail-label">schema.table_b</span></a></li>
+                    <li><a href="#db-table_a"><span class="n">4.2</span><span class="rail-label">schema.table_a</span></a></li>
+                </ol>
+            </li>
+            <li><a href="#api"><span class="n">05</span><span class="rail-label">API</span></a>
+                <ol>
+                    <li><a href="#api-create-thing"><span class="n">5.1</span><span class="rail-label">CreateThing</span></a></li>
+                    <li><a href="#api-get-things"><span class="n">5.2</span><span class="rail-label">GetThings</span></a></li>
+                    <li><a href="#api-shared-types"><span class="n">5.3</span><span class="rail-label">Shared types</span></a></li>
+                </ol>
+            </li>
+            <li><a href="#errors"><span class="n">06</span><span class="rail-label">Errors</span></a></li>
+            <li><a href="#mock"><span class="n">07</span><span class="rail-label">Mock UI</span></a></li>
+            <li><a href="#open-questions"><span class="n">08</span><span class="rail-label">Open questions</span></a></li>
+        </ol>
+    </nav>
+    <button class="rail-edge" id="railEdge" type="button" aria-controls="rail" aria-expanded="true" title="Hide index ( [ )" aria-label="Hide index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="11 17 6 12 11 7" />
+            <polyline points="18 17 13 12 18 7" />
+        </svg>
+    </button>
+
+    <button class="menu" id="menuBtn" type="button" aria-label="Open index">☰</button>
+
+    <main class="sheet" id="sheet">
+
+        <!-- ============ 01 OVERVIEW ============ -->
+        <section class="slide" id="overview" data-title="Overview">
+            <p class="kicker">Spec NNN · TICKET-123 · Draft</p>
+            <h1>Feature Name</h1>
+            <p class="lead">One short sentence: what the feature lets a user do.</p>
+            <dl class="facts">
+                <dt>Key decision</dt>
+                <dd>The one design choice a reader must know first.</dd>
+                <dt>Data impact</dt>
+                <dd>1 new table, 1 altered table. <a href="#database">See database</a></dd>
+                <dt>API impact</dt>
+                <dd>1 new RPC, 1 behaviour change. <a href="#api">See API</a></dd>
+                <dt>UI impact</dt>
+                <dd>Things page: new "Create" dialog.</dd>
+            </dl>
+        </section>
+
+        <!-- ============ 02 SCOPE ============ -->
+        <section class="slide" id="scope" data-title="Scope">
+            <h2><span class="sec-n">02</span>Scope</h2>
+            <div class="scope">
+                <div>
+                    <h3>In scope</h3>
+                    <ul>
+                        <li>Create a thing from the Things page.</li>
+                        <li>Filter things by source.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Out of scope</h3>
+                    <ul>
+                        <li>Bulk import <span class="faint">— needs a queue, next quarter</span></li>
+                        <li>Editing a thing's owner <span class="faint">— separate ticket</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ 03 FLOWS ============ -->
+        <section class="slide" id="flows" data-title="Flows">
+            <h2><span class="sec-n">03</span>Flows</h2>
+            <p class="muted">Each flow has three views, closed until you open one: <strong>Flowchart</strong> is the logic, <strong>Sequence</strong> is how the services talk, <strong>Rules</strong> is what the build must keep.</p>
+            <ol class="flow-index">
+                <li><a href="#flow-01"><span class="n">3.1</span>Example flow</a><span class="faint">US1 · P1</span></li>
+                <li><a href="#flow-02"><span class="n">3.2</span>Example flow · diagram-design</a><span class="faint">US1 · P1</span></li>
+            </ol>
+        </section>
+
+        <!-- ===== one block per flow: section.slide.flow id="flow-NN" + 3 view buttons + 3 hidden panels (Flowchart, Sequence, Rules) + try line.
+             Manual: <img src="flowchart/NN-slug.svg"> and <div class="seq" data-flow="NN-slug">.
+             diagram-design: <iframe class="diagram-frame"> in both, + the returned <div class="seq-steps"> right after the .seq box. ===== -->
+        <section class="slide flow" id="flow-01" data-title="Flow 3.1 · Example flow">
+            <header class="flow-head">
+                <h3><span class="sec-n">3.1</span>Example flow</h3>
+                <p class="refs">US1 · P1 · FR-001 · FR-002</p>
+            </header>
+            <p class="flow-line">Save a new thing. <span class="faint">Starts from Things page → New.</span></p>
+            <div class="views" role="tablist" aria-label="Flow 3.1 views">
+                <button role="tab" aria-selected="false" aria-controls="flow-01-chart" id="flow-01-chart-tab">Flowchart</button>
+                <button role="tab" aria-selected="false" aria-controls="flow-01-seq" id="flow-01-seq-tab">Sequence</button>
+                <button role="tab" aria-selected="false" aria-controls="flow-01-rules" id="flow-01-rules-tab">Rules</button>
+            </div>
+            <div class="panel wide" role="tabpanel" id="flow-01-chart" aria-labelledby="flow-01-chart-tab" hidden>
+                <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry"></div>
+            </div>
+            <div class="panel wide" role="tabpanel" id="flow-01-seq" aria-labelledby="flow-01-seq-tab" hidden>
+                <p class="seq-legend"><span>call</span><span class="ret">response</span><span class="hot">side effect</span></p>
+                <div class="seq" data-flow="01-example-flow"></div>
+            </div>
+            <div class="panel" role="tabpanel" id="flow-01-rules" aria-labelledby="flow-01-rules-tab" hidden>
+                <ul>
+                    <li>The name is unique per owner; a duplicate returns <code>ALREADY_EXISTS</code>.</li>
+                    <li>Only users with <code>thing.edit</code> see the "New" button.</li>
+                </ul>
+            </div>
+            <p class="try"><span class="faint">Try in the mock</span> <a href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener">Happy path ↗</a></p>
+        </section>
+        <!-- ===== end flow block ===== -->
+
+        <!-- Template preview only: flow 3.2 is the same flow in diagram-design mode. A real overview uses one mode for every flow. -->
+        <section class="slide flow" id="flow-02" data-title="Flow 3.2 · Example flow · diagram-design">
+            <header class="flow-head">
+                <h3><span class="sec-n">3.2</span>Example flow · diagram-design</h3>
+                <p class="refs">US1 · P1 · FR-001 · FR-002</p>
+            </header>
+            <p class="flow-line">The same flow as 3.1, drawn by diagram-design. <span class="faint">Starts from Things page → New.</span></p>
+            <div class="views" role="tablist" aria-label="Flow 3.2 views">
+                <button role="tab" aria-selected="false" aria-controls="flow-02-chart" id="flow-02-chart-tab">Flowchart</button>
+                <button role="tab" aria-selected="false" aria-controls="flow-02-seq" id="flow-02-seq-tab">Sequence</button>
+                <button role="tab" aria-selected="false" aria-controls="flow-02-rules" id="flow-02-rules-tab">Rules</button>
+            </div>
+            <div class="panel wide" role="tabpanel" id="flow-02-chart" aria-labelledby="flow-02-chart-tab" hidden>
+                <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
+            </div>
+            <div class="panel wide" role="tabpanel" id="flow-02-seq" aria-labelledby="flow-02-seq-tab" hidden>
+                <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
+                <div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>
+                    <li><span class="n">1</span><code>GetThing</code> id from the route</li>
+                    <li><span class="n">2</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
+                    <li><span class="n">3</span><code>CreateThing</code> name, ownerId</li>
+                    <li><span class="n">4</span><code>POST /things</code> timeout 10 s</li>
+                    <li><span class="n">5</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
+                </ol></div>
+            </div>
+            <div class="panel" role="tabpanel" id="flow-02-rules" aria-labelledby="flow-02-rules-tab" hidden>
+                <ul>
+                    <li>The name is unique per owner; a duplicate returns <code>ALREADY_EXISTS</code>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ============ 04 DATABASE: changes first, then the full schema of every related table in a closed details.more.
+             No related table at all → keep this section, replace its body with "This feature has no database changes." ============ -->
+        <section class="slide" id="database" data-title="Database">
+            <h2><span class="sec-n">04</span>Database changes <a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">ER diagram ↗</a></h2>
+            <dl class="facts">
+                <dt>Migration</dt>
+                <dd><code>path/to/migration.sql</code></dd>
+                <dt>Changed</dt>
+                <dd><code>schema.table_b</code> new · <code>schema.table_a</code> altered</dd>
+                <dt>Left alone</dt>
+                <dd><code>schema.table_c</code> <span class="faint">— read only</span></dd>
+            </dl>
+            <p class="legend"><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
+            <div class="tables">
+                <div class="tbl new" id="db-table_b">
+                    <div class="tbl-head"><span>schema.table_b</span><span class="tag">new table</span></div>
+                    <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                    <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                    <div class="row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                </div>
+                <div class="tbl" id="db-table_a">
+                    <div class="tbl-head"><span>schema.table_a</span><span class="tag">altered</span></div>
+                    <div class="row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
+                    <div class="row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                    <div class="row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
+                    <div class="row add"><span class="col">new_column</span><span class="type">index</span><span class="key">+ add</span></div>
+                </div>
+            </div>
+            <p class="rel"><code>schema.table_a.id</code> <span class="card-n">1 ── *</span> <code>schema.table_b.table_a_id</code> <span class="faint">new FK</span></p>
+            <details class="more">
+                <summary>Full schema <span class="faint">every related table, all columns</span></summary>
+                <div class="tables">
+                    <div class="tbl new">
+                        <div class="tbl-head"><span>schema.table_b</span><span class="tag">new table</span></div>
+                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                        <div class="row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                    </div>
+                    <div class="tbl">
+                        <div class="tbl-head"><span>schema.table_a</span><span class="tag">altered</span></div>
+                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="col">name</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                        <div class="row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
+                        <div class="row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                        <div class="row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
+                        <div class="row"><span class="col">created_at</span><span class="type">timestamptz</span><span class="key"></span></div>
+                    </div>
+                    <div class="tbl">
+                        <div class="tbl-head"><span>schema.table_c</span><span class="tag">read</span></div>
+                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                        <div class="row"><span class="col">enabled</span><span class="type">boolean</span><span class="key"></span></div>
+                    </div>
+                    <div class="tbl ext">
+                        <div class="tbl-head"><span>other.table_x</span><span class="tag">external</span></div>
+                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="col">code</span><span class="type">text</span><span class="key"></span></div>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- ============ 05 API: intro facts, one .api block per changed API (data-part = its name: one presentation step each),
+             then the full request / response of every related API in a closed details.more.
+             No related API at all → keep this section, replace its body with "This feature has no API changes." ============ -->
+        <section class="slide" id="api" data-title="API">
+            <h2><span class="sec-n">05</span>API changes</h2>
+            <dl class="facts">
+                <dt>Summary</dt>
+                <dd>1 new RPC, 1 behaviour change on <code>ThingService</code></dd>
+                <dt>Files</dt>
+                <dd><code>path/to/service.proto</code> <span class="faint">+1 RPC, +1 message</span><br><code>path/to/source.proto</code> <span class="faint">new file</span></dd>
+                <dt>Compatibility</dt>
+                <dd>Additive, wire-compatible.</dd>
+                <dt>Permissions</dt>
+                <dd>No new permission; 1 entry in <code>path/to/method_permissions.go</code></dd>
+            </dl>
+
+            <!-- ===== one block per changed API ===== -->
+            <div class="api" id="api-create-thing" data-part="CreateThing">
+                <h3><code>CreateThing</code> <span class="pill">new</span></h3>
+                <p class="refs">POST /api/v1/things · permission things.create</p>
+                <div class="tables">
+                    <div class="tbl new">
+                        <div class="tbl-head"><span>CreateThingRequest</span><span class="tag">new message</span></div>
+                        <div class="row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
+                        <div class="row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
+                        <div class="row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
+                    </div>
+                    <div class="tbl">
+                        <div class="tbl-head"><span>ThingResponse</span><span class="tag">altered</span></div>
+                        <div class="row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
+                        <div class="row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
+                        <div class="row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
+                    </div>
+                </div>
             </div>
 
-            <input class="nav-search" id="navSearch" placeholder="Search…" />
-
-            <nav id="nav">
-                <div class="nav-group">
-                    <div class="nav-group-title">Feature</div>
-                    <a class="nav-link" href="#overview">Overview</a>
-                    <a class="nav-link" href="#scope">Scope</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Flows</div>
-                    <a class="nav-link" href="#flows">All flows</a>
-                    <a class="nav-link" href="#flow-01">1. Example flow</a>
-                    <a class="nav-link" href="#flow-02">2. Example flow · diagram-design</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Design</div>
-                    <!-- a section with sub-items: .nav-tree, closed by default. Clicking .nav-parent jumps there and toggles it -->
-                    <div class="nav-tree">
-                        <a class="nav-link nav-parent" href="#database" aria-expanded="false">Database changes</a>
-                        <div class="nav-children" hidden>
-                            <a class="nav-link" href="#db-table_b">schema.table_b</a>
-                            <a class="nav-link" href="#db-table_a">schema.table_a</a>
-                        </div>
-                    </div>
-                    <div class="nav-tree">
-                        <a class="nav-link nav-parent" href="#api" aria-expanded="false">API changes</a>
-                        <div class="nav-children" hidden>
-                            <a class="nav-link" href="#api-create-thing">CreateThing</a>
-                            <a class="nav-link" href="#api-get-things">GetThings</a>
-                            <a class="nav-link" href="#api-shared-types">Shared types</a>
-                        </div>
-                    </div>
-                    <a class="nav-link" href="#errors">Errors</a>
-                    <a class="nav-link" href="#mock">Mock UI</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Plan</div>
-                    <a class="nav-link" href="#open-questions">Open questions</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Open in new tab</div>
-                    <a class="nav-link" href="mock/index.html" target="_blank" rel="noopener">Mock UI ↗</a>
-                </div>
-            </nav>
-        </aside>
-        <button class="sidebar-collapse" id="collapseBtn" aria-controls="sidebar" aria-expanded="true" title="Hide sidebar ( [ )" aria-label="Hide sidebar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="11 17 6 12 11 7" />
-                <polyline points="18 17 13 12 18 7" />
-            </svg>
-        </button>
-
-        <!-- ============ MAIN ============ -->
-        <div class="main">
-            <header class="topbar">
-                <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
-                <div class="topbar-actions">
-                    <button class="zoom-toggle" id="diagramAll" type="button">Show all diagrams</button>
-                    <button class="zoom-toggle" id="zoomToggle" type="button" aria-pressed="false" title="Scroll over a diagram to zoom">Zoom: off</button>
-                </div>
-            </header>
-
-            <article class="content wide">
-                <div class="eyebrow">Spec NNN · TICKET-123 · Draft</div>
-                <h1 id="overview">Feature Name</h1>
-                <p class="lead">One short sentence: what the feature lets a user do.</p>
-
-                <dl class="summary">
-                    <dt>Key decision</dt>
-                    <dd>The one design choice a reader must know first.</dd>
-                    <dt>Data impact</dt>
-                    <dd>New tables and changed columns, or "no schema change".</dd>
-                    <dt>UI impact</dt>
-                    <dd>Which screens change.</dd>
-                </dl>
-
-                <h2 id="scope">Scope</h2>
-                <h3>In scope</h3>
-                <ul>
-                    <li>Capability that ships</li>
-                </ul>
-                <h3>Out of scope</h3>
-                <ul>
-                    <li>Capability left for later <span class="faint">— why</span></li>
-                </ul>
-
-                <h2 id="flows">Flows</h2>
-                <ul>
-                    <li>Flowchart: the flow's logic.</li>
-                    <li>Sequence diagram: how the services talk.</li>
-                </ul>
-                <div class="seq-legend" style="margin:8px 0 0">
-                    <span>call</span>
-                    <span class="ret">response</span>
-                    <span class="hot">side effect</span>
-                </div>
-
-                <!-- ===== one block per flow: h3 id="flow-NN" + flowchart + sequence diagram + rules (all three in closed <details>) + try links.
-                     Manual: <img src="flowchart/NN-slug.svg"> and .seq[data-flow="NN-slug"].
-                     diagram-design: <iframe class="diagram-frame" src="flowchart/NN-slug.html" title="…" loading="lazy"></iframe>,
-                     and <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/NN-slug.html" …></iframe></div>
-                     + the returned <div class="seq-steps"> right after it (manual: render.js adds it). ===== -->
-                <h3 id="flow-01">1. Example flow <span class="meta">US1 · P1 · FR-001 · FR-002</span></h3>
-                <ul>
-                    <li><strong>What:</strong> what this flow achieves, in one short line.</li>
-                    <li><strong>Trigger:</strong> where the user starts it.</li>
-                </ul>
-                <details class="diagram-toggle">
-                    <summary>Flowchart <span class="faint">· flow logic</span></summary>
-                    <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry"></div>
-                </details>
-                <details class="diagram-toggle">
-                    <summary>Sequence diagram <span class="faint">· how the services talk</span></summary>
-                    <div class="seq" data-flow="01-example-flow"></div>
-                </details>
-                <details class="rules-toggle">
-                    <summary>Rules <span class="faint">· what this flow must keep</span></summary>
+            <div class="api" id="api-get-things" data-part="GetThings">
+                <h3><code>GetThings</code> <span class="pill quiet">behaviour</span></h3>
+                <p class="refs">GET /api/v1/things · permission things.read · no field change</p>
+                <details class="more">
+                    <summary>Behaviour <span class="faint">what changes at runtime</span></summary>
                     <ul>
-                        <li>A rule from the spec that the implementation must not break.</li>
+                        <li>Honours the new <code>source</code> filter; empty means no filter.</li>
                     </ul>
                 </details>
-                <p class="try"><span class="faint">Try in the mock:</span> <a href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener">Happy path ↗</a></p>
-                <!-- ===== end flow block ===== -->
+            </div>
 
-                <!-- Template preview only: flow 02 shows the same flow in diagram-design mode (iframe embeds).
-                     A real overview uses one mode for every flow. -->
-                <h3 id="flow-02">2. Example flow · diagram-design <span class="meta">US1 · P1 · FR-001 · FR-002</span></h3>
-                <ul>
-                    <li><strong>What:</strong> the same flow as 1, drawn by the diagram-design skill.</li>
-                    <li><strong>Trigger:</strong> where the user starts it.</li>
-                </ul>
-                <details class="diagram-toggle">
-                    <summary>Flowchart <span class="faint">· flow logic</span></summary>
-                    <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
-                </details>
-                <details class="diagram-toggle">
-                    <summary>Sequence diagram <span class="faint">· how the services talk</span></summary>
-                    <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
-                    <div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>
-                        <li><span class="n">1</span><code>GetThing</code> id from the route</li>
-                        <li><span class="n">2</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
-                        <li><span class="n">3</span><code>CreateThing</code> name, ownerId</li>
-                        <li><span class="n">4</span><code>POST /things</code> timeout 10 s</li>
-                        <li><span class="n">5</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
-                    </ol></div>
-                </details>
+            <!-- ===== end API block ===== -->
 
-                <!-- ===== Database: changes first, then the full schema of every related table in a closed .full-toggle.
-                     No related table at all → keep this section, replace its body with "This feature has no database changes." ===== -->
-                <h2 id="database">Database changes <a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a></h2>
-                <ul>
-                    <li><strong>Migration:</strong> <code>path/to/migration.sql</code></li>
-                    <li><strong>Changed tables:</strong> <code>schema.table_a</code> (altered), <code>schema.table_b</code> (new)</li>
-                    <li><strong>Not touched on purpose:</strong>
-                        <ul>
-                            <li><code>schema.table_c</code> — read only</li>
-                        </ul>
-                    </li>
-                </ul>
-                <p class="legend"><span class="new">▍ new table</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
-                <div class="erd">
-                    <div id="db-table_b" class="erd-table write">
-                        <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
-                        <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                        <div class="erd-row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
-                        <div class="erd-row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
-                    </div>
-                    <div id="db-table_a" class="erd-table">
-                        <div class="erd-head">schema.table_a <span class="erd-tag">altered</span></div>
-                        <div class="erd-row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
-                        <div class="erd-row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
-                        <div class="erd-row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
-                        <div class="erd-row add"><span class="col">new_column</span><span class="type">index</span><span class="key">+ add</span></div>
+            <div class="api" id="api-shared-types" data-part="Shared types">
+                <h3>Shared types</h3>
+                <div class="tables">
+                    <div class="tbl new">
+                        <div class="tbl-head"><span>RepositorySource</span><span class="tag">new enum</span></div>
+                        <div class="row"><span class="col">REPOSITORY_SOURCE_UNSPECIFIED</span><span class="type"></span><span class="key">0</span></div>
+                        <div class="row"><span class="col">GITLAB</span><span class="type"></span><span class="key">1</span></div>
                     </div>
                 </div>
-                <ul class="erd-rel">
-                    <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_b.table_a_id <span class="faint">(new FK)</span></li>
-                </ul>
-                <details class="full-toggle">
-                    <summary>Full schema <span class="faint">· every related table, all columns</span></summary>
-                    <div class="erd">
-                        <div class="erd-table write">
-                            <div class="erd-head">schema.table_b <span class="erd-tag">new table</span></div>
-                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                            <div class="erd-row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
-                            <div class="erd-row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
-                        </div>
-                        <div class="erd-table">
-                            <div class="erd-head">schema.table_a <span class="erd-tag">altered</span></div>
-                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                            <div class="erd-row"><span class="col">name</span><span class="type">text</span><span class="key">NOT NULL</span></div>
-                            <div class="erd-row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
-                            <div class="erd-row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
-                            <div class="erd-row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
-                            <div class="erd-row"><span class="col">created_at</span><span class="type">timestamptz</span><span class="key"></span></div>
-                        </div>
-                        <div class="erd-table">
-                            <div class="erd-head">schema.table_c <span class="erd-tag">read</span></div>
-                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                            <div class="erd-row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
-                            <div class="erd-row"><span class="col">enabled</span><span class="type">boolean</span><span class="key"></span></div>
-                        </div>
-                        <div class="erd-table external">
-                            <div class="erd-head">other.table_x <span class="erd-tag">external</span></div>
-                            <div class="erd-row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                            <div class="erd-row"><span class="col">code</span><span class="type">text</span><span class="key"></span></div>
-                        </div>
-                    </div>
-                    <ul class="erd-rel">
-                        <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_b.table_a_id <span class="faint">(new FK)</span></li>
-                        <li>schema.table_a.id <span class="card-n">1 ── *</span> schema.table_c.table_a_id</li>
-                    </ul>
-                </details>
-                <!-- ===== end Database ===== -->
+            </div>
 
-                <!-- ===== API: one block per API (request changes + response changes), then the full request / response of every related API
-                     in a closed .full-toggle. No related API at all → keep this section, replace its body with "This feature has no API changes." ===== -->
-                <h2 id="api">API changes</h2>
-                <ul>
-                    <li><strong>Summary:</strong> 1 new RPC, 1 behaviour change on <code>ThingService</code>.</li>
-                    <li><strong>Files:</strong>
-                        <ul>
-                            <li><code>path/to/service.proto</code> — +1 RPC, +1 message</li>
-                            <li><code>path/to/source.proto</code> — new file</li>
-                        </ul>
-                    </li>
-                    <li><strong>Compatibility:</strong> additive, wire-compatible.</li>
-                    <li><strong>Unchanged:</strong> <code>ThingResponse</code> gains no field.</li>
-                    <li><strong>Permissions:</strong> no new permission; add 1 entry to <code>path/to/method_permissions.go</code>.</li>
-                </ul>
-                <p class="legend"><span class="new">▍ new message</span><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
-
-                <!-- ===== one block per changed API ===== -->
-                <h3 id="api-create-thing"><code>CreateThing</code> <span class="meta"><span class="new">new</span> · POST /api/v1/things · permission things.create</span></h3>
-                <div class="erd">
-                    <div class="erd-table write">
-                        <div class="erd-head">CreateThingRequest <span class="erd-tag">new message</span></div>
-                        <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
-                        <div class="erd-row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
-                        <div class="erd-row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
+            <details class="more">
+                <summary>Full contracts <span class="faint">every related API, full request and response</span></summary>
+                <h4><code>CreateThing</code> <span class="faint">POST /api/v1/things · new</span></h4>
+                <div class="tables">
+                    <div class="tbl new">
+                        <div class="tbl-head"><span>CreateThingRequest</span><span class="tag">new message</span></div>
+                        <div class="row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
+                        <div class="row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
+                        <div class="row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
                     </div>
-                    <div class="erd-table">
-                        <div class="erd-head">ThingResponse <span class="erd-tag">altered</span></div>
-                        <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
-                        <div class="erd-row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
-                        <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
+                    <div class="tbl">
+                        <div class="tbl-head"><span>ThingResponse</span><span class="tag">altered</span></div>
+                        <div class="row"><span class="col">id</span><span class="type">int64</span><span class="key">1</span></div>
+                        <div class="row"><span class="col">name</span><span class="type">string</span><span class="key">2</span></div>
+                        <div class="row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
+                        <div class="row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
+                        <div class="row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
                     </div>
                 </div>
-
-                <h3 id="api-get-things"><code>GetThings</code> <span class="meta">behaviour change · GET /api/v1/things · permission things.read</span></h3>
-                <div class="erd">
-                    <div class="erd-table">
-                        <div class="erd-head">GetThingsRequest <span class="erd-tag">unchanged</span></div>
-                        <div class="erd-row none">No field change.</div>
+                <h4><code>GetOwner</code> <span class="faint">GET /api/v1/owners/{id} · called, unchanged</span></h4>
+                <div class="tables">
+                    <div class="tbl ext">
+                        <div class="tbl-head"><span>GetOwnerRequest</span><span class="tag">unchanged</span></div>
+                        <div class="row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
                     </div>
-                    <div class="erd-table">
-                        <div class="erd-head">GetThingsResponse <span class="erd-tag">unchanged</span></div>
-                        <div class="erd-row none">No field change.</div>
-                    </div>
-                </div>
-                <details class="rules-toggle">
-                    <summary>Behaviour <span class="faint">· what changes at runtime</span></summary>
-                    <ul>
-                        <li>Honours the new filter; empty means no filter.</li>
-                    </ul>
-                </details>
-                <!-- ===== end API block ===== -->
-
-                <h3 id="api-shared-types">Shared types</h3>
-                <div class="erd">
-                    <div class="erd-table write">
-                        <div class="erd-head">RepositorySource <span class="erd-tag">new enum</span></div>
-                        <div class="erd-row"><span class="col">REPOSITORY_SOURCE_UNSPECIFIED</span><span class="type"></span><span class="key">0</span></div>
-                        <div class="erd-row"><span class="col">GITLAB</span><span class="type"></span><span class="key">1</span></div>
+                    <div class="tbl ext">
+                        <div class="tbl-head"><span>Owner</span><span class="tag">unchanged</span></div>
+                        <div class="row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
+                        <div class="row"><span class="col">displayName</span><span class="type">string</span><span class="key">2</span></div>
                     </div>
                 </div>
+            </details>
+        </section>
 
-                <details class="full-toggle">
-                    <summary>Full contracts <span class="faint">· every related API, full request and response</span></summary>
-                    <h4><code>CreateThing</code> <span class="faint">· POST /api/v1/things · new</span></h4>
-                    <div class="erd">
-                        <div class="erd-table write">
-                            <div class="erd-head">CreateThingRequest <span class="erd-tag">new message</span></div>
-                            <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
-                            <div class="erd-row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
-                            <div class="erd-row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
-                        </div>
-                        <div class="erd-table">
-                            <div class="erd-head">ThingResponse <span class="erd-tag">altered</span></div>
-                            <div class="erd-row"><span class="col">id</span><span class="type">int64</span><span class="key">1</span></div>
-                            <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">2</span></div>
-                            <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
-                            <div class="erd-row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
-                            <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
-                        </div>
-                    </div>
-                    <h4><code>GetOwner</code> <span class="faint">· GET /api/v1/owners/{id} · called, unchanged</span></h4>
-                    <div class="erd">
-                        <div class="erd-table external">
-                            <div class="erd-head">GetOwnerRequest <span class="erd-tag">unchanged</span></div>
-                            <div class="erd-row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
-                        </div>
-                        <div class="erd-table external">
-                            <div class="erd-head">Owner <span class="erd-tag">unchanged</span></div>
-                            <div class="erd-row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
-                            <div class="erd-row"><span class="col">displayName</span><span class="type">string</span><span class="key">2</span></div>
-                        </div>
-                    </div>
-                </details>
-                <!-- ===== end API ===== -->
+        <!-- ============ 06 ERRORS ============ -->
+        <section class="slide" id="errors" data-title="Errors">
+            <h2><span class="sec-n">06</span>Errors</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Cause</th><th>Code</th><th>User sees</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Name already used by this owner</td><td><code>ALREADY_EXISTS</code></td><td>"A thing with this name exists. Pick another name."</td></tr>
+                        <tr><td>Upstream refuses</td><td><code>FAILED_PRECONDITION</code></td><td>The upstream reason, plus "Try again later".</td></tr>
+                        <tr><td>Missing <code>things.create</code></td><td><code>PERMISSION_DENIED</code></td><td>The "New" button is hidden.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-                <h2 id="errors">Errors</h2>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>Cause</th><th>Code</th><th>User sees</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Upstream refuses</td><td><code>FailedPrecondition</code></td><td>A reason the user can act on.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- ============ 07 MOCK ============ -->
+        <section class="slide" id="mock" data-title="Mock UI">
+            <h2><span class="sec-n">07</span>Mock UI</h2>
+            <p class="muted">A clickable mock with a scenario switcher for every edge state.</p>
+            <p><a class="side-link" href="mock/index.html" target="_blank" rel="noopener">Open the mock ↗</a></p>
+        </section>
 
-                <h2 id="mock">Mock UI</h2>
-                <ul>
-                    <li>Built from the app's real design system.</li>
-                    <li>Pages call a fake API with the real operation names.</li>
-                </ul>
-                <p><a href="mock/index.html" target="_blank" rel="noopener">Open the mock ↗</a> <span class="faint">· every page × scenario, fake API console</span></p>
+        <!-- ============ 08 OPEN QUESTIONS ============ -->
+        <section class="slide" id="open-questions" data-title="Open questions">
+            <h2><span class="sec-n">08</span>Open questions</h2>
+            <p class="blocker-line"><strong class="blocker">Blocker:</strong> the upstream timeout for <code>POST /things</code> is not agreed yet.</p>
+            <ol class="questions">
+                <li><p>Should a dropped <code>legacyFlag</code> wait one release behind a deprecation?</p><span class="who">Owner: API lead</span></li>
+                <li><p>Does bulk import need the same uniqueness rule?</p><span class="who">Owner: PM</span></li>
+            </ol>
+        </section>
+    </main>
 
-                <h2 id="open-questions">Open questions</h2>
-                <p><strong class="blocker">Blocker:</strong> anything that stops the feature shipping.</p>
-                <ol>
-                    <li><strong>Question</strong> — what must be decided or verified, and by whom.</li>
-                </ol>
-            </article>
-        </div>
+    <!-- ============ FLOATING TOOLS ============ -->
+    <div class="tools" role="toolbar" aria-label="View tools">
+        <button type="button" id="openAll" aria-pressed="false" title="Open every flow view">Open all</button>
+        <button type="button" id="zoomToggle" aria-pressed="false" title="Scroll over a diagram to zoom">Zoom</button>
+        <button type="button" id="presentBtn" aria-pressed="false" title="Present one section at a time ( P )">Present <kbd>P</kbd></button>
+    </div>
+
+    <!-- presentation bar: shown only in presentation mode (P) -->
+    <div class="hud" id="hud" hidden>
+        <button type="button" id="prevSlide" aria-label="Previous section">←</button>
+        <span id="hudLabel">1 / 1</span>
+        <button type="button" id="nextSlide" aria-label="Next section">→</button>
+        <button type="button" id="exitPresent" class="hud-exit">Esc</button>
     </div>
 
     <script src="assets/overview.js"></script>

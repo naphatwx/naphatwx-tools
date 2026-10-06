@@ -51,14 +51,19 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## Hard Rules
 
-1. `overview.html` starts from `template/overview.html`. Its styles and script live in `template/assets/overview.css` and `overview.js`: copy them unchanged, and keep the diagram zoom switch and sidebar search markup. Pages are always dark, in the Tokyo Night Moon palette with bright text (navy base, `#e4eaff` text, blue `#82aaff` accent; the diff marks + ~ − use green, yellow and red): add no light theme, theme toggle or other palette. Diagrams use the same palette and paper (the generate-diagram skill sets it). The script makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the top right resets); the `Zoom` switch in the top bar turns this on or off (off by default). Each diagram has a border, so panned-away space never blends into the page. A `⛶` button after the zoom scale opens that diagram in a lightbox: the page dims behind, the diagram sits in a frame 80% of the window's width and 90% of its height, fitted whole inside it, with its flow name as a caption below, and zoom works there even with the switch off (`✕`, Esc or a backdrop click closes it). The browser remembers each viewer's settings (`localStorage`): zoom, sidebar collapse, and the "Show all diagrams" choice.
+1. `overview.html` starts from `template/overview.html`. Its styles and script live in `template/assets/overview.css` and `overview.js`: copy them unchanged, and keep the rail, its search, the rail edge button, the floating tools and the presentation bar markup. Pages are always dark, in the Quiet Sheet palette (near-black `#121316` base, `#ececef` text, one blue `#8ab0ff` accent; green, amber and red only mark the diffs + ~ −): add no light theme, theme toggle or other palette. Diagrams use the same palette and paper (the generate-diagram skill sets it).
+    - Rail: always open on the left, numbered `01`–`08`, with flows, changed tables and changed APIs nested as `3.N` / `4.N` / `5.N`. The round edge button or `[` hides it; `/` focuses its search.
+    - Floating tools (bottom right): `Open all` shows every flow view stacked; `Zoom` makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the top right resets; off by default); `Present` (or `P`) starts presentation mode.
+    - Each diagram has a border and a `⛶` button at its top right that opens it in a lightbox: the page dims behind, the diagram sits in a frame 80% of the window's width and 90% of its height, fitted whole inside it, with its flow name and view as a caption below. Zoom works there even with the switch off (`✕`, Esc or a backdrop click closes it).
+    - Presentation mode shows one step per screen with a `← N / M · label →` bar: each flow gives one step per view, the API section an intro step plus one per `.api[data-part]`, every other `.slide` one step. A long step scrolls down; nothing scrolls sideways. `←` / `→` / Space step, Esc leaves. Full schema and full contracts stay out of it.
+    - The browser remembers each viewer's settings (`localStorage`): rail collapse, zoom and Open all.
 2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
-3. Both diagrams sit in the flow's own `<h3 id="flow-NN">` block, each inside a closed `<details class="diagram-toggle">` (no `open` attribute: hidden by default). The flow's rules sit in a closed `<details class="rules-toggle">` too.
+3. Each flow is one `<section class="slide flow" id="flow-NN" data-title="Flow 3.N · <name>">` with three view buttons (`role="tab"`: Flowchart, Sequence, Rules) and their three panels, all closed by default (`aria-selected="false"`, every `.panel` `hidden`). A click opens one panel at a time; a second click closes it.
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
     - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`.
     - Step details never sit inside a diagram: they go on the page right after the `.seq` box (manual: `render.js` adds them).
-4. Every sidebar `nav-link` `href="#id"` (sub-links included) matches a real `id` on the page.
+4. Every rail link `href="#id"` (`.rail-list a`, nested ones included) matches a real `id` on the page, and every `.slide` has a `data-title` (presentation mode labels its steps with it).
 5. Every link into `mock/` opens in a new tab: `target="_blank" rel="noopener"`.
 6. No external scripts, styles or fonts in `overview.html`. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
@@ -85,7 +90,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Mode: the `diagram-design` skill is available (`diagram-design:diagram-design` in Claude Code; any agent: listed in its skills) → diagram-design; otherwise manual. Pass it to every `generate-diagram` run.
 - Copy `template/overview.html` → `<output>/overview.html` and `template/assets/` → `<output>/assets/`. The template's `flowchart/`, `sequence-diagram/`, `database/` and `mock/` files exist only to preview it; don't copy them — `generate-diagram` and `generate-mock-ui` write the real ones.
-- The template shows the same example flow twice: flow 01 in manual mode (`<img>` + `render.js`), flow 02 in diagram-design mode (`<iframe class="diagram-frame">`, files drawn by the diagram-design skill). Copy the block of the chosen mode as the flow block, then delete flow 02 and its nav link from the output.
+- The template shows the same example flow twice: flow 01 in manual mode (`<img>` + `render.js`), flow 02 in diagram-design mode (`<iframe class="diagram-frame">`, files drawn by the diagram-design skill). Copy the block of the chosen mode as the flow block, then delete flow 02 and its rail link from the output.
 - diagram-design mode: remove the `render.js` `<script>` lines and `SeqDiagrams.renderAll()` from the output `overview.html`.
 
 ### 3. Fan out section agents
@@ -111,61 +116,59 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 4. Fill in `overview.html`
 
 - Merge the sub-agent fragments from `.parts/` into their sections, add their open questions to Open questions, then delete `.parts/`.
-- Replace the title, brand and eyebrow (spec number, ticket, status).
-- Sections, in order. Always keep every section and its nav link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
-    1. **Overview**: a one-sentence lead + a `<dl class="summary">` of 3–4 key facts (key decision, data impact, UI impact, eligibility/scale), each `<dd>` one short line.
-    2. **Scope**: `<h3>In scope</h3>` and `<h3>Out of scope</h3>`, each a bullet list. Each out-of-scope item ends with its reason in `<span class="faint">— why</span>`.
-    3. **Flows**: one block per flow (copy the block between the `one block per flow` comments):
-        - `<h3 id="flow-NN">` with its tags on the same line: `<span class="meta">` after the name (user story, requirement ids joined by ` · `; no file names). Then a list: `What:` and `Trigger:` bullets.
-        - Flowchart in a closed `<details class="diagram-toggle">`, summary `Flowchart · flow logic`:
-            - `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
-        - Sequence diagram in a second closed `<details class="diagram-toggle">`, summary `Sequence diagram · how the services talk`:
-            - Manual: `<div class="seq" data-flow="NN-<slug>"></div>`.
-            - diagram-design: `<div class="seq">` + the returned `<iframe class="diagram-frame">`, then the returned `<div class="seq-steps">` right after the `.seq` box, not inside it.
-        - The top bar's "Show all diagrams" button opens and closes every diagram toggle; keep it.
-        - Rules in a third closed `<details class="rules-toggle">`, summary `Rules · what this flow must keep`: 3–5 bullets from the spec. Not opened by "Show all diagrams".
-        - One `<p class="try">` line of mock links (`Try in the mock: Happy path ↗ · Empty ↗`) — only if a mock exists or will be built; each opens in a new tab.
-    4. **Database changes**: the ER diagram button, the changes, then the full schema hidden in a closed `<details class="full-toggle">` (copy the Database block).
-        - **Intro list** (copy the Database block): `Migration:`, `Changed tables:`, and `Not touched on purpose:` with one sublist item per table. Name indexes and constraints here too.
-        - **Open ER diagram ↗** button, inside the `<h2 id="database">` right after its text: `<a class="diagram-all" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one button per page (`Open ER diagram · catalog ↗`). No related table → no page and no button.
-        - **Changes** (always visible): one `.erd` card per table whose schema changes, each with `id="db-<table>"` for its sidebar sub-link:
-            - `.erd-table.write` + tag `new table` for a new table (all its columns); `.erd-table` + tag `altered` for an existing table (only the changed columns).
-            - Changed rows: `.erd-row.add` (`+ add`), `.erd-row.change` (`~ type` / `~ null`) (show `old → new` in the type), `.erd-row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the intro list.
-            - `.erd-rel` lines only for new or changed FKs. Name the migration file when the source gives one.
-            - No schema change → one sentence in place of the cards: "This feature has no schema change." Also say "no schema change" in the Overview data-impact line.
-        - **Full schema** (hidden, summary `Full schema · every related table, all columns`): every table the feature reads or writes, with all its columns.
-            - Tags: `new table` / `altered` (changed rows keep their marks), `read` for a table only read or only written to without a schema change, `external` + `.erd-table.external` for a table another service owns.
-            - `.erd-rel` lines for every relation between the listed tables.
+- Replace the `<title>`, the rail brand (`.rail-mark` letter + name) and the kicker (spec number, ticket, status).
+- Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="sec-n">` (`02`–`08`; flows `3.N`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
+    1. **Overview**: the `<h1>`, a one-sentence `.lead` + a `<dl class="facts">` of 3–4 key facts (key decision, data impact, API impact, UI impact or eligibility/scale), each `<dd>` one short line; a fact about data or API ends with a link to its section.
+    2. **Scope**: the two-column `.scope` block, `<h3>In scope</h3>` and `<h3>Out of scope</h3>`, each a bullet list. Each out-of-scope item ends with its reason in `<span class="faint">— why</span>`.
+    3. **Flows**: one muted line naming the three views, then an `ol.flow-index` with one row per flow (`3.N` + name, link to `#flow-NN`, user story and priority on the right). Then one block per flow (copy the block between the `one block per flow` comments):
+        - `<header class="flow-head">`: `<h3>` with `<span class="sec-n">3.N</span>` + the flow name, then `<p class="refs">` with its tags (user story, requirement ids joined by ` · `; no file names).
+        - `<p class="flow-line">`: what the flow achieves in one sentence, then `<span class="faint">Starts from <trigger>.</span>`.
+        - The `.views` button row and three panels, ids `flow-NN-chart`, `flow-NN-seq`, `flow-NN-rules` (buttons `…-tab`, linked by `aria-controls` / `aria-labelledby`):
+            - Flowchart panel (`.panel.wide`): `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
+            - Sequence panel (`.panel.wide`): manual → the `.seq-legend` line + `<div class="seq" data-flow="NN-<slug>"></div>`; diagram-design → `<div class="seq">` + the returned `<iframe class="diagram-frame">`, then the returned `<div class="seq-steps">` right after the `.seq` box, not inside it.
+            - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
+        - One `<p class="try">` line of mock links (`Try in the mock` + `Happy path ↗ · Empty ↗`) — only if a mock exists or will be built; each opens in a new tab.
+    4. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
+        - **ER diagram ↗** link, inside the `<h2 id="database">` right after its text: `<a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one link per page (`ER diagram · catalog ↗`). No related table → no page and no link.
+        - **Facts** (`dl.facts`): `Migration`, `Changed` (each table + `new` / `altered`), `Left alone` (tables read but not changed, each with why). Name indexes and constraints here too.
+        - **Changes** (always visible): the `+ add ~ change − drop` legend, then one `.tbl` card per table whose schema changes inside a `.tables` grid, each with `id="db-<table>"` for its rail sub-link:
+            - `.tbl.new` + tag `new table` for a new table (all its columns); `.tbl` + tag `altered` for an existing table (only the changed columns).
+            - Each column is a `.row` with `.col`, `.type`, `.key`. Changed rows: `.row.add` (`+ add`), `.row.change` (`~ type` / `~ null`) (show `old → new` in the type), `.row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the facts.
+            - `<p class="rel">` lines only for new or changed FKs (`table_a.id` `1 ── *` `table_b.table_a_id`).
+            - No schema change → one sentence in place of the cards: "This feature has no schema change." Also say "no schema change" in the Overview data-impact fact.
+        - **Full schema** (hidden, summary `Full schema` + `<span class="faint">every related table, all columns</span>`): every table the feature reads or writes, with all its columns.
+            - Tags: `new table` / `altered` (changed rows keep their marks), `read` for a table only read or only written to without a schema change, `external` + `.tbl.ext` for a table another service owns.
+            - `.rel` lines for every relation between the listed tables.
         - No related table at all → keep the section with one sentence: "This feature has no database changes."
-    5. **API changes**: one block per API with its request and response changes, then the full contracts hidden in a closed `<details class="full-toggle">` (copy the API block).
+    5. **API changes**: the facts, one block per changed API, then the full contracts hidden in a closed `<details class="more">` (copy the API block).
         - Source: the proto / OpenAPI / DTO diff in the spec's contracts.
-        - **Intro list** (copy the API block), one bold-labelled bullet each; leave out a bullet with nothing to say:
-            - `Summary:` count of new / changed RPCs and the service.
-            - `Files:` sublist, one file per item with its change count (`+4 RPCs, +8 messages`) or `new file`.
-            - `Compatibility:` wire-compatible or not.
-            - `Unchanged:` existing messages that gain no field, as a sublist when there are several.
-            - `Permissions:` new permissions, seeds, permission-map entries, snapshots to update.
-            - Other notes (an RPC kept as-is, where it appears): one bullet each.
-        - **One block per changed API** (always visible):
-            - `<h3 id="api-<kebab-name>"><code>RpcName</code> <span class="meta">…</span></h3>`, the meta on the heading's line, not a line below: `new` (as `<span class="new">`) / `changed` / `behaviour change`, route, permission (`none · system caller` when it has none), joined by ` · `.
-            - An `.erd` with two cards headed by the message name alone: the request message first, then the response message. New message → `.erd-table.write` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add (`.erd-row.add`), `~ N` change (`.erd-row.change`, type `old → new`), `− N` remove (`.erd-row.drop`). No field change → tag `unchanged` and one `.erd-row.none` "No field change."
-            - A rule change without a contract change → `behaviour change` in the meta line, both cards `unchanged`.
-            - Any runtime rule change (with or without a contract change) → a closed `<details class="rules-toggle">` under the cards, summary `Behaviour · what changes at runtime`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain `Behaviour:` paragraph.
-        - **Shared types** (`<h3 id="api-shared-types">`): new or changed enums and nested messages used by more than one API. Leave the subsection out when there are none.
+        - **Facts** (`dl.facts`), leave out a fact with nothing to say:
+            - `Summary`: count of new / changed RPCs and the service.
+            - `Files`: one file per line with its change count (`+4 RPCs, +8 messages`) or `new file`.
+            - `Compatibility`: wire-compatible or not.
+            - `Unchanged`: existing messages that gain no field.
+            - `Permissions`: new permissions, seeds, permission-map entries, snapshots to update.
+            - Other notes (an RPC kept as-is, where it appears): one fact each.
+        - **One block per changed API** (always visible): `<div class="api" id="api-<kebab-name>" data-part="<RpcName>">` — each is one presentation step:
+            - `<h3><code>RpcName</code> <span class="pill">new</span></h3>` (`<span class="pill quiet">` for `changed` / `behaviour`), then `<p class="refs">` with the route and permission (`none · system caller` when it has none), joined by ` · `.
+            - A `.tables` grid with two cards headed by the message name alone: the request message first, then the response message. New message → `.tbl.new` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add (`.row.add`), `~ N` change (`.row.change`, type `old → new`), `− N` remove (`.row.drop`). No field change → leave the cards out and end the refs line with `no field change`.
+            - A rule change without a contract change → `behaviour` pill, no cards.
+            - Any runtime rule change (with or without a contract change) → a closed `<details class="more">` under the cards, summary `Behaviour` + `<span class="faint">what changes at runtime</span>`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain paragraph.
+        - **Shared types** (`<div class="api" id="api-shared-types" data-part="Shared types">` + `<h3>Shared types</h3>`): new or changed enums and nested messages used by more than one API. Leave the block out when there are none.
         - When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
-        - **Full contracts** (hidden, summary `Full contracts · every related API, full request and response`): every API the feature adds, changes or calls.
-            - `<h4>` per API (name · route · `new` / `changed` / `called, unchanged`), then full Request and Response cards with every field in field-number order. Changed fields keep their marks.
-            - An API another service owns → `.erd-table.external`.
+        - **Full contracts** (hidden, summary `Full contracts` + `<span class="faint">every related API, full request and response</span>`): every API the feature adds, changes or calls.
+            - `<h4>` per API (name · route · `new` / `changed` / `called, unchanged`), then full request and response cards with every field in field-number order. Changed fields keep their marks.
+            - An API another service owns → `.tbl.ext`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
-    6. **Errors**: cause → code → user-facing text. No new errors → one sentence saying so.
-    7. **Mock UI**: one text link into `mock/index.html` (new tab). No mock → replace with one line saying the feature has no UI.
-    8. **Open questions**: a `<strong class="blocker">Blocker:</strong>` line per blocker, then a numbered list. None → one sentence saying there are no open questions.
+    6. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
+    7. **Mock UI**: one muted line, then one `.side-link` into `mock/index.html` (new tab). No mock → replace with one line saying the feature has no UI.
+    8. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker, then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
-- Rewrite the sidebar nav to match: one link per flow under "Flows".
-- Database changes and API changes are `.nav-tree` accordions (copy them from the template), closed by default (`hidden` children, `.nav-parent` with `aria-expanded="false"`). Clicking the parent link jumps to its section and toggles its sub-links; clicking any other link closes every section it is not in:
-    - Database changes: one sub-link per changed table card (`#db-<table>`, text = table name).
-    - API changes: one sub-link per changed API (`#api-<kebab-name>`, text = RPC name), plus `Shared types` when that subsection exists.
-    - No sub-items (no changes) → a plain `nav-link`, no `.nav-tree`.
+- Rewrite the rail to match, one `<li>` per section in page order, numbers matching each `.sec-n`:
+    - Flows: one nested link per flow (`#flow-NN`, `3.N` + flow name).
+    - Database: one nested link per changed table card (`#db-<table>`, `4.N` + table name).
+    - API: one nested link per changed API (`#api-<kebab-name>`, `5.N` + RPC name), plus `Shared types` when that block exists.
+    - No nested items (no changes) → the section link alone, no nested `<ol>`.
 
 ### 5. Offer the mock
 
@@ -175,14 +178,15 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 6. Verify
 
-- Every `nav-link` hash, sub-links included, matches an id on the page; every `.nav-tree` is closed by default; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
-- Every flow has both a flowchart and a sequence diagram file, and every `.diagram-toggle`, `.rules-toggle` and `.full-toggle` is closed by default.
+- Every rail link hash, nested ones included, matches an id on the page; every `.slide` has a `data-title`; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
+- Every flow has both a flowchart and a sequence diagram file; every view button has `aria-selected="false"`, every `.panel` is `hidden` and every `details.more` is closed by default.
 - Every flowchart decision, call, write and error node shows a real value from the brief (or `TBD`); no sequence note or `alt` says only `guards` / `checks`.
 - Database "Full schema" lists every table in the sequence diagrams; API "Full contracts" lists every API in them.
 - Every table in the Full schema appears on an ER diagram page, and every ER button points to a page that exists.
 - `.parts/` is deleted.
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
-- Open `overview.html` in a headless browser when one is available, and open every toggle ("Show all diagrams"), then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
+- Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
+- Presentation mode, in the same browser at 1440×900 and 1024×768: press `P` and step through every step; on each, the page is no wider than the window (`document.documentElement.scrollWidth <= innerWidth`) and the step's diagram or tables show whole across.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 7. Confirm

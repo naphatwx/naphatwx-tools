@@ -9,10 +9,12 @@ A flowchart shows one flow's logic: its steps, yes / no decisions, loops and end
 
 | Shape | Use for | Manual SVG |
 |-------|---------|------------|
-| Pill | Start, end, exit | gold `#ffc777` rounded `rect` |
-| Box | A step the user or system does | navy `#3e68d7` `rect` |
-| Diamond | A yes / no question | red `#914c54` `polygon` |
-| Arrow | Next step, loop back (retry, reset) | grey `#636da6` path with arrowhead |
+| Pill | Start, end, exit | outlined `rect rx="25"`: fill `#121316`, stroke `#4a4d55` |
+| Box | A step the user or system does | filled `rect rx="8"`: fill `#24262c`, stroke `#363940` |
+| Diamond | A yes / no question | accent `polygon`: fill `#1b2232`, stroke `#8ab0ff` |
+| Arrow | Next step, loop back (retry, reset) | grey `#6b6e78` path with arrowhead |
+
+- Shape carries the meaning; the diamond's blue is the only colour. Label text is `#ececef`, detail lines `#b9bbc2`, exit labels `#8d909a`.
 
 - Every diamond has exactly two labelled exits (`Yes` / `No`, or two short outcomes). Every path ends at a pill or loops back to an earlier node.
 - Node text is two lines: a short phrase (≤ 4 words; a question ends with `?`), then a **detail line** with the real value (below).
