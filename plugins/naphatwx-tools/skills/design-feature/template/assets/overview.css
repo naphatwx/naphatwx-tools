@@ -239,17 +239,16 @@ html {
     transition: background 0.12s, color 0.12s;
 }
 
+/* hover stays faint so it never matches the active fill */
 .nav-link:hover {
-    background: var(--card-hover);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text);
 }
 
-/* the inset bar sets active apart from hover, which has a near-identical fill */
 .nav-link.active {
-    background: var(--accent-soft);
+    background: rgba(255, 255, 255, 0.14);
     color: var(--accent);
-    font-weight: 500;
-    box-shadow: inset 2px 0 0 var(--accent);
+    font-weight: 600;
 }
 
 .nav-link.hidden {
