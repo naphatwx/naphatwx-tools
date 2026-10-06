@@ -86,8 +86,8 @@
                 <div>
                     <h3>Out of scope</h3>
                     <ul>
-                        <li>Bulk import <span class="faint">— needs a queue, next quarter</span></li>
-                        <li>Editing a thing's owner <span class="faint">— separate ticket</span></li>
+                        <li>Bulk import <span class="aside">— needs a queue, next quarter</span></li>
+                        <li>Editing a thing's owner <span class="aside">— separate ticket</span></li>
                     </ul>
                 </div>
             </div>
@@ -98,8 +98,8 @@
             <h2><span class="sec-n">03</span>Flows</h2>
             <p class="muted">Each flow has three views, closed until you open one: <strong>Flowchart</strong> is the logic, <strong>Sequence</strong> is how the services talk, <strong>Rules</strong> is what the build must keep.</p>
             <ol class="flow-index">
-                <li><a href="#flow-01"><span class="n">3.1</span>Example flow</a><span class="faint">US1 · P1</span></li>
-                <li><a href="#flow-02"><span class="n">3.2</span>Example flow · diagram-design</a><span class="faint">US1 · P1</span></li>
+                <li><a href="#flow-01"><span class="n">3.1</span>Example flow</a><span class="aside">US1 · P1</span></li>
+                <li><a href="#flow-02"><span class="n">3.2</span>Example flow · diagram-design</a><span class="aside">US1 · P1</span></li>
             </ol>
         </section>
 
@@ -111,7 +111,8 @@
                 <h3><span class="sec-n">3.1</span>Example flow</h3>
                 <p class="refs">US1 · P1 · FR-001 · FR-002</p>
             </header>
-            <p class="flow-line">Save a new thing. <span class="faint">Starts from Things page → New.</span></p>
+            <p class="flow-line">Save a new thing. <span class="aside">Starts from Things page → New.</span></p>
+            <p class="try"><span class="aside">Try in the mock</span> <a href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener">Happy path ↗</a></p>
             <div class="views" role="tablist" aria-label="Flow 3.1 views">
                 <button role="tab" aria-selected="false" aria-controls="flow-01-chart" id="flow-01-chart-tab">Flowchart</button>
                 <button role="tab" aria-selected="false" aria-controls="flow-01-seq" id="flow-01-seq-tab">Sequence</button>
@@ -130,7 +131,6 @@
                     <li>Only users with <code>thing.edit</code> see the "New" button.</li>
                 </ul>
             </div>
-            <p class="try"><span class="faint">Try in the mock</span> <a href="mock/page/example.html?scenario=normal" target="_blank" rel="noopener">Happy path ↗</a></p>
         </section>
         <!-- ===== end flow block ===== -->
 
@@ -140,7 +140,7 @@
                 <h3><span class="sec-n">3.2</span>Example flow · diagram-design</h3>
                 <p class="refs">US1 · P1 · FR-001 · FR-002</p>
             </header>
-            <p class="flow-line">The same flow as 3.1, drawn by diagram-design. <span class="faint">Starts from Things page → New.</span></p>
+            <p class="flow-line">The same flow as 3.1, drawn by diagram-design. <span class="aside">Starts from Things page → New.</span></p>
             <div class="views" role="tablist" aria-label="Flow 3.2 views">
                 <button role="tab" aria-selected="false" aria-controls="flow-02-chart" id="flow-02-chart-tab">Flowchart</button>
                 <button role="tab" aria-selected="false" aria-controls="flow-02-seq" id="flow-02-seq-tab">Sequence</button>
@@ -176,7 +176,7 @@
                 <dt>Changed</dt>
                 <dd><code>schema.table_b</code> new · <code>schema.table_a</code> altered</dd>
                 <dt>Left alone</dt>
-                <dd><code>schema.table_c</code> <span class="faint">— read only</span></dd>
+                <dd><code>schema.table_c</code> <span class="aside">— read only</span></dd>
             </dl>
             <p class="legend"><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
             <div class="tables">
@@ -194,9 +194,9 @@
                     <div class="row add"><span class="col">new_column</span><span class="type">index</span><span class="key">+ add</span></div>
                 </div>
             </div>
-            <p class="rel"><code>schema.table_a.id</code> <span class="card-n">1 ── *</span> <code>schema.table_b.table_a_id</code> <span class="faint">new FK</span></p>
+            <p class="rel"><code>schema.table_a.id</code> <span class="card-n">1 ── *</span> <code>schema.table_b.table_a_id</code> <span class="aside">new FK</span></p>
             <details class="more">
-                <summary>Full schema <span class="faint">every related table, all columns</span></summary>
+                <summary>Full schema <span class="aside">every related table, all columns</span></summary>
                 <div class="tables">
                     <div class="tbl new">
                         <div class="tbl-head"><span>schema.table_b</span><span class="tag">new table</span></div>
@@ -237,7 +237,7 @@
                 <dt>Summary</dt>
                 <dd>1 new RPC, 1 behaviour change on <code>ThingService</code></dd>
                 <dt>Files</dt>
-                <dd><code>path/to/service.proto</code> <span class="faint">+1 RPC, +1 message</span><br><code>path/to/source.proto</code> <span class="faint">new file</span></dd>
+                <dd><code>path/to/service.proto</code> <span class="aside">+1 RPC, +1 message</span><br><code>path/to/source.proto</code> <span class="aside">new file</span></dd>
                 <dt>Compatibility</dt>
                 <dd>Additive, wire-compatible.</dd>
                 <dt>Permissions</dt>
@@ -268,7 +268,7 @@
                 <h3><code>GetThings</code> <span class="pill quiet">behaviour</span></h3>
                 <p class="refs">GET /api/v1/things · permission things.read · no field change</p>
                 <details class="more">
-                    <summary>Behaviour <span class="faint">what changes at runtime</span></summary>
+                    <summary>Behaviour <span class="aside">what changes at runtime</span></summary>
                     <ul>
                         <li>Honours the new <code>source</code> filter; empty means no filter.</li>
                     </ul>
@@ -289,8 +289,8 @@
             </div>
 
             <details class="more">
-                <summary>Full contracts <span class="faint">every related API, full request and response</span></summary>
-                <h4><code>CreateThing</code> <span class="faint">POST /api/v1/things · new</span></h4>
+                <summary>Full contracts <span class="aside">every related API, full request and response</span></summary>
+                <h4><code>CreateThing</code> <span class="aside">POST /api/v1/things · new</span></h4>
                 <div class="tables">
                     <div class="tbl new">
                         <div class="tbl-head"><span>CreateThingRequest</span><span class="tag">new message</span></div>
@@ -307,7 +307,7 @@
                         <div class="row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
                     </div>
                 </div>
-                <h4><code>GetOwner</code> <span class="faint">GET /api/v1/owners/{id} · called, unchanged</span></h4>
+                <h4><code>GetOwner</code> <span class="aside">GET /api/v1/owners/{id} · called, unchanged</span></h4>
                 <div class="tables">
                     <div class="tbl ext">
                         <div class="tbl-head"><span>GetOwnerRequest</span><span class="tag">unchanged</span></div>

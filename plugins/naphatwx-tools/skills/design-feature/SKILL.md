@@ -119,15 +119,15 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Replace the `<title>`, the rail brand (`.rail-mark` letter + name) and the kicker (spec number, ticket, status).
 - Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="sec-n">` (`02`–`08`; flows `3.N`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
     1. **Overview**: the `<h1>`, a one-sentence `.lead` + a `<dl class="facts">` of 3–4 key facts (key decision, data impact, API impact, UI impact or eligibility/scale), each `<dd>` one short line; a fact about data or API ends with a link to its section.
-    2. **Scope**: the two-column `.scope` block, `<h3>In scope</h3>` and `<h3>Out of scope</h3>`, each a bullet list. Each out-of-scope item ends with its reason in `<span class="faint">— why</span>`.
+    2. **Scope**: the two-column `.scope` block, `<h3>In scope</h3>` and `<h3>Out of scope</h3>`, each a bullet list. Each out-of-scope item ends with its reason in `<span class="aside">— why</span>`.
     3. **Flows**: one muted line naming the three views, then an `ol.flow-index` with one row per flow (`3.N` + name, link to `#flow-NN`, user story and priority on the right). Then one block per flow (copy the block between the `one block per flow` comments):
         - `<header class="flow-head">`: `<h3>` with `<span class="sec-n">3.N</span>` + the flow name, then `<p class="refs">` with its tags (user story, requirement ids joined by ` · `; no file names).
-        - `<p class="flow-line">`: what the flow achieves in one sentence, then `<span class="faint">Starts from <trigger>.</span>`.
+        - `<p class="flow-line">`: what the flow achieves in one sentence, then `<span class="aside">Starts from <trigger>.</span>`.
+        - One `<p class="try">` line of mock links (`Try in the mock` + `Happy path ↗ · Empty ↗`) right under the flow line, above the `.views` row — only if a mock exists or will be built; each opens in a new tab.
         - The `.views` button row and three panels, ids `flow-NN-chart`, `flow-NN-seq`, `flow-NN-rules` (buttons `…-tab`, linked by `aria-controls` / `aria-labelledby`):
             - Flowchart panel (`.panel.wide`): `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
             - Sequence panel (`.panel.wide`): manual → the `.seq-legend` line + `<div class="seq" data-flow="NN-<slug>"></div>`; diagram-design → `<div class="seq">` + the returned `<iframe class="diagram-frame">`, then the returned `<div class="seq-steps">` right after the `.seq` box, not inside it.
             - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
-        - One `<p class="try">` line of mock links (`Try in the mock` + `Happy path ↗ · Empty ↗`) — only if a mock exists or will be built; each opens in a new tab.
     4. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
         - **ER diagram ↗** link, inside the `<h2 id="database">` right after its text: `<a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one link per page (`ER diagram · catalog ↗`). No related table → no page and no link.
         - **Facts** (`dl.facts`): `Migration`, `Changed` (each table + `new` / `altered`), `Left alone` (tables read but not changed, each with why). Name indexes and constraints here too.
@@ -136,7 +136,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Each column is a `.row` with `.col`, `.type`, `.key`. Changed rows: `.row.add` (`+ add`), `.row.change` (`~ type` / `~ null`) (show `old → new` in the type), `.row.drop` (`− drop`). Indexes and constraints count as changes: show them as a row on the column they cover (type `unique index`, `index`) and name them in the facts.
             - `<p class="rel">` lines only for new or changed FKs (`table_a.id` `1 ── *` `table_b.table_a_id`).
             - No schema change → one sentence in place of the cards: "This feature has no schema change." Also say "no schema change" in the Overview data-impact fact.
-        - **Full schema** (hidden, summary `Full schema` + `<span class="faint">every related table, all columns</span>`): every table the feature reads or writes, with all its columns.
+        - **Full schema** (hidden, summary `Full schema` + `<span class="aside">every related table, all columns</span>`): every table the feature reads or writes, with all its columns.
             - Tags: `new table` / `altered` (changed rows keep their marks), `read` for a table only read or only written to without a schema change, `external` + `.tbl.ext` for a table another service owns.
             - `.rel` lines for every relation between the listed tables.
         - No related table at all → keep the section with one sentence: "This feature has no database changes."
@@ -153,10 +153,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - `<h3><code>RpcName</code> <span class="pill">new</span></h3>` (`<span class="pill quiet">` for `changed` / `behaviour`), then `<p class="refs">` with the route and permission (`none · system caller` when it has none), joined by ` · `.
             - A `.tables` grid with two cards headed by the message name alone: the request message first, then the response message. New message → `.tbl.new` + tag `new message`, every field with its number. Existing message → tag `altered`, only the changed fields: `+ N` add (`.row.add`), `~ N` change (`.row.change`, type `old → new`), `− N` remove (`.row.drop`). No field change → leave the cards out and end the refs line with `no field change`.
             - A rule change without a contract change → `behaviour` pill, no cards.
-            - Any runtime rule change (with or without a contract change) → a closed `<details class="more">` under the cards, summary `Behaviour` + `<span class="faint">what changes at runtime</span>`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain paragraph.
+            - Any runtime rule change (with or without a contract change) → a closed `<details class="more">` under the cards, summary `Behaviour` + `<span class="aside">what changes at runtime</span>`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain paragraph.
         - **Shared types** (`<div class="api" id="api-shared-types" data-part="Shared types">` + `<h3>Shared types</h3>`): new or changed enums and nested messages used by more than one API. Leave the block out when there are none.
         - When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
-        - **Full contracts** (hidden, summary `Full contracts` + `<span class="faint">every related API, full request and response</span>`): every API the feature adds, changes or calls.
+        - **Full contracts** (hidden, summary `Full contracts` + `<span class="aside">every related API, full request and response</span>`): every API the feature adds, changes or calls.
             - `<h4>` per API (name · route · `new` / `changed` / `called, unchanged`), then full request and response cards with every field in field-number order. Changed fields keep their marks.
             - An API another service owns → `.tbl.ext`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
