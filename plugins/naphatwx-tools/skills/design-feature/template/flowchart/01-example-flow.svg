@@ -5,10 +5,10 @@
          Each node: a plain-words line, then a mono line with the real value from the source (permission, RPC, field rule, code, status). -->
     <defs>
         <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#636da6" />
+            <path d="M0,0 L10,5 L0,10 z" fill="#7f89c4" />
         </marker>
     </defs>
-    <g fill="none" stroke="#636da6" stroke-width="2" marker-end="url(#ah)">
+    <g fill="none" stroke="#7f89c4" stroke-width="2" marker-end="url(#ah)">
         <path d="M380,70 V103" />
         <path d="M490,165 H578" />
         <path d="M380,225 V263" />
@@ -17,7 +17,7 @@
         <path d="M660,355 V418" />
         <path d="M120,295 V244 H378" />
     </g>
-    <g fill="#8a92c0" font-size="13" text-anchor="middle">
+    <g fill="#a3abd6" font-size="13" text-anchor="middle">
         <text x="534" y="157">No</text>
         <text x="398" y="250">Yes</text>
         <text x="534" y="317">Yes</text>

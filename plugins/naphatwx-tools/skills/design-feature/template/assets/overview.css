@@ -1,15 +1,15 @@
 /* ============ THEME TOKENS ============ */
 :root {
-    /* Tokyo Night Moon (dark): navy base, blue accent; green / yellow / red mark diffs */
+    /* Tokyo Night Moon (dark), bright text: navy base, blue accent; green / yellow / red mark diffs */
     --bg: #222436;
     --bg-elevated: #2f334d;
     --sidebar-bg: #1e2030;
     --border: #3b4261;
     --border-strong: #444a73;
-    --text: #c8d3f5;
-    --text-body: #b8c0e8;
-    --text-muted: #a5aed8;
-    --text-faint: #8a92c0;
+    --text: #e4eaff;
+    --text-body: #d0d8f8;
+    --text-muted: #bec6ec;
+    --text-faint: #a3abd6;
     --accent: #82aaff;
     --accent-soft: rgba(130, 170, 255, 0.14);
     --code-bg: #2f334d;
