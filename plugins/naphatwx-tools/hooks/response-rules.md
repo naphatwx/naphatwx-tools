@@ -1,10 +1,10 @@
 # Response Rules
 
-These rules apply to every reply and override any output style or other style hook.
+These rules apply to every reply.
 Rule 1 also applies to files you write. Rule 2 is chat only.
 
 - Draft the reply with the active output style first (e.g. Explanatory insights, Learning requests).
-- Then, as the last step, reshape the draft to these rules. Where they conflict, these rules win.
+- Then, as the last step, reshape the draft to these rules.
 
 1. **Answer in lists.**
    - Every answer is bullets or numbered lists — no prose paragraphs.

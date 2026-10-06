@@ -9,7 +9,7 @@ case "${1:-}" in
         cat "$(dirname "$0")/response-rules.md"
         ;;
     prompt)
-        echo 'RESPONSE RULES ACTIVE. They override any output style: draft with the output style, then reshape as the last step: lists only (no prose paragraphs); headers are plain bold lines, never list items; an `&nbsp;` line between every block, never between bullets of one list. Lists also apply to files; the `&nbsp;` rule is chat only.'
+        echo 'RESPONSE RULES ACTIVE. Draft with the output style, then reshape as the last step: lists only (no prose paragraphs); headers are plain bold lines, never list items; an `&nbsp;` line between every block, never between bullets of one list. Lists also apply to files; the `&nbsp;` rule is chat only.'
         ;;
 esac
 exit 0
