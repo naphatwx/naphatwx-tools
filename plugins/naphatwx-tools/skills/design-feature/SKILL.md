@@ -65,7 +65,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Step details never sit inside a diagram: they go on the page right after the `.seq` box (manual: `render.js` adds them).
 4. Every rail link `href="#id"` (`.rail-list a`, nested ones included) matches a real `id` on the page, and every `.slide` has a `data-title` (presentation mode labels its steps with it).
 5. Every link into `mock/` opens in a new tab: `target="_blank" rel="noopener"`.
-6. No external scripts, styles or fonts in `overview.html`. `assets/`, `render.js` and the flow files are local.
+6. No external scripts, styles or fonts in `overview.html` or the diagram files: text uses the OS font. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
 
