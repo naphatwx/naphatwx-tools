@@ -7,17 +7,19 @@
     <title>ER diagram · Feature Name</title>
     <style>
         :root {
-            --bg: #1f232b;
-            --bg-elevated: #2a2f38;
-            --border: #343945;
-            --border-strong: #444b58;
-            --text: #f8f9fb;
-            --text-muted: #b6bcc8;
-            --text-faint: #9ea5b3;
-            --accent: #b097fb;
-            --accent-soft: rgba(176, 151, 251, 0.18);
-            --card-bg: #252a33;
-            --drop: #fb8585;
+            --bg: #222222;
+            --bg-elevated: #2d2d2d;
+            --border: #363636;
+            --border-strong: #454545;
+            --text: #ededed;
+            --text-muted: #b0b0b0;
+            --text-faint: #969696;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.1);
+            --card-bg: #282828;
+            --add: #86c29c;
+            --change: #d4b46e;
+            --drop: #de8f8f;
             color-scheme: dark;
         }
 
@@ -106,7 +108,8 @@
         .r-key { fill: var(--accent); font-size: 10px; font-weight: 700; }
         .r-drop .r-col, .r-drop .r-type { fill: var(--text-faint); text-decoration: line-through; }
         .r-drop .r-key { fill: var(--drop); }
-        .r-add .r-col { fill: var(--accent); }
+        .r-add .r-col, .r-add .r-key { fill: var(--add); }
+        .r-change .r-key { fill: var(--change); }
         .fk { fill: none; stroke: var(--text-faint); stroke-width: 1.4; }
         .fk.new { stroke: var(--accent); stroke-width: 1.8; }
         .fk-card { fill: var(--text-muted); font-size: 10px; font-weight: 700; }

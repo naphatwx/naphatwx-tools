@@ -1,27 +1,27 @@
 /* ============ THEME TOKENS ============ */
 :root {
-    /* slate dark: surfaces sit a little above black, text stays bright */
-    --bg: #1f232b;
-    --bg-elevated: #2a2f38;
-    --sidebar-bg: #1a1d24;
-    --border: #343945;
-    --border-strong: #444b58;
-    --text: #f8f9fb;
-    --text-body: #e2e5eb;
-    --text-muted: #b6bcc8;
-    --text-faint: #9ea5b3;
-    --accent: #b097fb;
-    --accent-soft: rgba(176, 151, 251, 0.18);
-    --code-bg: #2c313c;
-    --card-bg: #252a33;
-    --card-hover: #303641;
-    --selection: rgba(176, 151, 251, 0.35);
-    --scrollbar: #444b58;
-    --scrollbar-hover: #565e6e;
-    /* diff marks: + add / ~ change / − drop */
-    --add: #5ee29a;
-    --change: #fcc94a;
-    --drop: #fb8585;
+    /* graphite mono: neutral grays, hierarchy from lightness alone; hue only marks diffs */
+    --bg: #222222;
+    --bg-elevated: #2d2d2d;
+    --sidebar-bg: #1c1c1c;
+    --border: #363636;
+    --border-strong: #454545;
+    --text: #ededed;
+    --text-body: #d4d4d4;
+    --text-muted: #b0b0b0;
+    --text-faint: #969696;
+    --accent: #ffffff;
+    --accent-soft: rgba(255, 255, 255, 0.1);
+    --code-bg: #303030;
+    --card-bg: #282828;
+    --card-hover: #343434;
+    --selection: rgba(255, 255, 255, 0.22);
+    --scrollbar: #454545;
+    --scrollbar-hover: #585858;
+    /* diff marks: + add / ~ change / − drop — muted, the only hue on the page */
+    --add: #86c29c;
+    --change: #d4b46e;
+    --drop: #de8f8f;
     color-scheme: dark;
 }
 
@@ -454,13 +454,17 @@ html {
     max-width: var(--measure);
 }
 
+/* links are white like the text, so a faint underline marks them */
 .content a {
     color: var(--accent);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.12s;
 }
 
 .content a:hover {
-    text-decoration: underline;
+    text-decoration-color: var(--accent);
 }
 
 .content ul,
@@ -630,7 +634,7 @@ td {
 .meta code { background: none; padding: 0; color: inherit; }
 /* meta sits on the heading's own line, after its name */
 :is(h3, h4) > .meta { font-weight: 400; margin-left: 10px; white-space: normal; }
-.new { color: var(--accent); }
+.new { color: var(--accent); font-weight: 600; }
 .add { color: var(--add); }
 .change { color: var(--change); }
 .drop { color: var(--drop); }
@@ -692,9 +696,9 @@ td {
 
 .flowchart img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
 
-/* iframe of a standalone diagram-design HTML file (default dark theme, paper #2d3142).
+/* iframe of a standalone diagram-design HTML file (graphite paper #222222, matching this page).
    The file posts its real height (its SVG shrinks with the width); the script below applies it. */
-.diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #2d3142; }
+.diagram-frame { display: block; width: 100%; height: 480px; border: 0; border-radius: 8px; background: #222222; }
 /* an iframe brings its own paper: drop the host box around it so there is one frame, not two */
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; background: none; }
 

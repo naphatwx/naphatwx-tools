@@ -34,7 +34,19 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 1. Every name in a diagram (RPC, endpoint, table, column, job, screen) comes from the source. Unknown → write `TBD`. Never invent one.
 2. Write only the output files. Never edit the caller's page (for example design-feature's `overview.html`); give it the embed snippet instead.
 3. Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split into several diagrams and say so. In diagram-design mode its own, tighter budgets win.
-4. Dark theme is the default. Use light only when the user or caller asks for it. In diagram-design mode, dark means the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`), and every diagram uses the shipped default tokens. Skip its first-run style-guide question: the answer is always "proceed with the default".
+4. Dark theme is the default. Use light only when the user or caller asks for it. Dark is graphite monochrome: neutral grays, white as the focal accent, no hue (it matches design-feature's pages). In diagram-design mode, dark means the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) with its dark tokens swapped for the graphite ones below. Skip its first-run style-guide question: the answer is always "proceed with the default", then apply this swap to every color in the saved file.
+
+    | Role | Shipped dark | Graphite |
+    |------|--------------|----------|
+    | `paper` | `#2d3142` | `#222222` |
+    | `paper-2` | `#393e53` | `#2d2d2d` |
+    | tag / phase fill | `#41465b` | `#363636` |
+    | `ink` | `#f5f5f5` | `#ededed` |
+    | `muted` | `#bfc0c0` | `#b0b0b0` |
+    | `soft` | `#8e98ac` | `#969696` |
+    | `accent` | `#f08a59` | `#ffffff` |
+    | `link` | `#6a95d8` | `#d4d4d4` |
+    | `rgba(245,245,245,X)` / `rgba(191,192,192,X)` / `rgba(240,138,89,X)` | — | `rgba(237,237,237,X)` / `rgba(176,176,176,X)` / `rgba(255,255,255,X)` |
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
 6. A diagram file never holds a step details list. The caller's page shows it (see the sequence reference).
 
