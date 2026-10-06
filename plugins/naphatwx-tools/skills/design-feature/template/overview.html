@@ -258,13 +258,13 @@
                 <h3 id="api-create-thing"><code>CreateThing</code> <span class="meta"><span class="new">new</span> · POST /api/v1/things · permission things.create</span></h3>
                 <div class="erd">
                     <div class="erd-table write">
-                        <div class="erd-head">Request · CreateThingRequest <span class="erd-tag">new message</span></div>
+                        <div class="erd-head">CreateThingRequest <span class="erd-tag">new message</span></div>
                         <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
                         <div class="erd-row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
                         <div class="erd-row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
                     </div>
                     <div class="erd-table">
-                        <div class="erd-head">Response · ThingResponse <span class="erd-tag">altered</span></div>
+                        <div class="erd-head">ThingResponse <span class="erd-tag">altered</span></div>
                         <div class="erd-row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
                         <div class="erd-row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
                         <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
@@ -274,11 +274,11 @@
                 <h3 id="api-get-things"><code>GetThings</code> <span class="meta">behaviour change · GET /api/v1/things · permission things.read</span></h3>
                 <div class="erd">
                     <div class="erd-table">
-                        <div class="erd-head">Request · GetThingsRequest <span class="erd-tag">unchanged</span></div>
+                        <div class="erd-head">GetThingsRequest <span class="erd-tag">unchanged</span></div>
                         <div class="erd-row none">No field change.</div>
                     </div>
                     <div class="erd-table">
-                        <div class="erd-head">Response · GetThingsResponse <span class="erd-tag">unchanged</span></div>
+                        <div class="erd-head">GetThingsResponse <span class="erd-tag">unchanged</span></div>
                         <div class="erd-row none">No field change.</div>
                     </div>
                 </div>
@@ -304,13 +304,13 @@
                     <h4><code>CreateThing</code> <span class="faint">· POST /api/v1/things · new</span></h4>
                     <div class="erd">
                         <div class="erd-table write">
-                            <div class="erd-head">Request · CreateThingRequest <span class="erd-tag">new message</span></div>
+                            <div class="erd-head">CreateThingRequest <span class="erd-tag">new message</span></div>
                             <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
                             <div class="erd-row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
                             <div class="erd-row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
                         </div>
                         <div class="erd-table">
-                            <div class="erd-head">Response · ThingResponse <span class="erd-tag">altered</span></div>
+                            <div class="erd-head">ThingResponse <span class="erd-tag">altered</span></div>
                             <div class="erd-row"><span class="col">id</span><span class="type">int64</span><span class="key">1</span></div>
                             <div class="erd-row"><span class="col">name</span><span class="type">string</span><span class="key">2</span></div>
                             <div class="erd-row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
@@ -321,11 +321,11 @@
                     <h4><code>GetOwner</code> <span class="faint">· GET /api/v1/owners/{id} · called, unchanged</span></h4>
                     <div class="erd">
                         <div class="erd-table external">
-                            <div class="erd-head">Request · GetOwnerRequest <span class="erd-tag">unchanged</span></div>
+                            <div class="erd-head">GetOwnerRequest <span class="erd-tag">unchanged</span></div>
                             <div class="erd-row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
                         </div>
                         <div class="erd-table external">
-                            <div class="erd-head">Response · Owner <span class="erd-tag">unchanged</span></div>
+                            <div class="erd-head">Owner <span class="erd-tag">unchanged</span></div>
                             <div class="erd-row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
                             <div class="erd-row"><span class="col">displayName</span><span class="type">string</span><span class="key">2</span></div>
                         </div>

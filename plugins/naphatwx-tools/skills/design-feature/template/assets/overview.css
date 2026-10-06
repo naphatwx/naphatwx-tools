@@ -244,10 +244,12 @@ html {
     color: var(--text);
 }
 
+/* the inset bar sets active apart from hover, which has a near-identical fill */
 .nav-link.active {
     background: var(--accent-soft);
     color: var(--accent);
     font-weight: 500;
+    box-shadow: inset 2px 0 0 var(--accent);
 }
 
 .nav-link.hidden {
@@ -458,7 +460,8 @@ html {
 .content a {
     color: var(--accent);
     text-decoration: underline;
-    text-decoration-color: var(--border-strong);
+    text-decoration-color: var(--text-faint);
+    text-decoration-thickness: 1px;
     text-underline-offset: 3px;
     transition: text-decoration-color 0.12s;
 }
@@ -635,6 +638,8 @@ td {
 /* meta sits on the heading's own line, after its name */
 :is(h3, h4) > .meta { font-weight: 400; margin-left: 10px; white-space: normal; }
 .new { color: var(--accent); font-weight: 600; }
+/* a pill in heading meta, so "new" never reads as plain bold; the legend keeps its ▍ bar */
+.meta .new { padding: 0 5px; border: 1px solid var(--text-muted); border-radius: 4px; }
 .add { color: var(--add); }
 .change { color: var(--change); }
 .drop { color: var(--drop); }
@@ -862,7 +867,7 @@ td {
 }
 
 .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-faint); }
-.seq-legend .hot::before { border-color: var(--accent); }
+.seq-legend .hot::before { border-color: var(--accent); border-top-width: 3px; }
 
 /* ============ DATABASE STRUCTURE (.erd) ============ */
 .erd {
