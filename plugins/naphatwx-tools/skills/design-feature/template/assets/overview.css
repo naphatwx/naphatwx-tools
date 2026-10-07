@@ -24,7 +24,7 @@
     --fs-h1: 2.75rem;
     --measure: 72ch;
     --wide: 1120px;
-    --rail-w: 280px;
+    --rail-w: 320px;
     --ease: cubic-bezier(0.2, 0, 0, 1);
     --sans: -apple-system, "Segoe UI", system-ui, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -83,14 +83,14 @@ strong { color: var(--text); font-weight: 600; }
 .rail-list, .rail-list ol { list-style: none; padding: 0; }
 .rail-list li { margin: 0; }
 .rail-list a {
-    display: flex; align-items: baseline; gap: 14px;
-    padding: 6px 16px 6px 20px;
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 9px 16px 9px 20px;
     color: var(--text-2); font-size: var(--fs-body); line-height: 1.4;
     text-decoration: none;
 }
 .rail-list a:hover { color: var(--text); background: var(--surface-2); }
-.rail-list .n { flex: none; color: var(--text-3); width: 24px; font: 500 var(--fs-code)/1.4 var(--mono); font-variant-numeric: tabular-nums; }
-.rail-list ol a { padding-top: 4px; padding-bottom: 4px; padding-left: 40px; }
+.rail-list .n { flex: none; color: var(--text-3); width: 24px; font-variant-numeric: tabular-nums; }
+.rail-list ol a { padding-top: 7px; padding-bottom: 7px; padding-left: 40px; }
 .rail-list a.active { color: var(--accent); background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); font-weight: 600; }
 .rail-list a.active .n { color: var(--accent); }
 .rail-list a.hidden { display: none; }
@@ -128,8 +128,8 @@ h1 { font-size: var(--fs-h1); line-height: 1.08; letter-spacing: -0.025em; color
 h2 { font-size: var(--fs-h2); line-height: 1.2; letter-spacing: -0.015em; color: var(--text); font-weight: 600; margin-bottom: 20px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 14px; }
 h3 { font-size: var(--fs-h3); line-height: 1.3; color: var(--text); font-weight: 600; }
 h4 { font-size: var(--fs-body); color: var(--text); font-weight: 600; margin: 28px 0 10px; }
-.sec-n { font: 500 0.55em/1 var(--mono); color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; position: relative; top: -0.2em; }
-h3 .sec-n { font-size: 0.7em; margin-right: 10px; }
+.sec-n { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
+h3 .sec-n { margin-right: 10px; }
 .lead { font-size: var(--fs-lead); line-height: 1.5; color: var(--text); margin-top: 16px; max-width: 52ch; }
 p + p { margin-top: 12px; }
 ul, ol { padding-left: 1.2em; }
@@ -141,7 +141,7 @@ li::marker { color: var(--text-3); }
 .facts dd { color: var(--text); }
 h2 + .facts { margin-top: 0; }
 
-.scope { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.scope { display: grid; gap: 28px; }
 .scope h3 { font-size: var(--fs-body); color: var(--text-3); font-weight: 500; margin-bottom: 10px; }
 .scope ul { color: var(--text); }
 
@@ -155,9 +155,9 @@ h2 + .facts { margin-top: 0; }
 .flow-index li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); margin: 0; }
 .flow-index a { color: var(--text); }
 .flow-index .aside { color: var(--text-3); font-size: var(--fs-body); }
-.flow-index .n { font: 500 var(--fs-code) var(--mono); color: var(--text-3); margin-right: 14px; }
+.flow-index .n { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
 
-.flow-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap; }
+.flow-head { display: flex; flex-direction: column; gap: 8px; }
 .refs { font: var(--fs-code)/1.6 var(--mono); color: var(--text-3); }
 .flow-line { margin-top: 8px; color: var(--text); }
 .flow-line .aside { margin-left: 4px; }
@@ -411,7 +411,6 @@ html[data-present="on"] .slide > .api { margin-top: 8px; }
     .wide { width: 100%; margin-left: 0; transform: none; }
     .panel.wide.entering { animation-name: panel-in-narrow; }
     .menu { display: grid; }
-    .scope { grid-template-columns: 1fr; gap: 24px; }
     .facts { grid-template-columns: 1fr; gap: 2px; }
     .facts dd { margin-bottom: 12px; }
     :root { --fs-h1: 2.1rem; --fs-h2: 1.5rem; }
