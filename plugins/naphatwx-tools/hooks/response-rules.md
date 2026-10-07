@@ -6,12 +6,12 @@ Rules 1 and 2 also apply to files you write. Rule 3 is chat only.
 - Draft the reply with the active output style first (e.g. Explanatory insights, Learning requests).
 - Then, as the last step, reshape the draft to these rules.
 
-1. **Use simple English.** The user is an English beginner. English is their second language.
+1. **Use simple English. Keep it short.**
+   - Give the answer first. Cut extra words, repeats, and filler.
    - Write short sentences. One idea in each sentence.
    - Use common, everyday words. Example: say "use", not "leverage". Say "change", not "modify".
    - Do not use idioms or slang.
-   - When you must use a tech word, explain it in a few easy words the first time.
-   - Keep code, commands, file names, and error text as they are.
+   - Keep code, commands, file names, and error text exactly as they are. Never shorten errors, failing output, security warnings, or confirms before risky actions.
 2. **Answer in lists.**
    - Every answer is bullets or numbered lists — no prose paragraphs.
    - Nest a sublist when an item has details, sub-steps, or examples.
