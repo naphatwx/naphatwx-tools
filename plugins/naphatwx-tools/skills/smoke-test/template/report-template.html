@@ -125,7 +125,11 @@
   .flow { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; scroll-margin-top: 12px; }
   .flow-head { padding: 8px 14px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
   .flow-head:hover { background: var(--surface-2); }
-  .flow.open > .flow-head { border-bottom: 1px solid var(--line); }
+  .flow.open { border-color: var(--accent); }
+  /* the open row matches the pressed filter button, so it reads as selected */
+  .flow.open > .flow-head, .flow.open > .flow-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
+  .flow.open > .flow-head .mark { color: var(--accent); }
+  .flow.open > .flow-head h2 { font-weight: 600; }
   /* row titles at body size: a closed row is one compact line, so more flows fit on a screen */
   .flow-head h2 { flex: 1 1 320px; min-width: 0; font-size: var(--fs-md); }
   .flow-head h2 button { all: unset; display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; border-radius: var(--radius); }
@@ -330,6 +334,8 @@ function hopRow(f, h, n) {
   return el('li', {}, d);
 }
 
+let closeOpen = null;
+
 function flowBox(f) {
   const failed = f.status !== 'pass';
   const id = flowId(f);
@@ -343,7 +349,16 @@ function flowBox(f) {
   // Same disclosure as the e2e report: the whole row is a mouse target, the heading's button serves keyboards.
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
   const set = (open) => { box.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
-  toggle.onclick = () => set(panel.hidden);
+  toggle.onclick = () => {
+    const open = panel.hidden;
+    // Only one flow open at a time; closing one above shifts this row, so bring it back into view.
+    const other = open && closeOpen && closeOpen !== close;
+    if (other) closeOpen();
+    closeOpen = open ? close : null;
+    set(open);
+    if (other) head.scrollIntoView({ block: 'nearest' });
+  };
+  const close = () => set(false);
   set(false);
   box.append(head, panel);
 

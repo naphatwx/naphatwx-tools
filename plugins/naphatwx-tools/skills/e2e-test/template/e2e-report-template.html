@@ -128,7 +128,11 @@
   .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
   .test-head { padding: 8px 14px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
   .test-head:hover { background: var(--surface-2); }
-  .test.open > .test-head { border-bottom: 1px solid var(--line); }
+  .test.open { border-color: var(--accent); }
+  /* the open row matches the pressed filter button, so it reads as selected */
+  .test.open > .test-head, .test.open > .test-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
+  .test.open > .test-head .mark { color: var(--accent); }
+  .test.open > .test-head h2 { font-weight: 600; }
   /* row titles at body size: a closed row is one compact line, so more tests fit on a screen */
   .test-head h2 { flex: 1 1 320px; min-width: 0; font-size: var(--fs-md); }
   .test-head h2 button { all: unset; display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; border-radius: var(--radius); }
@@ -376,6 +380,7 @@ function viewer(slides) {
 
 const NOTE = { skip: 'Skipped', fixme: 'Fixme', fail: 'Expected to fail' };
 let uid = 0;
+let closeOpen = null;
 
 function testBox(t) {
   const k = kind(t);
@@ -392,7 +397,16 @@ function testBox(t) {
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
   const body = el('div', { class: 'test-body', id: id + '-b' });
   const setOpen = (o) => { box.classList.toggle('open', o); toggle.setAttribute('aria-expanded', String(o)); body.hidden = !o; };
-  toggle.onclick = () => setOpen(!box.classList.contains('open'));
+  toggle.onclick = () => {
+    const o = !box.classList.contains('open');
+    // Only one test open at a time; closing one above shifts this row, so bring it back into view.
+    const other = o && closeOpen && closeOpen !== close;
+    if (other) closeOpen();
+    closeOpen = o ? close : null;
+    setOpen(o);
+    if (other) head.scrollIntoView({ block: 'nearest' });
+  };
+  const close = () => setOpen(false);
 
   const notes = t.annotations || [];
   if (notes.length) body.append(el('ul', { class: 'notes', 'aria-label': 'Annotations' },

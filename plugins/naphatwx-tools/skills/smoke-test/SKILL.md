@@ -126,7 +126,7 @@ All flows run in parallel. In each flow the hops are checked in order, and each 
 
 ### R3. Read the report and sum it up
 
-Open the HTML file named on the last line of the output (`report: <path>`). It has the same layout as the e2e-test report: failed / passed counts and an All / Failed / Passed filter in the header, then one closed row per flow, failed flows first. An opened failed flow shows its verdict and a copyable rerun command. For each failed flow, find the first failed hop and give a likely cause from its detail:
+Open the HTML file named on the last line of the output (`report: <path>`). It has the same layout as the e2e-test report: failed / passed counts and an All / Failed / Passed filter in the header, then one closed row per flow, failed flows first. Only one flow is open at a time: expanding one collapses the others. An opened failed flow shows its verdict and a copyable rerun command. For each failed flow, find the first failed hop and give a likely cause from its detail:
 
 | Detail | Likely cause |
 |---|---|
