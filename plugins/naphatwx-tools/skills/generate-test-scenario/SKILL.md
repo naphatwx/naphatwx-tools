@@ -23,7 +23,7 @@ $ARGUMENTS
 
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
-**Expected format:** a spec folder path, a spec number, or a feature description — plus an optional `--target api|ui` (default `api`).
+**Expected format:** a spec folder path, a spec number, a plan folder (from design-feature), or a feature description — plus an optional `--target api|ui` (default `api`).
 
 Examples:
 
@@ -49,10 +49,26 @@ surface (step 4) and the case format (step 6).
   working directory. One match → use it. Several matches → list them and ask
   which one, then stop until answered.
 - **Nothing found** → say so and stop. Do not guess another spec.
+- **Plan folder given** (has `overview.html`) → it is `<plan>`. The spec is
+  the folder it sits in (`<spec-path>/plan/`), or the spec its overview names.
 - **Feature description given** (no spec) → there is no `<spec-path>`. Skip
   step 2; the description is the requirement. Find the code in step 3 from the
   names in the description, and list in the file's header what you treated as
   the requirements so the user can correct them.
+
+### 1b. Find the Use Cases
+
+Look for `use-cases.js` from the `generate-use-case` skill, first match wins:
+`<plan>/use-cases.js`, `<spec-path>/plan/use-cases.js`,
+`plans/<feature-slug>/use-cases.js`.
+
+- **Found** → read `USE_CASE_FLOWS` and `USE_CASES` (strict JSON after
+  `var NAME = `). Every use case whose `surface` matches the target (`ui` for
+  `--target ui`, `api` otherwise) becomes one test case in step 5, with the
+  same `id` and flow. Never edit the file; a use case that looks wrong is a
+  note in the header.
+- **Not found** → go on from the spec alone, and say in the confirm step that
+  running the `generate-use-case` skill first links test cases to use cases.
 
 ### 2. Read the Spec
 
@@ -107,6 +123,12 @@ in the header. If no MCP server matches, write plain HTTP calls
 
 ### 5. Choose Coverage
 
+**Use cases first** (when step 1b found them): one case per use case of this
+target, in flow order, titled with the use case's title. Its `given` is the
+precondition, its `when` the steps, its `expect` the expected result (made
+exact in steps 3 and 4). Then add the extra cases below that no use case
+covers; mark each one `extra`.
+
 Include a case for each row that applies. Skip what the feature does not have
 — do not pad the file.
 
@@ -137,11 +159,20 @@ Use this exact structure.
 - **Target**: MCP `{server}` → `{Service}` | REST `{base path}`
 - **Generated**: {YYYY-MM-DD}
 
+- **Use cases**: `{path to use-cases.js}` | none found
+
 ## Coverage
 
 | Requirement | Test cases |
 | ----------- | ---------- |
 | {FR-01 short text} | TC-01, TC-04 |
+
+| Flow | Use case | Test case |
+| ---- | -------- | --------- |
+| 3.1 {flow title} | `{use-case-id}` | TC-01 |
+| 3.1 {flow title} | `{use-case-id}` | — other target (`ui`) |
+
+Leave this second table out when no use cases were found.
 
 ## Preconditions
 
@@ -163,6 +194,7 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 
 ## TC-01 — {short title}
 
+**Use case**: `{use-case-id}` · **Flow**: 3.1 {flow title}
 **Depends on**: none
 
 **Steps**
@@ -184,6 +216,8 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 ---
 
 ## TC-0N — Input validation
+
+**Use case**: extra · **Flow**: 3.1 {flow title}
 
 | # | Field | Input | Expected |
 | - | ----- | ----- | -------- |
@@ -219,6 +253,9 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 - **Mark destructive cases** with `⚠️ writes data` in the title.
 - **No secrets in the file.** Use placeholders for tokens and passwords.
 - Keep each case under ~10 steps. Split it if longer.
+- **Use case line**: every case has one. A case from a use case names its id
+  and flow; an extra case says `extra` plus the flow it belongs to, or
+  `extra` alone. Never invent a use case id.
 
 ### 8. Save the File
 
@@ -237,7 +274,7 @@ Always save inside the spec folder:
   existing file of the same kind, and use the next number.
 - **Never overwrite an existing file.**
 
-Confirm with: `✅ Test scenario created at: {path} ({n} test cases)`
+Confirm with: `✅ Test scenario created at: {path} ({n} test cases, {u} from use cases)`
 
 Then print a one-line list of the case titles and remind the user that nothing
 was executed — they can ask to run it separately.

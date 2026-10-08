@@ -147,7 +147,8 @@
     <script src="shared/scenarios.js"></script>
     <script src="shared/components.js"></script>
     <script src="shared/fake-api.js"></script>
-    <script src="shared/use-cases.js"></script>
+    <script src="../use-cases.js"></script>
+    <script src="shared/use-case-play.js"></script>
 </head>
 
 <body>
@@ -206,7 +207,8 @@
                 <h2 class="font-bold"><span class="meta mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
                 <span class="t-code font-mono meta">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="link">plan</a></span>
               </div>`;
-            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="muted measure">${UI.esc(f.none || 'No use case to play.')}</p></section>`;
+            const skipped = USE_CASES_SKIPPED.filter(u => u.flow === f.flow);
+            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="muted measure">${UI.esc(f.none || skipped[0]?.skip || 'No use case to play.')}</p></section>`;
             return `
               <section id="flow-${nn(f.flow)}" data-flow="${f.flow}">
                 ${head}
@@ -214,6 +216,7 @@
                   ${ucs.map(u => `<button type="button" role="tab" class="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)">${UI.esc(u.title)}</button>`).join('')}
                 </div>
                 <div class="card mt-3"></div>
+                ${skipped.map(u => `<p class="meta measure mt-2">Not in the mock: ${UI.esc(u.title)} — ${UI.esc(u.skip)}</p>`).join('')}
               </section>`;
         }).join('');
 

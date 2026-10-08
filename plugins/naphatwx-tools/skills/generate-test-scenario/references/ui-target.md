@@ -59,6 +59,7 @@ Each case:
 ````markdown
 ## TC-01 — {short title}
 
+**Use case**: `{use-case-id}` · **Flow**: 3.1 {flow title}
 **Depends on**: none
 **Page**: `{/route}`   **Role**: `{role}`   **Viewport**: default
 

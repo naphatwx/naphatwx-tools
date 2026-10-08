@@ -1,5 +1,5 @@
 // Mock-only: pages and scenarios. A scenario picks an entity from data.js, the caller's permissions and upstream faults.
-// Selected with ?scenario=<id>, so every state has its own link; use cases (shared/use-cases.js) pick one each.
+// Selected with ?scenario=<id>, so every state has its own link; use cases (shared/use-case-play.js) pick one each.
 
 var Scenarios = (function () {
     // every permission an operation in fake-api.js checks; RO lacks the write ones

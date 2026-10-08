@@ -123,6 +123,8 @@
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .empty-filter { margin-top: 16px; font-size: var(--fs-md); }
+  .flow-title { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+  .flow-title .meta { font-weight: 400; }
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
   .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
@@ -417,7 +419,7 @@ function testBox(t) {
   const attempts = t.attempts || [];
   const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : t.retry ? ' · retry ' + t.retry : '';
   const head = el('div', { class: 'test-head' }, el('h2', { id: id + '-h' }, toggle),
-    el('div', { class: 'info' }, el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : ''))));
+    el('div', { class: 'info' }, t.useCase ? el('span', { class: 'meta' }, 'use case ' + t.useCase) : null, el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : ''))));
   // The whole row is a mouse target; keyboard and screen readers use the heading's button.
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
   const body = el('div', { class: 'test-body', id: id + '-b' });
@@ -465,6 +467,16 @@ function render() {
   for (const t of DATA.tests) n[kind(t)]++;
   const tools = el('div', { class: 'tools', role: 'group', 'aria-label': 'Show tests' });
   const boxes = DATA.tests.map(testBox);
+  // Group by flow (3.1, 3.2, … then tests with no flow) when any test carries a `flow` annotation.
+  const grouped = DATA.tests.some((t) => t.flow);
+  const flowKey = (f) => f ? f.split(' ')[0].split('.').map(Number) : [Infinity];
+  const flows = [...new Set(DATA.tests.map((t) => t.flow || ''))]
+    .sort((a, b) => { const x = flowKey(a), y = flowKey(b); return x[0] - y[0] || (x[1] || 0) - (y[1] || 0); });
+  const heads = new Map(flows.map((f) => {
+    const tests = DATA.tests.filter((t) => (t.flow || '') === f);
+    const passed = tests.filter((t) => kind(t) === 'passed').length;
+    return [f, el('h2', { class: 'flow-title' }, f || 'Other tests', el('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
+  }));
   const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
   const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['flaky', 'Flaky', n.flaky], ['passed', 'Passed', n.passed], ['skipped', 'Skipped', n.skipped]];
   const buttons = FILTERS.map(([key, label, c]) => {
@@ -476,6 +488,7 @@ function render() {
         box.hidden = key !== 'all' && box.dataset.kind !== key;
         if (!box.hidden) shown++;
       }
+      for (const [f, h] of heads) h.hidden = !boxes.some((box, i) => !box.hidden && (DATA.tests[i].flow || '') === f);
       none.hidden = shown > 0;
     };
     return b;
@@ -491,9 +504,14 @@ function render() {
         el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
         DATA.baseURL ? el('span', { class: 'meta' }, DATA.baseURL) : null)),
     tools));
-  // Failed tests first, so the report opens on what needs attention.
+  // Failed tests first (inside each flow), so the report opens on what needs attention.
   const order = { failed: 0, flaky: 1, passed: 2, skipped: 3 };
-  boxes.map((b, i) => [b, i]).sort((a, b) => order[a[0].dataset.kind] - order[b[0].dataset.kind] || a[1] - b[1]).forEach(([b]) => app.append(b));
+  const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => order[a[0].dataset.kind] - order[b[0].dataset.kind] || a[1] - b[1]);
+  if (!grouped) sorted.forEach(([b]) => app.append(b));
+  else for (const f of flows) {
+    app.append(heads.get(f));
+    sorted.filter(([, i]) => (DATA.tests[i].flow || '') === f).forEach(([b]) => app.append(b));
+  }
   app.append(none);
 }
 render();

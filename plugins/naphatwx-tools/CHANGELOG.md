@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.155
+
+**generate-use-case: new skill; use cases shared by the plan, the mock and the tests**
+
+- New `generate-use-case`: writes `<plan>/use-cases.js` (one use case per acceptance scenario, edge case and refusal, grouped by flow, with `surface`, `given`, `when`, `expect`) and `scripts/check.js` to check it. Features with no UI get use cases too.
+- design-feature runs it as a section agent; section 07 lists the use cases with or without a mock.
+- generate-mock-ui no longer writes use cases. It adds `mock/shared/use-case-play.js` (scenario, page, steps, or `skip` with why), keyed by use case id. Old plans with `mock/shared/use-cases.js` still work with `use-cases-section.js`.
+- generate-test-scenario makes one test case per use case of its target, with the same id and flow, then the extra cases.
+- e2e-test tags each test with its flow and use case; the report groups tests by flow and shows each use case id.
+
 ## 1.9.142
 
 **All skills: rewritten descriptions**

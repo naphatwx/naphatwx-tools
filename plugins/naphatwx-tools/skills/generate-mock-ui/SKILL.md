@@ -15,7 +15,10 @@ Build a clickable mock of a planned feature, in one of two modes:
 
 Standalone mode builds `mock/` — a clickable mock that opens straight from disk and doubles as the frontend contract. Its index is organised by **use case**: one block per plan flow, a chip per use case, and a card that plays the picked use case on the real screen.
 
+The use cases themselves are not written here. They live in `<plan>/use-cases.js`, written by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code). This skill only adds how to play each one.
+
 ```
+<plan>/use-cases.js         USE_CASE_FLOWS + USE_CASES (generate-use-case); read-only here
 mock/
 ├── index.html              one block per flow: use-case chips + a card that plays the picked one; audit log; contract links
 ├── contract/
@@ -26,14 +29,14 @@ mock/
 │   ├── <screen>.html       one file per screen; state from ?scenario= and the params its use cases need
 │   └── console.html        "MCP client" panel for API / MCP use cases (only when the feature has one)
 └── shared/
-    ├── use-cases.js        USE_CASE_FLOWS + USE_CASES: what a reviewer can play, grouped by plan flow
+    ├── use-case-play.js    USE_CASE_PLAY: how to play each use case (scenario, page, steps), keyed by id
     ├── fake-api.js         the real operation names, served from contract/
     ├── components.js       the app's component classes
     ├── shell.js            the app's chrome + the mock-only scenario / use-case panel
     └── scenarios.js        pages list + entity, permissions and upstream faults per scenario
 ```
 
-`template/` already has this layout working on a placeholder domain: copy it and replace the domain, don't rebuild it.
+`template/` already has this layout working on a placeholder domain: copy it and replace the domain, don't rebuild it. Its pages read `../use-cases.js`, which is this skill's `use-cases.js` (preview data only; never copy it).
 
 ## User Input
 
@@ -45,8 +48,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 **Expected format:** `<plan-folder | spec-folder> [frontend-app-path] [standalone | in-project]`
 
-- Plan folder (has `overview.html` + `sequence-diagram/`, from the `design-feature` skill) → write `<plan-folder>/mock/`, and read its flows.
-- Spec folder only → write `<spec-folder>/plan/mock/`.
+- Plan folder (has `overview.html` + `sequence-diagram/`, from the `design-feature` skill) → `<plan>` is the plan folder. Write `<plan>/mock/`, and read its flows.
+- Spec folder only → `<plan>` is `<spec-folder>/plan/`. Write `<plan>/mock/`.
+- `<plan>/use-cases.js` missing → run the `generate-use-case` skill with the same input first. Never write use cases here.
 - No frontend path → find the app: look for `package.json` with a UI framework, a `components/` folder, or ask once (use AskUserQuestion when the agent has it).
 - No frontend exists at all → ask whether to use plain Tailwind defaults instead of a real design system. In-project needs a frontend, so this means standalone.
 - No mode → ask once (use AskUserQuestion when the agent has it): in-project is recommended when a frontend app is found, standalone otherwise.
@@ -63,7 +67,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 7. **Mock-only UI is obvious**: the scenario panel stays pink and dashed. Nothing mock-only uses product styling.
 8. Wrap every `sessionStorage` / `localStorage` call in `try/catch`; the mock must still work when storage is blocked.
 9. No absolute local paths in any file. Code comments max 3 lines.
-10. **Use cases are data, and the only source of truth for them.** `shared/use-cases.js` holds two globals, each a strict-JSON array (double quotes, no trailing commas, no comments inside), so other tools can parse it after stripping `var NAME = `. The overview's Use cases section and every "Try in the mock" line are generated from it by a script — never typed by hand — so the plan can't drift from the mock.
+10. **Use cases are data, owned by `<plan>/use-cases.js`.** Never add, remove or rename a use case here; when one is wrong or missing, fix it with the `generate-use-case` skill. The mock adds only `shared/use-case-play.js`: one entry per use case id, a strict-JSON array (double quotes, no trailing commas, no comments inside) so other tools can parse it after stripping `var NAME = `. The overview's Use cases section and every "Try in the mock" line are generated from both files by a script — never typed by hand — so the plan can't drift from the mock.
 11. **Every count you report is computed** (by `scripts/check-use-cases.js`), never estimated: use cases per flow, total, console runs.
 12. **Controls follow the spec, then the real app.**
     - No permission → do what the real app does: a control the app hides is **hidden** in the mock too.
@@ -79,7 +83,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - **Screens** the feature adds or changes → one `page/*.html` each.
     - **Operations** the UI calls → fake-API functions.
     - **Edge states** (empty, unreachable, refused, ineligible, timeout, …) → scenarios.
-    - **Use cases**: one per acceptance scenario, edge case and refusal row in the spec (step 4b). A reviewer plays these; they are why the mock exists.
+    - **Use cases**: read `<plan>/use-cases.js`. Each one with `surface` `ui` or `api` needs a way to play it (step 4b). A reviewer plays these; they are why the mock exists.
 
 ### 2. Scan the design system
 
@@ -108,25 +112,23 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
     - One entity per scenario that needs different data (never released, ineligible, …). Keep ids consistent with the plan's diagrams.
     - Generate large data with a throwaway script, then commit the literal result.
 
-### 4b. Write the use cases (`shared/use-cases.js`)
+### 4b. Write how to play each use case (`shared/use-case-play.js`)
 
-- `USE_CASE_FLOWS`: one entry per plan flow, same numbers as the overview — `{ "flow": "3.1", "title", "refs" }`. A flow with nothing to play (an operator script, a migration) gets `"none"`: one sentence saying why.
-- `USE_CASES`: one entry per acceptance scenario, edge case and refusal row in the spec, grouped by flow (keep them in flow order):
+- `USE_CASE_PLAY`: exactly one entry per use case in `<plan>/use-cases.js`, same `id`, in the same order:
 
 | Field | What |
 |-------|------|
-| `id` | kebab-case, unique; becomes `#uc-<id>` in links |
-| `flow` | a `USE_CASE_FLOWS` number |
-| `title` | short, what the reviewer does ("Cut a new version", "Merge request already released") |
-| `story` | user story + acceptance ids from the spec (`"US1 · AC2–4"`), or the FR / decision id |
+| `id` | the use case's id; becomes `#uc-<id>` in links |
 | `scenario` | a `Scenarios.LIST` id |
 | `page` | screen file name without `.html`, or `"console"` |
 | `params` | optional query params the screen needs (`{ "status": "FAILED" }`, `{ "modal": "NEW_VERSION" }`) |
 | `steps` | "How to play": imperative, with real values from the mock data (`Pick merge request !161`, `v2.3.3-1`) |
-| `expect` | "What you should see": the exact user-facing messages from the spec, in quotes. The first line is shown in the overview, so make it the key outcome |
 | `op`, `req` | API / MCP use cases: the preset operation and request |
+| `skip` | instead of the fields above, for a use case with nothing to play (a `job`, a migration): one sentence saying why |
 
+- `title`, `story` and `expect` come from `use-cases.js`; the file's last lines merge both lists into `USE_CASES` for the pages. Keep those lines as the template has them.
 - Steps name what is on screen, not how the code works. A reviewer who never read the spec should be able to follow them.
+- A use case you can't play as written (its `expect` doesn't match the spec or the screen) → report it; don't change `use-cases.js`.
 
 ### 5. Write `shared/`
 
@@ -143,7 +145,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 - Each page: the same `<head>` (CSS stack + the six scripts in template order), `Shell.mount()`, a small state object, `load()` via the fake API, `render()`.
 - Show every state the real screen has: loading skeleton, error with retry, empty, filtered-empty, success toast, refusal alert, outcome-unknown.
 - Deep links: support every query param a use case needs (`?status=FAILED` pre-sets a filter, `?modal=…` opens a form), so each use case opens on the exact state.
-- Load `shared/use-cases.js` before `shell.js` on every page.
+- Load `../../use-cases.js`, then `../shared/use-case-play.js`, before `shell.js` on every page (the index loads `../use-cases.js` and `shared/use-case-play.js`).
 - Controls follow the spec's control rules (Hard Rule 12).
 - Expose page state as `window.S` (or similar) so a test harness can drive it.
 - API / MCP use cases → `page/console.html`: tool name, operation select, params textarea, Run, result, audit log. It reads `?scenario=` and `?uc=` to preset the operation and request.
@@ -153,6 +155,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 Keep the template's layout; only change the header text and `screenUrl()`. What it does, so you keep it working:
 
 - One block per flow, in plan order. Head: `3.N <flow name>`, refs on the right, a `plan` link to `../overview.html#flow-NN`.
+- Skipped use cases (`skip`) get no chip: one `Not in the mock: <title> — <why>` line under the flow's card. A flow with only skipped ones shows the first reason instead of chips.
 - A chip row of underlined tabs (`role="tablist"`, chips are `.tab` `role="tab"` buttons with `aria-selected`) that wraps onto another row when it overflows (no hidden chips on a phone). Chips: 14px, `min-width: 9rem`, `max-width: 14rem`.
 - The picked use case, flat on the page (no card around it): title + story + scenario label; then a closed `details.guide` ("How to play · what you should see") holding "How to play" (ol) and "What you should see" (ul) side by side, under sentence-case `.label` headings, each list capped by `.measure` (about 70 characters a line); then one `.frame`: a browser bar (three dots, the URL the real app would show — `localhost:3000/<route>?…` or `MCP client · <Service> · <op>` — `<P>% of 1600 px`, Restart) and the screen in an iframe at 1600×940, transform-scaled to the frame width by a `ResizeObserver`, no border.
 - Page max width 1200px, dark only. The index chrome uses the synced theme block (Quiet Sheet tokens such as `--surface`, `--text-3`, `--accent`): style it with the template's CSS classes, never Tailwind gray/purple or `dark:` classes. Don't edit between the `theme:*` markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`. Tailwind stays loaded for layout utilities.
@@ -162,13 +165,13 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 
 ### 7. Link the plan (when a plan folder exists)
 
-- Run `node <design-feature skill dir>/scripts/use-cases-section.js <plan-folder>` (the design-feature skill is this skill's sibling folder, `../design-feature/`). It rewrites `overview.html` section 07 "Use cases" and every flow's "Try in the mock" line (each use case → `mock/index.html#uc-<id>`, new tab) from `use-cases.js`, and adds the line to flows that had none. Don't edit those parts by hand; re-run the script after any change to the use cases.
+- Run `node <design-feature skill dir>/scripts/use-cases-section.js <plan-folder>` (the design-feature skill is this skill's sibling folder, `../design-feature/`). It rewrites `overview.html` section 07 "Use cases" and every flow's "Try in the mock" line (each playable use case → `mock/index.html#uc-<id>`, new tab) from `use-cases.js` and `use-case-play.js`, and adds the line to flows that had none. Don't edit those parts by hand; re-run the script after any change to the use cases.
 
 ### 8. Verify
 
 - `node <this skill dir>/scripts/check-use-cases.js <output>/mock`. It:
     - runs `node --check` on every `.js` file and the inline `<script>` of every page;
-    - checks `use-cases.js` is strict JSON, every id is unique, every `flow` is in `USE_CASE_FLOWS`, every `scenario` is in `scenarios.js`, every `page` exists, and every flow has a use case or a `none` sentence;
+    - reads `<plan>/use-cases.js` (`--use-cases <file>` for another path) and `shared/use-case-play.js`: both strict JSON, every use case has exactly one play entry and every play entry matches a use case, every `scenario` is in `scenarios.js`, every `page` exists;
     - runs every console use case against the fake API in a Node `vm` sandbox (location and `sessionStorage` stubbed) and prints the result next to its `expect`.
     - Read each console result against its `expect`. Any mismatch → fix the data, the fake API or the expect text, then re-run. Exit code 0 and no mismatch before you go on.
 - Type-check the contract when Node is available (a temporary install is fine):
@@ -185,7 +188,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 ### 9. Confirm
 
 - Output: `✅ Mock created at: {output}/mock/index.html`
-- Use cases per flow and the total, copied from `check-use-cases.js` output — never counted by eye.
+- Use cases per flow, the total and how many are playable, copied from `check-use-cases.js` output — never counted by eye.
 - The review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
 - List the pages and scenarios, and what could not be copied from the real design system (logos, images, fonts), plus the CDNs the pages need.
 - Remind the user: open `mock/index.html` directly; no server or build is needed.

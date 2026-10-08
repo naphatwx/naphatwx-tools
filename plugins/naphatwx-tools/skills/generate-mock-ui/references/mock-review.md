@@ -52,7 +52,7 @@ Question: **"Does every use case behave as the spec says?"**
 - In-project mock: read `_mock/use<Screen>.ts` and `rules.ts`, and trace each use case through them.
 - Compare every code and exact message with `spec.md` and `contracts/`.
 - Read the screen logic for dead buttons, wrong or ignored query params, and state leaking between frames (storage keys the index does not clear).
-- List every acceptance scenario, edge case and refusal row in the spec that has **no** use case.
+- List every acceptance scenario, edge case and refusal row in the spec that has **no** use case in `<plan>/use-cases.js`, and every `skip` that could be played.
 - Report: numbered findings, each with severity, use-case id, `file:line`, spec line and the fix; then the gaps.
 
 ## 3. Merge and fix
@@ -60,6 +60,7 @@ Question: **"Does every use case behave as the spec says?"**
 - Merge the two reports into one numbered list.
 - When the UI review and a use case disagree (e.g. the mock has a control the real app lacks), settle it against the **spec first, then the real code**. Write down which won and why.
 - Apply every fix with **one fresh fix agent** — never one of the reviewers. Give it the merged list and the files; it reports each finding as fixed or not fixable, with why.
-- Then regenerate the overview's Use cases section from `use-cases.js` (`use-cases-section.js`, see `SKILL.md` step 7) and re-run Verify.
+    - A missing or wrong use case (title, `expect`, a gap) is fixed in `<plan>/use-cases.js` with the `generate-use-case` skill's rules, then `scripts/check.js` there. Everything else is fixed in the mock.
+- Then regenerate the overview's Use cases section (`use-cases-section.js`, see `SKILL.md` step 7) and re-run Verify.
 - Don't run the reviewers a second time, unless the fix agent reports a finding it could not apply.
 - Confirm step: the two verdicts, the number of findings by severity, how many were fixed, and every conflict with the side that won.

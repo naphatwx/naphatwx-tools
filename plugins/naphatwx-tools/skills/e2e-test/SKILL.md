@@ -7,11 +7,11 @@ argument-hint: "<spec folder | spec number | feature description> [--env <name>]
 # E2E Test
 
 ```text
-1 scenarios     generate-test-scenario (target ui) ─► scenario file
+1 scenarios     generate-test-scenario (target ui) ─► scenario file (test cases linked to use cases)
 2 harness       Playwright config + login + step helper + one-html reporter (once per repo)
 3 write         1 writer agent per scenario group, in parallel ─► <group>.e2e.spec.ts
 4 run           Playwright, parallel workers for independent files
-5 report        1 HTML: test ─► steps paged like slides ─► screenshot, pass/fail, error
+5 report        1 HTML: flow ─► test (use case id) ─► steps paged like slides ─► screenshot, pass/fail, error
 ```
 
 ## User Input
@@ -38,10 +38,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## 1. Scenarios
 
-Run the `generate-test-scenario` skill (`naphatwx-tools:generate-test-scenario` in Claude Code) with **target ui** and the source. It writes a scenario file with pages, user actions, selectors, on-screen expectations, the sign-in role and the viewport.
+Run the `generate-test-scenario` skill (`naphatwx-tools:generate-test-scenario` in Claude Code) with **target ui** and the source. It writes a scenario file with pages, user actions, selectors, on-screen expectations, the sign-in role and the viewport. When the feature has a `use-cases.js` (from the `generate-use-case` skill), each test case names its use case id and flow.
 
 - If a scenario file for this source already exists, ask whether to reuse it or generate a new one.
-- Read the file. Group its test cases by page or flow. Each group becomes one spec file, so a group should have about 3–8 cases.
+- Read the file. Group its test cases by flow (their **Flow** line), else by page. Each group becomes one spec file, so a group should have about 3–8 cases.
 
 ## 2. Harness (once per repo)
 
@@ -56,6 +56,7 @@ Then add these, next to the e2e folder, **unchanged** from this skill's `templat
 
 - `step.ts`: wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
 - `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded. Each test shows its steps one at a time: use Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot (this works on scrolling full-page shots too). A step without a screenshot shows a "No screenshot for this step" image, so every step can be clicked through. Only one test is open at a time: expanding one collapses the others. Expanding a test starts on step 1; collapsing and re-expanding it keeps the last step seen. A failed step shows its error above the screenshot. A failed test has a copyable rerun command, and a copyable `npx playwright show-trace <path>` command when Playwright saved a trace (the path is relative to the config folder). A full-page screenshot (taller than 1.5× its width) scrolls inside the viewer instead of shrinking.
+- Tests are grouped under their flow (`3.N <flow title>`, from the `flow` annotation), in flow order; tests with no flow come last under "Other tests". Each test shows its use case id (`use case` annotation) next to its file.
 - The report has one card per test, keyed by test id. With retries it keeps the final attempt, puts the earlier ones under "Earlier attempts", and marks a test that passed on retry as flaky. Header counts and filters (Failed, Flaky, Passed, Skipped) use Playwright's own outcome, so they match its summary. A skipped test shows its `skip` / `fixme` reason; a `test.fail()` test shows that annotation.
 - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
 
@@ -105,13 +106,14 @@ Run it the way the repo's guide says to run tools (for example in its Docker ser
 ## 5. Report
 
 The reporter prints `E2E report: <path>`. Open the file and check:
-- every test is listed
+- every test is listed, under its flow
 - every step has a screenshot
 - the failed tests are listed first; every test starts closed, and opening a failed one shows its error
 
 Reply with:
 - the scenario file path and the spec files written
 - failed / flaky / passed / skipped counts
+- per flow: passed / total, and the use case ids of the failed tests
 - each failure: its test, its step, and the likely cause (product bug, missing selector, wrong scenario, environment)
 - missing selectors and code/scenario mismatches, as findings for the app owner
 - whether cleanup is confirmed

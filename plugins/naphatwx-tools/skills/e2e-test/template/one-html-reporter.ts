@@ -23,6 +23,9 @@ type TestOut = {
   trace?: string
   annotations: Note[]
   attempts: Attempt[]
+  // From the test's `flow` and `use case` annotations (generate-use-case ids); the report groups by flow.
+  flow?: string
+  useCase?: string
 }
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -69,6 +72,7 @@ export default class OneHtmlReporter implements Reporter {
     const trace = result.attachments.find((a) => a.name === 'trace' && a.path)
     const prev = this.tests.get(test.id)
     const attempts = prev ? [...prev.attempts, { retry: prev.retry, status: prev.status, error: prev.error, duration: prev.ms }] : []
+    const tag = (type: string) => test.annotations.find((a) => a.type === type)?.description
     const seen = new Set<string>()
     const annotations = [...test.annotations, ...((result as { annotations?: Note[] }).annotations ?? [])]
       .filter((a) => ['skip', 'fixme', 'fail'].includes(a.type))
@@ -88,6 +92,8 @@ export default class OneHtmlReporter implements Reporter {
       trace: trace ? relative(this.configDir, trace.path!).split('\\').join('/') : undefined,
       annotations,
       attempts,
+      flow: tag('flow'),
+      useCase: tag('use case'),
     })
   }
 

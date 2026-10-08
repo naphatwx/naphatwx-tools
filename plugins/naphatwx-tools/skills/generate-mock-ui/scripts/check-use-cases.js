@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Checks a standalone mock's use cases and runs every console (API / MCP) use case against the fake API.
-// Usage: node check-use-cases.js <mock-dir> [--json]
-// Exit 1 on any structural error. Console results are printed next to `expect` for you to compare.
+// Checks a standalone mock's play data against the plan's use cases, and runs every console (API / MCP) use case
+// against the fake API. Usage: node check-use-cases.js <mock-dir> [--use-cases <file>] [--json]
+// Use cases default to <mock-dir>/../use-cases.js. Exit 1 on any structural error.
 
 const fs = require('fs');
 const os = require('os');
@@ -11,8 +11,10 @@ const { execFileSync } = require('child_process');
 
 const out = s => process.stdout.write(s + '\n');
 const dir = process.argv[2];
-if (!dir) { process.stderr.write('usage: node check-use-cases.js <mock-dir> [--json]\n'); process.exit(2); }
+if (!dir) { process.stderr.write('usage: node check-use-cases.js <mock-dir> [--use-cases <file>] [--json]\n'); process.exit(2); }
 const asJson = process.argv.includes('--json');
+const ucArg = process.argv.indexOf('--use-cases');
+const ucFile = ucArg > 0 ? process.argv[ucArg + 1] : path.join(dir, '..', 'use-cases.js');
 const read = p => fs.readFileSync(path.join(dir, p), 'utf8');
 const errors = [];
 
@@ -49,9 +51,13 @@ for (const f of walk(dir)) {
 }
 
 // ---------------------------------------------------------------- structure
-let FLOWS = [], UCS = [];
-try { const src = read('shared/use-cases.js'); FLOWS = parseVar(src, 'USE_CASE_FLOWS'); UCS = parseVar(src, 'USE_CASES'); }
-catch (e) { errors.push(`use-cases.js is missing or not strict JSON: ${e.message}`); }
+let FLOWS = [], CORE = [], PLAY = [];
+try { const src = fs.readFileSync(ucFile, 'utf8'); FLOWS = parseVar(src, 'USE_CASE_FLOWS'); CORE = parseVar(src, 'USE_CASES'); }
+catch (e) { errors.push(`${ucFile} is missing or not strict JSON (write it with the generate-use-case skill): ${e.message}`); }
+try { PLAY = parseVar(read('shared/use-case-play.js'), 'USE_CASE_PLAY'); }
+catch (e) { errors.push(`shared/use-case-play.js is missing or not strict JSON: ${e.message}`); }
+// The merged view the pages see: each use case plus its play entry.
+const UCS = CORE.map(u => ({ ...u, ...(PLAY.find(p => p.id === u.id) || { skip: 'No play entry.' }) }));
 
 /** The mock's shared scripts in a VM, with location and storage stubbed and latency removed. */
 function sandbox(scenario, uc) {
@@ -66,9 +72,11 @@ function sandbox(scenario, uc) {
     };
     ctx.window = ctx;
     vm.createContext(ctx);
-    for (const f of ['contract/rules.js', 'contract/data.js', 'shared/scenarios.js', 'shared/components.js', 'shared/fake-api.js', 'shared/use-cases.js']) {
+    const files = ['contract/rules.js', 'contract/data.js', 'shared/scenarios.js', 'shared/components.js', 'shared/fake-api.js'].map(f => path.join(dir, f))
+        .concat(ucFile, path.join(dir, 'shared/use-case-play.js'));
+    for (const f of files) {
         // top-level const/let would stay script-scoped; var makes them reachable from runInContext
-        if (fs.existsSync(path.join(dir, f))) vm.runInContext(read(f).replace(/^(const|let) (\w+) =/gm, 'var $2 ='), ctx, { filename: f });
+        if (fs.existsSync(f)) vm.runInContext(fs.readFileSync(f, 'utf8').replace(/^(const|let) (\w+) =/gm, 'var $2 ='), ctx, { filename: path.relative(dir, f) });
     }
     return ctx;
 }
@@ -78,21 +86,31 @@ try { scenarioIds = vm.runInContext('Scenarios.LIST.map(s => s.id)', sandbox('')
 catch (e) { errors.push(`could not load the mock in a sandbox: ${e.message}`); }
 
 const ids = new Set();
-for (const u of UCS) {
+for (const u of CORE) {
     if (ids.has(u.id)) errors.push(`duplicate use-case id: ${u.id}`);
     ids.add(u.id);
-    for (const k of ['id', 'flow', 'title', 'story', 'scenario', 'page', 'steps', 'expect']) if (u[k] == null || u[k] === '') errors.push(`${u.id}: missing ${k}`);
     if (!FLOWS.some(f => f.flow === u.flow)) errors.push(`${u.id}: flow ${u.flow} is not in USE_CASE_FLOWS`);
+}
+const playIds = new Set();
+for (const p of PLAY) {
+    if (playIds.has(p.id)) errors.push(`duplicate play entry: ${p.id}`);
+    playIds.add(p.id);
+    if (!ids.has(p.id)) errors.push(`play entry ${p.id} matches no use case in use-cases.js`);
+}
+for (const u of UCS) {
+    if (!playIds.has(u.id)) { errors.push(`${u.id}: no play entry; add one, or one with "skip" and why`); continue; }
+    if (u.skip) continue;
+    for (const k of ['scenario', 'page', 'steps']) if (u[k] == null || u[k] === '') errors.push(`${u.id}: missing ${k}`);
     if (scenarioIds.length && !scenarioIds.includes(u.scenario)) errors.push(`${u.id}: scenario ${u.scenario} is not in scenarios.js`);
     if (!fs.existsSync(path.join(dir, 'page', `${u.page}.html`))) errors.push(`${u.id}: page/${u.page}.html does not exist`);
     if (u.page === 'console' && (!u.op || !u.req)) errors.push(`${u.id}: console use case needs op and req`);
 }
-FLOWS.forEach(f => { if (!UCS.some(u => u.flow === f.flow) && !f.none) errors.push(`flow ${f.flow} has no use case and no "none" sentence`); });
+FLOWS.forEach(f => { if (!CORE.some(u => u.flow === f.flow) && !f.none) errors.push(`flow ${f.flow} has no use case and no "none" sentence`); });
 
 // ---------------------------------------------------------------- run console use cases (first run only; later steps are manual)
 (async () => {
     const runs = [];
-    for (const u of UCS.filter(u => u.page === 'console' && u.op)) {
+    for (const u of UCS.filter(u => !u.skip && u.page === 'console' && u.op)) {
         let result;
         try {
             const ctx = sandbox(u.scenario, u.id);
@@ -103,11 +121,13 @@ FLOWS.forEach(f => { if (!UCS.some(u => u.flow === f.flow) && !f.none) errors.pu
         runs.push({ id: u.id, op: u.op, scenario: u.scenario, result, expect: u.expect, moreSteps: u.steps.length > 1 });
     }
 
-    const perFlow = FLOWS.map(f => ({ flow: f.flow, title: f.title, count: UCS.filter(u => u.flow === f.flow).length }));
-    if (asJson) out(JSON.stringify({ total: UCS.length, perFlow, errors, runs }, null, 2));
+    const inFlow = f => UCS.filter(u => u.flow === f.flow);
+    const perFlow = FLOWS.map(f => ({ flow: f.flow, title: f.title, count: inFlow(f).length, playable: inFlow(f).filter(u => !u.skip).length }));
+    const playable = UCS.filter(u => !u.skip).length;
+    if (asJson) out(JSON.stringify({ total: UCS.length, playable, perFlow, errors, runs }, null, 2));
     else {
-        out(`${UCS.length} use cases`);
-        perFlow.forEach(f => out(`  ${f.flow} ${f.title}: ${f.count}`));
+        out(`${UCS.length} use cases, ${playable} playable in the mock`);
+        perFlow.forEach(f => out(`  ${f.flow} ${f.title}: ${f.count} (${f.playable} playable)`));
         out(`\nConsole runs (${runs.length}), compare each result with expect:`);
         for (const r of runs) {
             out(`\n# ${r.id} · ${r.op} · scenario ${r.scenario}${r.moreSteps ? ' (later steps not run)' : ''}`);

@@ -11,7 +11,8 @@ Mock pages written inside the real frontend app, built from its real components 
     ├── rules.ts            spec rules as pure functions
     ├── data.ts             realistic data, typed with the real types
     ├── scenarios.ts        scenario id → data set or forced state
-    ├── use-cases.ts        USE_CASE_FLOWS + USE_CASES, same shape as standalone
+    ├── use-cases.ts        copy of <plan>/use-cases.js as TS exports; never edited here
+    ├── use-case-play.ts    USE_CASE_PLAY: how to play each use case, same shape as standalone
     ├── use<Screen>.ts      one hook per screen: state + events
     └── ScenarioPanel.tsx   mock-only scenario switcher
 ```
@@ -54,7 +55,8 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - `types.ts`: only the types not generated yet (Hard Rule 4). Empty → leave the file out.
 - `rules.ts`: every spec rule as a pure function — status and field mapping, eligibility, validation, error classification, the user-facing messages.
 - `data.ts`: realistic names, ids, dates and volumes (enough rows to page), typed with the real types. One entity per scenario that needs different data. Keep ids consistent with the plan's diagrams.
-- `use-cases.ts`: `export const USE_CASE_FLOWS = [...]` and `export const USE_CASES = [...]`, each a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment). Derive them from every acceptance scenario, edge case and refusal row, as in standalone.
+- `use-cases.ts`: `<plan>/use-cases.js` (from the `generate-use-case` skill) copied as-is, with `var` turned into `export const`. The app can't load a file outside itself, so this is a copy: re-copy it whenever `use-cases.js` changes, never edit it here.
+- `use-case-play.ts`: `export const USE_CASE_PLAY = [...]`, a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment), one entry per use case id.
 - `scenarios.ts`: `SCENARIOS` list (`id`, `label`, `flow` = plan flow numbers, `hint` telling the viewer what to try, the data set or forced state) and a `useScenario()` helper that reads `?scenario=`.
 - `use<Screen>.ts`: the screen's state and events. Fake latency with a short timeout so loading states show; scenario faults turn into the real error codes and messages from `rules.ts`.
 - `ScenarioPanel.tsx`: a select of the scenarios that changes `?scenario=`, plus the current hint (Hard Rule 8). With `?uc=<id>` it shows that use case's steps and expect instead, with a link back to the index.
@@ -65,13 +67,13 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - Show every state the real screen has: loading skeleton, error with retry, empty, filtered-empty, success toast, refusal alert, outcome-unknown.
 - Every interaction works: submit, edit, delete, filter, sort, paginate, open / close modal, confirm, cancel.
 - Deep links: read extra query params (`?mode=`, `?line=`) so each plan flow can open the exact state.
-- `page.tsx` at the folder root: one block per flow (`3.N` + name), each listing its use cases as links to `<screen>?scenario=<id>&uc=<id>` with the first `expect` line; a flow with none shows its `none` sentence.
+- `page.tsx` at the folder root: one block per flow (`3.N` + name), each listing its playable use cases as links to `<screen>?scenario=<id>&uc=<id>` with the first `expect` line, then a `Not in the mock` line per skipped one; a flow with none shows its `none` sentence.
 - Controls follow the spec, then the real app: a control the user has no permission for is hidden when the real app hides it; shown unavailable with a reason (`aria-disabled` + tooltip) only where the spec says so.
 
 ### 5. Link the plan (when a plan folder exists)
 
 - Run the design-feature skill's `scripts/use-cases-section.js` with the in-project source and links:
-  `node <design-feature skill dir, sibling of this skill>/scripts/use-cases-section.js <plan-folder> --use-cases <mock-folder>/_mock/use-cases.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?scenario={scenario}&uc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
+  `node <design-feature skill dir, sibling of this skill>/scripts/use-cases-section.js <plan-folder> --play-file <mock-folder>/_mock/use-case-play.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?scenario={scenario}&uc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
 - It writes section 07 "Use cases" and every flow's "Try in the mock" line. Then add one muted line under the section's first line: the mock runs in the app, start it with the app's dev command.
 
 ### 6. Verify

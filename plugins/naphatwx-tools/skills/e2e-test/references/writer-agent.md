@@ -19,7 +19,10 @@ For each test case:
 1. Read the real page code for every control you touch. Use selectors in this order:
    data-testid → getByRole with accessible name → getByLabel → getByText with the exact copy from the code.
    Never invent a selector. If a control has no stable selector, say so in your report.
-2. One `test()` per test case, titled "<TC-id> <title>".
+2. One `test()` per test case, titled "<TC-id> <title>". Tag it from the case's **Use case** line:
+   test('<TC-id> <title>', { annotation: [{ type: 'flow', description: '3.1 <flow title>' },
+     { type: 'use case', description: '<use-case-id>' }] }, async ({ page }) => { ... })
+   An `extra` case gets only the flow annotation (none when it has no flow). Never invent a use case id.
 3. EVERY user action or check is its own `await step(page, '<plain sentence>', async () => { ... })`
    so each one gets a screenshot. Name steps as the user sees them: "Open the Announcements page",
    "Click Save as draft", "The draft shows under My drafts".
@@ -33,6 +36,6 @@ For each test case:
 
 Return:
 - the file path
-- per test case: the test title, the number of steps, and the selectors used
+- per test case: the test title, its use case id and flow, the number of steps, and the selectors used
 - every selector you could not find a stable hook for, and every place where the code and the scenario disagree
 ```
