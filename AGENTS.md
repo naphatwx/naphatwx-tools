@@ -14,6 +14,7 @@
 - Source: `theme/tokens.css` (colors, fonts, radius) and `theme/base.css` (element defaults).
 - `node theme/sync.mjs` copies them into each template between `/* theme:tokens:start */ … end */` and `/* theme:base:start */ … end */` markers. Each skill folder stays self-contained, because `npx skills add` installs one folder only.
 - Never edit between the markers. Edit `theme/`, then run `node theme/sync.mjs`.
+- design-feature's `template/mock`, `flowchart`, `sequence-diagram` and `database` are preview copies of the generate-mock-ui and generate-diagram templates. Edit the source, then run `node theme/sync.mjs`. Files that differ on purpose are listed in `OWN` in `theme/sync.mjs`.
 - Run `node theme/sync.mjs --check` before committing. It fails on drift, on any hex color that is not a theme color, and on text tokens below 4.5:1 contrast.
 - Template CSS uses `var(--token)` only. Standalone `.svg` files use the theme hex values.
 - Exception: mock screens (`mock/page|shared|contract`) use the target app's own design system.

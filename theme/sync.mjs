@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Copies theme/tokens.css and theme/base.css into every skill template between marker comments,
 // so each skill folder stays self-contained (`npx skills add` installs one folder only).
-// Usage: node theme/sync.mjs          write the blocks
-//        node theme/sync.mjs --check  fail on drift, off-palette hex colors, or low contrast
+// Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS).
+// Usage: node theme/sync.mjs          write the blocks and preview copies
+//        node theme/sync.mjs --check  fail on drift, stale previews, off-palette hex colors, or low contrast
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -81,7 +82,48 @@ for (const file of walk(SKILLS)) {
     });
 }
 
-if (!CHECK) out(`theme: ${synced} file(s) updated`);
+// ---- preview copies: design-feature's template previews files the other skills own ----
+// Each [preview, source] dir pair must match file for file; the generator is the source of truth.
+const DF = 'design-feature/template/';
+const PREVIEWS = [
+    [DF + 'mock', 'generate-mock-ui/template'],
+    [DF + 'sequence-diagram', 'generate-diagram/template/sequence-diagram'],
+    [DF + 'flowchart', 'generate-diagram/template/flowchart'],
+    [DF + 'database/er-diagram.html', 'generate-diagram/template/er/er-diagram.html'],
+];
+// Preview files that differ on purpose: design-feature's own example data, or diagram-design stand-ins.
+const OWN = new Set([DF + 'mock/shared/use-case-play.js', DF + 'flowchart/02-example-flow.html', DF + 'sequence-diagram/02-example-flow.html']);
+// Source files the preview doesn't need: the overview embeds the diagrams, not the standalone viewer.
+const SOURCE_ONLY = new Set(['generate-diagram/template/sequence-diagram/index.html']);
+const filesOf = (p) => (statSync(p).isDirectory()
+    ? readdirSync(p).flatMap((n) => filesOf(join(p, n)))
+    : [p]);
+let copied = 0;
+for (const [preview, source] of PREVIEWS) {
+    const [pAbs, sAbs] = [join(SKILLS, preview), join(SKILLS, source)];
+    for (const s of filesOf(sAbs)) {
+        const p = join(pAbs, relative(sAbs, s));
+        const rel = relative(SKILLS, p);
+        if (OWN.has(rel) || SOURCE_ONLY.has(relative(SKILLS, s))) continue;
+        const want = readFileSync(s);
+        let have = null;
+        try { have = readFileSync(p); } catch {}
+        if (have && want.equals(have)) continue;
+        copied++;
+        if (CHECK) problems.push(`preview: ${rel} differs from ${relative(SKILLS, s)} (run node theme/sync.mjs)`);
+        else writeFileSync(p, want);
+    }
+    if (statSync(pAbs).isDirectory()) {
+        for (const p of filesOf(pAbs)) {
+            const rel = relative(SKILLS, p);
+            let inSource = true;
+            try { statSync(join(sAbs, relative(pAbs, p))); } catch { inSource = false; }
+            if (!inSource && !OWN.has(rel)) problems.push(`preview: ${rel} has no source in ${source} (delete it, or list it in OWN)`);
+        }
+    }
+}
+
+if (!CHECK) out(`theme: ${synced} file(s) updated, ${copied} preview copy(ies) refreshed`);
 if (problems.length) {
     err(problems.join('\n'));
     process.exit(CHECK ? 1 : 0);
