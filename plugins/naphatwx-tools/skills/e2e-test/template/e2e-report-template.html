@@ -154,14 +154,15 @@
   /* Full-page shots: scroll the frame at full width instead of shrinking the page to an unreadable strip. */
   .stage.tall .frame { max-height: 70vh; overflow-y: auto; overscroll-behavior: contain; }
   .stage.tall img { max-height: none; height: auto; object-fit: initial; object-position: top; }
-  .stage.tall .nav { display: none; }
   .hint { position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-md); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; }
-  .stage .empty { padding: 48px 16px; text-align: center; border: 1px dashed var(--line-strong); border-radius: var(--radius); }
-  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; border-radius: 0; background: transparent; color: var(--text); font-size: var(--fs-lg); opacity: 0; transition: opacity .15s var(--ease); }
-  .stage .nav.prev { left: 0; text-align: left; padding-left: 12px; cursor: w-resize; }
-  .stage .nav.next { right: 0; text-align: right; padding-right: 12px; cursor: e-resize; }
-  .stage .nav:hover:not(:disabled) { opacity: 1; background: transparent; text-shadow: 0 1px 6px rgb(0 0 0 / .8); }
-  .stage .nav:disabled { cursor: default; opacity: 0; }
+  /* The whole shot is the click target: left half goes back, right half forward. The arrows only show the side;
+     they ignore the pointer, so a tall shot still scrolls under them. */
+  .stage[data-side="prev"] .frame { cursor: w-resize; }
+  .stage[data-side="next"] .frame { cursor: e-resize; }
+  .edge { position: absolute; top: 50%; transform: translateY(-50%); padding: 4px 12px; border-radius: 999px; font-size: var(--fs-lg); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; opacity: 0; transition: opacity .15s var(--ease); }
+  .edge.prev { left: 12px; }
+  .edge.next { right: 20px; }
+  .stage[data-side="prev"] .edge.prev, .stage[data-side="next"] .edge.next { opacity: 1; }
 
   .list { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
   .list li + li { border-top: 1px solid var(--line); }
@@ -269,6 +270,11 @@ const zoom = document.getElementById('zoom');
 const zoomImg = zoom.querySelector('img');
 document.getElementById('zoom-close').onclick = () => zoom.close();
 zoom.onclick = (e) => { if (e.target === zoom || e.target === zoomImg) zoom.close(); };
+// Stand-in for a step without a screenshot, so every step shows a frame you can click through.
+const NO_SHOT = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">'
+  + '<rect width="1280" height="720" fill="#18191d"/><rect x="560" y="250" width="160" height="120" rx="12" fill="none" stroke="#4a4d55" stroke-width="6"/>'
+  + '<circle cx="640" cy="310" r="26" fill="none" stroke="#4a4d55" stroke-width="6"/><path d="M548 238 L732 382" stroke="#4a4d55" stroke-width="6"/>'
+  + '<text x="640" y="440" fill="#a3a6b0" font-family="-apple-system, Segoe UI, system-ui, sans-serif" font-size="32" text-anchor="middle">No screenshot for this step</text></svg>');
 const isTall = (img) => img.naturalWidth > 0 && img.naturalHeight / img.naturalWidth > 1.5;
 
 // One step at a time, like slides. Controls are built once and updated in place, so focus stays put.
@@ -284,16 +290,24 @@ function viewer(slides) {
   const full = el('button', { type: 'button' }, 'Zoom');
   const err = el('div', { class: 'err' }, el('div', { class: 'err-label' }, 'Error in this step'), el('pre', {}));
   const img = el('img', { alt: '' });
-  const empty = el('div', { class: 'meta empty' }, 'No screenshot for this step.');
-  // Click halves are a mouse shortcut only; keyboard users have Prev/Next and the step list.
-  const left = el('button', { type: 'button', class: 'nav prev', tabindex: '-1', 'aria-hidden': 'true' }, '‹');
-  const right = el('button', { type: 'button', class: 'nav next', tabindex: '-1', 'aria-hidden': 'true' }, '›');
+  // Clicking the shot is a mouse shortcut only; keyboard users have Prev/Next and the step list.
+  const left = el('span', { class: 'edge prev', 'aria-hidden': 'true' }, '‹');
+  const right = el('span', { class: 'edge next', 'aria-hidden': 'true' }, '›');
   const hint = el('span', { class: 'hint', 'aria-hidden': 'true', hidden: '' }, 'scroll ↓');
   const frame = el('div', { class: 'frame' }, img);
-  const stage = el('div', { class: 'stage' }, frame, empty, left, right, hint);
+  const stage = el('div', { class: 'stage' }, frame, left, right, hint);
+  const side = (e) => {
+    const r = frame.getBoundingClientRect();
+    if (e.clientX - r.left > frame.clientWidth) return '';  // on the scrollbar
+    const d = e.clientX - r.left < r.width / 2 ? 'prev' : 'next';
+    return (d === 'prev' ? i > 0 : i < slides.length - 1) ? d : '';
+  };
+  frame.onmousemove = (e) => { stage.dataset.side = side(e); };
+  frame.onmouseleave = () => { stage.dataset.side = ''; };
+  frame.onclick = (e) => { const d = side(e); if (d) { go(d === 'prev' ? -1 : 1); stage.dataset.side = side(e); } };
   // Tall shots make the frame a scroll region, which keyboard users must be able to focus.
   const fit = () => {
-    const tall = !img.hidden && isTall(img);
+    const tall = isTall(img);
     stage.classList.toggle('tall', tall);
     if (tall) { frame.setAttribute('tabindex', '0'); frame.setAttribute('aria-label', 'Full-page screenshot, scrolls vertically'); }
     else { frame.removeAttribute('tabindex'); frame.removeAttribute('aria-label'); }
@@ -317,17 +331,14 @@ function viewer(slides) {
     status.replaceChildren(pill(s.status));
     time.textContent = ms(s.ms);
     count.textContent = 'Step ' + (i + 1) + ' / ' + slides.length;
-    prev.disabled = left.disabled = i === 0;
-    next.disabled = right.disabled = i === slides.length - 1;
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
     full.disabled = !s.shot;
     err.hidden = !s.error;
     err.querySelector('pre').textContent = s.error || '';
-    img.hidden = !s.shot;
-    left.hidden = right.hidden = !s.shot;
-    empty.hidden = !!s.shot;
-    frame.hidden = !s.shot;
     frame.scrollTop = 0;
-    if (s.shot) { img.src = s.shot; img.alt = s.title; } else img.removeAttribute('src');
+    img.src = s.shot || NO_SHOT;
+    img.alt = s.shot ? s.title : 'No screenshot for this step';
     fit();
     items.forEach((li, n) => {
       const b = li.firstChild;
@@ -337,8 +348,8 @@ function viewer(slides) {
     if (document.activeElement?.disabled) box.focus({ preventScroll: true });
   };
   const go = (d) => { const n = i + d; if (n >= 0 && n < slides.length) { i = n; update(); } };
-  prev.onclick = left.onclick = () => go(-1);
-  next.onclick = right.onclick = () => go(1);
+  prev.onclick = () => go(-1);
+  next.onclick = () => go(1);
   full.onclick = () => {
     const s = slides[i];
     zoomImg.src = s.shot; zoomImg.alt = s.title;
