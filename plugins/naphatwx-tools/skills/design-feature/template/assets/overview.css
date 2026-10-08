@@ -215,8 +215,8 @@ li::marker { color: var(--text-3); }
 .facts dd { color: var(--text); }
 h2 + .facts { margin-top: 0; }
 
-/* in and out of scope side by side: they are read against each other */
-.scope { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px 40px; }
+/* in scope, then out of scope below it, each full width */
+.scope { display: grid; gap: 24px; }
 .scope h3 { font-size: var(--fs-body); color: var(--text-3); font-weight: 500; margin-bottom: 4px; }
 .scope ul { color: var(--text); }
 
