@@ -1,6 +1,6 @@
 ---
 name: announce
-description: Draft a Thanos announcement from a GitLab merge request. Analyzes the MR and produces a ready-to-paste title + markdown content (+ popup recommendation).
+description: Draft a Thanos markdown announcement from a GitLab MR diff, with popup advice. Use when the user says "announce this MR" or "write an announcement". Publishes only when asked.
 allowed-tools: Skill, Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests, mcp__thanos-mcp__AnnouncementService_CreateAnnouncement
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: design-feature
-description: Design a feature as a browsable HTML folder — overview.html with scope, a Flows section where every flow has a flowchart (its logic) and a sequence diagram (how services talk) showing real permission keys, RPCs, fields and codes, each in its own file and hidden until opened along with the flow's rules, database changes with an ER diagram page, API changes (each API's request / response changes, with the full schema and full contracts hidden until opened), errors, use cases (every acceptance scenario, edge case and refusal, each playable in an optional interactive mock UI) and open questions; can also publish the plan as a claude.ai Artifact. Use when the user asks to plan a feature, design a feature, generate feature docs/diagrams from a spec, ticket or idea, or publish/share a plan folder made by this skill.
+description: Plan a feature as a browsable HTML folder (flow diagrams, database and API changes, use cases, open questions) from a spec or idea. Use when the user says "design this feature" or "plan spec 127". The full plan; one diagram is generate-diagram, a mock alone is generate-mock-ui.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 

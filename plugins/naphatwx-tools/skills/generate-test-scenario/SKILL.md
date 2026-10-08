@@ -1,6 +1,6 @@
 ---
 name: generate-test-scenario
-description: Generate an AI-runnable test scenario file from a spec folder (or a feature description), targeting MCP tools or backend APIs by default, or the web UI with `--target ui` (pages, user actions, selectors, on-screen expectations — the input for the e2e-test skill). Use when the user gives a spec number, spec folder path or feature and asks for test scenarios, test cases, or a test plan. Generates only — it never executes the tests.
+description: Generate a test scenario file an AI can run later against MCP tools, APIs or the web UI, from a spec or feature. Use when the user says "test scenarios for spec 127" or "write test cases". Writes only, never runs tests; to run browser tests use e2e-test.
 ---
 
 # Test Scenario Generator

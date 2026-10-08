@@ -1,6 +1,6 @@
 ---
 name: e2e-test
-description: Browser E2E test for a feature. UI scenarios from generate-test-scenario --target ui, Playwright scripts with a screenshot at every step, then one self-contained HTML report.
+description: Write and run Playwright browser tests for a feature, with a screenshot per step and one HTML report. Use when the user says "e2e test spec 127" or "test this in the browser". A scenario file alone is generate-test-scenario; service checks are smoke-test.
 argument-hint: "<spec folder | spec number | feature description> [--env <name>] [--base-url <url>]"
 ---
 

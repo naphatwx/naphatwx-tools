@@ -1,7 +1,7 @@
 ---
 name: commit
 disable-model-invocation: true
-description: Generate a conventional commit message from staged changes and create the commit.
+description: Commit your staged changes with a conventional commit message written from the diff. Run it after `git add`. Stops if nothing is staged; never pushes.
 allowed-tools: Bash
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: list-plugins
-description: Show installed Claude Code plugin and marketplace details
+description: List installed Claude Code plugins and marketplaces with versions, skills and commands. Use when the user says "list my plugins" or "what plugins are installed".
 allowed-tools: Bash, Read, Glob
 ---
 

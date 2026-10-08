@@ -1,6 +1,6 @@
 ---
 name: generate-diagram
-description: Draw one diagram as a local file — a flowchart (a flow's logic), a sequence diagram (how services talk) or an ER diagram (tables, columns, foreign keys) — with the diagram-design skill when it is installed, otherwise from this skill's own templates. Use when the user asks for a flowchart, sequence diagram, ER diagram or database schema diagram from a spec, brief, migrations or database, or when the design-feature skill needs one.
+description: Draw one flowchart, sequence diagram or ER diagram as a local file, from a spec, brief, migrations or a database. Use when the user says "flowchart of the login flow" or "ER diagram of these tables". One diagram only; a full feature plan is design-feature.
 argument-hint: <flowchart | sequence | er> <source> [output-path] [mode=diagram-design|manual]
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: run-parallel
-description: Split a task into independent sub-tasks and run them in parallel using multiple sub-agents.
+description: Split a task into independent sub-tasks and run them at once with several sub-agents. Use when the user says "run this in parallel" or "split this across agents".
 allowed-tools: Agent, Read, Glob, Grep
 ---
 

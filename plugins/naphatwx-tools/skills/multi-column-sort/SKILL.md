@@ -1,12 +1,6 @@
 ---
 name: multi-column-sort
-description: >-
-  Implement multi-column table sorting with a tri-state per-column toggle
-  (none -> ASC -> DESC -> none) and a sort priority stack. Ships a
-  framework-agnostic TypeScript core plus a client-side comparator and
-  server-side sort-param serializers. Use when adding sortable table headers,
-  "sort by multiple columns", multi-sort, sort priority, or three-state column
-  sort UX to a table/grid/list.
+description: Implement multi-column table sorting with a three-state header toggle and a sort priority stack. Use when the user says "sort by several columns" or "multi-sort".
 ---
 
 # Multi-column sort

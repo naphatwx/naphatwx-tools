@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.142
+
+**All skills: rewritten descriptions**
+
+- Every skill `description` is rewritten as one plain line: what it does (starting with a verb), "Use when" with real trigger phrases, then what it does not do. Total length went from 5,002 to 4,561 characters, so the shared skill-list budget drops fewer descriptions.
+- Overlapping skills now name each other so a request matches only one: generate-test-scenario / e2e-test / smoke-test, review-code / get-mr-diffs, generate-changelog / update-merge-request, design-feature / generate-mock-ui / generate-diagram, html-document / html-presentation / user-guide.
+- commit and update-merge-request are written for the `/` menu; update-merge-request says it saves to the MR with no confirm step. get-mr-diffs starts with "Helper:" and names its callers.
+- multi-column-sort's `>-` block is now a single line. No skill body or other frontmatter key changed.
+
 ## 1.9.141
 
 **smoke-test, e2e-test: shorter descriptions; plugin.json lists get-mr-diffs**

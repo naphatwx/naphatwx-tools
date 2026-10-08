@@ -1,6 +1,6 @@
 ---
 name: generate-mock-ui
-description: Build an interactive, clickable mock UI for a planned feature in the target app's real design system — either a standalone HTML folder (typed contract, fake API with the real operation names) or mock pages inside the real app under mock/spec<NNN>/ (real components and types, local data, no API calls) — with one page per screen, a scenario switcher for every edge state, and a list of playable use cases (steps + what you should see) derived from every acceptance scenario, edge case and refusal in the spec. Use when the user asks for a mock UI, UI prototype, clickable mock or wireframe for a feature, or when the design-feature skill offers one.
+description: Build a clickable mock UI for a feature in the app's real design system, standalone or inside the app, with every edge state. Use when the user says "mock UI for spec 127" or "clickable prototype". Screens only, no real API; the full plan is design-feature.
 argument-hint: <plan-folder | spec-folder> [frontend-app-path] [standalone | in-project]
 ---
 

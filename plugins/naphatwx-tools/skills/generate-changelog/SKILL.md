@@ -1,6 +1,6 @@
 ---
 name: generate-changelog
-description: Generate a short, copy-paste changelog from a GitLab merge request. Outputs a single code block grouped by spec/area.
+description: Generate a short changelog from a GitLab merge request diff, as one copy-paste code block grouped by spec or area. Use when the user says "changelog for this MR" or "what changed in !123". Output only; it never edits the MR (update-merge-request does).
 allowed-tools: Skill, Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests
 ---
 

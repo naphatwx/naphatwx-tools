@@ -1,6 +1,6 @@
 ---
 name: check-job
-description: Poll a Jenkins build from its URL until it finishes, then explain any failure. Read-only - never fixes, retries, or stops a build.
+description: Watch a Jenkins build from its URL until it ends, then explain any failure. Use when the user pastes a build link or says "why did the build fail". Read-only.
 argument-hint: <jenkins-build-url>
 allowed-tools: Bash(sleep:*), mcp__jenkins__get_item, mcp__jenkins__get_build, mcp__jenkins__get_build_failure_excerpt, mcp__jenkins__get_build_console_tail, mcp__jenkins__get_build_console_chunk, mcp__jenkins__search_build_console, mcp__jenkins__get_build_test_report
 ---

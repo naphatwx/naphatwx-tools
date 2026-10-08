@@ -1,6 +1,6 @@
 ---
 name: get-mr-diffs
-description: Shared helper - resolve a GitLab merge request reference and fetch its actual changes (local git first, GitLab MCP fallback). Invoked by the MR-based commands; not meant to be run directly by users.
+description: "Helper: fetch a GitLab merge request diff, local git first, else GitLab MCP. Called by review-code, generate-changelog, announce and update-merge-request. Not for direct use."
 user-invocable: false
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: html-presentation
-description: Create an HTML slide presentation (16:9, click-zone navigation, fade transitions). Use when the user asks to build or generate an HTML presentation, slides, or slideshow.
+description: Create a single-file 16:9 HTML slide deck, one click per slide, from a topic. Use when the user says "make HTML slides about X", "build a presentation" or "make a slideshow". Slides only; a scrolling docs page is html-document, an end-user guide is user-guide.
 ---
 
 # HTML Presentation Generator

@@ -1,7 +1,7 @@
 ---
 name: update-merge-request
 disable-model-invocation: true
-description: Generate an updated title and description for a GitLab merge request and apply them to the MR
+description: Rewrite a GitLab merge request's title and description from its diff, then save them to the MR with no confirm step. Pass an MR URL or number; best when the MR text is stale or empty. To get a copy-paste changelog and leave the MR alone, use generate-changelog.
 argument-hint: <merge-request-url-or-iid>
 ---
 

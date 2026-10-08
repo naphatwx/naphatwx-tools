@@ -1,6 +1,6 @@
 ---
 name: smoke-test
-description: Post-deploy smoke test that checks the services of a real flow can talk to each other. `setup` builds a no-op simulation probe and a runner script in the repo; `run <env>` checks every hop and env var and writes one HTML report.
+description: Check after a deploy that every service in a real flow still reaches the next one, using a no-op probe. Use when the user says "smoke test staging" or "set up a smoke test". Checks service links and env vars, not the UI; for browser tests use e2e-test.
 argument-hint: "setup [flow ...] | run <env> [flow ...]"
 ---
 

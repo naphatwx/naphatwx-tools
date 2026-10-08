@@ -1,6 +1,6 @@
 ---
 name: html-document
-description: Generate a styled single-file HTML documentation page (dark mode by default, light/dark toggle, base font size picker, sidebar nav, search). Use when the user asks to build or generate HTML docs, a docs page, or styled documentation instead of plain markdown.
+description: Generate a styled single-file HTML docs page with sidebar navigation and search, from files or a topic. Use when the user says "make HTML docs for X" or "turn this markdown into a docs page". Slides are html-presentation; a markdown user guide is user-guide.
 ---
 
 # HTML Documentation Generator

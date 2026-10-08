@@ -1,6 +1,6 @@
 ---
 name: review-code
-description: Review only the changed lines of a diff (staged changes or a GitLab merge request)
+description: Review only the changed lines of staged changes, files or a GitLab merge request against the repo's guidelines. Use when the user says "review my staged changes" or "review this MR". Reports only, never edits code. Fetching the diff alone is get-mr-diffs.
 argument-hint: [staged | <merge-request-url> | file paths...]
 allowed-tools: Skill, Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), Bash(git fetch:*), Bash(git status:*), Bash(git -C:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__get_file_contents
 ---

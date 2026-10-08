@@ -1,6 +1,6 @@
 ---
 name: issue-log
-description: Log troubleshooting issues encountered during work — problems, causes, and fixes.
+description: Log a troubleshooting issue (problem, cause, fix) to today's private log file, or show today's log. Use when the user says "log this issue" or "show today's log".
 ---
 
 # Daily Log
