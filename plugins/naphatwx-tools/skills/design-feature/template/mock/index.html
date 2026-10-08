@@ -112,21 +112,21 @@
         h3 { font-size: var(--fs-h3); line-height: 1.3; }
         .t-code { font-size: var(--fs-sm); }
         .label { color: var(--text-3); font-weight: 500; }
-        /* Steps and expected result stay folded so the frame leads; one click opens them. */
-        .guide > summary { display: inline-flex; gap: 8px; align-items: center; color: var(--text-2); cursor: pointer; list-style: none; border-radius: var(--radius); }
-        .guide > summary::-webkit-details-marker { display: none; }
-        .guide > summary::before { content: "+"; font-family: var(--mono); color: var(--text-3); width: 1ch; }
-        .guide[open] > summary::before { content: "\2212"; }
-        .guide > summary:hover { color: var(--text); }
         .link { color: var(--accent); text-decoration: none; }
         .link:hover { text-decoration: underline; }
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
         a.panel { color: inherit; text-decoration: none; transition: border-color .15s var(--ease); }
         a.panel:hover { border-color: var(--accent); }
-        /* the use-case row (side list + frame) breaks out of the text column so the frame gets the width */
-        .uc-row { --row-w: min(100vw - 2 * var(--gutter) - 12px, 1880px); width: var(--row-w); margin-left: calc(50% - var(--row-w) / 2); display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 24px; align-items: start; }
-        .tabs { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: var(--radius-lg); }
-        @media (max-width: 900px) { .uc-row { grid-template-columns: minmax(0, 1fr); } .tabs { position: static; max-height: none; } }
+        /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
+           the guide sits beside the frame, not above it, so steps and the whole screen show at once;
+           on mid widths it tops the side list: the open use case matters more than the others */
+        .uc-row { --row-w: min(100vw - 2 * var(--gutter) - 12px, 1880px); width: var(--row-w); margin-left: calc(50% - var(--row-w) / 2); display: grid; grid-template-columns: 17rem minmax(0, 1fr) 20rem; grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
+        .uc-row > .tabs { grid-area: tabs; } .uc-row > .card { grid-area: card; } .uc-row > .guide { grid-area: guide; }
+        .tabs, .guide { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        .tabs { display: flex; flex-direction: column; gap: 2px; padding: 4px; }
+        .guide { padding: 12px 16px; }
+        @media (max-width: 1400px) { .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; max-height: none; } }
+        @media (max-width: 900px) { .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
         .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
         .tab-n { min-width: 2ch; text-align: right; }
@@ -225,6 +225,7 @@
                   ${ucs.map((u, i) => `<button type="button" role="tab" class="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)"><span class="tab-n">${i + 1}</span><span class="tab-t">${UI.esc(u.title)}</span><span class="tab-s">${UI.esc(u.surface || '')}</span></button>`).join('')}
                 </div>
                 <div class="card"></div>
+                <aside class="guide" aria-label="How to play and what you should see"></aside>
                 </div>
                 ${skipped.map(u => `<p class="meta measure mt-2">Not in the mock: ${UI.esc(u.title)} — ${UI.esc(u.skip)}</p>`).join('')}
               </section>`;
@@ -237,20 +238,7 @@
             if (fromClick) { clearState(); history.replaceState(null, '', '#uc-' + id); }
             block.querySelector('.card').innerHTML = `
               <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="font-semibold">${UI.esc(uc.title)}</h3><span class="t-code font-mono meta">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
-              <details class="guide mt-2 mb-3">
-                <summary>How to play · what you should see</summary>
-                <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 mt-3">
-                <div>
-                  <div class="label mb-1">How to play</div>
-                  <ol class="list-decimal pl-5 space-y-0.5 muted measure">${list(uc.steps)}</ol>
-                </div>
-                <div>
-                  <div class="label mb-1">What you should see</div>
-                  <ul class="list-disc pl-5 space-y-0.5 muted measure">${list(uc.expect)}</ul>
-                </div>
-                </div>
-              </details>
-              <div class="frame">
+              <div class="frame mt-2">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
                   <span class="url">${UI.esc(screenUrl(uc))}</span>
@@ -259,18 +247,27 @@
                 </div>
                 <div class="fit"><iframe title="${UI.esc(uc.title)} — interactive mock" src="${screenSrc(uc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>
               </div>`;
+            block.querySelector('.guide').innerHTML = `
+              <div class="label mb-1">How to play</div>
+              <ol class="list-decimal pl-5 space-y-1 muted">${list(uc.steps)}</ol>
+              <div class="label mt-4 mb-1">What you should see</div>
+              <ul class="list-disc pl-5 space-y-1 muted">${list(uc.expect)}</ul>`;
             fit(block);
         }
         function restart(id) { clearState(); pick(id); }
 
         function fit(block) {
             const box = block.querySelector('.fit'); if (!box) return;
-            const s = Math.min(1, box.clientWidth / SCREEN_W);
+            // fit the card's width and the window's height: the flow heading, title, toolbar and frame show without scrolling
+            const above = box.getBoundingClientRect().top - block.getBoundingClientRect().top;
+            const s = Math.min(1, block.querySelector('.card').clientWidth / SCREEN_W, (innerHeight - above - 48) / SCREEN_H);
             box.querySelector('iframe').style.transform = `scale(${s})`;
             box.style.height = Math.round(SCREEN_H * s) + 'px';
+            box.closest('.frame').style.width = Math.round(SCREEN_W * s) + 2 + 'px';
             block.querySelector('.scale-label').textContent = `${Math.round(s * 100)}% of ${SCREEN_W} px`;
         }
         new ResizeObserver(() => document.querySelectorAll('section[data-flow]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #flows
+        addEventListener('resize', () => document.querySelectorAll('section[data-flow]').forEach(fit)); // height-only changes skip the observer
 
         function renderLog() {
             const rows = FakeApi.log();

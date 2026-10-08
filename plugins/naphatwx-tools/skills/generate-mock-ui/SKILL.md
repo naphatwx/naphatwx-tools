@@ -20,7 +20,7 @@ The use cases themselves are not written here. They live in `<plan>/use-cases.js
 ```
 <plan>/use-cases.js         USE_CASE_FLOWS + USE_CASES (generate-use-case); read-only here
 mock/
-├── index.html              one block per flow: a side list of use cases + a card that plays the picked one; audit log; contract links
+├── index.html              one block per flow: a side list of use cases, a card that plays the picked one, its steps beside it; audit log; contract links
 ├── contract/
 │   ├── types.ts            real shapes to implement (reference; never loaded by pages)
 │   ├── rules.js            spec rules as pure functions
@@ -156,8 +156,8 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 
 - One block per flow, in plan order. Head: `3.N <flow name>`, refs on the right, a `plan` link to `../overview.html#flow-NN`.
 - Skipped use cases (`skip`) get no chip: one `Not in the mock: <title> — <why>` line under the flow's card. A flow with only skipped ones shows the first reason instead of chips.
-- Per flow, one row breaks out of the text column (`.uc-row`, up to `min(100vw − 2 × gutter, 1880px)`): a sticky side list on the left (17rem, `role="tablist"`, chips are `.tab` `role="tab"` buttons with `aria-selected`), the card and frame on the right. Each chip: number, full title (wraps, never cut), `surface` tag. The picked chip gets a solid `--accent` fill with `--bg` text. Under 900px the list stacks above the frame.
-- The picked use case, flat on the page (no card around it): title + story + scenario label; then a closed `details.guide` ("How to play · what you should see") holding "How to play" (ol) and "What you should see" (ul) side by side, under sentence-case `.label` headings, each list capped by `.measure` (about 70 characters a line); then one `.frame`: a browser bar (three dots, the URL the real app would show — `localhost:3000/<route>?…` or `MCP client · <Service> · <op>` — `<P>% of 1600 px`, Restart) and the screen in an iframe at 1600×940, transform-scaled to the frame width by a `ResizeObserver`, no border.
+- Per flow, one row breaks out of the text column (`.uc-row`, up to `min(100vw − 2 × gutter, 1880px)`): a sticky side list on the left (17rem, `role="tablist"`, chips are `.tab` `role="tab"` buttons with `aria-selected`), the card and frame in the middle, a sticky `aside.guide` on the right (20rem). Each chip: number, full title (wraps, never cut), `surface` tag. The picked chip gets a solid `--accent` fill with `--bg` text. At 1400px or less the guide moves to the left column, above the list. Under 900px everything stacks: guide, list, frame.
+- The picked use case, flat on the page (no card around it): title + story + scenario label, then one `.frame`. The guide column, always open, holds "How to play" (ol) then "What you should see" (ul), under sentence-case `.label` headings. The `.frame`: a browser bar (three dots, the URL the real app would show — `localhost:3000/<route>?…` or `MCP client · <Service> · <op>` — `<P>% of 1600 px`, Restart) and the screen in an iframe at 1600×940, transform-scaled by a `ResizeObserver` and a window `resize` listener to fit both the card width and the window height (flow heading, title and toolbar included), no border.
 - Page max width 1200px, dark only. The index chrome uses the synced theme block (Quiet Sheet tokens such as `--surface`, `--text-3`, `--accent`): style it with the template's CSS classes, never Tailwind gray/purple or `dark:` classes. Don't edit between the `theme:*` markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`. Tailwind stays loaded for layout utilities.
 - `#uc-<id>` picks that chip in its flow and scrolls to it; picking a chip updates the hash.
 - State: clear every `FakeApi.STORE` key on page load, on every chip pick and on Restart, so each use case starts clean. Without it, rows written in one card leak into every other card after a reload.
