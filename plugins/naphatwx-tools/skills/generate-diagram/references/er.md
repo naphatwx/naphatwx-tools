@@ -11,7 +11,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
 
 ## diagram-design mode
 
-- Ask for a **Database Schema** diagram (`type-db-schema`: FK lines column to column, `ON DELETE` label when the source gives one), dark theme, in the theme's colors and type (SKILL.md hard rule 4); save it as `er-diagram.html`. No height reporter: it is a page, not an iframe.
+- Ask for a **Database Schema** diagram (`type-db-schema`: FK lines column to column, `ON DELETE` label when the source gives one), dark theme, in the theme's colors and type (SKILL.md hard rule 4); save it as `er-diagram.html`. No embed script: it is a page, not an iframe.
 - Over its budget (5 tables, 8 columns each) → split by area (for example catalog, ordering) into `er-<area>.html`, one link per page. Every table appears in at least one page; a table shared by two areas appears in both.
 
 ## Manual mode

@@ -61,13 +61,13 @@ Every label, detail line and condition a reader sees:
 
 ## diagram-design mode
 
-- Ask for a Flowchart of the same content, dark theme, with each node's detail line as its mono sub-label, in the theme's colors and type (SKILL.md hard rule 4); save to `NN-<slug>.html`; add the height reporter (SKILL.md step 3).
+- Ask for a Flowchart of the same content, dark theme, with each node's detail line as its mono sub-label, in the theme's colors and type (SKILL.md hard rule 4); save to `NN-<slug>.html`; add the embed script (SKILL.md step 3).
 
 ## Manual mode
 
 - Start from `template/flowchart/01-example-flow.svg`. Keep its `<title>` / `<desc>`, marker, colours and the mono `<g>` for detail lines. A standalone `.svg` can't read CSS variables, so it uses the theme's hex values directly.
 - Size shapes to the detail line: boxes and pills ≥ 160 wide, diamonds ≥ 220 wide.
-- Set the `viewBox` to fit; lay nodes on a grid, main path top to bottom, branches to the sides; no line crosses a node.
+- Set the `viewBox` to fit, and `width` / `height` on the `<svg>` to the same numbers: a host page reads them as the drawing's 1:1 size (design-feature's presentation mode scales from it). Lay nodes on a grid, main path top to bottom, branches to the sides; no line crosses a node.
 - Save to `NN-<slug>.svg`. Don't copy the example itself to the output.
 
 ## Checks

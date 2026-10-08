@@ -48,11 +48,16 @@ search.addEventListener("keydown", (e) => {
 // ===== Active link on scroll: the last target whose top passed 120px; a clicked link wins until the next scroll gesture =====
 const byId = new Map(railLinks.map(a => [a.getAttribute("href").slice(1), a]));
 const targets = [...byId.keys()].map(id => document.getElementById(id)).filter(Boolean);
-let pinnedLink = null;
-const setActive = (a) => railLinks.forEach(l => {
-    l.classList.toggle("active", l === a);
-    if (l === a) l.setAttribute("aria-current", "location"); else l.removeAttribute("aria-current");
-});
+let pinnedLink = null, activeLink;
+function setActive(a) {
+    if (a === activeLink) return;
+    activeLink = a;
+    railLinks.forEach(l => {
+        l.classList.toggle("active", l === a);
+        if (l === a) l.setAttribute("aria-current", "location"); else l.removeAttribute("aria-current");
+    });
+    railTitles(); // the active link is bold, so its label may now be cut short
+}
 function spy() {
     if (pinnedLink) return;
     const atBottom = innerHeight + scrollY >= root.scrollHeight - 2;
@@ -65,43 +70,26 @@ railLinks.forEach(a => a.addEventListener("click", () => { pinnedLink = a; setAc
 addEventListener("scroll", spy, { passive: true });
 spy();
 
-// ===== Flow views: one panel at a time, all closed at first; clicking the open tab closes it.
-// Roving tabindex: one tab per row is in the Tab order; arrows, Home and End move between tabs.
+// ===== Flow views: disclosure buttons (aria-expanded), all closed at first; one panel open per flow,
+// and clicking the open view's button closes it.
 const flows = [...document.querySelectorAll(".flow")];
-function selectView(tab, force) {
-    const list = tab.closest("[role=tablist]");
-    const open = force ?? tab.getAttribute("aria-selected") !== "true";
-    list.querySelectorAll("[role=tab]").forEach(t => {
-        const on = open && t === tab;
-        t.setAttribute("aria-selected", String(on));
-        t.tabIndex = t === tab ? 0 : -1;
-        const panel = document.getElementById(t.getAttribute("aria-controls"));
+const viewButtons = [...document.querySelectorAll(".views button[aria-controls]")];
+function selectView(btn, force) {
+    const open = force ?? btn.getAttribute("aria-expanded") !== "true";
+    btn.closest(".views").querySelectorAll("button[aria-controls]").forEach(b => {
+        const on = open && b === btn;
+        b.setAttribute("aria-expanded", String(on));
+        const panel = document.getElementById(b.getAttribute("aria-controls"));
         if (!panel) return;
         const was = !panel.hidden;
         panel.hidden = !on;
         if (on && !was) { panel.classList.remove("entering"); void panel.offsetWidth; panel.classList.add("entering"); }
     });
 }
-document.querySelectorAll("[role=tab]").forEach(tab => {
-    const panel = document.getElementById(tab.getAttribute("aria-controls"));
-    if (panel) panel.dataset.label = tab.textContent.trim();
-    tab.addEventListener("click", () => selectView(tab));
-    tab.addEventListener("keydown", (e) => {
-        if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(e.key)) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const tabs = [...tab.parentElement.querySelectorAll("[role=tab]:not(:disabled)")];
-        const i = tabs.indexOf(tab);
-        const next = e.key === "Home" ? tabs[0] : e.key === "End" ? tabs[tabs.length - 1]
-            : tabs[(i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
-        tabs.forEach(t => { t.tabIndex = t === next ? 0 : -1; });
-        next.focus();
-    });
-});
-document.querySelectorAll("[role=tablist]").forEach(list => {
-    const tabs = [...list.querySelectorAll("[role=tab]")];
-    const first = tabs.find(t => t.getAttribute("aria-selected") === "true") || tabs.find(t => !t.disabled);
-    tabs.forEach(t => { t.tabIndex = t === first ? 0 : -1; });
+viewButtons.forEach(btn => {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (panel) panel.dataset.label = btn.textContent.trim();
+    btn.addEventListener("click", () => selectView(btn));
 });
 document.querySelectorAll(".panel").forEach(p => p.addEventListener("animationend", () => p.classList.remove("entering")));
 // the flow a 1/2/3 key acts on: the current slide when presenting, else the flow nearest the top of the screen
@@ -131,8 +119,8 @@ const hudLabel = document.getElementById("hudLabel");
 const presentBtn = document.getElementById("presentBtn");
 const steps = slides.flatMap(slide => {
     const title = slide.dataset.title;
-    const tabs = [...slide.querySelectorAll("[role=tab]:not(:disabled)")];
-    if (tabs.length) return tabs.map(tab => ({ slide, tab, label: `${title} · ${tab.textContent.trim()}` }));
+    const views = [...slide.querySelectorAll(".views button[aria-controls]:not(:disabled)")];
+    if (views.length) return views.map(tab => ({ slide, tab, label: `${title} · ${tab.textContent.trim()}` }));
     const parts = [...slide.querySelectorAll(":scope > [data-part]")];
     if (parts.length) return [{ slide, part: null, label: title },
         ...parts.map(part => ({ slide, part, label: `${title} · ${part.dataset.part}` }))];
@@ -140,23 +128,66 @@ const steps = slides.flatMap(slide => {
 });
 let current = 0;
 const presenting = () => root.getAttribute("data-present") === "on";
-// height left for the step's diagram: window minus the chrome above it, its box padding and the bar
+// ===== Present fit: the step's diagram is scaled to the room above the bar, up to the box width.
+// Never below 1:1 (diagrams draw every label at 12px or more): a taller one scrolls in its box with a cue.
+const fitted = new Set();
+const postFit = (frame, height) => frame.contentWindow?.postMessage({ type: "diagram-fit", height }, "*");
+function updateCue(box) {
+    const cue = box.querySelector(":scope > .more-cue");
+    if (cue) cue.hidden = !fitted.has(box) || box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
+}
+function unfit() {
+    fitted.forEach(box => {
+        box.style.maxHeight = "";
+        box.classList.remove("fitted");
+        const art = box.querySelector("img, svg");
+        if (art) art.style.width = "";
+        const frame = box.querySelector(".diagram-frame");
+        if (frame && +frame.dataset.fit) { frame.dataset.fit = 0; postFit(frame, 0); }
+    });
+    const was = [...fitted];
+    fitted.clear();
+    was.forEach(updateCue);
+}
 function fitRoom() {
+    unfit();
     if (!presenting()) return;
+    const room = innerHeight - hudSpace();
     const slide = steps[current].slide;
-    const art = slide.querySelector(".panel:not([hidden]) .flowchart img, .panel:not([hidden]) .seq svg");
-    if (!art) return;
-    const box = art.closest(".flowchart, .seq");
-    const above = art.getBoundingClientRect().top - slide.getBoundingClientRect().top;
+    const box = slide.querySelector(".panel:not([hidden]) .flowchart, .panel:not([hidden]) .seq");
+    if (!box) return;
     const sheetTop = parseFloat(getComputedStyle(document.getElementById("sheet")).paddingTop);
-    const below = parseFloat(getComputedStyle(box).paddingBottom) + box.clientTop;
-    let room = innerHeight - sheetTop - above - below - hud.offsetHeight - 32;
-    // never shrink a sequence diagram below its drawn size (13px labels): a taller one scrolls instead
-    const vb = art.viewBox?.baseVal;
-    if (vb?.height) room = Math.max(room, vb.height * Math.min(1, art.parentElement.clientWidth / vb.width));
-    root.style.setProperty("--room", Math.max(160, Math.floor(room)) + "px");
+    const top = sheetTop + box.getBoundingClientRect().top - slide.getBoundingClientRect().top;
+    const cs = getComputedStyle(box);
+    const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + box.clientTop * 2;
+    const width = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const height = Math.max(200, Math.floor(room - top - padY));
+    fitted.add(box);
+    box.classList.add("fitted");
+    box.style.maxHeight = height + padY + "px";
+    const frame = box.querySelector(".diagram-frame");
+    if (frame) { frame.dataset.fit = height; postFit(frame, height); }
+    else {
+        const art = box.querySelector("img, svg");
+        const vb = art?.viewBox?.baseVal;
+        const [w, h] = art?.tagName === "IMG" ? [art.naturalWidth, art.naturalHeight] : [vb?.width, vb?.height];
+        if (w && h) art.style.width = Math.floor(w * Math.max(1, Math.min(width / w, height / h))) + "px";
+    }
+    if (!box.querySelector(":scope > .more-cue")) {
+        box.insertAdjacentHTML("beforeend", '<div class="more-cue" aria-hidden="true" hidden>continues ↓</div>');
+        box.addEventListener("scroll", () => updateCue(box), { passive: true });
+    }
+    box.scrollTop = 0;
+    updateCue(box);
+}
+// the bar's footprint: its height plus its bottom offset; the sheet keeps 24px more below its last line
+function hudSpace() {
+    const space = hud.offsetHeight + parseFloat(getComputedStyle(hud).bottom);
+    root.style.setProperty("--hud-space", space + "px");
+    return space + 24;
 }
 addEventListener("resize", fitRoom);
+document.querySelectorAll(".flowchart img").forEach(img => img.addEventListener("load", fitRoom));
 function show(i) {
     current = Math.max(0, Math.min(steps.length - 1, i));
     const step = steps[current];
@@ -176,14 +207,15 @@ function show(i) {
 }
 function setPresent(on) {
     if (on) {
-        const near = slides.find(s => s.getBoundingClientRect().bottom > innerHeight * 0.3) || slides[0];
+        // the last section whose top has passed 30% of the window: a short flow at the top still counts
+        const near = slides.filter(s => s.getBoundingClientRect().top <= innerHeight * 0.3).pop() || slides[0];
         root.setAttribute("data-present", "on");
         hud.hidden = false;
         show(steps.findIndex(st => st.slide === near));
     } else {
         root.removeAttribute("data-present");
-        root.style.removeProperty("--room");
         hud.hidden = true;
+        unfit();
         document.querySelectorAll(".step-off").forEach(el => el.classList.remove("step-off"));
         steps[current].slide.scrollIntoView({ behavior: "instant" });
     }
@@ -193,8 +225,8 @@ presentBtn.addEventListener("click", () => setPresent(true));
 document.getElementById("prevSlide").addEventListener("click", () => show(current - 1));
 document.getElementById("nextSlide").addEventListener("click", () => show(current + 1));
 document.getElementById("exitPresent").addEventListener("click", () => setPresent(false));
-// a tab click while presenting jumps to that view's step
-document.querySelectorAll("[role=tab]").forEach(tab => tab.addEventListener("click", () => {
+// a view click while presenting jumps to that view's step
+viewButtons.forEach(tab => tab.addEventListener("click", () => {
     if (!presenting()) return;
     const i = steps.findIndex(st => st.tab === tab);
     if (i >= 0) show(i);
@@ -224,7 +256,7 @@ document.addEventListener("keydown", (e) => {
     if (k === "p" || k === "P") { setPresent(!presenting()); return; }
     if (k === "?") { openKeys(); return; }
     if (k === "1" || k === "2" || k === "3") {
-        const tab = flowInView()?.querySelectorAll("[role=tab]")[+k - 1];
+        const tab = flowInView()?.querySelectorAll(".views button[aria-controls]")[+k - 1];
         if (!tab || tab.disabled) return;
         selectView(tab);
         const panel = document.getElementById(tab.getAttribute("aria-controls"));
@@ -238,11 +270,17 @@ document.addEventListener("keydown", (e) => {
     else if (k === "ArrowLeft" || k === "PageUp" || (k === " " && e.shiftKey)) { e.preventDefault(); show(current - 1); }
 });
 
-// ===== Fit each diagram-design iframe to the height its file posts (works on file://) =====
+// ===== Fit each diagram-design iframe to the height its file posts (works on file://).
+// Presenting, the frame is sent a fit height; one that loaded after it was sent (lazy) gets it again.
 addEventListener("message", (e) => {
     if (!e.data || e.data.type !== "diagram-height") return;
     const frame = [...document.querySelectorAll(".diagram-frame")].find(f => f.contentWindow === e.source);
-    if (frame) frame.style.height = Math.ceil(e.data.height) + "px";
+    if (!frame) return;
+    frame.style.height = Math.ceil(e.data.height) + "px";
+    const want = +frame.dataset.fit || 0;
+    if ((+e.data.fit || 0) !== want) postFit(frame, want);
+    const box = frame.closest(".flowchart, .seq");
+    if (box) updateCue(box);
 });
 
 // ===== Diagram zoom: with Zoom on, wheel zooms at the cursor and drag pans; ⛶ opens a lightbox where zoom always works =====
@@ -349,8 +387,18 @@ lightbox.addEventListener("close", () => {
 lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
 lightbox.addEventListener("click", (e) => { if (e.target === lightbox) lightbox.close(); });
 
+// a rail label cut short by the ellipsis shows in full on hover
+function railTitles() {
+    rail.querySelectorAll(".rail-label").forEach(l => {
+        const a = l.closest("a") || l;
+        if (l.scrollWidth > l.clientWidth) a.title = l.textContent.trim(); else a.removeAttribute("title");
+    });
+}
+addEventListener("resize", railTitles);
+
 document.addEventListener("DOMContentLoaded", () => {
     document.body.append(lightbox);
+    railTitles();
     document.querySelectorAll(".flowchart, .seq").forEach(makeZoomable);
     // sequence diagrams have drawn by now, so section offsets are final
     spy();

@@ -102,28 +102,40 @@ function checkEnv(expected = [], reported = {}) {
   })
 }
 
-// One observation of one hop: { ok, detail, env, instance, evidence }, or null when it is not there yet.
+// One observation of one hop: { ok, detail, env, instance, evidence, entry? },
+// or { pending, method, evidence } when it is not there yet, so a timeout can say what was polled.
 async function observe(flow, hop, vars) {
   const o = hop.observe
   if (o.type === 'store' || o.type === 'service') {
     const target =
       o.type === 'store' ? flow.store : { service: hop.service, path: o.path ?? flow.store.path, auth: o.auth ?? flow.store.auth }
     const r = await call(target.service, 'GET', fill(target.path, vars), { auth: target.auth })
-    if (r.status === 404) return null
+    if (r.status === 404) return { pending: 'not found', method: 'GET', evidence: r }
     if (r.status !== 200) return { ok: false, detail: `HTTP ${r.status}`, evidence: r }
-    const entry = (pick(r.json, o.hopsField ?? 'hops') ?? []).find((h) => h.hop === hop.id)
-    if (!entry) return null
-    return { ok: entry.ok !== false, detail: entry.error ?? entry.note ?? 'reported', env: entry.env, instance: entry.instance, evidence: r }
+    const field = o.hopsField ?? 'hops'
+    const list = pick(r.json, field) ?? []
+    const index = list.findIndex((h) => h.hop === hop.id)
+    if (index < 0) return { pending: `hop "${hop.id}" not in ${field}`, method: 'GET', evidence: r }
+    const entry = list[index]
+    return {
+      ok: entry.ok !== false,
+      detail: entry.error ?? entry.note ?? 'reported',
+      env: entry.env,
+      instance: entry.instance,
+      evidence: r,
+      entry: { path: `${field}[${index}]`, json: JSON.stringify(entry) },
+    }
   }
   if (o.type === 'http') {
-    const r = await call(o.service ?? hop.service, o.method ?? 'GET', fill(o.path, vars), { auth: o.auth })
-    if (o.retryOn?.includes(r.status)) return null
+    const method = o.method ?? 'GET'
+    const r = await call(o.service ?? hop.service, method, fill(o.path, vars), { auth: o.auth })
+    if (o.retryOn?.includes(r.status)) return { pending: `HTTP ${r.status} is in retryOn`, method, evidence: r }
     const okStatus = (o.expectStatus ?? [200]).includes(r.status)
     const field = o.expectField ? pick(r.json, o.expectField.path) : undefined
     const okField =
       !o.expectField || (o.expectField.equals === undefined ? field !== undefined : field === fill(o.expectField.equals, vars))
     if (!okStatus || !okField) {
-      if (o.pollUntilMatch) return null
+      if (o.pollUntilMatch) return { pending: 'no match yet', method, evidence: r }
       const shown = o.expectField ? ` ${o.expectField.path}=${JSON.stringify(field)}` : ''
       return { ok: false, detail: `HTTP ${r.status}${shown}`, evidence: r }
     }
@@ -133,33 +145,66 @@ async function observe(flow, hop, vars) {
 }
 
 const shell = (hop, status) => ({ id: hop.id, service: hop.service, from: hop.from, transport: hop.transport, status })
+const evidenceOf = (r, entry) =>
+  r && {
+    url: mask(r.url),
+    status: r.status,
+    ms: r.ms,
+    body: mask(r.text),
+    truncated: r.truncated,
+    ...(entry && { entryPath: entry.path, entry: mask(entry.json) }),
+  }
+// "NAME = used (expected want)" for each failed env check; values are already masked.
+const envProblem = (c) => (c.value === undefined ? `${c.name} ${c.note}` : `${c.name} = ${c.value}${c.note ? ` (${c.note})` : ''}`)
 
 async function runHop(flow, hop, vars) {
   const timeoutMs = hop.timeoutMs ?? env.hopTimeoutMs ?? 30000
   const started = Date.now()
   let last = null
+  const polls = []
   while (Date.now() - started < timeoutMs) {
     try {
       last = await observe(flow, hop, vars)
     } catch (e) {
       last = { ok: false, detail: e.message }
     }
-    if (last) break
+    if (!last.pending) break
+    polls.push(last)
     await sleep(hop.pollMs ?? 1000)
   }
   const ms = Date.now() - started
-  if (!last) return { ...shell(hop, 'timed-out'), ms, detail: `not observed within ${timeoutMs} ms` }
-  const envChecks = checkEnv(hop.envVars, last.env)
-  const envOk = envChecks.every((c) => c.ok)
+  if (!last || last.pending) {
+    const end = polls.at(-1)
+    const statuses = [...new Set(polls.map((p) => p.evidence.status))]
+    return {
+      ...shell(hop, 'timed-out'),
+      ms,
+      detail: `not observed within ${timeoutMs} ms` + (end ? ` · ${polls.length} polls, last HTTP ${end.evidence.status}` : ''),
+      polling: end && {
+        polls: polls.length,
+        method: end.method,
+        lastUrl: mask(end.evidence.url),
+        lastStatus: end.evidence.status,
+        sameStatus: statuses.length === 1,
+        lastReason: mask(end.pending),
+        waitedMs: ms,
+      },
+      evidence: evidenceOf(end?.evidence),
+    }
+  }
+  const envChecks = checkEnv(hop.envVars, last.env).map((c) => ({ ...c, value: c.value === undefined ? undefined : mask(c.value), note: mask(c.note) }))
+  const envFailed = envChecks.filter((c) => !c.ok)
+  // A failed env check is the cause, so it replaces the service's own success note ("stored").
+  const envText = envFailed.map(envProblem).join('; ')
+  const detail = envFailed.length ? (last.ok ? envText : `${mask(last.detail)} · ${envText}`) : mask(last.detail)
   return {
-    ...shell(hop, last.ok && envOk ? 'pass' : 'fail'),
+    ...shell(hop, last.ok && !envFailed.length ? 'pass' : 'fail'),
     ms,
     instance: last.instance,
-    detail: mask(last.detail) + (envOk ? '' : ' · env var mismatch'),
-    env: envChecks.map((c) => ({ ...c, value: mask(c.value), note: mask(c.note) })),
-    evidence: last.evidence
-      ? { url: last.evidence.url, status: last.evidence.status, ms: last.evidence.ms, body: mask(last.evidence.text), truncated: last.evidence.truncated }
-      : undefined,
+    detail,
+    envMismatch: envFailed.length ? envFailed.map((c) => c.name) : undefined,
+    env: envChecks,
+    evidence: evidenceOf(last.evidence, last.entry),
   }
 }
 

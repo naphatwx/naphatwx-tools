@@ -60,18 +60,27 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 3. Draw
 
 - Read the reference for the type and follow it: [flowchart](references/flowchart.md), [sequence](references/sequence.md), [er](references/er.md).
-- diagram-design mode, `flowchart` and `sequence`: add this height reporter just before `</body>` of every saved `.html`. The SVG shrinks with an iframe's width, so a fixed height leaves empty space; a host page that listens for `diagram-height` (design-feature's `overview.html` does) sizes the iframe instead. It also keeps each SVG at least its viewBox width (labels stay 12px or larger) and scrolls it sideways in a narrow window instead of overflowing the page.
+- diagram-design mode, `flowchart` and `sequence`: add this embed script just before `</body>` of every saved `.html`, unchanged. It is the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
+    - Height: it posts `diagram-height` on every resize, so the host sizes the iframe (the SVG shrinks with the iframe's width, so a fixed height leaves empty space).
+    - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
+    - Fit: a host that presents posts `diagram-fit` with a height; the SVG scales to fit it, up to the frame width, never below 1:1, and the host scrolls what is still taller.
+    - Width: each SVG stays at least its viewBox width (labels stay 12px or larger) and scrolls sideways in a narrow window instead of overflowing the page.
 
 ```html
 <script>
-  // Report the real height to the host page so its iframe fits (postMessage works on file://).
-  // body, not documentElement: its scrollHeight never drops below the iframe's height; the
-  // fractional rect height avoids a 0.1px overflow showing a scrollbar strip.
+  // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
+  // Out: {type: "diagram-height", height, fit} on every resize. In: {type: "diagram-fit", height}, 0 = off.
+  const embedded = parent !== window;
   const style = document.createElement("style");
-  style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }`;
+  style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
+    .embedded body { padding: 1rem; }
+    .embedded .eyebrow, .embedded h1 { display: none; }`;
   document.head.append(style);
+  // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
+  if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
   // Never draw a diagram below its viewBox width, so 12px labels stay 12px; a narrow frame scrolls it sideways.
-  document.querySelectorAll("svg[viewBox]:not(svg svg)").forEach(svg => {
+  const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
+  svgs.forEach(svg => {
     svg.style.minWidth = svg.viewBox.baseVal.width + "px";
     if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
     const box = document.createElement("div");
@@ -79,12 +88,27 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     svg.before(box);
     box.append(svg);
   });
-  if (parent !== window) {
-    // Embedded: the host sizes the height.
-    document.documentElement.style.overflowY = "hidden";
-    document.body.style.padding = "1rem";
+  // body, not documentElement: its scrollHeight never drops below the iframe's height
+  let fit = 0;
+  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, fit }, "*");
+  // Fit (host presenting): scale to the given height, up to the frame width, never below 1:1; taller → the host scrolls.
+  function applyFit() {
+    svgs.forEach(svg => { svg.style.width = ""; svg.style.maxWidth = ""; });
+    if (!fit) return;
+    const rest = document.body.getBoundingClientRect().height - svgs.reduce((h, svg) => h + svg.getBoundingClientRect().height, 0);
+    svgs.forEach(svg => {
+      const vb = svg.viewBox.baseVal;
+      const s = Math.max(1, Math.min(svg.parentElement.clientWidth / vb.width, (fit - rest) / svgs.length / vb.height));
+      svg.style.width = vb.width * s + "px";
+      svg.style.maxWidth = "none";
+    });
   }
-  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
+  addEventListener("message", (e) => {
+    if (e.source !== parent || e.data?.type !== "diagram-fit") return;
+    fit = +e.data.height || 0;
+    applyFit();
+    postHeight();
+  });
   addEventListener("load", postHeight);
   new ResizeObserver(postHeight).observe(document.body);
 </script>

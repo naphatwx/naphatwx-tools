@@ -58,7 +58,7 @@
 
         <!-- ============ 01 OVERVIEW ============ -->
         <section class="slide" id="overview" data-title="Overview">
-            <p class="kicker">Spec NNN · TICKET-123 · Draft</p>
+            <p class="kicker"><span class="sec-n">01</span>Spec NNN · TICKET-123 · Draft</p>
             <h1>Feature Name</h1>
             <p class="lead">One short sentence: what the feature lets a user do.</p>
             <dl class="facts">
@@ -114,19 +114,19 @@
             </header>
             <p class="flow-line">Save a new thing. <span class="aside">Starts from Things page → New.</span></p>
             <p class="try"><span class="aside">Try in the mock</span> <a href="mock/index.html#uc-create-read-only" target="_blank" rel="noopener">User without create permission ↗</a> · <a href="mock/index.html#uc-create-archived" target="_blank" rel="noopener">Archived owner ↗</a> · <a href="mock/index.html#uc-create-api" target="_blank" rel="noopener">Create over the API ↗</a></p>
-            <div class="views" role="tablist" aria-label="Flow 3.1 views">
-                <button role="tab" aria-selected="false" aria-controls="flow-01-chart" id="flow-01-chart-tab">Flowchart</button>
-                <button role="tab" aria-selected="false" aria-controls="flow-01-seq" id="flow-01-seq-tab">Sequence</button>
-                <button role="tab" aria-selected="false" aria-controls="flow-01-rules" id="flow-01-rules-tab">Rules</button>
+            <div class="views" role="group" aria-label="Flow 3.1 views">
+                <button type="button" aria-expanded="false" aria-controls="flow-01-chart" id="flow-01-chart-tab">Flowchart</button>
+                <button type="button" aria-expanded="false" aria-controls="flow-01-seq" id="flow-01-seq-tab">Sequence</button>
+                <button type="button" aria-expanded="false" aria-controls="flow-01-rules" id="flow-01-rules-tab">Rules</button>
             </div>
-            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-01-chart" aria-labelledby="flow-01-chart-tab" hidden>
+            <div class="panel wide" role="region" tabindex="-1" id="flow-01-chart" aria-labelledby="flow-01-chart-tab" hidden>
                 <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry"></div>
             </div>
-            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-01-seq" aria-labelledby="flow-01-seq-tab" hidden>
+            <div class="panel wide" role="region" tabindex="-1" id="flow-01-seq" aria-labelledby="flow-01-seq-tab" hidden>
                 <p class="seq-legend"><span>call</span><span class="ret">response</span><span class="hot">side effect</span></p>
                 <div class="seq" data-flow="01-example-flow"></div>
             </div>
-            <div class="panel" role="tabpanel" tabindex="0" id="flow-01-rules" aria-labelledby="flow-01-rules-tab" hidden>
+            <div class="panel" role="region" tabindex="-1" id="flow-01-rules" aria-labelledby="flow-01-rules-tab" hidden>
                 <ul>
                     <li>The name is unique per owner; a duplicate returns <code>ALREADY_EXISTS</code>.</li>
                     <li>Only users with <code>thing.edit</code> see the "New" button.</li>
@@ -143,25 +143,25 @@
             </header>
             <p class="flow-line">The same flow as 3.1, drawn by diagram-design. <span class="aside">Starts from Things page → New.</span></p>
             <p class="try"><span class="aside">Try in the mock</span> <a href="mock/index.html#uc-create-read-only" target="_blank" rel="noopener">User without create permission ↗</a> · <a href="mock/index.html#uc-create-archived" target="_blank" rel="noopener">Archived owner ↗</a> · <a href="mock/index.html#uc-create-api" target="_blank" rel="noopener">Create over the API ↗</a></p>
-            <div class="views" role="tablist" aria-label="Flow 3.2 views">
-                <button role="tab" aria-selected="false" aria-controls="flow-02-chart" id="flow-02-chart-tab">Flowchart</button>
-                <button role="tab" aria-selected="false" aria-controls="flow-02-seq" id="flow-02-seq-tab">Sequence</button>
-                <button role="tab" aria-selected="false" aria-controls="flow-02-rules" id="flow-02-rules-tab">Rules</button>
+            <div class="views" role="group" aria-label="Flow 3.2 views">
+                <button type="button" aria-expanded="false" aria-controls="flow-02-chart" id="flow-02-chart-tab">Flowchart</button>
+                <button type="button" aria-expanded="false" aria-controls="flow-02-seq" id="flow-02-seq-tab">Sequence</button>
+                <button type="button" aria-expanded="false" aria-controls="flow-02-rules" id="flow-02-rules-tab">Rules</button>
             </div>
-            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-02-chart" aria-labelledby="flow-02-chart-tab" hidden>
+            <div class="panel wide" role="region" tabindex="-1" id="flow-02-chart" aria-labelledby="flow-02-chart-tab" hidden>
                 <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
             </div>
-            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-02-seq" aria-labelledby="flow-02-seq-tab" hidden>
+            <div class="panel wide" role="region" tabindex="-1" id="flow-02-seq" aria-labelledby="flow-02-seq-tab" hidden>
                 <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
-                <div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>
-                    <li><span class="n">1</span><code>GetThing</code> id from the route</li>
-                    <li><span class="n">2</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
-                    <li><span class="n">3</span><code>CreateThing</code> name, ownerId</li>
-                    <li><span class="n">4</span><code>POST /things</code> timeout 10 s</li>
-                    <li><span class="n">5</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
+                <div class="seq-steps"><p class="seq-steps-title">Step details · only steps with extra detail, by their number in the diagram</p><ol>
+                    <li><span class="n">2</span><code>GetThing</code> id from the route</li>
+                    <li><span class="n">·</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
+                    <li><span class="n">6</span><code>CreateThing</code> name, ownerId</li>
+                    <li><span class="n">7</span><code>POST /things</code> timeout 10 s</li>
+                    <li><span class="n">12</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
                 </ol></div>
             </div>
-            <div class="panel" role="tabpanel" tabindex="0" id="flow-02-rules" aria-labelledby="flow-02-rules-tab" hidden>
+            <div class="panel" role="region" tabindex="-1" id="flow-02-rules" aria-labelledby="flow-02-rules-tab" hidden>
                 <ul>
                     <li>The name is unique per owner; a duplicate returns <code>ALREADY_EXISTS</code>.</li>
                 </ul>

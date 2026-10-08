@@ -49,6 +49,15 @@
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
+      /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
+         headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+      --fs-xs: 0.75rem;
+      --fs-sm: 0.875rem;
+      --fs-md: 1rem;
+      --fs-lg: 1.25rem;
+      --fs-xl: 1.75rem;
+      --fs-2xl: 2.75rem;
+
       --radius: 6px;
       --radius-lg: 10px;
       --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -76,39 +85,47 @@
   }
   /* theme:base:end */
 
-  body { font-size: 14px; line-height: 1.5; }
+  body { font-size: var(--fs-sm); line-height: 1.5; }
   [hidden] { display: none !important; }
   main { max-width: 1400px; margin: 0 auto; padding: 24px 16px 64px; }
   header { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
-  h1 { font-size: 20px; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
-  h2 { font-size: 15px; margin: 0; overflow-wrap: anywhere; }
-  h3 { font-size: 15px; margin: 0; overflow-wrap: anywhere; }
-  .meta { color: var(--text-3); font-size: 13px; }
-  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
-  code { font-size: 12px; overflow-wrap: anywhere; }
+  h1 { font-size: var(--fs-xl); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
+  h2 { font-size: var(--fs-lg); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
+  h3 { font-size: var(--fs-md); margin: 0; overflow-wrap: anywhere; }
+  .meta { color: var(--text-3); font-size: var(--fs-xs); }
+  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-sm); }
+  .summary-line .lead { font-weight: 600; }
+  .summary-line .c-bad { color: var(--bad); }
+  .summary-line .c-warn { color: var(--warn); }
+  code { font-size: var(--fs-xs); overflow-wrap: anywhere; }
 
-  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: 12px; white-space: nowrap; }
+  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-xs); white-space: nowrap; }
   .tone-ok { color: var(--ok); background: var(--ok-soft); }
   .tone-warn { color: var(--warn); background: var(--warn-soft); }
   .tone-bad { color: var(--bad); background: var(--bad-soft); }
   .tone-neutral { color: var(--neutral); background: var(--neutral-soft); }
 
-  button { font: inherit; font-size: 13px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
+  button { font: inherit; font-size: var(--fs-sm); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
   button:hover:not(:disabled) { background: var(--surface-3); }
   button:disabled { opacity: .45; cursor: default; }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-  .empty-filter { margin-top: 16px; }
+  .empty-filter { margin-top: 16px; font-size: var(--fs-sm); }
 
-  details.test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 12px; background: var(--surface); overflow: hidden; }
-  details.test > summary { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; list-style: none; transition: background-color .15s var(--ease); }
-  details.test > summary::-webkit-details-marker { display: none; }
-  details.test > summary:hover { background: var(--surface-2); }
-  details.test > summary:focus-visible { outline-offset: -2px; }
-  details.test[open] > summary { border-bottom: 1px solid var(--line); }
+  /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
+  .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 12px; background: var(--surface); overflow: hidden; }
+  .test-head { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
+  .test-head:hover { background: var(--surface-2); }
+  .test.open > .test-head { border-bottom: 1px solid var(--line); }
+  .test-head h2 { flex: 1 1 320px; min-width: 0; }
+  .test-head h2 button { all: unset; display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; border-radius: var(--radius); }
+  .test-head h2 button:hover { background: transparent; }
+  .test-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .test-head .t { overflow-wrap: anywhere; min-width: 0; }
+  .test-head .info { display: flex; flex-wrap: wrap; gap: 2px 12px; }
   .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
   .mark::before { content: "+"; }
-  details[open] > summary .mark::before { content: "\2212"; }
+  .test.open .mark::before { content: "\2212"; }
   .test-body { padding: 14px 16px 16px; display: grid; gap: 14px; min-width: 0; }
 
   .viewer { border-radius: var(--radius); min-width: 0; }
@@ -125,9 +142,15 @@
   }
 
   .stage { position: relative; user-select: none; }
-  .stage img { width: 100%; max-height: 70vh; object-fit: contain; display: block; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+  .frame { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+  .stage img { width: 100%; max-height: 70vh; object-fit: contain; display: block; }
+  /* Full-page shots: scroll the frame at full width instead of shrinking the page to an unreadable strip. */
+  .stage.tall .frame { max-height: 70vh; overflow-y: auto; overscroll-behavior: contain; }
+  .stage.tall img { max-height: none; height: auto; object-fit: initial; object-position: top; }
+  .stage.tall .nav { display: none; }
+  .hint { position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-xs); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; }
   .stage .empty { padding: 48px 16px; text-align: center; border: 1px dashed var(--line-strong); border-radius: var(--radius); }
-  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; border-radius: 0; background: transparent; color: var(--text); font-size: 36px; opacity: 0; transition: opacity .15s var(--ease); }
+  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; border-radius: 0; background: transparent; color: var(--text); font-size: var(--fs-2xl); opacity: 0; transition: opacity .15s var(--ease); }
   .stage .nav.prev { left: 0; text-align: left; padding-left: 12px; cursor: w-resize; }
   .stage .nav.next { right: 0; text-align: right; padding-right: 12px; cursor: e-resize; }
   .stage .nav:hover:not(:disabled) { opacity: 1; background: transparent; text-shadow: 0 1px 6px rgb(0 0 0 / .8); }
@@ -144,18 +167,30 @@
   .list .g.bad { color: var(--bad); }
   .list .g.neutral { color: var(--neutral); }
   .list .t { overflow-wrap: anywhere; }
-  .list .ms { color: var(--text-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .list .ms { color: var(--text-3); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; }
 
-  pre { font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
+  pre { font-size: var(--fs-xs); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
   .err { display: grid; gap: 4px; }
   .err pre { margin: 0; }
-  .err-label { color: var(--bad); font-weight: 600; font-size: 13px; }
-  .rerun { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-  .rerun code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+  .err-label { color: var(--bad); font-weight: 600; }
+  .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .cmd > .meta { min-width: 4em; font-size: var(--fs-sm); }
+  .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+  .cmds { display: grid; gap: 8px; }
+
+  .notes { margin: 0; padding: 10px 12px; list-style: none; display: grid; gap: 4px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
+  .notes b { font-weight: 600; margin-right: 6px; }
+  details.attempts { border: 1px solid var(--line); border-radius: var(--radius); }
+  details.attempts > summary { padding: 8px 12px; cursor: pointer; color: var(--text-2); }
+  details.attempts > summary:focus-visible { outline-offset: -2px; }
+  details.attempts ol { margin: 0; padding: 0 12px 12px; list-style: none; display: grid; gap: 10px; }
+  .att-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
 
   dialog { border: 1px solid var(--line-strong); border-radius: var(--radius-lg); padding: 0; background: var(--surface); color: var(--text); max-width: 96vw; max-height: 96vh; }
   dialog .dhead { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  dialog .dbody { max-height: calc(96vh - 52px); overflow: auto; }
   dialog img { max-width: 96vw; max-height: calc(96vh - 52px); display: block; object-fit: contain; }
+  dialog.tall img { max-height: none; height: auto; }
   dialog::backdrop { background: rgb(0 0 0 / .75); }
 </style>
 </head>
@@ -163,8 +198,9 @@
 <main id="app"></main>
 <dialog id="zoom" aria-labelledby="zoom-title">
   <div class="dhead"><span id="zoom-title" class="meta"></span><button type="button" id="zoom-close">Close</button></div>
-  <img alt="">
+  <div class="dbody"><img alt=""></div>
 </dialog>
+<div id="announce" class="sr-only" aria-live="polite"></div>
 <script>
 const DATA = /*__E2E_DATA__*/null;
 
@@ -198,9 +234,12 @@ const STATUS = {
 };
 const st = (s) => STATUS[s] || { word: String(s), glyph: '–', tone: 'neutral' };
 const pill = (s) => el('span', { class: 'pill tone-' + st(s).tone }, el('span', { 'aria-hidden': 'true' }, st(s).glyph), st(s).word);
-const kind = (t) => (t.status === 'passed' ? (t.retry ? 'flaky' : 'passed') : t.status === 'skipped' ? 'skipped' : 'failed');
+// Buckets follow Playwright's own outcome, so header and filters match its summary.
+const OUTCOME = { expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped' };
+const kind = (t) => OUTCOME[t.outcome] || (t.status === 'passed' ? (t.retry ? 'flaky' : 'passed') : t.status === 'skipped' ? 'skipped' : 'failed');
 
-async function copy(text, btn) {
+const announcer = document.getElementById('announce');
+async function copy(text, btn, what) {
   try { await navigator.clipboard.writeText(text); }
   catch {
     const t = el('textarea', {}, text);
@@ -208,15 +247,22 @@ async function copy(text, btn) {
     try { document.execCommand('copy'); } catch {}
     t.remove();
   }
-  const was = btn.textContent;
   btn.textContent = 'Copied';
-  setTimeout(() => { btn.textContent = was; }, 1200);
+  announcer.textContent = '';
+  setTimeout(() => { announcer.textContent = 'Copied ' + what; }, 50);
+  setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
 }
+const cmdRow = (label, cmd, what) => {
+  const btn = el('button', { type: 'button', 'aria-label': 'Copy ' + what }, 'Copy');
+  btn.onclick = () => copy(cmd, btn, what);
+  return el('div', { class: 'cmd' }, el('span', { class: 'meta' }, label), el('code', {}, cmd), btn);
+};
 
 const zoom = document.getElementById('zoom');
 const zoomImg = zoom.querySelector('img');
 document.getElementById('zoom-close').onclick = () => zoom.close();
 zoom.onclick = (e) => { if (e.target === zoom || e.target === zoomImg) zoom.close(); };
+const isTall = (img) => img.naturalWidth > 0 && img.naturalHeight / img.naturalWidth > 1.5;
 
 // One step at a time, like slides. Controls are built once and updated in place, so focus stays put.
 function viewer(slides) {
@@ -235,7 +281,19 @@ function viewer(slides) {
   // Click halves are a mouse shortcut only; keyboard users have Prev/Next and the step list.
   const left = el('button', { type: 'button', class: 'nav prev', tabindex: '-1', 'aria-hidden': 'true' }, '‹');
   const right = el('button', { type: 'button', class: 'nav next', tabindex: '-1', 'aria-hidden': 'true' }, '›');
-  const stage = el('div', { class: 'stage' }, img, empty, left, right);
+  const hint = el('span', { class: 'hint', 'aria-hidden': 'true', hidden: '' }, 'scroll ↓');
+  const frame = el('div', { class: 'frame' }, img);
+  const stage = el('div', { class: 'stage' }, frame, empty, left, right, hint);
+  // Tall shots make the frame a scroll region, which keyboard users must be able to focus.
+  const fit = () => {
+    const tall = !img.hidden && isTall(img);
+    stage.classList.toggle('tall', tall);
+    if (tall) { frame.setAttribute('tabindex', '0'); frame.setAttribute('aria-label', 'Full-page screenshot, scrolls vertically'); }
+    else { frame.removeAttribute('tabindex'); frame.removeAttribute('aria-label'); }
+    hint.hidden = !tall || frame.scrollTop + frame.clientHeight >= frame.scrollHeight - 4;
+  };
+  img.onload = fit;
+  frame.onscroll = fit;
   const items = slides.map((s, n) => {
     const t = st(s.status);
     const b = el('button', { type: 'button' }, el('span', { class: 'n' }, n + 1 + '.'),
@@ -260,7 +318,10 @@ function viewer(slides) {
     img.hidden = !s.shot;
     left.hidden = right.hidden = !s.shot;
     empty.hidden = !!s.shot;
+    frame.hidden = !s.shot;
+    frame.scrollTop = 0;
     if (s.shot) { img.src = s.shot; img.alt = s.title; } else img.removeAttribute('src');
+    fit();
     items.forEach((li, n) => {
       const b = li.firstChild;
       if (n === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
@@ -274,11 +335,12 @@ function viewer(slides) {
   full.onclick = () => {
     const s = slides[i];
     zoomImg.src = s.shot; zoomImg.alt = s.title;
+    zoom.classList.toggle('tall', isTall(img));
     document.getElementById('zoom-title').textContent = (i + 1) + '. ' + s.title;
     zoom.showModal();
   };
   box.onkeydown = (e) => {
-    if (e.target.closest('pre')) return;
+    if (e.target.closest('pre, .frame')) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   };
@@ -288,49 +350,67 @@ function viewer(slides) {
   return box;
 }
 
+const NOTE = { skip: 'Skipped', fixme: 'Fixme', fail: 'Expected to fail' };
+let uid = 0;
+
 function testBox(t) {
   const k = kind(t);
-  const d = el('details', { class: 'test' });
-  d.dataset.kind = k;
-  d.open = k === 'failed';
-  d.append(el('summary', {}, el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' ? t.status : k), el('h2', {}, t.title),
-    el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + (t.retry ? ' · retry ' + t.retry : '') + (t.project ? ' · ' + t.project : ''))));
-  const body = el('div', { class: 'test-body' });
+  const id = 'test-' + (++uid);
+  const box = el('section', { class: 'test', 'aria-labelledby': id + '-h' });
+  box.dataset.kind = k;
+  const toggle = el('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
+    el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' && st(t.status).tone === 'bad' ? t.status : k), el('span', { class: 't' }, t.title));
+  const attempts = t.attempts || [];
+  const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : t.retry ? ' · retry ' + t.retry : '';
+  const head = el('div', { class: 'test-head' }, el('h2', { id: id + '-h' }, toggle),
+    el('div', { class: 'info' }, el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : ''))));
+  // The whole row is a mouse target; keyboard and screen readers use the heading's button.
+  head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
+  const body = el('div', { class: 'test-body', id: id + '-b' });
+  const setOpen = (o) => { box.classList.toggle('open', o); toggle.setAttribute('aria-expanded', String(o)); body.hidden = !o; };
+  toggle.onclick = () => setOpen(!box.classList.contains('open'));
+
+  const notes = t.annotations || [];
+  if (notes.length) body.append(el('ul', { class: 'notes', 'aria-label': 'Annotations' },
+    notes.map((a) => el('li', {}, el('b', {}, NOTE[a.type] || a.type), a.description || 'no reason given'))));
   const slides = t.steps.slice();
   if (t.finalShot) slides.push({ title: 'Page at failure', status: 'failed', shot: t.finalShot });
   if (slides.length) body.append(viewer(slides));
-  else body.append(el('div', { class: 'meta' }, 'This test has no named steps.'));
+  else if (!notes.length) body.append(el('div', { class: 'meta' }, k === 'skipped' ? 'Skipped, with no reason given.' : 'This test has no named steps.'));
   // Playwright usually repeats the failed step's error as the test error; show it once.
   const stepErrors = t.steps.map((s) => (s.error || '').trim()).filter(Boolean);
   if (t.error && !stepErrors.some((e) => e === t.error.trim())) body.append(el('div', {}, el('h3', {}, 'Test error'), el('pre', {}, t.error)));
+  if (attempts.length) body.append(el('details', { class: 'attempts' },
+    el('summary', {}, 'Earlier attempts (' + attempts.length + ')'),
+    el('ol', {}, attempts.map((a) => el('li', {},
+      el('div', { class: 'att-head' }, el('span', {}, a.retry ? 'Retry ' + a.retry : 'First run'), pill(a.status), el('span', { class: 'meta' }, ms(a.duration))),
+      a.error ? el('pre', {}, a.error) : null)))));
   if (k !== 'passed') {
     const cmd = 'npx playwright test ' + t.file + (t.project ? ' --project=' + JSON.stringify(t.project).replace(/^"([\w.-]+)"$/, '$1') : '');
-    const btn = el('button', { type: 'button' }, 'Copy');
-    btn.onclick = () => copy(cmd, btn);
-    body.append(el('div', { class: 'rerun' }, el('span', { class: 'meta' }, 'Rerun:'), el('code', {}, cmd), btn,
-      t.trace ? el('a', { href: t.trace, download: '' }, 'Trace (open with npx playwright show-trace)') : null));
+    body.append(el('div', { class: 'cmds' }, cmdRow('Rerun', cmd, 'rerun command for ' + t.title),
+      t.trace ? cmdRow('Trace', 'npx playwright show-trace ' + t.trace, 'trace command for ' + t.title) : null));
   }
-  d.append(body);
-  return d;
+  box.append(head, body);
+  setOpen(k === 'failed');
+  return box;
 }
 
 function render() {
   const app = document.getElementById('app');
   if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
-  const n = { failed: 0, passed: 0, flaky: 0, skipped: 0 };
+  const n = { failed: 0, flaky: 0, passed: 0, skipped: 0 };
   for (const t of DATA.tests) n[kind(t)]++;
   const tools = el('div', { class: 'tools', role: 'group', 'aria-label': 'Show tests' });
   const boxes = DATA.tests.map(testBox);
   const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
-  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['passed', 'Passed', n.passed + n.flaky], ['skipped', 'Skipped', n.skipped]];
+  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['flaky', 'Flaky', n.flaky], ['passed', 'Passed', n.passed], ['skipped', 'Skipped', n.skipped]];
   const buttons = FILTERS.map(([key, label, c]) => {
     const b = el('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + c);
     b.onclick = () => {
       buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       let shown = 0;
       for (const box of boxes) {
-        const k = box.dataset.kind === 'flaky' ? 'passed' : box.dataset.kind;
-        box.hidden = key !== 'all' && k !== key;
+        box.hidden = key !== 'all' && box.dataset.kind !== key;
         if (!box.hidden) shown++;
       }
       none.hidden = shown > 0;
@@ -338,14 +418,15 @@ function render() {
     return b;
   });
   tools.append(...buttons);
+  // Same buckets and order as the filters; a count is colored only when it is not zero.
+  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' c-' + tone : '') }, c + ' ' + word);
   app.append(el('header', {},
     el('div', {}, el('h1', {}, 'E2E report · ' + DATA.name, pill(DATA.status)),
-      el('div', { class: 'summary-line meta' },
-        el('span', {}, n.passed + ' passed'), n.flaky ? el('span', {}, n.flaky + ' flaky') : null,
-        el('span', {}, n.failed + ' failed'), el('span', {}, n.skipped + ' skipped'),
-        el('span', {}, DATA.tests.length + ' tests · ' + ms(DATA.ms)),
-        el('time', { datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
-        DATA.baseURL ? el('span', {}, DATA.baseURL) : null)),
+      el('div', { class: 'summary-line' },
+        count(n.failed, 'failed', 'bad'), count(n.flaky, 'flaky', 'warn'), count(n.passed, 'passed'), count(n.skipped, 'skipped'),
+        el('span', { class: 'meta' }, DATA.tests.length + ' tests · ' + ms(DATA.ms)),
+        el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
+        DATA.baseURL ? el('span', { class: 'meta' }, DATA.baseURL) : null)),
     tools));
   // Failed tests first, so the report opens on what needs attention.
   const order = { failed: 0, flaky: 1, passed: 2, skipped: 3 };

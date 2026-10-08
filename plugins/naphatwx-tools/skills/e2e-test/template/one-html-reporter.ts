@@ -6,17 +6,23 @@ import type { FullConfig, FullResult, Reporter, Suite, TestCase, TestResult, Tes
 
 type Options = { name?: string; outputDir?: string; template?: string }
 type StepOut = { title: string; status: 'passed' | 'failed'; ms: number; error?: string; shot?: string }
+type Attempt = { retry: number; status: string; error?: string; duration: number }
+type Note = { type: string; description?: string }
 type TestOut = {
   title: string
   file: string
   project: string
   status: string
+  // Playwright's verdict across all attempts: expected | unexpected | flaky | skipped.
+  outcome: string
   ms: number
   retry: number
   error?: string
   steps: StepOut[]
   finalShot?: string
   trace?: string
+  annotations: Note[]
+  attempts: Attempt[]
 }
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -26,7 +32,8 @@ export default class OneHtmlReporter implements Reporter {
   private opts: Options
   private rootDir = process.cwd()
   private configDir = process.cwd()
-  private tests: TestOut[] = []
+  // One entry per test, keyed by test.id; a retry replaces the entry and moves the old one into attempts.
+  private tests = new Map<string, TestOut>()
   private started = new Date()
 
   constructor(opts: Options = {}) {
@@ -58,19 +65,29 @@ export default class OneHtmlReporter implements Reporter {
     // Playwright's own failure screenshot is a file on disk, not an in-memory body.
     const failShot = result.attachments.find((a) => a.name === 'screenshot' && (a.body || a.path))
     const failBody = failShot ? failShot.body ?? readFileSync(failShot.path!) : undefined
-    // The trace zip stays on disk; the report links to it relative to its own folder.
+    // The trace zip stays on disk; the report shows it relative to the config folder, for `npx playwright show-trace`.
     const trace = result.attachments.find((a) => a.name === 'trace' && a.path)
-    this.tests.push({
+    const prev = this.tests.get(test.id)
+    const attempts = prev ? [...prev.attempts, { retry: prev.retry, status: prev.status, error: prev.error, duration: prev.ms }] : []
+    const seen = new Set<string>()
+    const annotations = [...test.annotations, ...((result as { annotations?: Note[] }).annotations ?? [])]
+      .filter((a) => ['skip', 'fixme', 'fail'].includes(a.type))
+      .filter((a) => !seen.has(a.type + a.description) && seen.add(a.type + a.description))
+      .map((a) => ({ type: a.type, description: a.description }))
+    this.tests.set(test.id, {
       title: test.titlePath().slice(3).join(' › ') || test.title,
       file: relative(this.rootDir, test.location.file) + ':' + test.location.line,
       project: test.parent.project()?.name ?? '',
       status: result.status,
+      outcome: test.outcome(),
       ms: result.duration,
       retry: result.retry,
       error: result.error ? stripAnsi(result.error.message) : undefined,
       steps,
       finalShot: failShot && failBody ? `data:${failShot.contentType};base64,${failBody.toString('base64')}` : undefined,
-      trace: trace ? relative(this.outDir(), trace.path!).split('\\').join('/') : undefined,
+      trace: trace ? relative(this.configDir, trace.path!).split('\\').join('/') : undefined,
+      annotations,
+      attempts,
     })
   }
 
@@ -87,7 +104,7 @@ export default class OneHtmlReporter implements Reporter {
       startedAt: this.started.toISOString(),
       ms: result.duration,
       baseURL: process.env.PW_BASE_URL ?? process.env.BASE_URL ?? '',
-      tests: this.tests,
+      tests: [...this.tests.values()],
     }
     const file = join(outDir, `e2e-report-${name}-${stamp}.html`)
     mkdirSync(dirname(file), { recursive: true })

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 490" role="img" aria-labelledby="t d" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 490" width="760" height="490" role="img" aria-labelledby="t d" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14">
     <title id="t">Example flowchart</title>
     <desc id="d">Open the form, check the thing.edit permission, validate the name, save it with CreateThing or show INVALID_ARGUMENT and retry.</desc>
     <!-- Shapes: terminal = outlined pill · process = filled box · decision = accent diamond. Connectors: grey, sentence-case Yes/No labels on each branch.

@@ -55,7 +55,8 @@ Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, 
 Then add these, next to the e2e folder, **unchanged** from this skill's `template/`:
 
 - `step.ts`: wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
-- `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded. Each test shows its steps one at a time: use Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot. A failed test opens on its failed step, with that step's error above the screenshot, a copyable rerun command, and a trace link when Playwright saved one.
+- `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded. Each test shows its steps one at a time: use Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot. A failed test opens on its failed step, with that step's error above the screenshot, a copyable rerun command, and a copyable `npx playwright show-trace <path>` command when Playwright saved a trace (the path is relative to the config folder). A full-page screenshot (taller than 1.5× its width) scrolls inside the viewer instead of shrinking.
+- The report has one card per test, keyed by test id. With retries it keeps the final attempt, puts the earlier ones under "Earlier attempts", and marks a test that passed on retry as flaky. Header counts and filters (Failed, Flaky, Passed, Skipped) use Playwright's own outcome, so they match its summary. A skipped test shows its `skip` / `fixme` reason; a `test.fail()` test shows that annotation.
 - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
 
 Wire the config:
@@ -110,7 +111,7 @@ The reporter prints `E2E report: <path>`. Open the file and check:
 
 Reply with:
 - the scenario file path and the spec files written
-- passed / failed / skipped counts
+- failed / flaky / passed / skipped counts
 - each failure: its test, its step, and the likely cause (product bug, missing selector, wrong scenario, environment)
 - missing selectors and code/scenario mismatches, as findings for the app owner
 - whether cleanup is confirmed

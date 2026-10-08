@@ -15,12 +15,13 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 ## diagram-design mode
 
-- Ask for a Sequence diagram with the labels above, dark theme, in the theme's colors and type (SKILL.md hard rule 4), with no step details list in the file; save to `NN-<slug>.html`; add the height reporter (SKILL.md step 3). Skip the `.js` format.
-- Return the step details as a fragment for the caller's page, in `render.js`'s markup. `n` is the step number the diagram shows; when it shows none, number the rows 1, 2, 3 in diagram order:
+- Ask for a Sequence diagram with the labels above, dark theme, in the theme's colors and type (SKILL.md hard rule 4), with no step details list in the file; save to `NN-<slug>.html`; add the embed script (SKILL.md step 3). Skip the `.js` format.
+- Return the step details as a fragment for the caller's page, in `render.js`'s markup, with its title line as-is. List only the steps that have a detail. `n` is the number the diagram prints on that step (so the list can read `2, ·, 6, 7, 12`), `·` for a note; when the diagram prints no numbers, number the rows 1, 2, 3 in diagram order:
 
 ```html
-<div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>
-    <li><span class="n">1</span><code>CreateThing</code> name, ownerId</li>
+<div class="seq-steps"><p class="seq-steps-title">Step details · only steps with extra detail, by their number in the diagram</p><ol>
+    <li><span class="n">6</span><code>CreateThing</code> name, ownerId</li>
+    <li><span class="n">·</span><code>permission thing.view</code> needs permission thing.view</li>
 </ol></div>
 ```
 

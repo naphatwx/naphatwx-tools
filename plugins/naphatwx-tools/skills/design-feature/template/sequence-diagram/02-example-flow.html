@@ -49,6 +49,15 @@
         --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
         --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
+        /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
+           headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+        --fs-xs: 0.75rem;
+        --fs-sm: 0.875rem;
+        --fs-md: 1rem;
+        --fs-lg: 1.25rem;
+        --fs-xl: 1.75rem;
+        --fs-2xl: 2.75rem;
+
         --radius: 6px;
         --radius-lg: 10px;
         --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -155,14 +164,19 @@
     </div>
   </div>
   <script>
-    // Report the real height to the host page so its iframe fits (postMessage works on file://).
-    // body, not documentElement: its scrollHeight never drops below the iframe's height; the
-    // fractional rect height avoids a 0.1px overflow showing a scrollbar strip.
+    // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
+    // Out: {type: "diagram-height", height, fit} on every resize. In: {type: "diagram-fit", height}, 0 = off.
+    const embedded = parent !== window;
     const style = document.createElement("style");
-    style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }`;
+    style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
+      .embedded body { padding: 1rem; }
+      .embedded .eyebrow, .embedded h1 { display: none; }`;
     document.head.append(style);
+    // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
+    if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
     // Never draw a diagram below its viewBox width, so 12px labels stay 12px; a narrow frame scrolls it sideways.
-    document.querySelectorAll("svg[viewBox]:not(svg svg)").forEach(svg => {
+    const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
+    svgs.forEach(svg => {
       svg.style.minWidth = svg.viewBox.baseVal.width + "px";
       if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
       const box = document.createElement("div");
@@ -170,12 +184,27 @@
       svg.before(box);
       box.append(svg);
     });
-    if (parent !== window) {
-      // Embedded: the host sizes the height.
-      document.documentElement.style.overflowY = "hidden";
-      document.body.style.padding = "1rem";
+    // body, not documentElement: its scrollHeight never drops below the iframe's height
+    let fit = 0;
+    const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, fit }, "*");
+    // Fit (host presenting): scale to the given height, up to the frame width, never below 1:1; taller → the host scrolls.
+    function applyFit() {
+      svgs.forEach(svg => { svg.style.width = ""; svg.style.maxWidth = ""; });
+      if (!fit) return;
+      const rest = document.body.getBoundingClientRect().height - svgs.reduce((h, svg) => h + svg.getBoundingClientRect().height, 0);
+      svgs.forEach(svg => {
+        const vb = svg.viewBox.baseVal;
+        const s = Math.max(1, Math.min(svg.parentElement.clientWidth / vb.width, (fit - rest) / svgs.length / vb.height));
+        svg.style.width = vb.width * s + "px";
+        svg.style.maxWidth = "none";
+      });
     }
-    const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
+    addEventListener("message", (e) => {
+      if (e.source !== parent || e.data?.type !== "diagram-fit") return;
+      fit = +e.data.height || 0;
+      applyFit();
+      postHeight();
+    });
     addEventListener("load", postHeight);
     new ResizeObserver(postHeight).observe(document.body);
   </script>

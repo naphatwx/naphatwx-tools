@@ -128,3 +128,15 @@ scripts/smoke/
 | `header` | `<header>: $<env>` |
 
 The runner masks every auth value in the report.
+
+## Report data (per hop)
+
+The runner embeds one JSON object in the report. Per hop, besides `id`, `service`, `from`, `transport`, `status` and `ms`:
+
+| Field | When | Meaning |
+|---|---|---|
+| `detail` | always | One line. On an env mismatch it is `NAME = used (expected want)` per failed var, never the service's own success note. |
+| `envMismatch` | env check failed | The failed env var names, used by the top line and the Broken links list. |
+| `env[]` | `envVars` set | `{ name, ok, value, note }` per expected env var, values masked. |
+| `polling` | `timed-out` | `{ polls, method, lastUrl, lastStatus, sameStatus, lastReason, waitedMs }`: what the runner polled before giving up. |
+| `evidence` | a request was made | `{ url, status, ms, body, truncated }`. For `store`/`service` hops also `entry` (this hop's object from `hopsField`, untruncated) and `entryPath` (e.g. `hops[1]`); the report shows the entry and puts the full body behind "Show full response". |

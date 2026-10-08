@@ -126,12 +126,12 @@ All flows run in parallel. In each flow the hops are checked in order, and each 
 
 ### R3. Read the report and sum it up
 
-Open the HTML file named on the last line of the output (`report: <path>`). Failed flows come first, under a "Broken links" list, each with a copyable rerun command. For each failed flow, find the first failed hop and give a likely cause from its detail:
+Open the HTML file named on the last line of the output (`report: <path>`). A top line names the broken-flow count and the first break. Failed flows come first, under a "Broken links" list, each with a copyable rerun command. For each failed flow, find the first failed hop and give a likely cause from its detail:
 
 | Detail | Likely cause |
 |---|---|
-| `env var mismatch` | The service runs with a different value than the flow map expects (a wrong queue name, URL or key). Name the env var and both values (masked for secrets). |
-| `not observed within N ms` (timed out) | The message never arrived: wrong exchange, queue or route, consumer down, or a crash before the hop recorded. |
+| `NAME = used (expected want)` | Env var mismatch: the service runs with a different value than the flow map expects (a wrong queue name, URL or key). The detail already names the var and both values (secrets as `sha256:`). |
+| `not observed within N ms · K polls, last HTTP S` (timed out) | The message never arrived: wrong exchange, queue or route, consumer down, or a crash before the hop recorded. The hop shows the polled URL and its last answer: 404 on the store means the probe id is unknown there (wrong store, expired, or another replica). |
 | `HTTP 401/403` | A wrong or expired credential on that link. |
 | `HTTP 404` on the trigger | The probe endpoint is not deployed in this version. This is a blocker, not a failed smoke. |
 | Hop missing from the store but found on the service | The report-to-store call is failing. The link itself works. |

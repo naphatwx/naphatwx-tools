@@ -45,6 +45,15 @@
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
+    /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
+       headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+    --fs-xs: 0.75rem;
+    --fs-sm: 0.875rem;
+    --fs-md: 1rem;
+    --fs-lg: 1.25rem;
+    --fs-xl: 1.75rem;
+    --fs-2xl: 2.75rem;
+
     --radius: 6px;
     --radius-lg: 10px;
     --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -72,15 +81,17 @@ code, kbd, pre, samp { font-family: var(--mono); }
 }
 /* theme:base:end */
 
-/* Page-only tokens: type scale and layout widths. Colors come from the synced theme block above. */
+/* Page aliases onto the theme's type scale (projector page: body --fs-md), plus layout widths. */
 :root {
-    --fs-body: 1rem;
-    --fs-code: calc(var(--fs-body) * 0.875);
-    --fs-lead: 1.25rem;
-    --fs-h3: 1.25rem;
-    --fs-h2: 1.75rem;
-    --fs-h1: 2.75rem;
+    --fs-body: var(--fs-md);
+    --fs-code: var(--fs-sm);
+    --fs-lead: var(--fs-lg);
+    --fs-h3: var(--fs-lg);
+    --fs-h2: var(--fs-xl);
+    --fs-h1: var(--fs-2xl);
     --measure: 72ch;
+    /* running prose: ch ("0") is wider than an average glyph, so 50ch reads as about 68 characters */
+    --prose: 50ch;
     --wide: 1120px;
     --rail-w: 320px;
 }
@@ -95,8 +106,10 @@ code, kbd { font-size: 0.875em; }
 code { color: var(--text); }
 strong { color: var(--text); font-weight: 600; }
 .aside { color: inherit; }
-.muted { color: var(--text); max-width: var(--measure); }
+.muted { color: var(--text); max-width: var(--prose); }
 .group-head { margin: 40px 0 12px; }
+/* subordinate text under a title or in a table cell: lighter than the title it follows */
+.group-head .aside, td .aside { color: var(--text-2); font-size: var(--fs-sm); font-weight: 400; }
 .nowrap { white-space: nowrap; }
 .skip {
     position: fixed; top: 12px; left: 12px; z-index: 60;
@@ -124,7 +137,7 @@ strong { color: var(--text); font-weight: 600; }
 .rail-mark {
     flex: none; display: grid; place-items: center;
     width: 26px; height: 26px; border-radius: 7px;
-    background: var(--text); color: var(--bg); font-size: 13px; font-weight: 700;
+    background: var(--text); color: var(--bg); font-size: var(--fs-sm); font-weight: 700;
 }
 .rail-search { display: block; padding: 0 14px; margin-bottom: 12px; }
 .rail-search input {
@@ -224,10 +237,10 @@ h2 + .facts { margin-top: 0; }
     color: var(--text-2); font: 500 var(--fs-body) var(--sans); cursor: pointer;
     transition: background 0.16s var(--ease), color 0.16s var(--ease);
 }
-.views button:hover:not(:disabled):not([aria-selected="true"]) { color: var(--text); background: var(--surface-2); }
-.views button[aria-selected="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
+.views button:hover:not(:disabled):not([aria-expanded="true"]) { color: var(--text); background: var(--surface-2); }
+.views button[aria-expanded="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
 .views button:disabled { color: var(--text-3); text-decoration: line-through; cursor: not-allowed; }
-.views kbd { font-size: 12px; color: inherit; opacity: 0.75; }
+.views kbd { font-size: var(--fs-xs); color: inherit; opacity: 0.75; }
 html[data-all="on"] .views { display: none; }
 
 .panel { margin-top: 16px; }
@@ -254,7 +267,7 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
     overflow: hidden;
 }
 .flowchart img { display: block; max-width: 100%; max-height: 72vh; height: auto; margin: 0 auto; }
-.flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0; }
+.flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0 0 48px; }
 .diagram-frame { display: block; width: 100%; height: 480px; border: 0; background: var(--surface); }
 
 .seq-legend { display: flex; gap: 20px; font-size: var(--fs-body); color: var(--text-3); margin-bottom: 10px; }
@@ -309,9 +322,9 @@ html[data-zoom="on"] .zoom-shield, .in-lightbox .zoom-shield { display: block; }
     min-width: 40px; height: 40px; padding: 0 12px; border-radius: 9px;
     display: grid; place-items: center;
     background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--text);
-    font: 600 15px/1 var(--sans); cursor: pointer;
+    font: 600 var(--fs-sm)/1 var(--sans); cursor: pointer;
 }
-.zoom-tools .zoom-full { font-size: 18px; }
+.zoom-tools .zoom-full { font-size: var(--fs-lg); }
 .zoom-tools button:hover { color: var(--text); background: var(--line-strong); }
 .zoom-reset { display: none !important; }
 html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !important; }
@@ -338,7 +351,7 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 .lightbox-caption:empty { display: none; }
 .lightbox-close {
     position: absolute; top: 14px; right: 18px; width: 40px; height: 40px;
-    border: 0; border-radius: 8px; background: none; color: var(--text); font-size: 22px; cursor: pointer;
+    border: 0; border-radius: 8px; background: none; color: var(--text); font-size: var(--fs-lg); cursor: pointer;
 }
 .lightbox-close:hover { background: var(--surface-3); }
 
@@ -411,36 +424,40 @@ table { width: 100%; border-collapse: collapse; font-size: var(--fs-body); }
 th { text-align: left; font-weight: 500; color: var(--text-3); padding: 0 16px 10px 0; border-bottom: 1px solid var(--line-strong); }
 td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
 
-.blocker-line { margin: 4px 0 8px; padding: 12px 16px; border-radius: var(--radius-lg); background: var(--warn-soft); color: var(--text); max-width: var(--measure); }
+.blocker-line { margin: 4px 0 8px; padding: 12px 16px; border-radius: var(--radius-lg); background: var(--warn-soft); color: var(--text); max-width: var(--prose); }
 .blocker-line + .blocker-line { margin-top: 8px; }
 .blocker { display: inline-block; margin-right: 8px; color: var(--warn); font: 600 var(--fs-code)/1.4 var(--mono); }
 .questions { list-style: none; padding: 0; counter-reset: q; }
 .questions li { counter-increment: q; display: grid; grid-template-columns: 2rem 1fr; gap: 2px 8px; padding: 16px 0; border-bottom: 1px solid var(--line); margin: 0; }
 .questions li::before { content: counter(q); grid-row: span 2; font: 500 var(--fs-code)/1.65 var(--mono); color: var(--text-3); }
-.questions p { color: var(--text); }
+.questions p { color: var(--text); max-width: var(--prose); }
 .questions .who { font-size: var(--fs-body); color: var(--text-3); }
 
 /* ============ FLOATING TOOLS + HUD ============ */
 .tools, .hud {
     position: fixed; right: 20px; bottom: 20px; z-index: 30;
     display: flex; gap: 2px; padding: 4px;
-    background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line-strong); border-radius: 12px;
-    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
+    background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px;
 }
 .tools button, .hud button {
     display: inline-flex; align-items: center; gap: 8px;
     height: 32px; padding: 0 12px; border: 0; border-radius: 8px;
-    background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); cursor: pointer;
+    background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer;
 }
 .tools button:hover, .hud button:hover { background: var(--surface-2); color: var(--text); }
 .tools button[aria-pressed="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
-.tools kbd { font-size: 12px; padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
+.tools kbd { font-size: var(--fs-xs); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
 .hud { left: 50%; right: auto; transform: translateX(-50%); align-items: center; }
 .hud[hidden] { display: none; }
 #hudLabel { padding: 0 10px; font: var(--fs-code) var(--mono); color: var(--text); font-variant-numeric: tabular-nums; min-width: 14ch; text-align: center; }
 .hud-exit { color: var(--text-3) !important; font-family: var(--mono) !important; font-size: var(--fs-code) !important; }
-.hud-keys { padding: 0 8px 0 4px; color: var(--text-3); font: 12px var(--mono); white-space: nowrap; }
+.hud-keys { padding: 0 8px 0 4px; color: var(--text-3); font: var(--fs-xs) var(--mono); white-space: nowrap; }
+/* wide screens with the index open: the tools sit at the foot of the rail, so they never cover a diagram */
+@media (min-width: 881px) {
+    html:not([data-rail="collapsed"]) .rail { padding-bottom: 76px; }
+    html:not([data-rail="collapsed"]) .tools { left: 14px; right: auto; bottom: 14px; width: calc(var(--rail-w) - 28px); justify-content: space-between; }
+    html:not([data-rail="collapsed"]) .tools button { padding: 0 8px; }
+}
 
 /* ============ SHORTCUT SHEET ( ? ) ============ */
 .keys { margin: auto; padding: 24px 28px; width: min(440px, calc(100vw - 32px)); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); }
@@ -448,27 +465,39 @@ td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var
 .keys h2 { font-size: var(--fs-h3); margin-bottom: 12px; }
 .keys dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; align-items: baseline; }
 .keys dt { white-space: nowrap; }
-.keys kbd { display: inline-block; min-width: 24px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; text-align: center; font-size: 13px; color: var(--text); }
-.keys-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: var(--radius); background: none; color: var(--text); font-size: 18px; cursor: pointer; }
+.keys kbd { display: inline-block; min-width: 24px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; text-align: center; font-size: var(--fs-sm); color: var(--text); }
+.keys-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: var(--radius); background: none; color: var(--text); font-size: var(--fs-lg); cursor: pointer; }
 .keys-close:hover { background: var(--surface-3); }
 
 /* ============ PRESENT MODE: one step per screen; long steps scroll down, never sideways ============ */
-html[data-present="on"] { --fs-body: 1.125rem; --fs-h2: 2.25rem; --fs-h3: 1.75rem; }
+/* a flow's h3 is its slide title here, so it takes the h2 size */
+html[data-present="on"] { --fs-h3: var(--fs-xl); }
 html[data-present="on"], html[data-present="on"] body { overflow-x: hidden; }
 html[data-present="on"] .rail, html[data-present="on"] .rail-edge, html[data-present="on"] .tools,
-html[data-present="on"] .zoom-tools, html[data-present="on"] details.more, html[data-present="on"] .step-off,
+html[data-present="on"] .zoom-tools, html[data-present="on"] .zoom-shield, html[data-present="on"] details.more, html[data-present="on"] .step-off,
 html[data-present="on"] .try { display: none !important; }
 html[data-present="on"] .refs { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* flex column + auto margins: a short step sits in the middle, a tall one starts at the top and scrolls */
-html[data-present="on"] .sheet { margin-left: 0; padding: 28px 48px 104px; min-height: 100vh; display: flex; flex-direction: column; }
+/* bottom padding = the bar's footprint (set by show()) + 24px, so the last line clears it */
+html[data-present="on"] .sheet { margin-left: 0; padding: 28px 48px calc(var(--hud-space, 62px) + 24px); min-height: 100vh; display: flex; flex-direction: column; }
 html[data-present="on"] .slide { display: none; margin: 0 auto !important; padding: 0 !important; border: 0 !important; }
 html[data-present="on"] .slide.current { display: block; margin: auto !important; width: min(1080px, 100%); max-width: none; animation: slide-in 0.32s var(--ease); }
-html[data-present="on"] .slide.current p, html[data-present="on"] .slide.current .facts { max-width: 90ch; }
+html[data-present="on"] .slide.current p, html[data-present="on"] .slide.current .facts { max-width: var(--prose); }
 html[data-present="on"] .wide { width: 100%; margin-left: 0; transform: none; }
 html[data-present="on"] .panel { animation: none !important; }
-/* diagrams grow to the width, but stop above the bar: show() sets --room to the height left under the chrome */
+/* fitRoom() sizes the diagram to the room above the bar, never below 1:1 (labels stay >= 12px);
+   a taller one scrolls inside its box, with a "continues" cue on the bottom edge */
 html[data-present="on"] .flowchart, html[data-present="on"] .seq { padding-bottom: 24px; }
-html[data-present="on"] .flowchart img, html[data-present="on"] .seq svg { width: 100%; max-width: 100% !important; height: auto; max-height: var(--room, calc(100vh - 360px)); object-fit: contain; }
+html[data-present="on"] .flowchart:has(.diagram-frame), html[data-present="on"] .seq:has(.diagram-frame) { padding-bottom: 0; }
+html[data-present="on"] .flowchart img, html[data-present="on"] .seq svg { max-width: none !important; max-height: none; height: auto; }
+html[data-present="on"] .fitted { overflow: auto; overscroll-behavior: contain; }
+.more-cue {
+    position: sticky; bottom: 0; z-index: 3; height: 44px; margin-top: -44px;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
+    background: linear-gradient(to bottom, transparent, var(--surface) 70%);
+    color: var(--text-2); font-size: var(--fs-sm); pointer-events: none;
+}
+.more-cue[hidden] { display: none; }
 html[data-present="on"] .zoom-stage { transform: none !important; }
 html[data-present="on"] .zoomable { cursor: default; }
 html[data-present="on"] .slide > .api { margin-top: 8px; }
@@ -480,7 +509,7 @@ html[data-present="on"] .slide > .api { margin-top: 8px; }
     display: none; place-items: center;
     position: fixed; top: 14px; left: 14px; z-index: 25;
     width: 40px; height: 40px; border-radius: 10px;
-    background: var(--surface); border: 1px solid var(--line-strong); color: var(--text); font-size: 18px; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line-strong); color: var(--text); font-size: var(--fs-lg); cursor: pointer;
 }
 @media (max-width: 880px) {
     .rail { z-index: 50; width: min(var(--rail-w), 86vw); transform: translateX(-100%); visibility: visible !important; transition: transform 0.24s var(--ease); }
@@ -492,7 +521,7 @@ html[data-present="on"] .slide > .api { margin-top: 8px; }
     .menu { display: grid; }
     .facts { grid-template-columns: 1fr; gap: 2px; }
     .facts dd { margin-bottom: 12px; }
-    :root { --fs-h1: 2.1rem; --fs-h2: 1.5rem; }
+    :root { --fs-h1: var(--fs-xl); }
     /* phones: a solid top bar holds ☰ and the tools, so nothing floats over the text */
     html { scroll-padding-top: 80px; }
     body::before { content: ""; position: fixed; inset: 0 0 auto; height: 68px; z-index: 24; background: var(--bg); border-bottom: 1px solid var(--line); }

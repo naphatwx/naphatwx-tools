@@ -52,6 +52,15 @@
             --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
             --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
+            /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
+               headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+            --fs-xs: 0.75rem;
+            --fs-sm: 0.875rem;
+            --fs-md: 1rem;
+            --fs-lg: 1.25rem;
+            --fs-xl: 1.75rem;
+            --fs-2xl: 2.75rem;
+
             --radius: 6px;
             --radius-lg: 10px;
             --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -82,16 +91,18 @@
         /* Index chrome only. The screens inside the frames use the target app's own design system. */
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; }
-        .measure { max-width: 70ch; }
+        /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
+        .measure { max-width: 48ch; }
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
-        .label { color: var(--text-3); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+        .label { color: var(--text-3); font-size: var(--fs-sm); font-weight: 500; }
         .link { color: var(--accent); text-decoration: none; }
         .link:hover { text-decoration: underline; }
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
         a.panel { color: inherit; text-decoration: none; transition: border-color .15s var(--ease); }
         a.panel:hover { border-color: var(--accent); }
-        .tabs { display: flex; overflow-x: auto; border-bottom: 1px solid var(--line); }
+        /* chips wrap onto more rows rather than scroll out of sight on a narrow screen */
+        .tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
         .tab { flex-shrink: 0; min-width: 9rem; max-width: 14rem; padding: 10px 16px; margin-bottom: -1px; font-size: 14px; color: var(--text-2); background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; }
         .tab:hover { color: var(--text); background: var(--surface); }
         .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
@@ -193,13 +204,13 @@
             block.querySelector('.card').innerHTML = `
               <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="text-lg font-semibold">${UI.esc(uc.title)}</h3><span class="text-xs font-mono meta">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
               <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 mt-3 mb-5">
-                <div class="measure">
+                <div>
                   <div class="label mb-1">How to play</div>
-                  <ol class="list-decimal pl-5 space-y-1.5 text-[15px] muted">${list(uc.steps)}</ol>
+                  <ol class="list-decimal pl-5 space-y-1.5 text-[15px] muted measure">${list(uc.steps)}</ol>
                 </div>
-                <div class="measure">
+                <div>
                   <div class="label mb-1">What you should see</div>
-                  <ul class="list-disc pl-5 space-y-1.5 text-[15px] muted">${list(uc.expect)}</ul>
+                  <ul class="list-disc pl-5 space-y-1.5 text-[15px] muted measure">${list(uc.expect)}</ul>
                 </div>
               </div>
               <div class="frame">

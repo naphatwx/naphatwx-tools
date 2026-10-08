@@ -73,7 +73,8 @@ var SeqDiagrams = (function () {
             const w = Math.min(gap - 12, Math.max(118, sub.length * 7 + 20, name.length * 8.6 + 20));
             out.push(`<g class="actor"><rect x="${X[k] - w / 2}" y="${TOP}" width="${w}" height="${HEAD}" rx="8"/><text x="${X[k]}" y="${TOP + 20}" text-anchor="middle">${esc(name)}</text><text class="sub" x="${X[k]}" y="${TOP + 37}" text-anchor="middle">${esc(sub)}</text></g>`);
         });
-        const list = !details.length ? '' : `<div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>${details.map(([n, label, d]) =>
+        // numbers are the diagram's own, so a list of 2, ·, 6 reads as a selection, not a gap
+        const list = !details.length ? '' : `<div class="seq-steps"><p class="seq-steps-title">Step details · only steps with extra detail, by their number in the diagram</p><ol>${details.map(([n, label, d]) =>
             `<li><span class="n">${n === 'note' ? '·' : n}</span><code>${esc(label)}</code> ${esc(d)}</li>`).join('')}</ol></div>`;
         return [out.concat(body, '</svg>').join(''), list];
     }
