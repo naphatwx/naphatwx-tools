@@ -55,8 +55,8 @@
       --fs-sm: 0.875rem;
       --fs-md: 1rem;
       --fs-lg: 1.25rem;
-      --fs-xl: 1.75rem;
-      --fs-2xl: 2.75rem;
+      --fs-xl: 1.5rem;
+      --fs-2xl: 2rem;
       /* Headings and lead line: the same steps on every page */
       --fs-lead: var(--fs-lg);
       --fs-h3: var(--fs-lg);
@@ -96,15 +96,15 @@
 
   body { font-size: var(--fs-md); line-height: 1.5; }
   [hidden] { display: none !important; }
-  main { max-width: var(--page-w); margin: 0 auto; padding: 24px var(--gutter) 64px; }
+  main { max-width: var(--page-w); margin: 0 auto; padding: 16px var(--gutter) 48px; }
   /* Title, one summary line at one size, then the status filter on the left above the rows. */
-  header { display: grid; gap: 12px; justify-items: start; margin-bottom: 8px; }
+  header { display: grid; gap: 8px; justify-items: start; margin-bottom: 8px; }
   /* Headings use the shared theme steps (--fs-h1/h2/h3); other text --fs-md, pills and code --fs-sm. */
   h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
   h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
   h3 { font-size: var(--fs-h3); margin: 0; overflow-wrap: anywhere; }
   .meta { color: var(--text-3); font-size: var(--fs-md); }
-  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-md); }
+  .summary-line { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-md); }
   .summary-line .lead { font-weight: 600; }
   .summary-line .meta { font-size: inherit; }
   .summary-line .c-bad { color: var(--bad); }
@@ -125,11 +125,12 @@
   .empty-filter { margin-top: 16px; font-size: var(--fs-md); }
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
-  .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 12px; background: var(--surface); overflow: hidden; }
-  .test-head { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
+  .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
+  .test-head { padding: 8px 14px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
   .test-head:hover { background: var(--surface-2); }
   .test.open > .test-head { border-bottom: 1px solid var(--line); }
-  .test-head h2 { flex: 1 1 320px; min-width: 0; font-size: var(--fs-lead); }
+  /* row titles at body size: a closed row is one compact line, so more tests fit on a screen */
+  .test-head h2 { flex: 1 1 320px; min-width: 0; font-size: var(--fs-md); }
   .test-head h2 button { all: unset; display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; border-radius: var(--radius); }
   .test-head h2 button:hover { background: transparent; }
   .test-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
@@ -138,26 +139,26 @@
   .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
   .mark::before { content: "+"; }
   .test.open .mark::before { content: "\2212"; }
-  .test-body { padding: 14px 16px 16px; display: grid; gap: 14px; min-width: 0; }
+  .test-body { padding: 10px 14px 12px; display: grid; gap: 10px; min-width: 0; }
 
   .viewer { border-radius: var(--radius); min-width: 0; }
   .viewer:focus-visible { outline-offset: 4px; }
-  .bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 8px; }
   .bar h3 { flex: 1 1 240px; }
   .bar .btns { display: flex; gap: 6px; }
-  .vbody { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "err" "stage" "list"; }
+  .vbody { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "err" "stage" "list"; }
   .vbody > .err { grid-area: err; }
   .vbody > .stage { grid-area: stage; }
   .vbody > .list { grid-area: list; }
   @media (min-width: 1100px) {
-    .vbody { grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "stage err" "stage list"; align-items: start; }
+    .vbody { grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "stage err" "stage list"; align-items: start; }
   }
 
   .stage { position: relative; user-select: none; }
   .frame { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
-  .stage img { width: 100%; max-height: 70vh; object-fit: contain; display: block; }
+  .stage img { width: 100%; max-height: 78vh; object-fit: contain; display: block; }
   /* Full-page shots: scroll the frame at full width instead of shrinking the page to an unreadable strip. */
-  .stage.tall .frame { max-height: 70vh; overflow-y: auto; overscroll-behavior: contain; }
+  .stage.tall .frame { max-height: 78vh; overflow-y: auto; overscroll-behavior: contain; }
   .stage.tall img { max-height: none; height: auto; object-fit: initial; object-position: top; }
   .hint { position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-md); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; }
   /* The whole shot is the click target: left half goes back, right half forward. The arrows only show the side;
@@ -171,7 +172,7 @@
 
   .list { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
   .list li + li { border-top: 1px solid var(--line); }
-  .list button { width: 100%; display: grid; grid-template-columns: 2.2em 1.2em minmax(0, 1fr) auto; gap: 8px; align-items: baseline; text-align: left; border: 0; border-radius: 0; background: transparent; padding: 7px 10px; }
+  .list button { width: 100%; display: grid; grid-template-columns: 2.2em 1.2em minmax(0, 1fr) auto; gap: 8px; align-items: baseline; text-align: left; border: 0; border-radius: 0; background: transparent; padding: 4px 10px; }
   .list button:hover { background: var(--surface-2); }
   .list button:focus-visible { outline-offset: -2px; }
   .list button[aria-current="step"] { background: var(--accent-fill); box-shadow: inset 2px 0 0 var(--accent); }

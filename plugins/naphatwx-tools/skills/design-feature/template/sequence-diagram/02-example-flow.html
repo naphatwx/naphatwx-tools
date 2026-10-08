@@ -55,8 +55,8 @@
         --fs-sm: 0.875rem;
         --fs-md: 1rem;
         --fs-lg: 1.25rem;
-        --fs-xl: 1.75rem;
-        --fs-2xl: 2.75rem;
+        --fs-xl: 1.5rem;
+        --fs-2xl: 2rem;
         /* Headings and lead line: the same steps on every page */
         --fs-lead: var(--fs-lg);
         --fs-h3: var(--fs-lg);
@@ -95,15 +95,15 @@
     /* theme:base:end */
 
     * { margin: 0; padding: 0; }
-    body { background: var(--surface); padding: 3rem 2rem; }
-    .page { max-width: 1200px; width: 100%; margin: 0 auto; }
-    .eyebrow { font-size: 0.8125rem; color: var(--text-3); margin-bottom: 0.5rem; }
-    h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1.5rem; }
+    body { background: var(--surface); padding: 1.5rem var(--gutter); }
+    .page { max-width: var(--page-w); width: 100%; margin: 0 auto; }
+    .eyebrow { font-size: var(--fs-md); color: var(--text-3); margin-bottom: 0.25rem; }
+    h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1rem; }
     /* Drawn at 1:1 (every label 14px), never scaled; a narrow window scrolls the diagram, not the page. */
     .diagram { overflow-x: auto; }
-    .diagram svg { display: block; width: 901px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
+    .diagram svg { display: block; width: 949px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
-    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.875rem; color: var(--text-3); margin-bottom: 12px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: var(--fs-sm); color: var(--text-3); margin-bottom: 8px; }
     .legend span::before { content: ""; display: inline-block; width: 26px; vertical-align: middle; margin-right: 6px; border-top: 2px solid var(--text-2); }
     .legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
     .legend .hot::before { border-color: var(--accent); }
@@ -139,35 +139,50 @@
     <p class="legend"><span>Call</span><span class="ret">Response</span><span class="hot">Side effect (external write or audit)</span></p>
 
     <div class="diagram">
-      <svg viewBox="0 0 901 784" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
+      <svg viewBox="0 0 949 646" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
         <title id="example-flow-seq-title">Example flow: sequence diagram, 5 participants, 12 steps</title>
         <desc id="example-flow-seq-desc">web-app loads a thing through api-service and Postgres, then CreateThing calls the external system and writes an audit log on 200, or returns FAILED_PRECONDITION on 400.</desc>
-        <line class="life" x1="80" x2="80" y1="68" y2="780"/>
-        <line class="life" x1="240" x2="240" y1="68" y2="780"/>
-        <line class="life" x1="431" x2="431" y1="68" y2="780"/>
-        <line class="life" x1="657" x2="657" y1="68" y2="780"/>
-        <line class="life" x1="817" x2="817" y1="68" y2="780"/>
-        <g class="frame"><rect class="box" x="14" y="446" width="873" height="308" rx="6"/><rect class="tab" x="14" y="446" width="46" height="22" rx="4"/><text x="24" y="462">alt</text><text class="cond" x="68" y="462">[upstream 200]</text><line x1="14" x2="887" y1="642" y2="642"/><text class="cond" x="22" y="659">[upstream 400]</text></g>
+        <line class="life" x1="80" x2="80" y1="68" y2="642"/>
+        <line class="life" x1="240" x2="240" y1="68" y2="642"/>
+        <line class="life" x1="455" x2="455" y1="68" y2="642"/>
+        <line class="life" x1="705" x2="705" y1="68" y2="642"/>
+        <line class="life" x1="865" x2="865" y1="68" y2="642"/>
+        <g class="frame"><rect class="box" x="14" y="380" width="921" height="244" rx="6"/><rect class="tab" x="14" y="380" width="46" height="22" rx="4"/><text x="24" y="396">alt</text><text class="cond" x="68" y="396">[upstream 200]</text>
+        <line x1="14" x2="935" y1="536" y2="536"/><text class="cond" x="22" y="553">[upstream 400]</text></g>
         <g class="actor"><rect x="21" y="16" width="118" height="52" rx="8"/><text x="80" y="38" text-anchor="middle">User</text><text class="sub" x="80" y="57" text-anchor="middle">browser</text></g>
         <g class="actor"><rect x="181" y="16" width="118" height="52" rx="8"/><text x="240" y="38" text-anchor="middle">web-app</text><text class="sub" x="240" y="57" text-anchor="middle">screen name</text></g>
-        <g class="actor"><rect x="370.5" y="16" width="121" height="52" rx="8"/><text x="431" y="38" text-anchor="middle">api-service</text><text class="sub" x="431" y="57" text-anchor="middle">ServiceName</text></g>
-        <g class="actor"><rect x="598" y="16" width="118" height="52" rx="8"/><text x="657" y="38" text-anchor="middle">Postgres</text><text class="sub" x="657" y="57" text-anchor="middle">schema.*</text></g>
-        <g class="actor"><rect x="745.5" y="16" width="143" height="52" rx="8"/><text x="817" y="38" text-anchor="middle">External</text><text class="sub" x="817" y="57" text-anchor="middle">upstream system</text></g>
-        <g class="phase"><line x1="8" x2="893" y1="102" y2="102"/><rect x="8" y="90" width="90" height="24" rx="4"/><text x="18" y="107">1 · Load</text></g>
-        <g class="step"><line class="msg" x1="80" y1="136" x2="232" y2="136"/><path class="ah" d="M239,136 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="129" text-anchor="middle">/things/:id</text><text class="num" x="86" y="153">1</text></g>
-        <g class="step"><title>id from the route</title><line class="msg" x1="240" y1="176" x2="423" y2="176"/><path class="ah" d="M430,176 l-9,-4.5 v9 z"/><text class="lbl" x="335.5" y="169" text-anchor="middle">GetThing</text><text class="num" x="246" y="193">2</text></g>
-        <g class="step"><line class="msg" x1="431" y1="216" x2="649" y2="216"/><path class="ah" d="M656,216 l-9,-4.5 v9 z"/><text class="lbl" x="544" y="209" text-anchor="middle">SELECT schema.thing</text><text class="num" x="437" y="233">3</text></g>
-        <g class="note"><title>needs permission thing.view; the id must exist, or NOT_FOUND</title><rect x="328.5" y="244" width="205" height="24" rx="4"/><text x="431" y="261" text-anchor="middle">permission thing.view</text></g>
-        <g class="step"><line class="msg ret" x1="431" y1="290" x2="248" y2="290"/><path class="ah ret" d="M241,290 l9,-4.5 v9 z"/><text class="lbl" x="335.5" y="283" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="307">4</text></g>
-        <g class="phase"><line x1="8" x2="893" y1="336" y2="336"/><rect x="8" y="324" width="82" height="24" rx="4"/><text x="18" y="341">2 · Act</text></g>
-        <g class="step"><line class="msg" x1="80" y1="370" x2="232" y2="370"/><path class="ah" d="M239,370 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="363" text-anchor="middle">Confirm</text><text class="num" x="86" y="387">5</text></g>
-        <g class="step"><title>name, ownerId</title><line class="msg" x1="240" y1="410" x2="423" y2="410"/><path class="ah" d="M430,410 l-9,-4.5 v9 z"/><text class="lbl" x="335.5" y="403" text-anchor="middle">CreateThing</text><text class="num" x="246" y="427">6</text></g>
-        <g class="step"><title>timeout 10 s</title><line class="msg hot" x1="431" y1="486" x2="809" y2="486"/><path class="ah hot" d="M816,486 l-9,-4.5 v9 z"/><text class="lbl hot" x="624" y="479" text-anchor="middle">POST /things</text><text class="num" x="437" y="503">7</text></g>
-        <g class="step"><line class="msg ret" x1="817" y1="526" x2="439" y2="526"/><path class="ah ret" d="M432,526 l9,-4.5 v9 z"/><text class="lbl" x="624" y="519" text-anchor="middle">200</text><text class="num" x="437" y="543">8</text></g>
-        <g class="step"><line class="msg hot" x1="431" y1="566" x2="649" y2="566"/><path class="ah hot" d="M656,566 l-9,-4.5 v9 z"/><text class="lbl hot" x="544" y="559" text-anchor="middle">INSERT schema.audit_log</text><text class="num" x="437" y="583">9</text></g>
-        <g class="step"><line class="msg ret" x1="431" y1="606" x2="248" y2="606"/><path class="ah ret" d="M241,606 l9,-4.5 v9 z"/><text class="lbl" x="335.5" y="599" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="623">10</text></g>
-        <g class="step"><line class="msg ret" x1="817" y1="682" x2="439" y2="682"/><path class="ah ret" d="M432,682 l9,-4.5 v9 z"/><text class="lbl" x="624" y="675" text-anchor="middle">400</text><text class="num" x="437" y="699">11</text></g>
-        <g class="step"><title>upstream reason passed through</title><line class="msg ret" x1="431" y1="722" x2="248" y2="722"/><path class="ah ret" d="M241,722 l9,-4.5 v9 z"/><text class="lbl" x="335.5" y="715" text-anchor="middle">FAILED_PRECONDITION</text><text class="num" x="246" y="739">12</text></g>
+        <g class="actor"><rect x="394.5" y="16" width="121" height="52" rx="8"/><text x="455" y="38" text-anchor="middle">api-service</text><text class="sub" x="455" y="57" text-anchor="middle">ServiceName</text></g>
+        <g class="actor"><rect x="646" y="16" width="118" height="52" rx="8"/><text x="705" y="38" text-anchor="middle">Postgres</text><text class="sub" x="705" y="57" text-anchor="middle">schema.*</text></g>
+        <g class="actor"><rect x="793.5" y="16" width="143" height="52" rx="8"/><text x="865" y="38" text-anchor="middle">External</text><text class="sub" x="865" y="57" text-anchor="middle">upstream system</text></g>
+        <g class="phase">
+        <line x1="8" x2="941" y1="98" y2="98"/><rect x="8" y="86" width="90" height="24" rx="4"/><text x="18" y="103">1 · Load</text></g>
+        <g class="step">
+        <line class="msg" x1="80" y1="132" x2="232" y2="132"/><path class="ah" d="M239,132 l-9,-4.5 v9 z"/><text class="lbl" x="171" y="125" text-anchor="middle">/things/:id</text><text class="num" x="86" y="125">1</text></g>
+        <g class="step"><title>id from the route</title>
+        <line class="msg" x1="240" y1="162" x2="447" y2="162"/><path class="ah" d="M454,162 l-9,-4.5 v9 z"/><text class="lbl" x="358.5" y="155" text-anchor="middle">GetThing</text><text class="num" x="246" y="155">2</text></g>
+        <g class="step">
+        <line class="msg" x1="455" y1="192" x2="697" y2="192"/><path class="ah" d="M704,192 l-9,-4.5 v9 z"/><text class="lbl" x="591" y="185" text-anchor="middle">SELECT schema.thing</text><text class="num" x="461" y="185">3</text></g>
+        <g class="note"><title>needs permission thing.view; the id must exist, or NOT_FOUND</title><rect x="352.5" y="210" width="205" height="24" rx="4"/><text x="455" y="227" text-anchor="middle">permission thing.view</text></g>
+        <g class="step">
+        <line class="msg ret" x1="455" y1="256" x2="248" y2="256"/><path class="ah ret" d="M241,256 l9,-4.5 v9 z"/><text class="lbl" x="358.5" y="249" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="249">4</text></g>
+        <g class="phase">
+        <line x1="8" x2="941" y1="290" y2="290"/><rect x="8" y="278" width="82" height="24" rx="4"/><text x="18" y="295">2 · Act</text></g>
+        <g class="step">
+        <line class="msg" x1="80" y1="324" x2="232" y2="324"/><path class="ah" d="M239,324 l-9,-4.5 v9 z"/><text class="lbl" x="171" y="317" text-anchor="middle">Confirm</text><text class="num" x="86" y="317">5</text></g>
+        <g class="step"><title>name, ownerId</title>
+        <line class="msg" x1="240" y1="354" x2="447" y2="354"/><path class="ah" d="M454,354 l-9,-4.5 v9 z"/><text class="lbl" x="358.5" y="347" text-anchor="middle">CreateThing</text><text class="num" x="246" y="347">6</text></g>
+        <g class="step"><title>timeout 10 s</title>
+        <line class="msg hot" x1="455" y1="420" x2="857" y2="420"/><path class="ah hot" d="M864,420 l-9,-4.5 v9 z"/><text class="lbl hot" x="671" y="413" text-anchor="middle">POST /things</text><text class="num" x="461" y="413">7</text></g>
+        <g class="step">
+        <line class="msg ret" x1="865" y1="450" x2="463" y2="450"/><path class="ah ret" d="M456,450 l9,-4.5 v9 z"/><text class="lbl" x="671" y="443" text-anchor="middle">200</text><text class="num" x="461" y="443">8</text></g>
+        <g class="step">
+        <line class="msg hot" x1="455" y1="480" x2="697" y2="480"/><path class="ah hot" d="M704,480 l-9,-4.5 v9 z"/><text class="lbl hot" x="591" y="473" text-anchor="middle">INSERT schema.audit_log</text><text class="num" x="461" y="473">9</text></g>
+        <g class="step">
+        <line class="msg ret" x1="455" y1="510" x2="248" y2="510"/><path class="ah ret" d="M241,510 l9,-4.5 v9 z"/><text class="lbl" x="358.5" y="503" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="503">10</text></g>
+        <g class="step">
+        <line class="msg ret" x1="865" y1="576" x2="463" y2="576"/><path class="ah ret" d="M456,576 l9,-4.5 v9 z"/><text class="lbl" x="671" y="569" text-anchor="middle">400</text><text class="num" x="461" y="569">11</text></g>
+        <g class="step"><title>upstream reason passed through</title>
+        <line class="msg ret" x1="455" y1="606" x2="248" y2="606"/><path class="ah ret" d="M241,606 l9,-4.5 v9 z"/><text class="lbl" x="358.5" y="599" text-anchor="middle">FAILED_PRECONDITION</text><text class="num" x="246" y="599">12</text></g>
       </svg>
     </div>
   </div>

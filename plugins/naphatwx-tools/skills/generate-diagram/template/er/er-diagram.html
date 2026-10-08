@@ -56,8 +56,8 @@
             --fs-sm: 0.875rem;
             --fs-md: 1rem;
             --fs-lg: 1.25rem;
-            --fs-xl: 1.75rem;
-            --fs-2xl: 2.75rem;
+            --fs-xl: 1.5rem;
+            --fs-2xl: 2rem;
             /* Headings and lead line: the same steps on every page */
             --fs-lead: var(--fs-lg);
             --fs-h3: var(--fs-lg);
@@ -100,7 +100,7 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
 
-        body { padding: 40px 24px 48px; }
+        body { padding: 20px var(--gutter) 32px; }
 
         header {
             display: flex;
@@ -109,16 +109,16 @@
             justify-content: space-between;
             gap: 12px;
             max-width: 1400px;
-            margin: 0 auto 16px;
+            margin: 0 auto 12px;
         }
 
         h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; }
-        .sub { color: var(--text-3); font-size: 0.875rem; margin-top: 4px; }
+        .sub { color: var(--text-3); font-size: var(--fs-md); margin-top: 2px; }
         .actions { display: flex; gap: 8px; }
 
         .btn {
             font: inherit;
-            font-size: 0.875rem;
+            font-size: var(--fs-md);
             color: var(--text-2);
             background: var(--surface-2);
             border: 1px solid var(--line-strong);
@@ -145,7 +145,7 @@
 
         .legend {
             max-width: 1400px;
-            margin: 14px auto 0;
+            margin: 10px auto 0;
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
@@ -233,7 +233,7 @@
         };
 
         (function render({ tables, rels }) {
-            const HEAD = 40, ROW = 30, GX = 150, GY = 70, PAD = 30;
+            const HEAD = 34, ROW = 26, GX = 110, GY = 44, PAD = 16;
             const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
             // Text is 14px; one width fits every table's longest name, key and type (estimated per character, on the wide side).
             const MONO = 8.6, SANS = 7.9, BOLD = 8.8;
@@ -302,15 +302,15 @@
                     return `<g class="${mark ? "r-" + mark : ""}">`
                         + (i % 2 ? `<rect class="r-zebra" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>` : "")
                         + (i ? `<line class="r-line" x1="${t.x}" x2="${t.x + W}" y1="${y}" y2="${y}"/>` : "")
-                        + `<text class="r-col" x="${t.x + 12}" y="${y + 20}">${esc(col)}</text>`
-                        + `<text class="r-key" x="${t.x + KEY_X}" y="${y + 20}">${esc(key)}</text>`
-                        + `<text class="r-type" x="${t.x + W - 12}" y="${y + 20}" text-anchor="end">${esc(type)}</text></g>`;
+                        + `<text class="r-col" x="${t.x + 12}" y="${y + 18}">${esc(col)}</text>`
+                        + `<text class="r-key" x="${t.x + KEY_X}" y="${y + 18}">${esc(key)}</text>`
+                        + `<text class="r-type" x="${t.x + W - 12}" y="${y + 18}" text-anchor="end">${esc(type)}</text></g>`;
                 }).join("");
                 return `<g class="table ${kind}" data-id="${t.id}" tabindex="0" role="group" aria-label="${esc(t.name)}${t.tag ? ", " + esc(t.tag) : ""}">`
                     + `<rect class="t-box ${kind}" x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/>`
                     + `<path class="t-head" d="M${t.x + 1},${t.y + HEAD} V${t.y + 8} a7,7 0 0 1 7,-7 H${t.x + W - 8} a7,7 0 0 1 7,7 V${t.y + HEAD} Z"/>`
-                    + `<text class="t-name" x="${t.x + 12}" y="${t.y + 25}">${esc(t.name)}</text>`
-                    + `<text class="t-tag${kind === "write" ? " write" : ""}" x="${t.x + W - 12}" y="${t.y + 25}" text-anchor="end">${esc(t.tag || "")}</text>`
+                    + `<text class="t-name" x="${t.x + 12}" y="${t.y + 22}">${esc(t.name)}</text>`
+                    + `<text class="t-tag${kind === "write" ? " write" : ""}" x="${t.x + W - 12}" y="${t.y + 22}" text-anchor="end">${esc(t.tag || "")}</text>`
                     + rows + `</g>`;
             });
 

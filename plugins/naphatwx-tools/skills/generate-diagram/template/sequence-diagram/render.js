@@ -8,7 +8,7 @@ var SeqDiagrams = (function () {
     const define = (id, spec) => { flows[id] = spec; };
     const MAX = 40;
     // Text is 14px; widths are estimated per character (mono, sans, bold sans), on the wide side.
-    const MONO = 8.6, SANS = 7.9, BOLD = 8.8;
+    const MONO = 8.6, SANS = 7.9, BOLD = 8.8, NUM = 24;
 
     function svg(id, { title = id, actors, steps, gap = 160 }) {
         const TOP = 16, HEAD = 52;
@@ -19,7 +19,8 @@ var SeqDiagrams = (function () {
         for (const [kind, a, b, label] of steps) {
             if (!['call', 'ret', 'hot'].includes(kind)) continue;
             const lo = Math.min(idx[a], idx[b]), hi = Math.max(idx[a], idx[b]);
-            const span = gaps.slice(lo, hi).reduce((s, g) => s + g, 0), need = label.length * MONO + 28;
+            // NUM: the step number shares the label's row, at the arrow's left end
+            const span = gaps.slice(lo, hi).reduce((s, g) => s + g, 0), need = label.length * MONO + NUM + 28;
             for (let i = lo; i < hi && span < need; i++) gaps[i] += (need - span) / (hi - lo);
         }
         const xs = [Math.round(Math.max(80, aw[0] / 2 + 12))];
@@ -29,11 +30,11 @@ var SeqDiagrams = (function () {
         const body = [], frames = [], stack = [], details = [];
         const tip = d => d ? `<title>${esc(d)}</title>` : '';
         const long = (kind, text) => { if (text.length > MAX && /\s/.test(text)) console.warn(`[seq] ${kind} over ${MAX} chars, move the rest to detail: ${text}`); };
-        let y = TOP + HEAD + 28, num = 0;
+        let y = TOP + HEAD + 26, num = 0;
         for (const s of steps) {
             const [t] = s;
             if (t === 'phase') {
-                y += 6;
+                y += 4;
                 body.push(`<g class="phase"><line x1="8" x2="${W - 8}" y1="${y}" y2="${y}"/><rect x="8" y="${y - 12}" width="${Math.round(s[1].length * BOLD + 20)}" height="24" rx="4"/><text x="18" y="${y + 5}">${esc(s[1])}</text></g>`);
                 y += 34;
             } else if (t === 'alt' || t === 'opt' || t === 'loop') {
@@ -45,8 +46,8 @@ var SeqDiagrams = (function () {
                 stack[stack.length - 1].cuts.push([y - 4, s[1]]);
                 y += 36;
             } else if (t === 'end') {
-                const f = stack.pop(); f.y1 = y - 8; frames.push(f);
-                y += 14;
+                const f = stack.pop(); f.y1 = y - 12; frames.push(f);
+                y += 10;
             } else if (t === 'note') {
                 const [, a, text, to, detail] = s, b = to || a;
                 long('note', text);
@@ -61,18 +62,18 @@ var SeqDiagrams = (function () {
                 const x1 = X[a], x2 = X[b], d = x2 > x1 ? 1 : -1;
                 const cls = { call: 'msg', ret: 'msg ret', hot: 'msg hot' }[kind];
                 const ah = { call: 'ah', ret: 'ah ret', hot: 'ah hot' }[kind];
-                const lw = label.length * MONO;
-                const lx = Math.min(Math.max((x1 + x2) / 2, lw / 2 + 6), W - lw / 2 - 6);
+                const lw = label.length * MONO, lo = Math.min(x1, x2) + NUM + 4, hi = Math.max(x1, x2) - 6;
+                const lx = Math.min(Math.max((lo + hi) / 2, lw / 2 + 6), W - lw / 2 - 6);
                 num++;
                 if (detail) details.push([num, label, detail]);
                 body.push(`<g class="step">${tip(detail)}<line class="${cls}" x1="${x1}" y1="${y}" x2="${x2 - d * 8}" y2="${y}"/>`,
                     `<path class="${ah}" d="M${x2 - d},${y} l${-d * 9},-4.5 v9 z"/>`,
                     `<text class="lbl${kind === 'hot' ? ' hot' : ''}" x="${lx}" y="${y - 7}" text-anchor="middle">${esc(label)}</text>`,
-                    `<text class="num" x="${Math.min(x1, x2) + 6}" y="${y + 17}">${num}</text></g>`);
-                y += 40;
+                    `<text class="num" x="${Math.min(x1, x2) + 6}" y="${y - 7}">${num}</text></g>`);
+                y += 30;
             }
         }
-        const H = y + 8;
+        const H = y;
         // width / height are the 1:1 size: hosts never scale it, so 14px labels render at 14px; a wider box scrolls.
         const ariaName = `${title}: sequence diagram, ${actors.length} participants, ${num} steps`;
         const out = [`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(ariaName)}">`];

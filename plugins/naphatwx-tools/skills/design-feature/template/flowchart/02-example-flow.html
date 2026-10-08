@@ -55,8 +55,8 @@
         --fs-sm: 0.875rem;
         --fs-md: 1rem;
         --fs-lg: 1.25rem;
-        --fs-xl: 1.75rem;
-        --fs-2xl: 2.75rem;
+        --fs-xl: 1.5rem;
+        --fs-2xl: 2rem;
         /* Headings and lead line: the same steps on every page */
         --fs-lead: var(--fs-lg);
         --fs-h3: var(--fs-lg);
@@ -95,10 +95,10 @@
     /* theme:base:end */
 
     * { margin: 0; padding: 0; }
-    body { background: var(--surface); padding: 3rem 2rem; }
-    .frame { max-width: 1200px; width: 100%; margin: 0 auto; }
-    .eyebrow { font-size: 0.8125rem; color: var(--text-3); margin-bottom: 0.5rem; }
-    h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1.5rem; }
+    body { background: var(--surface); padding: 1.5rem var(--gutter); }
+    .frame { max-width: var(--page-w); width: 100%; margin: 0 auto; }
+    .eyebrow { font-size: var(--fs-md); color: var(--text-3); margin-bottom: 0.25rem; }
+    h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1rem; }
     /* Drawn at 1:1 (every label 14px), never scaled; a narrow window scrolls the diagram, not the page. */
     .diagram { overflow-x: auto; }
     .diagram svg { display: block; width: 760px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
@@ -119,7 +119,7 @@
     <h1>Example flow</h1>
 
     <div class="diagram">
-      <svg viewBox="0 0 760 490" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-chart-title example-flow-chart-desc">
+      <svg viewBox="0 0 760 376" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-chart-title example-flow-chart-desc">
         <title id="example-flow-chart-title">Example flow: flowchart, 7 nodes</title>
         <desc id="example-flow-chart-desc">Open the form, check the thing.edit permission, validate the name, save it with CreateThing as ACTIVE, or show INVALID_ARGUMENT and retry.</desc>
         <defs>
@@ -127,26 +127,26 @@
         </defs>
         <!-- Connectors first, behind nodes. The retry loop enters "Name valid?" on its own edge, not on the Yes connector. -->
         <g class="conn" marker-end="url(#ah)">
-          <path d="M380,70 V103"/>
-          <path d="M500,165 H578"/>
-          <path d="M380,225 V263"/>
-          <path d="M500,325 H578"/>
-          <path d="M260,325 H202"/>
-          <path d="M660,355 V418"/>
-          <path d="M120,293 V258 H325 V293"/>
+          <path d="M380,56 V84"/>
+          <path d="M500,134 H578"/>
+          <path d="M380,182 V214"/>
+          <path d="M500,264 H578"/>
+          <path d="M260,264 H202"/>
+          <path d="M660,290 V316"/>
+          <path d="M120,236 V200 H325 V234"/>
         </g>
-        <text class="exit" x="539" y="157">No</text>
-        <text class="exit" x="398" y="250">Yes</text>
-        <text class="exit" x="539" y="317">Yes</text>
-        <text class="exit" x="231" y="317">No</text>
-        <text class="exit" x="222" y="250">Retry</text>
-        <g class="node"><rect class="pill" x="300" y="20" width="160" height="50" rx="25"/><text x="380" y="41">Open the form</text><text class="detail" x="380" y="59">/things/:id</text></g>
-        <g class="node"><polygon class="decision" points="380,105 500,165 380,225 260,165"/><text x="380" y="160">Can edit?</text><text class="detail" x="380" y="180">thing.edit</text></g>
-        <g class="node"><rect class="pill" x="580" y="140" width="160" height="50" rx="25"/><text x="660" y="161">No Edit button</text><text class="detail" x="660" y="179">read-only view</text></g>
-        <g class="node"><polygon class="decision" points="380,265 500,325 380,385 260,325"/><text x="380" y="320">Name valid?</text><text class="detail" x="380" y="340">name max 64 chars</text></g>
-        <g class="node"><rect class="box" x="40" y="295" width="160" height="60" rx="8"/><text x="120" y="320">Show error</text><text class="detail" x="120" y="340">INVALID_ARGUMENT</text></g>
-        <g class="node"><rect class="box" x="580" y="295" width="160" height="60" rx="8"/><text x="660" y="320">Save record</text><text class="detail" x="660" y="340">CreateThing</text></g>
-        <g class="node"><rect class="pill" x="580" y="420" width="160" height="50" rx="25"/><text x="660" y="441">Saved</text><text class="detail" x="660" y="459">status = ACTIVE</text></g>
+        <text class="exit" x="539" y="126">No</text>
+        <text class="exit" x="398" y="203">Yes</text>
+        <text class="exit" x="539" y="256">Yes</text>
+        <text class="exit" x="231" y="256">No</text>
+        <text class="exit" x="222" y="192">Retry</text>
+        <g class="node"><rect class="pill" x="300" y="12" width="160" height="44" rx="22"/><text x="380" y="30">Open the form</text><text class="detail" x="380" y="48">/things/:id</text></g>
+        <g class="node"><polygon class="decision" points="380,86 500,134 380,182 260,134"/><text x="380" y="129">Can edit?</text><text class="detail" x="380" y="149">thing.edit</text></g>
+        <g class="node"><rect class="pill" x="580" y="112" width="160" height="44" rx="22"/><text x="660" y="130">No Edit button</text><text class="detail" x="660" y="148">read-only view</text></g>
+        <g class="node"><polygon class="decision" points="380,216 500,264 380,312 260,264"/><text x="380" y="259">Name valid?</text><text class="detail" x="380" y="279">name max 64 chars</text></g>
+        <g class="node"><rect class="box" x="40" y="238" width="160" height="52" rx="8"/><text x="120" y="259">Show error</text><text class="detail" x="120" y="279">INVALID_ARGUMENT</text></g>
+        <g class="node"><rect class="box" x="580" y="238" width="160" height="52" rx="8"/><text x="660" y="259">Save record</text><text class="detail" x="660" y="279">CreateThing</text></g>
+        <g class="node"><rect class="pill" x="580" y="318" width="160" height="44" rx="22"/><text x="660" y="336">Saved</text><text class="detail" x="660" y="354">status = ACTIVE</text></g>
       </svg>
     </div>
   </div>

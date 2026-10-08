@@ -57,8 +57,8 @@
             --fs-sm: 0.875rem;
             --fs-md: 1rem;
             --fs-lg: 1.25rem;
-            --fs-xl: 1.75rem;
-            --fs-2xl: 2.75rem;
+            --fs-xl: 1.5rem;
+            --fs-2xl: 2rem;
             /* Headings and lead line: the same steps on every page */
             --fs-lead: var(--fs-lg);
             --fs-h3: var(--fs-lg);
@@ -101,12 +101,12 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
 
-        body { padding: 24px 16px 40px; }
-        main { max-width: 1200px; margin: 0 auto; }
+        body { padding: 20px var(--gutter) 32px; }
+        main { max-width: var(--page-w); margin: 0 auto; }
         header { margin-bottom: 8px; }
         h1 { font-size: var(--fs-h1); }
-        h2 { font-size: var(--fs-h2); margin-top: 28px; }
-        code { font-size: 0.88em; }
+        h2 { font-size: var(--fs-h2); margin-top: 20px; }
+        code { font-size: var(--fs-sm); }
 
         /* ============ SEQUENCE DIAGRAM (.seq) ============ */
         .seq {
@@ -114,7 +114,7 @@
             background: var(--surface);
             border-radius: 12px;
             padding: 8px;
-            margin: 18px 0;
+            margin: 12px 0;
             overflow-x: auto;
         }
 
@@ -144,17 +144,17 @@
         .seq .ah.ret { fill: var(--text-3); }
         .seq .ah.hot { fill: var(--accent); }
         .seq .step { cursor: default; }
-        .seq-steps { margin-top: 10px; font-size: 0.875rem; color: var(--text-2); }
+        .seq-steps { margin-top: 8px; font-size: var(--fs-md); color: var(--text-2); }
         .seq-steps-title { margin: 0; color: var(--text-3); font-weight: 600; }
         .seq-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
-        .seq-steps li { padding: 3px 0 3px 30px; text-indent: -30px; }
+        .seq-steps li { padding: 2px 0 2px 30px; text-indent: -30px; }
         .seq-steps .n { display: inline-block; width: 22px; margin-right: 8px; text-indent: 0; color: var(--text-3); font-weight: 600; text-align: right; }
 
         .seq-legend {
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
-            font-size: 0.875rem;
+            font-size: var(--fs-sm);
             color: var(--text-3);
             margin-top: -6px;
         }
