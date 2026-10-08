@@ -39,7 +39,8 @@ body {
     font: var(--fs-body)/1.65 var(--sans);
     -webkit-font-smoothing: antialiased;
 }
-::selection { background: var(--accent-soft); color: var(--text); }
+/* Accent tint, strong enough to see; the 12% --accent-soft tint was too faint. */
+::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
 * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
