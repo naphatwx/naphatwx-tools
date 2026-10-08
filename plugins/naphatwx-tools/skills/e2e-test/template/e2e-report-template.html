@@ -49,8 +49,8 @@
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-      /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
-         headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+      /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
+         --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
       --fs-xs: 0.75rem;
       --fs-sm: 0.875rem;
       --fs-md: 1rem;
@@ -89,32 +89,35 @@
   }
   /* theme:base:end */
 
-  body { font-size: var(--fs-sm); line-height: 1.5; }
+  body { font-size: var(--fs-md); line-height: 1.5; }
   [hidden] { display: none !important; }
   main { max-width: var(--page-w); margin: 0 auto; padding: 24px var(--gutter) 64px; }
-  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
-  h1 { font-size: var(--fs-xl); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
-  h2 { font-size: var(--fs-lg); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
+  /* Title, one summary line at one size, then the status filter on the left above the rows. */
+  header { display: grid; gap: 12px; justify-items: start; margin-bottom: 8px; }
+  /* Three sizes only: title --fs-lg, all other text --fs-md, pills and code --fs-sm. Hierarchy comes from weight and color. */
+  h1 { font-size: var(--fs-lg); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
+  h2 { font-size: var(--fs-md); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
   h3 { font-size: var(--fs-md); margin: 0; overflow-wrap: anywhere; }
-  .meta { color: var(--text-3); font-size: var(--fs-xs); }
-  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-sm); }
+  .meta { color: var(--text-3); font-size: var(--fs-md); }
+  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-md); }
   .summary-line .lead { font-weight: 600; }
+  .summary-line .meta { font-size: inherit; }
   .summary-line .c-bad { color: var(--bad); }
   .summary-line .c-warn { color: var(--warn); }
-  code { font-size: var(--fs-xs); overflow-wrap: anywhere; }
+  code { font-size: var(--fs-sm); overflow-wrap: anywhere; }
 
-  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-xs); white-space: nowrap; }
+  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
   .tone-ok { color: var(--ok); background: var(--ok-soft); }
   .tone-warn { color: var(--warn); background: var(--warn-soft); }
   .tone-bad { color: var(--bad); background: var(--bad-soft); }
   .tone-neutral { color: var(--neutral); background: var(--neutral-soft); }
 
-  button { font: inherit; font-size: var(--fs-sm); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
+  button { font: inherit; font-size: var(--fs-md); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
   button:hover:not(:disabled) { background: var(--surface-3); }
   button:disabled { opacity: .45; cursor: default; }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-  .empty-filter { margin-top: 16px; font-size: var(--fs-sm); }
+  .empty-filter { margin-top: 16px; font-size: var(--fs-md); }
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
   .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 12px; background: var(--surface); overflow: hidden; }
@@ -152,9 +155,9 @@
   .stage.tall .frame { max-height: 70vh; overflow-y: auto; overscroll-behavior: contain; }
   .stage.tall img { max-height: none; height: auto; object-fit: initial; object-position: top; }
   .stage.tall .nav { display: none; }
-  .hint { position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-xs); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; }
+  .hint { position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-md); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; }
   .stage .empty { padding: 48px 16px; text-align: center; border: 1px dashed var(--line-strong); border-radius: var(--radius); }
-  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; border-radius: 0; background: transparent; color: var(--text); font-size: var(--fs-2xl); opacity: 0; transition: opacity .15s var(--ease); }
+  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; border-radius: 0; background: transparent; color: var(--text); font-size: var(--fs-lg); opacity: 0; transition: opacity .15s var(--ease); }
   .stage .nav.prev { left: 0; text-align: left; padding-left: 12px; cursor: w-resize; }
   .stage .nav.next { right: 0; text-align: right; padding-right: 12px; cursor: e-resize; }
   .stage .nav:hover:not(:disabled) { opacity: 1; background: transparent; text-shadow: 0 1px 6px rgb(0 0 0 / .8); }
@@ -171,14 +174,14 @@
   .list .g.bad { color: var(--bad); }
   .list .g.neutral { color: var(--neutral); }
   .list .t { overflow-wrap: anywhere; }
-  .list .ms { color: var(--text-3); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; }
+  .list .ms { color: var(--text-3); font-size: var(--fs-md); font-variant-numeric: tabular-nums; }
 
-  pre { font-size: var(--fs-xs); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
+  pre { font-size: var(--fs-sm); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
   .err { display: grid; gap: 4px; }
   .err pre { margin: 0; }
   .err-label { color: var(--bad); font-weight: 600; }
   .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-  .cmd > .meta { min-width: 4em; font-size: var(--fs-sm); }
+  .cmd > .meta { min-width: 4em; font-size: var(--fs-md); }
   .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
   .cmds { display: grid; gap: 8px; }
 

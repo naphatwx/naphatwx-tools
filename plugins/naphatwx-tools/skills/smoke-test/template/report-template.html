@@ -49,8 +49,8 @@
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-      /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
-         headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+      /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
+         --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
       --fs-xs: 0.75rem;
       --fs-sm: 0.875rem;
       --fs-md: 1rem;
@@ -89,45 +89,43 @@
   }
   /* theme:base:end */
 
-  body { font-size: var(--fs-sm); line-height: 1.5; }
+  body { font-size: var(--fs-md); line-height: 1.5; }
   [hidden] { display: none !important; }
   main { max-width: var(--page-w); margin: 0 auto; padding: 24px var(--gutter) 64px; }
-  h1 { font-size: var(--fs-xl); line-height: 1.2; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
-  h1 .pill { font-size: var(--fs-sm); }
-  h2 { font-size: var(--fs-lg); line-height: 1.3; margin: 32px 0 10px; }
-  h2 .count { color: var(--text-3); font-weight: 500; }
-  h3 { font-size: var(--fs-md); margin: 0; }
-  .meta { color: var(--text-3); font-size: var(--fs-sm); }
+  /* Title, one summary line at one size, then the status filter on the left above the rows. */
+  header { display: grid; gap: 12px; justify-items: start; margin-bottom: 8px; }
+  /* Three sizes only: title --fs-lg, all other text --fs-md, pills and code --fs-sm. Hierarchy comes from weight and color. */
+  h1 { font-size: var(--fs-lg); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
+  h2 { font-size: var(--fs-md); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
+  .meta { color: var(--text-3); font-size: var(--fs-md); }
   .meta code { color: var(--text-2); }
-  code { font-size: var(--fs-xs); overflow-wrap: anywhere; }
+  code { font-size: var(--fs-sm); overflow-wrap: anywhere; }
 
-  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-xs); white-space: nowrap; }
+  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
   .tone-ok { color: var(--ok); background: var(--ok-soft); }
   .tone-warn { color: var(--warn); background: var(--warn-soft); }
   .tone-bad { color: var(--bad); background: var(--bad-soft); }
   .tone-neutral { color: var(--neutral); background: var(--neutral-soft); }
 
-  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
-  .lead { margin: 24px 0 0; font-size: var(--fs-md); font-weight: 600; overflow-wrap: anywhere; }
-  .lead .sep { color: var(--text-3); font-weight: 400; }
-
-  .broken { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); overflow: hidden; }
-  .broken li + li { border-top: 1px solid var(--line); }
-  .broken a { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; padding: 10px 14px; color: var(--text); text-decoration: none; }
-  .broken a:hover { background: var(--surface-2); }
-  .broken a:focus-visible { outline-offset: -2px; }
-  .broken .flow-name { font-weight: 600; color: var(--accent); }
-  .broken .detail { color: var(--text-2); overflow-wrap: anywhere; min-width: 0; }
+  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; font-size: var(--fs-md); }
+  .summary-line .lead { font-weight: 600; }
+  .summary-line .c-bad { color: var(--bad); }
+  .summary-line .meta { font-size: inherit; }
+  .tools { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tools button { font-size: var(--fs-md); padding: 4px 10px; }
+  .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .empty-filter { margin-top: 16px; font-size: var(--fs-md); }
 
   /* Flow boxes use the heading-plus-button disclosure, so the flow name stays a real heading. */
   .flow { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 12px; background: var(--surface); overflow: hidden; scroll-margin-top: 12px; }
-  .flow-head { margin: 0; font-size: var(--fs-sm); font-weight: 400; }
-  .flow-toggle { all: unset; box-sizing: border-box; width: 100%; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; cursor: pointer; transition: background-color .15s var(--ease); }
-  .flow-toggle:hover { background: var(--surface-2); }
-  .flow-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  .flow-toggle[aria-expanded="true"] { border-bottom: 1px solid var(--line); }
-  .flow-name-text { font-size: var(--fs-md); font-weight: 600; color: var(--text); }
-  .flow-toggle[aria-expanded="true"] .mark::before { content: "\2212"; }
+  .flow-head { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
+  .flow-head:hover { background: var(--surface-2); }
+  .flow.open > .flow-head { border-bottom: 1px solid var(--line); }
+  .flow-head h2 { flex: 1 1 320px; min-width: 0; }
+  .flow-head h2 button { all: unset; display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; border-radius: var(--radius); }
+  .flow-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .flow-head .info { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+  .flow.open .flow-head .mark::before { content: "\2212"; }
 
   summary { cursor: pointer; list-style: none; transition: background-color .15s var(--ease); }
   summary::-webkit-details-marker { display: none; }
@@ -138,43 +136,58 @@
   details[open] > summary .mark::before { content: "\2212"; }
 
   .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 14px 16px 10px; margin: 0; list-style: none; }
-  .node { display: inline-flex; gap: 6px; align-items: center; padding: 4px 10px; border-radius: var(--radius); font-weight: 600; font-size: var(--fs-sm); border: 1px solid var(--line-strong); }
+  .node { display: inline-flex; gap: 6px; align-items: center; padding: 4px 10px; border-radius: var(--radius); font-weight: 600; font-size: var(--fs-md); border: 1px solid var(--line-strong); }
   .node.plain { color: var(--text-2); font-weight: 500; border-style: dashed; }
-  .arrow { color: var(--connector); font-size: var(--fs-xs); }
+  .arrow { color: var(--connector); }
   .verdict { margin: 0 16px 12px; padding: 8px 12px; color: var(--text); border-radius: var(--radius); overflow-wrap: anywhere; }
   .verdict.bad { background: var(--bad-soft); font-weight: 600; }
   .facts { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 0 16px 12px; }
   .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 0 16px 12px; }
   .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
 
-  .hop { border-top: 1px solid var(--line); }
-  .hop > summary, .hop.plain { padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
-  .hop .route { color: var(--text-2); }
-  .hop .detail { color: var(--text-2); overflow-wrap: anywhere; min-width: 0; }
-  .hop-body { padding: 0 16px 14px 40px; }
+  /* Hops are a numbered table-like list: fixed columns so status, route and time line up row to row.
+     The cause lives in the opened row, not the summary, so a closed row stays one line. */
+  .hops-label { padding: 0 16px 6px; color: var(--text-3); }
+  .hops { list-style: none; margin: 0 16px 16px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .hops > li + li { border-top: 1px solid var(--line); }
+  .hop-row { display: grid; grid-template-columns: 1ch 2ch 8.5em minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 12px; }
+  .hop-row .pill { justify-self: start; }
+  .hop-row .n { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
+  .hop-row .route { overflow-wrap: anywhere; min-width: 0; }
+  .hop-row .via { color: var(--text-3); }
+  .hop-row .meta { text-align: right; white-space: nowrap; }
+  .hop.skipped .route { color: var(--text-3); }
+  .hop.skipped .mark { visibility: hidden; }
+  .hop[open] > .hop-row { background: var(--surface-2); }
+  .hop-body { padding: 12px 12px 14px calc(1ch + 2ch + 36px); border-top: 1px solid var(--line); display: grid; gap: 8px; min-width: 0; }
+  .hop-body .why { color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
+  .hop-body .why.bad { color: var(--bad); }
   .polled { margin-top: 4px; color: var(--text-2); overflow-wrap: anywhere; }
   .polled code { color: var(--text); }
 
-  button { font: inherit; font-size: var(--fs-xs); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 2px 10px; cursor: pointer; }
+  button { font: inherit; font-size: var(--fs-md); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 2px 10px; cursor: pointer; }
   button:hover { background: var(--surface-3); }
 
   .table-wrap { overflow-x: auto; margin: 8px 0; }
-  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: var(--fs-sm); }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: var(--fs-md); }
   th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { color: var(--text-3); font-weight: 500; white-space: nowrap; }
   td:first-child code { white-space: nowrap; overflow-wrap: normal; }
   .evidence-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 10px; }
-  pre { font-size: var(--fs-xs); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 360px; overflow-y: auto; }
+  pre { font-size: var(--fs-sm); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 360px; overflow-y: auto; }
   .full { margin-top: 8px; }
-  .full > summary { display: inline-flex; gap: 6px; align-items: center; color: var(--accent); font-size: var(--fs-xs); padding: 2px 0; }
+  .full > summary { display: inline-flex; gap: 6px; align-items: center; color: var(--accent); padding: 2px 0; }
   .full > summary:hover { background: none; text-decoration: underline; }
   .full-head { display: flex; justify-content: flex-end; margin-top: 6px; }
-  .note { color: var(--warn); font-size: var(--fs-xs); margin-top: 4px; }
+  .note { color: var(--warn); margin-top: 4px; }
 
   @media (max-width: 600px) {
     .chain { flex-direction: column; align-items: flex-start; }
     .arrow { transform: rotate(90deg); }
-    .hop-body { padding-left: 16px; }
+    .hop-row { grid-template-columns: 1ch 2ch minmax(0, 1fr) auto; row-gap: 4px; }
+    .hop-row .pill { grid-column: 3; grid-row: 1; justify-self: start; }
+    .hop-row .route { grid-column: 3 / -1; grid-row: 2; }
+    .hop-body { padding-left: 12px; }
   }
 </style>
 </head>
@@ -238,15 +251,6 @@ const firstBroken = (f) => f.hops.find((h) => h.status !== 'pass' && h.status !=
 const flowId = (f) => 'flow-' + slug(f.flow);
 const entryOf = (f) => f.entry || 'entry';
 
-// Short cause for one-line summaries: names the env var, or the trigger answer.
-function cause(f) {
-  if (f.error) return 'trigger → ' + entryOf(f) + ' failed';
-  const b = firstBroken(f);
-  if (!b) return '';
-  if (b.envMismatch?.length) return b.service + ' env ' + b.envMismatch.join(', ');
-  return b.service + ' ' + st(b.status).word;
-}
-
 function verdict(f) {
   if (f.error) return { bad: true, text: '✕ Trigger failed: ' + f.error };
   const broken = firstBroken(f);
@@ -290,17 +294,22 @@ function polled(p) {
     (p.lastReason ? ' (' + p.lastReason + ')' : '') + '.');
 }
 
-function hopRow(f, h) {
-  const route = el('span', { class: 'route' }, (h.from ? h.from + ' → ' : '') + h.service + (h.transport ? ' via ' + h.transport : ''));
+// One numbered row per hop; a closed row is a single line, the cause and evidence open below it.
+function hopShell(tag, n, status, from, to, via, time) {
+  return el(tag, { class: 'hop-row' }, el('span', { class: 'mark', 'aria-hidden': 'true' }), el('span', { class: 'n' }, n), pill(status),
+    el('span', { class: 'route' }, (from ? from + ' → ' : '') + to, via ? el('span', { class: 'via' }, '  via ' + via) : null),
+    el('span', { class: 'meta' }, time));
+}
+
+function hopRow(f, h, n) {
   const id = flowId(f) + '-hop-' + slug(h.id || h.service);
   if (h.status === 'not-reached') {
-    return el('div', { class: 'hop plain', id }, el('span', { class: 'mark', 'aria-hidden': 'true', style: 'visibility:hidden' }), pill(h.status), route,
-      el('span', { class: 'meta' }, 'Not checked: an earlier hop failed.'));
+    return el('li', { class: 'hop skipped', id }, hopShell('div', n, h.status, h.from, h.service, h.transport, 'not checked'));
   }
   const d = el('details', { class: 'hop', id });
-  d.append(el('summary', {}, el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(h.status), route,
-    el('span', { class: 'meta' }, ms(h.ms)), h.detail ? el('span', { class: 'detail' }, h.detail) : null));
+  d.append(hopShell('summary', n, h.status, h.from, h.service, h.transport, ms(h.ms)));
   const body = el('div', { class: 'hop-body' });
+  if (h.detail) body.append(el('div', { class: 'why' + (h.status === 'pass' ? '' : ' bad') }, h.detail));
   if (h.polling) body.append(polled(h.polling));
   if (h.instance) body.append(el('div', { class: 'meta' }, 'Instance: ', el('code', {}, h.instance)));
   if (h.env?.length) {
@@ -312,7 +321,7 @@ function hopRow(f, h) {
   if (h.evidence) body.append(evidence(h.polling ? 'Last poll' : 'Evidence', h.evidence, h.service + ' in ' + f.flow));
   if (!body.childNodes.length) body.append(el('div', { class: 'meta' }, 'The runner recorded no request for this hop.'));
   d.append(body);
-  return d;
+  return el('li', {}, d);
 }
 
 function flowBox(f) {
@@ -320,13 +329,17 @@ function flowBox(f) {
   const id = flowId(f);
   const box = el('section', { class: 'flow', id, 'aria-labelledby': id + '-name' });
   const panel = el('div', { id: id + '-panel' });
-  const toggle = el('button', { type: 'button', class: 'flow-toggle', 'aria-controls': id + '-panel' },
-    el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(f.status), el('span', { class: 'flow-name-text', id: id + '-name' }, f.flow),
-    f.description ? el('span', { class: 'meta' }, f.description) : null, el('span', { class: 'meta' }, ms(f.ms)));
-  const set = (open) => { toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
+  box.dataset.kind = failed ? 'failed' : 'passed';
+  const toggle = el('button', { type: 'button', 'aria-controls': id + '-panel' },
+    el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(f.status), el('span', { id: id + '-name' }, f.flow));
+  const head = el('div', { class: 'flow-head' }, el('h2', {}, toggle),
+    el('div', { class: 'info' }, f.description ? el('span', { class: 'meta' }, f.description) : null, el('span', { class: 'meta' }, ms(f.ms))));
+  // Same disclosure as the e2e report: the whole row is a mouse target, the heading's button serves keyboards.
+  head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
+  const set = (open) => { box.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
   toggle.onclick = () => set(panel.hidden);
   set(false);
-  box.append(el('h3', { class: 'flow-head' }, toggle), panel);
+  box.append(head, panel);
 
   const chain = el('div', { class: 'chain', role: 'list', 'aria-label': 'Hop chain' });
   const node = (name, s) => el('span', { class: 'node tone-' + st(s).tone, role: 'listitem' },
@@ -349,51 +362,54 @@ function flowBox(f) {
   if (facts.childNodes.length) panel.append(facts);
   if (failed && f.rerun) panel.append(el('div', { class: 'cmd' }, el('span', { class: 'meta' }, 'Rerun this flow:'), el('code', {}, f.rerun), copyBtn(f.rerun, 'rerun command for ' + f.flow)));
 
+  const list = el('ol', { class: 'hops', 'aria-label': 'Hops of ' + f.flow });
   if (f.trigger) {
     const t = el('details', { class: 'hop', id: id + '-trigger' });
-    t.append(el('summary', {}, el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(f.error ? 'fail' : 'pass'),
-      el('span', { class: 'route' }, 'trigger → ' + entryOf(f)), el('span', { class: 'meta' }, ms(f.trigger.ms))),
-      el('div', { class: 'hop-body' }, evidence('Trigger', f.trigger, 'trigger of ' + f.flow)));
-    panel.append(t);
+    t.append(hopShell('summary', '0', f.error ? 'fail' : 'pass', 'trigger', entryOf(f), '', ms(f.trigger.ms)),
+      el('div', { class: 'hop-body' }, f.error ? el('div', { class: 'why bad' }, f.error) : null, evidence('Trigger', f.trigger, 'trigger of ' + f.flow)));
+    list.append(el('li', {}, t));
   }
-  for (const h of f.hops) panel.append(hopRow(f, h));
-  box.reveal = set;
+  f.hops.forEach((h, i) => list.append(hopRow(f, h, String(i + 1))));
+  panel.append(el('div', { class: 'hops-label' }, 'Hops'), list);
   return box;
 }
 
 function render() {
   const app = document.getElementById('app');
   if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
-  const passed = DATA.flows.filter((f) => f.status === 'pass').length;
-  app.append(el('header', {},
-    el('h1', {}, 'Smoke report · ' + DATA.env, pill(DATA.status)),
-    el('div', { class: 'summary-line meta' },
-      el('span', {}, passed + ' / ' + DATA.flows.length + ' flows passed'),
-      el('span', {}, ms(DATA.ms)),
-      el('time', { datetime: DATA.startedAt }, isoLocal(DATA.startedAt))),
-    DATA.command ? el('div', { class: 'summary-line meta' }, el('span', {}, 'Command: ', el('code', {}, DATA.command)), copyBtn(DATA.command, 'run command')) : null));
-
+  const n = { failed: 0, passed: 0 };
+  for (const f of DATA.flows) n[f.status === 'pass' ? 'passed' : 'failed']++;
   // Failed flows first; the rest keep the runner's order.
-  const flows = DATA.flows.map((f, n) => [f, n]).sort((a, b) => (a[0].status === 'pass') - (b[0].status === 'pass') || a[1] - b[1]).map((x) => x[0]);
-  const failed = flows.filter((f) => f.status !== 'pass');
-  const boxes = {};
-  if (failed.length) {
-    app.append(el('p', { class: 'lead' }, failed.length + ' of ' + DATA.flows.length + ' flows broken',
-      el('span', { class: 'sep', 'aria-hidden': 'true' }, ' · '), el('span', { class: 'sr-only' }, '. '), 'first break: ' + cause(failed[0]) + ' (' + failed[0].flow + ')'));
-    app.append(el('h2', {}, 'Broken links ', el('span', { class: 'count' }, '(' + failed.length + ')')));
-    app.append(el('ul', { class: 'broken' }, failed.map((f) => {
-      const b = firstBroken(f);
-      const from = f.error ? 'trigger' : b?.from || 'trigger';
-      const to = f.error ? entryOf(f) : b?.service || '';
-      const detail = f.error || (b?.envMismatch?.length ? 'env ' + b.detail : b?.detail) || st(b?.status).word;
-      const a = el('a', { href: '#' + flowId(f) }, pill(b?.status || f.status), el('span', { class: 'flow-name' }, f.flow),
-        el('span', {}, from + ' → ' + to), el('span', { class: 'detail' }, '— ' + detail));
-      a.onclick = () => boxes[f.flow]?.reveal(true);
-      return el('li', {}, a);
-    })));
-  }
-  app.append(el('h2', {}, 'Flows ', el('span', { class: 'count' }, '(' + DATA.flows.length + ')')));
-  for (const f of flows) { const b = flowBox(f); boxes[f.flow] = b; app.append(b); }
+  const flows = DATA.flows.map((f, i) => [f, i]).sort((a, b) => (a[0].status === 'pass') - (b[0].status === 'pass') || a[1] - b[1]).map((x) => x[0]);
+  const boxes = flows.map(flowBox);
+  const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No flows match this filter.');
+  const tools = el('div', { class: 'tools', role: 'group', 'aria-label': 'Show flows' });
+  const FILTERS = [['all', 'All', DATA.flows.length], ['failed', 'Failed', n.failed], ['passed', 'Passed', n.passed]];
+  const buttons = FILTERS.map(([key, label, c]) => {
+    const b = el('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + c);
+    b.onclick = () => {
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      let shown = 0;
+      for (const box of boxes) {
+        box.hidden = key !== 'all' && box.dataset.kind !== key;
+        if (!box.hidden) shown++;
+      }
+      none.hidden = shown > 0;
+    };
+    return b;
+  });
+  tools.append(...buttons);
+  // Same header as the e2e report: counts in filter order, colored only when not zero.
+  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' c-' + tone : '') }, c + ' ' + word);
+  app.append(el('header', {},
+    el('div', {}, el('h1', {}, 'Smoke report · ' + DATA.env, pill(DATA.status)),
+      el('div', { class: 'summary-line' },
+        count(n.failed, 'failed', 'bad'), count(n.passed, 'passed'),
+        el('span', { class: 'meta' }, DATA.flows.length + ' flows · ' + ms(DATA.ms)),
+        el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt))),
+      DATA.command ? el('div', { class: 'summary-line' }, el('span', { class: 'meta' }, 'Command: ', el('code', {}, DATA.command)), copyBtn(DATA.command, 'run command')) : null),
+    tools));
+  app.append(...boxes, none);
 }
 render();
 </script>

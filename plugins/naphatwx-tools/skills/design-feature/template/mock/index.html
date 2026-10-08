@@ -52,8 +52,8 @@
             --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
             --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-            /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
-               headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+            /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
+               --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
             --fs-xs: 0.75rem;
             --fs-sm: 0.875rem;
             --fs-md: 1rem;
@@ -100,7 +100,17 @@
         .measure { max-width: 48ch; }
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
-        .label { color: var(--text-3); font-size: var(--fs-sm); font-weight: 500; }
+        /* Three sizes only: titles --fs-lg, all other text --fs-md, code and the frame's toolbar --fs-sm. */
+        body { font-size: var(--fs-md); }
+        .t-title { font-size: var(--fs-lg); line-height: 1.3; }
+        .t-code { font-size: var(--fs-sm); }
+        .label { color: var(--text-3); font-weight: 500; }
+        /* Steps and expected result stay folded so the frame leads; one click opens them. */
+        .guide > summary { display: inline-flex; gap: 8px; align-items: center; color: var(--text-2); cursor: pointer; list-style: none; border-radius: var(--radius); }
+        .guide > summary::-webkit-details-marker { display: none; }
+        .guide > summary::before { content: "+"; font-family: var(--mono); color: var(--text-3); width: 1ch; }
+        .guide[open] > summary::before { content: "\2212"; }
+        .guide > summary:hover { color: var(--text); }
         .link { color: var(--accent); text-decoration: none; }
         .link:hover { text-decoration: underline; }
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
@@ -108,11 +118,11 @@
         a.panel:hover { border-color: var(--accent); }
         /* chips wrap onto more rows rather than scroll out of sight on a narrow screen */
         .tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
-        .tab { flex-shrink: 0; min-width: 9rem; max-width: 14rem; padding: 10px 16px; margin-bottom: -1px; font-size: 14px; color: var(--text-2); background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; }
+        .tab { flex-shrink: 0; min-width: 9rem; max-width: 14rem; padding: 10px 16px; margin-bottom: -1px; color: var(--text-2); background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; }
         .tab:hover { color: var(--text); background: var(--surface); }
         .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
         .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
-        .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: 12px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+        .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-sm); background: var(--surface-2); border-bottom: 1px solid var(--line); }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
         .url { font-family: var(--mono); padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
         .btn-ghost { padding: 4px 8px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
@@ -136,25 +146,24 @@
 <body>
     <div class="page py-8 space-y-14">
         <header>
-            <a href="../overview.html#use-cases" class="link text-sm">← Feature plan</a>
-            <h1 class="text-2xl font-bold mt-2">Mock UI · Feature name</h1>
-            <p class="text-sm muted mt-1 measure">One block per flow. Pick a use case and play it in the frame: the screen is built from the app's real classes, rendered at 1600&nbsp;px and scaled to fit, on a fake API with the real operation names.</p>
+            <a href="../overview.html#use-cases" class="link">← Feature plan</a>
+            <h1 class="t-title font-bold mt-2">Mock UI · Feature name</h1>
         </header>
 
         <div id="flows" class="space-y-14"></div>
 
         <section>
-            <h2 class="text-lg font-bold mb-1">Audit log (this browser session)</h2>
-            <p class="text-sm meta mb-3 measure">What the real service writes: audit rows, events. Picking or restarting a use case clears it.</p>
+            <h2 class="t-title font-bold mb-1">Audit log (this browser session)</h2>
+            <p class="meta mb-3 measure">What the real service writes: audit rows, events. Picking or restarting a use case clears it.</p>
             <div id="log"></div>
         </section>
 
         <section>
-            <h2 class="text-lg font-bold mb-3">Contract</h2>
+            <h2 class="t-title font-bold mb-3">Contract</h2>
             <div class="grid md:grid-cols-3 gap-4">
-                <a href="contract/types.ts" class="panel p-5 block"><div class="font-mono font-semibold">types.ts</div><p class="text-sm meta mt-1">Real shapes to implement.</p></a>
-                <a href="contract/rules.js" class="panel p-5 block"><div class="font-mono font-semibold">rules.js</div><p class="text-sm meta mt-1">Spec rules as functions.</p></a>
-                <a href="contract/data.js" class="panel p-5 block"><div class="font-mono font-semibold">data.js</div><p class="text-sm meta mt-1">Mock data, typed against types.ts.</p></a>
+                <a href="contract/types.ts" class="panel p-5 block"><div class="font-mono t-code font-semibold">types.ts</div><p class="meta mt-1">Real shapes to implement.</p></a>
+                <a href="contract/rules.js" class="panel p-5 block"><div class="font-mono t-code font-semibold">rules.js</div><p class="meta mt-1">Spec rules as functions.</p></a>
+                <a href="contract/data.js" class="panel p-5 block"><div class="font-mono t-code font-semibold">data.js</div><p class="meta mt-1">Mock data, typed against types.ts.</p></a>
             </div>
         </section>
     </div>
@@ -187,10 +196,10 @@
             const ucs = ucsOf(f.flow);
             const head = `
               <div class="flex items-baseline justify-between gap-x-4 gap-y-1 flex-wrap mb-4">
-                <h2 class="text-xl font-bold"><span class="meta font-mono mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
-                <span class="text-xs font-mono meta">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="link">plan</a></span>
+                <h2 class="t-title font-bold"><span class="meta mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
+                <span class="t-code font-mono meta">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="link">plan</a></span>
               </div>`;
-            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="text-sm muted measure">${UI.esc(f.none || 'No use case to play.')}</p></section>`;
+            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="muted measure">${UI.esc(f.none || 'No use case to play.')}</p></section>`;
             return `
               <section id="flow-${nn(f.flow)}" data-flow="${f.flow}">
                 ${head}
@@ -207,17 +216,20 @@
             block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.uc === id)));
             if (fromClick) { clearState(); history.replaceState(null, '', '#uc-' + id); }
             block.querySelector('.card').innerHTML = `
-              <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="text-lg font-semibold">${UI.esc(uc.title)}</h3><span class="text-xs font-mono meta">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
-              <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 mt-3 mb-5">
+              <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="font-semibold">${UI.esc(uc.title)}</h3><span class="t-code font-mono meta">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
+              <details class="guide mt-3 mb-5">
+                <summary>How to play · what you should see</summary>
+                <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 mt-3">
                 <div>
                   <div class="label mb-1">How to play</div>
-                  <ol class="list-decimal pl-5 space-y-1.5 text-[15px] muted measure">${list(uc.steps)}</ol>
+                  <ol class="list-decimal pl-5 space-y-1.5 muted measure">${list(uc.steps)}</ol>
                 </div>
                 <div>
                   <div class="label mb-1">What you should see</div>
-                  <ul class="list-disc pl-5 space-y-1.5 text-[15px] muted measure">${list(uc.expect)}</ul>
+                  <ul class="list-disc pl-5 space-y-1.5 muted measure">${list(uc.expect)}</ul>
                 </div>
-              </div>
+                </div>
+              </details>
               <div class="frame">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
@@ -243,8 +255,8 @@
         function renderLog() {
             const rows = FakeApi.log();
             const html = !rows.length
-                ? '<div class="panel text-sm meta p-6 text-center">Nothing yet.</div>'
-                : `<div class="panel rows">${rows.map(r => `<div class="px-4 py-2 text-sm flex gap-4"><span class="meta whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
+                ? '<div class="panel meta p-6 text-center">Nothing yet.</div>'
+                : `<div class="panel rows">${rows.map(r => `<div class="px-4 py-2 flex gap-4"><span class="meta whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
             const el = document.getElementById('log');
             if (el.innerHTML !== html) el.innerHTML = html;
         }

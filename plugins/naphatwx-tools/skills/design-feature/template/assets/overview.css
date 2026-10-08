@@ -45,8 +45,8 @@
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-    /* Type scale: one hierarchy for every page. Dense pages (reports) set body to --fs-sm and step
-       headings down one size; projector pages (plan) use body --fs-md. Nothing renders below --fs-xs. */
+    /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
+       --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
     --fs-xs: 0.75rem;
     --fs-sm: 0.875rem;
     --fs-md: 1rem;
@@ -89,10 +89,12 @@ code, kbd, pre, samp { font-family: var(--mono); }
 :root {
     --fs-body: var(--fs-md);
     --fs-code: var(--fs-sm);
-    --fs-lead: var(--fs-lg);
-    --fs-h3: var(--fs-lg);
-    --fs-h2: var(--fs-xl);
-    --fs-h1: var(--fs-2xl);
+    /* Three sizes only, as in the reports: titles --fs-lg, all other text --fs-md, code / kbd / pills --fs-sm.
+       Hierarchy comes from weight and color. Diagram labels inside SVGs are drawings and keep their own sizes. */
+    --fs-lead: var(--fs-md);
+    --fs-h3: var(--fs-md);
+    --fs-h2: var(--fs-lg);
+    --fs-h1: var(--fs-lg);
     --measure: 72ch;
     /* running prose: ch ("0") is wider than an average glyph, so 50ch reads as about 68 characters */
     --prose: 50ch;
@@ -106,14 +108,14 @@ body { font: var(--fs-body)/1.65 var(--sans); }
 a { text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 :focus-visible { border-radius: 4px; }
-code, kbd { font-size: 0.875em; }
+code, kbd { font-size: var(--fs-code); }
 code { color: var(--text); }
 strong { color: var(--text); font-weight: 600; }
 .aside { color: inherit; }
 .muted { color: var(--text); max-width: var(--prose); }
 .group-head { margin: 40px 0 12px; }
 /* subordinate text under a title or in a table cell: lighter than the title it follows */
-.group-head .aside, td .aside { color: var(--text-2); font-size: var(--fs-sm); font-weight: 400; }
+.group-head .aside, td .aside { color: var(--text-2); font-size: var(--fs-body); font-weight: 400; }
 .nowrap { white-space: nowrap; }
 .skip {
     position: fixed; top: 12px; left: 12px; z-index: 60;
@@ -244,7 +246,7 @@ h2 + .facts { margin-top: 0; }
 .views button:hover:not(:disabled):not([aria-expanded="true"]) { color: var(--text); background: var(--surface-2); }
 .views button[aria-expanded="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
 .views button:disabled { color: var(--text-3); text-decoration: line-through; cursor: not-allowed; }
-.views kbd { font-size: var(--fs-xs); color: inherit; opacity: 0.75; }
+.views kbd { font-size: var(--fs-code); color: inherit; opacity: 0.75; }
 html[data-all="on"] .views { display: none; }
 
 .panel { margin-top: 16px; }
@@ -405,7 +407,7 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 .api h3 code, .refs, .facts dd, .rel { overflow-wrap: anywhere; }
 .api .refs { margin: 4px 0 16px; }
 .api h3 + .tables { margin-top: 16px; }
-.pill { font: 500 var(--fs-body)/1 var(--sans); padding: 4px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pill { font: 500 var(--fs-code)/1 var(--sans); padding: 4px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
 .pill.quiet { background: var(--surface-2); color: var(--text-2); }
 
 details.more { margin-top: 32px; border-top: 1px solid var(--line); }
@@ -450,12 +452,12 @@ td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var
 }
 .tools button:hover, .hud button:hover { background: var(--surface-2); color: var(--text); }
 .tools button[aria-pressed="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
-.tools kbd { font-size: var(--fs-xs); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
+.tools kbd { font-size: var(--fs-code); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
 .hud { left: 50%; right: auto; transform: translateX(-50%); align-items: center; }
 .hud[hidden] { display: none; }
 #hudLabel { padding: 0 10px; font: var(--fs-code) var(--mono); color: var(--text); font-variant-numeric: tabular-nums; min-width: 14ch; text-align: center; }
 .hud-exit { color: var(--text-3) !important; font-family: var(--mono) !important; font-size: var(--fs-code) !important; }
-.hud-keys { padding: 0 8px 0 4px; color: var(--text-3); font: var(--fs-xs) var(--mono); white-space: nowrap; }
+.hud-keys { padding: 0 8px 0 4px; color: var(--text-3); font: var(--fs-code) var(--mono); white-space: nowrap; }
 /* wide screens with the index open: the tools sit at the foot of the rail, so they never cover a diagram */
 @media (min-width: 881px) {
     html:not([data-rail="collapsed"]) .rail { padding-bottom: 76px; }
@@ -475,7 +477,7 @@ td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var
 
 /* ============ PRESENT MODE: one step per screen; long steps scroll down, never sideways ============ */
 /* a flow's h3 is its slide title here, so it takes the h2 size */
-html[data-present="on"] { --fs-h3: var(--fs-xl); }
+html[data-present="on"] { --fs-h3: var(--fs-lg); }
 html[data-present="on"], html[data-present="on"] body { overflow-x: hidden; }
 html[data-present="on"] .rail, html[data-present="on"] .rail-edge, html[data-present="on"] .tools,
 html[data-present="on"] .zoom-tools, html[data-present="on"] .zoom-shield, html[data-present="on"] details.more, html[data-present="on"] .step-off,
@@ -525,7 +527,6 @@ html[data-present="on"] .slide > .api { margin-top: 8px; }
     .menu { display: grid; }
     .facts { grid-template-columns: 1fr; gap: 2px; }
     .facts dd { margin-bottom: 12px; }
-    :root { --fs-h1: var(--fs-xl); }
     /* phones: a solid top bar holds ☰ and the tools, so nothing floats over the text */
     html { scroll-padding-top: 80px; }
     body::before { content: ""; position: fixed; inset: 0 0 auto; height: 68px; z-index: 24; background: var(--bg); border-bottom: 1px solid var(--line); }
