@@ -15,30 +15,49 @@
     <script src="../shared/scenarios.js"></script>
     <script src="../shared/components.js"></script>
     <script src="../shared/fake-api.js"></script>
+    <script src="../shared/use-cases.js"></script>
     <script src="../shared/shell.js"></script>
 </head>
 
 <body>
     <script>
-        // One screen. State comes from ?scenario= (and any deep-link params); data only via FakeApi.
+        // One screen. State comes from ?scenario= plus any param a use case needs (?status= pre-sets the filter).
+        const P = Scenarios.params;
         const { page: el, owner } = Shell.mount();
-        const S = window.S = { page: 1, loading: true, error: null, res: null };
+        const S = window.S = { page: 1, status: P.get('status') || '', loading: true, error: null, res: null };
 
         async function load() {
             S.loading = true; S.error = null; render();
-            try { S.res = await FakeApi.GetThings({ ownerId: owner.id, page: S.page, limit: 10 }); } catch (e) { S.error = e; }
+            try { S.res = await FakeApi.GetThings({ ownerId: owner.id, page: S.page, limit: 10, ...(S.status && { status: S.status }) }); } catch (e) { S.error = e; }
             S.loading = false; render();
+        }
+        function setStatus(v) { S.status = v; load(); }
+
+        // No permission → hidden, as the real app hides it. A reason the spec names → shown unavailable with a tooltip;
+        // aria-disabled, not native disabled: a disabled button gets no hover, so the tooltip would never show.
+        function createBtn() {
+            if (!Scenarios.current.perms.includes('things.create')) return '';
+            const reason = Scenarios.current.blocked;
+            if (!reason) return UI.btn('primary', 'md', 'Create', 'onclick="alert(\'Create form\')"');
+            return `<span class="relative group inline-block">${UI.btn('primary', 'md', 'Create', 'aria-disabled="true" aria-describedby="createReason"')
+                .replace('class="', 'class="opacity-50 cursor-not-allowed ')}
+              <span id="createReason" role="tooltip" class="absolute right-0 top-full mt-2 w-64 rounded-md bg-gray-900 text-white text-xs p-2 hidden group-hover:block group-focus-within:block">${UI.esc(reason)}</span></span>`;
         }
 
         function render() {
             el.innerHTML = `
-              <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center justify-between gap-3 mb-4">
                 <h2 class="text-lg font-bold">Things</h2>
-                ${UI.btn('neutral', 'md', 'Refresh', 'onclick="load()"')}
+                <div class="flex items-center gap-2">
+                  <select onchange="setStatus(this.value)" aria-label="Status" class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm">
+                    ${[['', 'All Status'], ['PENDING', 'Pending'], ['READY', 'Ready'], ['FAILED', 'Failed']].map(([v, l]) => `<option value="${v}" ${v === S.status ? 'selected' : ''}>${l}</option>`).join('')}
+                  </select>
+                  ${UI.btn('neutral', 'md', 'Refresh', 'onclick="load()"')}${createBtn()}
+                </div>
               </div>
               ${S.loading ? UI.skel('h-24 w-full')
                 : S.error ? UI.emptyState('Could not load', UI.esc(S.error.message), UI.btn('neutral', 'md', 'Retry', 'onclick="load()"'))
-                : !S.res.entities.length ? UI.emptyState('Nothing yet', 'No things have been created.')
+                : !S.res.entities.length ? (S.status ? UI.emptyState('No things match this filter', '') : UI.emptyState('Nothing yet', 'No things have been created.'))
                 : S.res.entities.map(t => `<div class="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 mb-2">
                     <span class="font-medium">${UI.esc(t.name)}</span>${UI.statusBadge(t.status)}<span class="text-xs text-gray-500 ml-auto">${UI.date(t.createdAt)}</span></div>`).join('')}`;
         }

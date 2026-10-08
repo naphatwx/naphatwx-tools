@@ -20,16 +20,36 @@ var Shell = (function () {
         <div id="page"></div>
       </main>`;
 
-    // ---- mock-only: dashed pink so nobody mistakes it for product UI; keep as-is
-    const scenarioPanel = () => `
-      <div class="fixed bottom-4 right-4 z-[400] w-80 rounded-xl border-2 border-dashed border-pink-500 bg-white/95 dark:bg-gray-950/95 p-3 text-xs text-gray-900 dark:text-gray-100 shadow-2xl">
+    // ---- mock-only: dashed pink so nobody mistakes it for product UI; keep as-is.
+    // ?uc=<id> shows that use case's steps instead of the scenario picker; ?embed=1 (inside a use-case card) shows nothing.
+    const head = title => `
         <div class="flex items-center justify-between mb-2">
-          <span class="font-bold text-pink-600 dark:text-pink-400 uppercase tracking-wider">Mock scenario</span>
+          <span class="font-bold text-pink-600 dark:text-pink-400 uppercase tracking-wider">${title}</span>
           <div class="flex gap-1">
             <button onclick="Shell.toggleTheme()" class="px-2 py-1 rounded border border-gray-300 dark:border-gray-600" title="Toggle theme">◐</button>
             <button onclick="document.getElementById('scBody').classList.toggle('hidden')" class="px-2 py-1 rounded border border-gray-300 dark:border-gray-600" title="Collapse">–</button>
           </div>
+        </div>`;
+    const box = 'fixed bottom-4 right-4 z-[400] rounded-xl border-2 border-dashed border-pink-500 bg-white/95 dark:bg-gray-950/95 p-3 text-xs text-gray-900 dark:text-gray-100 shadow-2xl';
+    const list = (tag, items) => `<${tag} class="mt-1 ${tag === 'ol' ? 'list-decimal' : 'list-disc'} pl-4 space-y-1 leading-relaxed">${items.map(i => `<li>${UI.esc(i)}</li>`).join('')}</${tag}>`;
+
+    const useCasePanel = uc => `
+      <div class="${box} w-96 max-h-[70vh] overflow-y-auto">
+        ${head('Use case · ' + UI.esc(uc.story))}
+        <div class="text-sm font-semibold">${UI.esc(uc.title)}</div>
+        <div id="scBody">
+          <div class="mt-3 font-semibold">How to play</div>${list('ol', uc.steps)}
+          <div class="mt-3 font-semibold">What you should see</div>${list('ul', uc.expect)}
+          <div class="mt-3 flex items-center justify-between">
+            <a href="../index.html#uc-${uc.id}" class="text-purple-600 dark:text-purple-400 underline">← All use cases</a>
+            <button onclick="FakeApi.reset();location.reload()" class="text-gray-500 hover:text-red-500">Start over</button>
+          </div>
         </div>
+      </div>`;
+
+    const scenarioPicker = () => `
+      <div class="${box} w-80">
+        ${head('Mock scenario')}
         <div id="scBody">
           <select onchange="location.href=Scenarios.href(location.pathname.split('/').pop(), {}, this.value)" class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs">
             ${Scenarios.LIST.map(s => `<option value="${s.id}" ${s.id === Scenarios.current.id ? 'selected' : ''}>${UI.esc(s.label)}</option>`).join('')}
@@ -41,6 +61,12 @@ var Shell = (function () {
           </div>
         </div>
       </div>`;
+
+    function scenarioPanel() {
+        if (Scenarios.params.get('embed')) return '';
+        const uc = (window.USE_CASES || []).find(u => u.id === Scenarios.params.get('uc'));
+        return uc ? useCasePanel(uc) : scenarioPicker();
+    }
 
     function mount() {
         const owner = FakeApi.owner();

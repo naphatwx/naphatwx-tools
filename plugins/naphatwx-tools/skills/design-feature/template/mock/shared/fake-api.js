@@ -1,6 +1,7 @@
 // Mock-only stand-in for the real operations, named exactly as in contract/types.ts.
 // Serves contract/data.js through contract/rules.js; swap for the real client and pages stay the same.
-// Writes and the side-effect log persist in sessionStorage, so they survive page changes.
+// Writes and the side-effect log persist in sessionStorage under STORE, so they survive page changes;
+// index.html clears every STORE key when a use case starts, so each one starts clean.
 
 var FakeApi = (function () {
     const D = MOCK_DATA, sc = Scenarios.current;
@@ -14,6 +15,7 @@ var FakeApi = (function () {
     const persist = () => { save('created', mem.created); save('log', mem.log); };
     const wait = ms => new Promise(r => setTimeout(r, ms));
     const fail = err => { throw err; };
+    const need = perm => { if (!sc.perms.includes(perm)) fail({ code: 'PermissionDenied', message: `missing permission ${perm}` }); };
 
     /** Side effects the real service writes (audit rows, events). Shown on index.html. */
     const record = message => { mem.log.unshift({ at: new Date().toISOString(), message }); persist(); };
@@ -36,6 +38,7 @@ var FakeApi = (function () {
 
     async function CreateThing(req) {
         await wait(LATENCY);
+        need('things.create');
         const invalid = Rules.validateCreate(req);
         if (invalid) { record(`refused: ${invalid}`); fail({ code: 'InvalidArgument', message: invalid }); }
         const row = { id: Date.now() % 100000, owner_id: req.ownerId, name: req.name, state: 'QUEUED', created_at: new Date().toISOString() };
@@ -45,16 +48,17 @@ var FakeApi = (function () {
         return Rules.toResponse(row);
     }
 
-    /** Sample requests for the index.html console, one per operation. */
+    /** Sample requests for page/console.html, one per operation (a use case's `req` overrides it). */
     const SAMPLES = {
         GetThings: { ownerId: sc.ownerId, page: 1, limit: 10 },
         CreateThing: { ownerId: sc.ownerId, name: 'Third thing' },
     };
 
     return {
-        GetThings, CreateThing, SAMPLES,
+        GetThings, CreateThing, SAMPLES, STORE,
         owner: () => D.owners.find(o => o.id === sc.ownerId),
-        log: () => mem.log,
+        // read from storage, not memory: screens in other frames write it too
+        log: () => load('log', mem.log),
         reset: () => { mem.created = {}; mem.log = []; persist(); },
     };
 })();

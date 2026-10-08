@@ -4,13 +4,14 @@ Mock pages written inside the real frontend app, built from its real components 
 
 ```
 <routes-root>/mock/spec<NNN>/
-├── page.tsx                index: screens × scenarios, one link each
+├── page.tsx                index: use cases grouped by flow, one link each
 ├── <screen>/page.tsx       one route per screen; state from ?scenario=
 └── _mock/                  private folder, not a route
     ├── types.ts            only types the app doesn't generate yet
     ├── rules.ts            spec rules as pure functions
     ├── data.ts             realistic data, typed with the real types
     ├── scenarios.ts        scenario id → data set or forced state
+    ├── use-cases.ts        USE_CASE_FLOWS + USE_CASES, same shape as standalone
     ├── use<Screen>.ts      one hook per screen: state + events
     └── ScenarioPanel.tsx   mock-only scenario switcher
 ```
@@ -53,9 +54,10 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - `types.ts`: only the types not generated yet (Hard Rule 4). Empty → leave the file out.
 - `rules.ts`: every spec rule as a pure function — status and field mapping, eligibility, validation, error classification, the user-facing messages.
 - `data.ts`: realistic names, ids, dates and volumes (enough rows to page), typed with the real types. One entity per scenario that needs different data. Keep ids consistent with the plan's diagrams.
+- `use-cases.ts`: `export const USE_CASE_FLOWS = [...]` and `export const USE_CASES = [...]`, each a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment). Derive them from every acceptance scenario, edge case and refusal row, as in standalone.
 - `scenarios.ts`: `SCENARIOS` list (`id`, `label`, `flow` = plan flow numbers, `hint` telling the viewer what to try, the data set or forced state) and a `useScenario()` helper that reads `?scenario=`.
 - `use<Screen>.ts`: the screen's state and events. Fake latency with a short timeout so loading states show; scenario faults turn into the real error codes and messages from `rules.ts`.
-- `ScenarioPanel.tsx`: a select of the scenarios that changes `?scenario=`, plus the current hint (Hard Rule 8).
+- `ScenarioPanel.tsx`: a select of the scenarios that changes `?scenario=`, plus the current hint (Hard Rule 8). With `?uc=<id>` it shows that use case's steps and expect instead, with a link back to the index.
 
 ### 4. Write the pages
 
@@ -63,13 +65,14 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - Show every state the real screen has: loading skeleton, error with retry, empty, filtered-empty, success toast, refusal alert, outcome-unknown.
 - Every interaction works: submit, edit, delete, filter, sort, paginate, open / close modal, confirm, cancel.
 - Deep links: read extra query params (`?mode=`, `?line=`) so each plan flow can open the exact state.
-- `page.tsx` at the folder root: a plain index listing every screen × scenario as a link, with each scenario's hint.
+- `page.tsx` at the folder root: one block per flow (`3.N` + name), each listing its use cases as links to `<screen>?scenario=<id>&uc=<id>` with the first `expect` line; a flow with none shows its `none` sentence.
+- Controls follow the spec, then the real app: a control the user has no permission for is hidden when the real app hides it; shown unavailable with a reason (`aria-disabled` + tooltip) only where the spec says so.
 
 ### 5. Link the plan (when a plan folder exists)
 
-- In `overview.html`, fill each flow's "Try in the mock" line with `http://localhost:<port>/mock/spec<NNN>/<screen>?scenario=<id>` links joined by ` · ` (`target="_blank" rel="noopener"`), and point the Mock UI section's link at `http://localhost:<port>/mock/spec<NNN>`.
-- Add one muted line to the Mock UI section: the mock runs in the app, start it with the app's dev command.
-- Flows with no UI (API / MCP only) → no "Try in the mock" line.
+- Run the design-feature skill's `scripts/use-cases-section.js` with the in-project source and links:
+  `node <design-feature skill dir, sibling of this skill>/scripts/use-cases-section.js <plan-folder> --use-cases <mock-folder>/_mock/use-cases.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?scenario={scenario}&uc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
+- It writes section 07 "Use cases" and every flow's "Try in the mock" line. Then add one muted line under the section's first line: the mock runs in the app, start it with the app's dev command.
 
 ### 6. Verify
 
@@ -78,8 +81,13 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - Dev server running and a headless browser available → open every screen × scenario, check the console for errors and look at the screenshots. Not running → don't start a long-lived server unasked; list the URLs instead.
 - Grep the mock folder for absolute local paths and remove them.
 
+### 6b. Review the mock
+
+- Follow [mock-review.md](mock-review.md) (skip it when the design-feature skill runs this; it reviews in its step 6b). The functional reviewer traces each use case through `_mock/` instead of a Node `vm`.
+
 ### 7. Confirm
 
 - Output: `✅ Mock created at: <mock-folder>` (repo-relative) and the index URL `http://localhost:<port>/mock/spec<NNN>`.
+- Use cases per flow and the total, as printed by `use-cases-section.js` — never counted by eye.
 - List the screens and scenarios, the types still marked `TODO: not generated yet`, and any route line the user must add (Hard Rule 1).
 - Note when `git check-ignore` says the folder is not ignored yet.

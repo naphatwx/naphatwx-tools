@@ -4,42 +4,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mock Index</title>
+    <title>Mock · Feature name</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
         @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+    <style>
+        html { scroll-padding-top: 24px; }
+        /* the screen renders at desktop width and is scaled down to the card */
+        .fit { position: relative; overflow: hidden; }
+        .fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
+        /* thin scrollbars that follow the theme, never the default white track */
+        * { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, .25) transparent; }
+        html.dark * { scrollbar-color: rgba(255, 255, 255, .18) transparent; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .25); border-radius: 8px; }
+        html.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); }
     </style>
     <script src="contract/rules.js"></script>
     <script src="contract/data.js"></script>
     <script src="shared/scenarios.js"></script>
     <script src="shared/components.js"></script>
     <script src="shared/fake-api.js"></script>
+    <script src="shared/use-cases.js"></script>
 </head>
 
-<body class="antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-    <div class="max-w-6xl mx-auto p-6 space-y-10">
+<body class="antialiased bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white">
+    <div class="max-w-[1200px] mx-auto px-6 py-8 space-y-14">
         <header class="flex items-start justify-between gap-4 flex-wrap">
             <div>
-                <a href="../overview.html" class="text-sm text-purple-600 dark:text-purple-400 hover:underline">← Feature plan</a>
-                <h1 class="text-2xl font-bold mt-2">Mock UI</h1>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">Pages call a fake API with the real operation names; data and rules live in <code class="font-mono">contract/</code>. Every state has its own link.</p>
+                <a href="../overview.html#use-cases" class="text-sm text-purple-600 dark:text-purple-400 hover:underline">← Feature plan</a>
+                <h1 class="text-2xl font-bold mt-2">Mock UI · Feature name</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">One block per flow. Pick a use case and play it in the card: the screen is built from the app's real classes, rendered at 1600&nbsp;px and scaled to fit, on a fake API with the real operation names.</p>
             </div>
-            <div class="flex gap-2">
-                <button onclick="Theme()" class="min-h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-600">◐</button>
-                <button onclick="FakeApi.reset();renderLog()" class="min-h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-600 text-sm">Reset mock state</button>
-            </div>
+            <button onclick="Theme()" class="min-h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-600" title="Toggle theme">◐</button>
         </header>
 
+        <div id="flows" class="space-y-14"></div>
+
         <section>
-            <h2 class="text-lg font-bold mb-3">Pages × scenarios</h2>
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-300 dark:border-gray-600">
-                        <tr class="text-left text-xs font-semibold uppercase tracking-wider"><th class="px-4 py-3">Scenario</th><th class="px-4 py-3">Flow</th><th class="px-4 py-3">Open</th></tr>
-                    </thead>
-                    <tbody id="scenarioRows"></tbody>
-                </table>
-            </div>
+            <h2 class="text-lg font-bold mb-1">Audit log (this browser session)</h2>
+            <p class="text-xs text-gray-500 mb-3">What the real service writes: audit rows, events. Picking or restarting a use case clears it.</p>
+            <div id="log"></div>
         </section>
 
         <section>
@@ -50,28 +57,6 @@
                 <a href="contract/data.js" class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 p-5 block"><div class="font-mono font-semibold">data.js</div><p class="text-xs text-gray-500 mt-1">Mock data, typed against types.ts.</p></a>
             </div>
         </section>
-
-        <section>
-            <h2 class="text-lg font-bold mb-1">Fake API console</h2>
-            <p class="text-xs text-gray-500 mb-3">Call the operations directly, as an API or MCP client would. Scenario faults apply.</p>
-            <div class="grid lg:grid-cols-2 gap-4">
-                <div class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="text-sm font-medium">Operation<select id="op" class="mt-1 w-full rounded-lg border border-gray-400 bg-white dark:bg-gray-800 px-3 py-2 text-sm"></select></label>
-                        <label class="text-sm font-medium">Scenario<select id="scen" class="mt-1 w-full rounded-lg border border-gray-400 bg-white dark:bg-gray-800 px-3 py-2 text-sm"></select></label>
-                    </div>
-                    <textarea id="reqBody" spellcheck="false" class="w-full h-56 font-mono text-xs bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg p-3"></textarea>
-                    <button id="runBtn" class="px-4 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 text-white">Run</button>
-                </div>
-                <pre id="resBody" class="rounded-lg bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 p-4 text-xs font-mono overflow-auto h-[22rem] whitespace-pre-wrap">Response appears here.</pre>
-            </div>
-        </section>
-
-        <section>
-            <h2 class="text-lg font-bold mb-1">Side-effect log (this browser session)</h2>
-            <p class="text-xs text-gray-500 mb-3">What the real service would write: audit rows, events.</p>
-            <div id="log"></div>
-        </section>
     </div>
 
     <script>
@@ -79,34 +64,105 @@
         try { if (localStorage.getItem('mock:theme') === 'light') root.classList.remove('dark'); } catch { }
         function Theme() { root.classList.toggle('dark'); try { localStorage.setItem('mock:theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch { } }
 
-        document.getElementById('scenarioRows').innerHTML = Scenarios.LIST.map(s => `
-          <tr class="border-t border-gray-200 dark:border-gray-700 align-top">
-            <td class="px-4 py-3"><div class="font-medium">${UI.esc(s.label)}</div><div class="text-xs text-gray-500">${UI.esc(s.hint)}</div></td>
-            <td class="px-4 py-3 text-xs">${s.flow}</td>
-            <td class="px-4 py-3 text-xs"><div class="flex flex-col gap-1">${Scenarios.PAGES.map(p =>
-                `<a href="${Scenarios.href(p.file, p.extra, s.id)}" class="text-purple-600 dark:text-purple-400 hover:underline">${UI.esc(p.label)}</a>`).join('')}</div></td>
-          </tr>`).join('');
+        const SCREEN_W = 1600, SCREEN_H = 940;
+        const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
+        const nn = flow => flow.split('.')[1].padStart(2, '0');
+        const ucsOf = flow => USE_CASES.filter(u => u.flow === flow);
+        const scenarioOf = uc => Scenarios.LIST.find(s => s.id === uc.scenario);
 
-        const op = document.getElementById('op'), scen = document.getElementById('scen'), reqBody = document.getElementById('reqBody'), resBody = document.getElementById('resBody');
-        op.innerHTML = Object.keys(FakeApi.SAMPLES).map(k => `<option>${k}</option>`).join('');
-        scen.innerHTML = Scenarios.LIST.map(s => `<option value="${s.id}" ${s.id === Scenarios.current.id ? 'selected' : ''}>${UI.esc(s.label)}</option>`).join('');
-        const fill = () => { reqBody.value = JSON.stringify(FakeApi.SAMPLES[op.value], null, 2); };
-        op.onchange = fill; fill();
-        scen.onchange = () => { location.href = Scenarios.href('index.html', {}, scen.value); };
-        document.getElementById('runBtn').onclick = async () => {
-            const t = performance.now();
-            try { resBody.textContent = `// OK · ${Math.round(performance.now() - t)} ms\n` + JSON.stringify(await FakeApi[op.value](JSON.parse(reqBody.value)), null, 2); }
-            catch (e) { resBody.textContent = '// ERROR\n' + JSON.stringify(e instanceof Error ? { code: 'InvalidArgument', message: e.message } : e, null, 2); }
+        function screenSrc(uc) {
+            const q = new URLSearchParams({ scenario: uc.scenario, uc: uc.id, embed: '1', ...(uc.params || {}) });
+            return `page/${uc.page}.html?${q}`;
+        }
+        // The URL the real app would show for this use case: edit the route to the app's own.
+        function screenUrl(uc) {
+            if (uc.page === 'console') return `MCP client · <ServiceName> · ${uc.op}`;
+            const q = new URLSearchParams(uc.params || {}); q.delete('modal');
+            return `localhost:3000/owners/${scenarioOf(uc).ownerId}${q.size ? '?' + q : ''}${uc.params?.modal ? ' · ' + uc.params.modal : ''}`;
+        }
+        /** Each use case starts from a clean mock: no rows written by another card, empty audit log. */
+        function clearState() {
+            try { Object.keys(sessionStorage).filter(k => k.startsWith(FakeApi.STORE + ':')).forEach(k => sessionStorage.removeItem(k)); } catch { }
             renderLog();
-        };
+        }
+
+        // ---------------------------------------------------------------- one block per flow
+        document.getElementById('flows').innerHTML = USE_CASE_FLOWS.map(f => {
+            const ucs = ucsOf(f.flow);
+            const head = `
+              <div class="flex items-baseline justify-between gap-4 flex-wrap mb-4">
+                <h2 class="text-xl font-bold"><span class="text-gray-500 font-mono mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
+                <span class="text-xs font-mono text-gray-500">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="text-purple-600 dark:text-purple-400 hover:underline">plan</a></span>
+              </div>`;
+            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="text-sm text-gray-600 dark:text-gray-400">${UI.esc(f.none || 'No use case to play.')}</p></section>`;
+            return `
+              <section id="flow-${nn(f.flow)}" data-flow="${f.flow}">
+                ${head}
+                <div class="text-xs text-gray-500 mb-2">Use case</div>
+                <div class="flex overflow-x-auto rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" role="tablist" aria-label="Use cases of flow ${f.flow}">
+                  ${ucs.map(u => `<button type="button" role="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)"
+                      class="shrink-0 min-w-[9rem] max-w-[14rem] px-4 py-3 text-sm text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 aria-selected:bg-purple-600/15 aria-selected:text-purple-700 dark:aria-selected:text-purple-200 aria-selected:font-semibold cursor-pointer">${UI.esc(u.title)}</button>`).join('')}
+                </div>
+                <div class="card mt-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden"></div>
+              </section>`;
+        }).join('');
+
+        function pick(id, fromClick) {
+            const uc = USE_CASES.find(u => u.id === id);
+            const block = document.querySelector(`section[data-flow="${uc.flow}"]`);
+            block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.uc === id)));
+            if (fromClick) { clearState(); history.replaceState(null, '', '#uc-' + id); }
+            block.querySelector('.card').innerHTML = `
+              <div class="grid md:grid-cols-[1.2fr_1fr] gap-6 p-5 border-b border-gray-200 dark:border-gray-700">
+                <div>
+                  <div class="flex items-baseline gap-3 flex-wrap"><h3 class="text-lg font-semibold">${UI.esc(uc.title)}</h3><span class="text-xs font-mono text-gray-500">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
+                  <div class="text-xs font-semibold uppercase tracking-wider text-gray-500 mt-3 mb-1">How to play</div>
+                  <ol class="list-decimal pl-5 space-y-1.5 text-[15px] text-gray-700 dark:text-gray-300">${list(uc.steps)}</ol>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1 md:mt-8">What you should see</div>
+                  <ul class="list-disc pl-5 space-y-1.5 text-[15px] text-gray-700 dark:text-gray-300">${list(uc.expect)}</ul>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 px-4 py-2 bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-700 text-xs">
+                <span class="flex gap-1.5" aria-hidden="true"><i class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-700"></i><i class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-700"></i><i class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-700"></i></span>
+                <span class="font-mono px-2 py-0.5 rounded border border-gray-300 dark:border-gray-700 truncate">${UI.esc(screenUrl(uc))}</span>
+                <span class="ml-auto font-mono text-gray-500 scale-label"></span>
+                <button type="button" onclick="restart('${uc.id}')" class="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:border-purple-400 cursor-pointer">↻ Restart</button>
+              </div>
+              <div class="fit"><iframe title="${UI.esc(uc.title)} — interactive mock" src="${screenSrc(uc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>`;
+            fit(block);
+        }
+        function restart(id) { clearState(); pick(id); }
+
+        function fit(block) {
+            const box = block.querySelector('.fit'); if (!box) return;
+            const s = Math.min(1, box.clientWidth / SCREEN_W);
+            box.querySelector('iframe').style.transform = `scale(${s})`;
+            box.style.height = Math.round(SCREEN_H * s) + 'px';
+            block.querySelector('.scale-label').textContent = `${Math.round(s * 100)}% of ${SCREEN_W} px`;
+        }
+        new ResizeObserver(() => document.querySelectorAll('section[data-flow]').forEach(fit)).observe(document.getElementById('flows'));
 
         function renderLog() {
             const rows = FakeApi.log();
-            document.getElementById('log').innerHTML = !rows.length
-                ? '<div class="text-sm text-gray-500 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">Nothing yet.</div>'
-                : `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-200 dark:divide-gray-700">${rows.map(r => `<div class="px-4 py-2 text-xs flex gap-4"><span class="text-gray-500 whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
+            const html = !rows.length
+                ? '<div class="text-sm text-gray-500 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">Nothing yet.</div>'
+                : `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-200 dark:divide-gray-700">${rows.map(r => `<div class="px-4 py-2 text-xs flex gap-4"><span class="text-gray-500 whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
+            const el = document.getElementById('log');
+            if (el.innerHTML !== html) el.innerHTML = html;
         }
-        renderLog();
+
+        clearState(); // a reload starts clean too: rows written in an earlier visit would leak into every card
+        // first use case of every flow, or the one in the URL (#uc-<id>, from the plan's links)
+        const wanted = USE_CASES.find(u => location.hash === '#uc-' + u.id);
+        USE_CASE_FLOWS.forEach(f => { const first = ucsOf(f.flow)[0]; if (first) pick(wanted?.flow === f.flow ? wanted.id : first.id); });
+        if (wanted) document.querySelector(`section[data-flow="${wanted.flow}"]`).scrollIntoView();
+        addEventListener('hashchange', () => {
+            const uc = USE_CASES.find(u => location.hash === '#uc-' + u.id);
+            if (uc) { clearState(); pick(uc.id); document.querySelector(`section[data-flow="${uc.flow}"]`).scrollIntoView(); }
+        });
+        setInterval(renderLog, 1500); // the screens write the log from inside their frames
     </script>
 </body>
 
