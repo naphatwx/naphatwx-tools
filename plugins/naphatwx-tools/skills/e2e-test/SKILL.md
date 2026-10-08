@@ -55,7 +55,8 @@ Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, 
 Then add these, next to the e2e folder, **unchanged** from this skill's `template/`:
 
 - `step.ts`: wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
-- `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded. Each test shows its steps one at a time: click the right half of the screenshot for the next step, the left half for the previous one (or use ← / →). A failed test opens on its failed step.
+- `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded. Each test shows its steps one at a time: use Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot. A failed test opens on its failed step, with that step's error above the screenshot, a copyable rerun command, and a trace link when Playwright saved one.
+- The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
 
 Wire the config:
 
@@ -105,7 +106,7 @@ Run it the way the repo's guide says to run tools (for example in its Docker ser
 The reporter prints `E2E report: <path>`. Open the file and check:
 - every test is listed
 - every step has a screenshot
-- the failed tests are open, with their error
+- the failed tests are listed first and open, with their error
 
 Reply with:
 - the scenario file path and the spec files written

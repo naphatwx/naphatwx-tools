@@ -2,7 +2,7 @@
 
 <!-- impeccable:product-schema 1 -->
 
-Scope: the HTML plan folder the `design-feature` skill generates (`overview.html` + diagrams + optional mock). Other skills in this repo are not covered here.
+Scope: the HTML plan folder the `design-feature` skill generates (`overview.html` + diagrams + optional mock). Its dark "Quiet Sheet" palette is also the shared theme (`theme/`) for every HTML the plugin makes: reports, docs, slides, diagrams.
 
 ## Platform
 

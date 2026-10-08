@@ -1,26 +1,113 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mock · Feature name</title>
+    <!-- Tailwind stays: layout utilities here, and the screens' shared components need it -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss">
-        @custom-variant dark (&:where(.dark, .dark *));
-    </style>
     <style>
+        /* theme:tokens:start */
+        /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+        :root {
+            color-scheme: dark;
+
+            /* Surfaces, darkest first */
+            --bg: #121316;
+            --surface: #18191d;
+            --surface-2: #1f2025;
+            --surface-3: #24262c;
+            --line: #26282e;
+            --line-strong: #363940;
+            --line-3: #4a4d55;
+
+            /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+            --text: #e2e3e7;
+            --text-2: #c6c8cf;
+            --text-3: #a3a6b0;
+
+            /* One accent */
+            --accent: #8ab0ff;
+            --accent-fill: #1b2232;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+
+            /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+            --ok: #8fd694;
+            --warn: #f0c26b;
+            --bad: #f28b8d;
+            --neutral: #a3a6b0;
+            --ok-soft: rgba(143, 214, 148, 0.12);
+            --warn-soft: rgba(240, 194, 107, 0.12);
+            --bad-soft: rgba(242, 139, 141, 0.12);
+            --neutral-soft: rgba(163, 166, 176, 0.12);
+            --add: var(--ok);
+            --change: var(--warn);
+            --drop: var(--bad);
+
+            /* Diagrams: connectors and their labels */
+            --connector: #6b6e78;
+
+            /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+            --radius: 6px;
+            --radius-lg: 10px;
+            --ease: cubic-bezier(0.2, 0, 0, 1);
+        }
+        /* theme:tokens:end */
+        /* theme:base:start */
+        /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        a { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        code, kbd, pre, samp { font-family: var(--mono); }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* theme:base:end */
+
+        /* Index chrome only. The screens inside the frames use the target app's own design system. */
         html { scroll-padding-top: 24px; }
-        /* the screen renders at desktop width and is scaled down to the card */
+        body { line-height: 1.55; }
+        .measure { max-width: 70ch; }
+        .muted { color: var(--text-2); }
+        .meta { color: var(--text-3); }
+        .label { color: var(--text-3); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+        .link { color: var(--accent); text-decoration: none; }
+        .link:hover { text-decoration: underline; }
+        .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        a.panel { color: inherit; text-decoration: none; transition: border-color .15s var(--ease); }
+        a.panel:hover { border-color: var(--accent); }
+        .tabs { display: flex; overflow-x: auto; border-bottom: 1px solid var(--line); }
+        .tab { flex-shrink: 0; min-width: 9rem; max-width: 14rem; padding: 10px 16px; margin-bottom: -1px; font-size: 14px; color: var(--text-2); background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; }
+        .tab:hover { color: var(--text); background: var(--surface); }
+        .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+        .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
+        .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: 12px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
+        .url { font-family: var(--mono); padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+        .btn-ghost { padding: 4px 8px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
+        .btn-ghost:hover { border-color: var(--accent); }
+        .rows > * + * { border-top: 1px solid var(--line); }
+        /* the screen renders at desktop width and is scaled down to the frame */
         .fit { position: relative; overflow: hidden; }
         .fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
-        /* thin scrollbars that follow the theme, never the default white track */
-        * { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, .25) transparent; }
-        html.dark * { scrollbar-color: rgba(255, 255, 255, .18) transparent; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .25); border-radius: 8px; }
-        html.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
     </style>
     <script src="contract/rules.js"></script>
     <script src="contract/data.js"></script>
@@ -30,40 +117,33 @@
     <script src="shared/use-cases.js"></script>
 </head>
 
-<body class="antialiased bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white">
-    <div class="max-w-[1200px] mx-auto px-6 py-8 space-y-14">
-        <header class="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-                <a href="../overview.html#use-cases" class="text-sm text-purple-600 dark:text-purple-400 hover:underline">← Feature plan</a>
-                <h1 class="text-2xl font-bold mt-2">Mock UI · Feature name</h1>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">One block per flow. Pick a use case and play it in the card: the screen is built from the app's real classes, rendered at 1600&nbsp;px and scaled to fit, on a fake API with the real operation names.</p>
-            </div>
-            <button onclick="Theme()" class="min-h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-600" title="Toggle theme">◐</button>
+<body>
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-8 space-y-14">
+        <header>
+            <a href="../overview.html#use-cases" class="link text-sm">← Feature plan</a>
+            <h1 class="text-2xl font-bold mt-2">Mock UI · Feature name</h1>
+            <p class="text-sm muted mt-1 measure">One block per flow. Pick a use case and play it in the frame: the screen is built from the app's real classes, rendered at 1600&nbsp;px and scaled to fit, on a fake API with the real operation names.</p>
         </header>
 
         <div id="flows" class="space-y-14"></div>
 
         <section>
             <h2 class="text-lg font-bold mb-1">Audit log (this browser session)</h2>
-            <p class="text-xs text-gray-500 mb-3">What the real service writes: audit rows, events. Picking or restarting a use case clears it.</p>
+            <p class="text-sm meta mb-3 measure">What the real service writes: audit rows, events. Picking or restarting a use case clears it.</p>
             <div id="log"></div>
         </section>
 
         <section>
             <h2 class="text-lg font-bold mb-3">Contract</h2>
             <div class="grid md:grid-cols-3 gap-4">
-                <a href="contract/types.ts" class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 p-5 block"><div class="font-mono font-semibold">types.ts</div><p class="text-xs text-gray-500 mt-1">Real shapes to implement.</p></a>
-                <a href="contract/rules.js" class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 p-5 block"><div class="font-mono font-semibold">rules.js</div><p class="text-xs text-gray-500 mt-1">Spec rules as functions.</p></a>
-                <a href="contract/data.js" class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-400 p-5 block"><div class="font-mono font-semibold">data.js</div><p class="text-xs text-gray-500 mt-1">Mock data, typed against types.ts.</p></a>
+                <a href="contract/types.ts" class="panel p-5 block"><div class="font-mono font-semibold">types.ts</div><p class="text-sm meta mt-1">Real shapes to implement.</p></a>
+                <a href="contract/rules.js" class="panel p-5 block"><div class="font-mono font-semibold">rules.js</div><p class="text-sm meta mt-1">Spec rules as functions.</p></a>
+                <a href="contract/data.js" class="panel p-5 block"><div class="font-mono font-semibold">data.js</div><p class="text-sm meta mt-1">Mock data, typed against types.ts.</p></a>
             </div>
         </section>
     </div>
 
     <script>
-        const root = document.documentElement;
-        try { if (localStorage.getItem('mock:theme') === 'light') root.classList.remove('dark'); } catch { }
-        function Theme() { root.classList.toggle('dark'); try { localStorage.setItem('mock:theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch { } }
-
         const SCREEN_W = 1600, SCREEN_H = 940;
         const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
         const nn = flow => flow.split('.')[1].padStart(2, '0');
@@ -90,20 +170,18 @@
         document.getElementById('flows').innerHTML = USE_CASE_FLOWS.map(f => {
             const ucs = ucsOf(f.flow);
             const head = `
-              <div class="flex items-baseline justify-between gap-4 flex-wrap mb-4">
-                <h2 class="text-xl font-bold"><span class="text-gray-500 font-mono mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
-                <span class="text-xs font-mono text-gray-500">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="text-purple-600 dark:text-purple-400 hover:underline">plan</a></span>
+              <div class="flex items-baseline justify-between gap-x-4 gap-y-1 flex-wrap mb-4">
+                <h2 class="text-xl font-bold"><span class="meta font-mono mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
+                <span class="text-xs font-mono meta">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="link">plan</a></span>
               </div>`;
-            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="text-sm text-gray-600 dark:text-gray-400">${UI.esc(f.none || 'No use case to play.')}</p></section>`;
+            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="text-sm muted measure">${UI.esc(f.none || 'No use case to play.')}</p></section>`;
             return `
               <section id="flow-${nn(f.flow)}" data-flow="${f.flow}">
                 ${head}
-                <div class="text-xs text-gray-500 mb-2">Use case</div>
-                <div class="flex overflow-x-auto rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" role="tablist" aria-label="Use cases of flow ${f.flow}">
-                  ${ucs.map(u => `<button type="button" role="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)"
-                      class="shrink-0 min-w-[9rem] max-w-[14rem] px-4 py-3 text-sm text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 aria-selected:bg-purple-600/15 aria-selected:text-purple-700 dark:aria-selected:text-purple-200 aria-selected:font-semibold cursor-pointer">${UI.esc(u.title)}</button>`).join('')}
+                <div class="tabs" role="tablist" aria-label="Use cases of flow ${f.flow}">
+                  ${ucs.map(u => `<button type="button" role="tab" class="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)">${UI.esc(u.title)}</button>`).join('')}
                 </div>
-                <div class="card mt-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden"></div>
+                <div class="card mt-5"></div>
               </section>`;
         }).join('');
 
@@ -113,24 +191,26 @@
             block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.uc === id)));
             if (fromClick) { clearState(); history.replaceState(null, '', '#uc-' + id); }
             block.querySelector('.card').innerHTML = `
-              <div class="grid md:grid-cols-[1.2fr_1fr] gap-6 p-5 border-b border-gray-200 dark:border-gray-700">
-                <div>
-                  <div class="flex items-baseline gap-3 flex-wrap"><h3 class="text-lg font-semibold">${UI.esc(uc.title)}</h3><span class="text-xs font-mono text-gray-500">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
-                  <div class="text-xs font-semibold uppercase tracking-wider text-gray-500 mt-3 mb-1">How to play</div>
-                  <ol class="list-decimal pl-5 space-y-1.5 text-[15px] text-gray-700 dark:text-gray-300">${list(uc.steps)}</ol>
+              <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="text-lg font-semibold">${UI.esc(uc.title)}</h3><span class="text-xs font-mono meta">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
+              <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 mt-3 mb-5">
+                <div class="measure">
+                  <div class="label mb-1">How to play</div>
+                  <ol class="list-decimal pl-5 space-y-1.5 text-[15px] muted">${list(uc.steps)}</ol>
                 </div>
-                <div>
-                  <div class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1 md:mt-8">What you should see</div>
-                  <ul class="list-disc pl-5 space-y-1.5 text-[15px] text-gray-700 dark:text-gray-300">${list(uc.expect)}</ul>
+                <div class="measure">
+                  <div class="label mb-1">What you should see</div>
+                  <ul class="list-disc pl-5 space-y-1.5 text-[15px] muted">${list(uc.expect)}</ul>
                 </div>
               </div>
-              <div class="flex items-center gap-3 px-4 py-2 bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-700 text-xs">
-                <span class="flex gap-1.5" aria-hidden="true"><i class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-700"></i><i class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-700"></i><i class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-700"></i></span>
-                <span class="font-mono px-2 py-0.5 rounded border border-gray-300 dark:border-gray-700 truncate">${UI.esc(screenUrl(uc))}</span>
-                <span class="ml-auto font-mono text-gray-500 scale-label"></span>
-                <button type="button" onclick="restart('${uc.id}')" class="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:border-purple-400 cursor-pointer">↻ Restart</button>
-              </div>
-              <div class="fit"><iframe title="${UI.esc(uc.title)} — interactive mock" src="${screenSrc(uc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>`;
+              <div class="frame">
+                <div class="toolbar">
+                  <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
+                  <span class="url">${UI.esc(screenUrl(uc))}</span>
+                  <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
+                  <button type="button" onclick="restart('${uc.id}')" class="btn-ghost">↻ Restart</button>
+                </div>
+                <div class="fit"><iframe title="${UI.esc(uc.title)} — interactive mock" src="${screenSrc(uc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>
+              </div>`;
             fit(block);
         }
         function restart(id) { clearState(); pick(id); }
@@ -147,8 +227,8 @@
         function renderLog() {
             const rows = FakeApi.log();
             const html = !rows.length
-                ? '<div class="text-sm text-gray-500 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">Nothing yet.</div>'
-                : `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-200 dark:divide-gray-700">${rows.map(r => `<div class="px-4 py-2 text-xs flex gap-4"><span class="text-gray-500 whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
+                ? '<div class="panel text-sm meta p-6 text-center">Nothing yet.</div>'
+                : `<div class="panel rows">${rows.map(r => `<div class="px-4 py-2 text-sm flex gap-4"><span class="meta whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
             const el = document.getElementById('log');
             if (el.innerHTML !== html) el.innerHTML = html;
         }

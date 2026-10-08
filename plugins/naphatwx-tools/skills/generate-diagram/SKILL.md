@@ -34,8 +34,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 1. Every name in a diagram (RPC, endpoint, table, column, job, screen) comes from the source. Unknown → write `TBD`. Never invent one.
 2. Write only the output files. Never edit the caller's page (for example design-feature's `overview.html`); give it the embed snippet instead.
 3. Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split into several diagrams and say so. In diagram-design mode its own, tighter budgets win.
-4. Dark theme is the default. Use light only when the user or caller asks for it. In diagram-design mode, dark means the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`), and every diagram uses the shipped default tokens recolored to the Quiet Sheet palette, matching design-feature's page: paper `#2d3142` → `#18191d`, `#393e53` → `#1f2025`, `#41465b` → `#363940`; ink `#f5f5f5` → `#ececef`; muted `#bfc0c0` → `#b9bbc2`; accent `#f08a59` → `#8ab0ff`; tags `#8e98ac` → `#8d909a`; amber `#e0bb6a` → `#f0c26b`; red `#ab5258` → `#f28b8d`; blue `#274a73` → `#1b2232`. Skip its first-run style-guide question: the answer is always "proceed with the default".
-    - Fonts: the OS font, never a web font. Delete the Google Fonts `<link>` (and any `preconnect`) and swap the font stacks: Geist and Instrument Serif → `-apple-system, "Segoe UI", system-ui, sans-serif`; Geist Mono → `ui-monospace, "SF Mono", Menlo, Consolas, monospace` (single quotes inside SVG `font-family="…"` attributes).
+4. Dark only, in the shared theme: no light palette, theme toggle or second palette, in either mode.
+    - Manual mode: every template's `<style>` holds the synced theme block (`theme:tokens` and `theme:base` markers). Keep it as-is and style only with its tokens (`var(--surface)`, `var(--accent)`, `var(--mono)`…); the standalone flowchart `.svg` uses the same hex values.
+    - diagram-design mode: use the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) and skip its first-run style-guide question (the answer is always "proceed with the default"). Brief it so its output matches manual mode:
+        - Colors: only the theme's values, the hexes in the `theme:tokens` block of `template/er/er-diagram.html`. Map its defaults: paper `#2d3142` → `#18191d`; `#393e53` → `#1f2025`; `#41465b` → `#363940`; ink `#f5f5f5` → `#e2e3e7`; muted `#bfc0c0` → `#c6c8cf`; tags `#8e98ac` → `#a3a6b0`; accent `#f08a59` → `#8ab0ff`; blue `#274a73` → `#1b2232`; amber → `#f0c26b`; red `#ab5258` → `#f28b8d`; connectors `#6b6e78`.
+        - Type: every label at least 12px (`font-size` ≥ 12 in viewBox units), viewBox at most about 840 wide so it shows at 1:1 or larger. Sentence case labels (`Yes`, `Retry`, `1 · Load`): no all-caps or letter-spaced tags. No dot-grid or patterned background.
+        - Fonts: the OS font, never a web font. Delete the Google Fonts `<link>` (and any `preconnect`) and swap the font stacks: Geist and Instrument Serif → `-apple-system, "Segoe UI", system-ui, sans-serif`; Geist Mono → `ui-monospace, "SF Mono", Menlo, Consolas, monospace` (single quotes inside SVG `font-family="…"` attributes).
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
 6. A diagram file never holds a step details list. The caller's page shows it (see the sequence reference).
 
@@ -56,24 +60,29 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 3. Draw
 
 - Read the reference for the type and follow it: [flowchart](references/flowchart.md), [sequence](references/sequence.md), [er](references/er.md).
-- diagram-design mode, `flowchart` and `sequence`: add this height reporter just before `</body>` of every saved `.html`. The SVG shrinks with an iframe's width, so a fixed height leaves empty space; a host page that listens for `diagram-height` (design-feature's `overview.html` does) sizes the iframe instead. It does nothing when the file is opened on its own.
+- diagram-design mode, `flowchart` and `sequence`: add this height reporter just before `</body>` of every saved `.html`. The SVG shrinks with an iframe's width, so a fixed height leaves empty space; a host page that listens for `diagram-height` (design-feature's `overview.html` does) sizes the iframe instead. It also keeps each SVG at least its viewBox width (labels stay 12px or larger) and scrolls it sideways in a narrow window instead of overflowing the page.
 
 ```html
 <script>
   // Report the real height to the host page so its iframe fits (postMessage works on file://).
-  // body, not documentElement: documentElement.scrollHeight never drops below the iframe's current height.
-  // Fractional rect height, not scrollHeight (rounds down): a 0.1px overflow shows a scrollbar strip.
-  // Thin scrollbars that match the dark paper; the default white track shows whenever the SVG overflows.
+  // body, not documentElement: its scrollHeight never drops below the iframe's height; the
+  // fractional rect height avoids a 0.1px overflow showing a scrollbar strip.
   const style = document.createElement("style");
-  style.textContent = `* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 8px; }`;
+  style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }`;
   document.head.append(style);
+  // Never draw a diagram below its viewBox width, so 12px labels stay 12px; a narrow frame scrolls it sideways.
+  document.querySelectorAll("svg[viewBox]:not(svg svg)").forEach(svg => {
+    svg.style.minWidth = svg.viewBox.baseVal.width + "px";
+    if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
+    const box = document.createElement("div");
+    box.style.overflowX = "auto";
+    svg.before(box);
+    box.append(svg);
+  });
   if (parent !== window) {
-    // Embedded: the host sizes the height; slimmer padding and a 720px floor fit an 880px column without a scrollbar.
+    // Embedded: the host sizes the height.
     document.documentElement.style.overflowY = "hidden";
     document.body.style.padding = "1rem";
-    document.querySelectorAll("svg").forEach(svg => { svg.style.minWidth = "min(720px, 100%)"; });
   }
   const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
   addEventListener("load", postHeight);

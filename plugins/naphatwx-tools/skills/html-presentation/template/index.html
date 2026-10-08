@@ -1,51 +1,101 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presentation</title>
     <style>
-        /* dark theme (default) */
-        :root,
-        [data-theme="dark"] {
-            --bg: #1a1a1a;
-            --heading: #f5f5f5;
-            --text: #cfcfcf;
-            --badge: #999;
-            --marker: #aaa;
-            --counter: #777;
-            --hint: #666;
-            --toggle-bg: rgba(255, 255, 255, 0.08);
-            --toggle-fg: #ddd;
-        }
+        /* theme:tokens:start */
+        /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+        :root {
+            color-scheme: dark;
 
-        /* light theme */
-        [data-theme="light"] {
-            --bg: #d3d3d3;
-            --heading: #1a1a1a;
-            --text: #333;
-            --badge: #666;
-            --marker: #555;
-            --counter: #888;
-            --hint: #999;
-            --toggle-bg: rgba(0, 0, 0, 0.06);
-            --toggle-fg: #333;
+            /* Surfaces, darkest first */
+            --bg: #121316;
+            --surface: #18191d;
+            --surface-2: #1f2025;
+            --surface-3: #24262c;
+            --line: #26282e;
+            --line-strong: #363940;
+            --line-3: #4a4d55;
+
+            /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+            --text: #e2e3e7;
+            --text-2: #c6c8cf;
+            --text-3: #a3a6b0;
+
+            /* One accent */
+            --accent: #8ab0ff;
+            --accent-fill: #1b2232;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+
+            /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+            --ok: #8fd694;
+            --warn: #f0c26b;
+            --bad: #f28b8d;
+            --neutral: #a3a6b0;
+            --ok-soft: rgba(143, 214, 148, 0.12);
+            --warn-soft: rgba(240, 194, 107, 0.12);
+            --bad-soft: rgba(242, 139, 141, 0.12);
+            --neutral-soft: rgba(163, 166, 176, 0.12);
+            --add: var(--ok);
+            --change: var(--warn);
+            --drop: var(--bad);
+
+            /* Diagrams: connectors and their labels */
+            --connector: #6b6e78;
+
+            /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+            --radius: 6px;
+            --radius-lg: 10px;
+            --ease: cubic-bezier(0.2, 0, 0, 1);
+        }
+        /* theme:tokens:end */
+        /* theme:base:start */
+        /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        a { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        code, kbd, pre, samp { font-family: var(--mono); }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* theme:base:end */
+
+        /* Slide roles mapped onto the synced theme; hint and counter stay at --text-3 or brighter for contrast. */
+        :root {
+            --heading: var(--text);
+            --body: var(--text-2);
+            --badge: var(--accent);
+            --marker: var(--text-3);
+            --counter: var(--text-3);
+            --hint: var(--text-3);
         }
 
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         html,
         body {
             height: 100%;
-            background: var(--bg);
-            font-family: "Segoe UI", system-ui, sans-serif;
             overflow: hidden;
-            transition: background 0.4s ease;
         }
 
         /* 16:9 stage, centered, scales to fit viewport */
@@ -62,7 +112,6 @@
             /* 16:9 */
             background: var(--bg);
             overflow: hidden;
-            transition: background 0.4s ease;
         }
 
         .slide {
@@ -103,14 +152,14 @@
             font-size: 1.6vw;
             max-width: 70%;
             line-height: 1.6;
-            color: var(--text);
+            color: var(--body);
         }
 
         .slide ul,
         .slide ol {
             font-size: 1.6vw;
             line-height: 1.9;
-            color: var(--text);
+            color: var(--body);
             text-align: left;
             padding-left: 1.5em;
         }
@@ -162,7 +211,7 @@
             bottom: 2.5%;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 1.1vw;
+            font-size: max(1.1vw, 12px);
             color: var(--counter);
             z-index: 20;
         }
@@ -170,7 +219,7 @@
         .hint {
             position: absolute;
             bottom: 2.5%;
-            font-size: 0.95vw;
+            font-size: max(0.95vw, 11px);
             color: var(--hint);
             z-index: 20;
         }
@@ -181,26 +230,6 @@
 
         .hint.right {
             right: 3%;
-        }
-
-        /* theme toggle */
-        .theme-toggle {
-            position: absolute;
-            top: 2.5%;
-            right: 3%;
-            z-index: 30;
-            border: none;
-            border-radius: 50%;
-            width: 3vw;
-            height: 3vw;
-            min-width: 32px;
-            min-height: 32px;
-            font-size: 1.3vw;
-            line-height: 1;
-            cursor: pointer;
-            background: var(--toggle-bg);
-            color: var(--toggle-fg);
-            transition: background 0.3s ease;
         }
     </style>
 </head>
@@ -242,8 +271,6 @@
             <p>Click left to revisit. Click right to wrap up.</p>
         </section>
 
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (t)">🌙</button>
-
         <div class="nav-zone left" onclick="prev()"></div>
         <div class="nav-zone right" onclick="next()"></div>
 
@@ -257,7 +284,6 @@
         const curEl = document.getElementById("cur");
         const leftHint = document.querySelector(".hint.left");
         const rightHint = document.querySelector(".hint.right");
-        const toggleBtn = document.querySelector(".theme-toggle");
         let i = 0;
 
         document.getElementById("total").textContent = slides.length;
@@ -281,19 +307,10 @@
         function next() { show(i + 1); }
         function prev() { show(i - 1); }
 
-        // dark is default; toggle swaps to light and back
-        function toggleTheme() {
-            const root = document.documentElement;
-            const dark = root.getAttribute("data-theme") !== "light";
-            root.setAttribute("data-theme", dark ? "light" : "dark");
-            toggleBtn.textContent = dark ? "☀️" : "🌙";
-        }
-
         // keyboard support
         document.addEventListener("keydown", (e) => {
             if (e.key === "ArrowRight") next();
             if (e.key === "ArrowLeft") prev();
-            if (e.key === "t" || e.key === "T") toggleTheme();
         });
 
         updateHints();

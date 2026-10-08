@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <a class="skip" href="#sheet">Skip to content</a>
     <!-- ============ INDEX RAIL: always open; the edge button or "[" hides it.
          One <li> per section (01–08); flows, changed tables and changed APIs nest as 3.N / 4.N / 5.N. ============ -->
     <nav class="rail" id="rail" aria-label="Sections">
@@ -22,8 +23,8 @@
             <li><a href="#scope"><span class="n">02</span><span class="rail-label">Scope</span></a></li>
             <li><a href="#flows"><span class="n">03</span><span class="rail-label">Flows</span></a>
                 <ol>
-                    <li><a href="#flow-01"><span class="n">3.1</span><span class="rail-label">Example flow</span></a></li>
-                    <li><a href="#flow-02"><span class="n">3.2</span><span class="rail-label">Example flow · diagram-design</span></a></li>
+                    <li><a href="#flow-01"><span class="n">3.1</span><span class="rail-label">Create a thing</span></a></li>
+                    <li><a href="#flow-02"><span class="n">3.2</span><span class="rail-label">Create a thing · diagram-design</span></a></li>
                 </ol>
             </li>
             <li><a href="#database"><span class="n">04</span><span class="rail-label">Database</span></a>
@@ -53,7 +54,7 @@
 
     <button class="menu" id="menuBtn" type="button" aria-label="Open index">☰</button>
 
-    <main class="sheet" id="sheet">
+    <main class="sheet" id="sheet" tabindex="-1">
 
         <!-- ============ 01 OVERVIEW ============ -->
         <section class="slide" id="overview" data-title="Overview">
@@ -98,34 +99,34 @@
             <h2><span class="sec-n">03</span>Flows</h2>
             <p class="muted">Each flow has three views, closed until you open one: <strong>Flowchart</strong> is the logic, <strong>Sequence</strong> is how the services talk, <strong>Rules</strong> is what the build must keep.</p>
             <ol class="flow-index">
-                <li><a href="#flow-01"><span class="n">3.1</span>Example flow</a><span class="aside">US1 · P1</span></li>
-                <li><a href="#flow-02"><span class="n">3.2</span>Example flow · diagram-design</a><span class="aside">US1 · P1</span></li>
+                <li><a href="#flow-01"><span class="n">3.1</span>Create a thing</a><span class="aside">US2 · P1</span></li>
+                <li><a href="#flow-02"><span class="n">3.2</span>Create a thing · diagram-design</a><span class="aside">US2 · P1</span></li>
             </ol>
         </section>
 
         <!-- ===== one block per flow: section.slide.flow id="flow-NN" + 3 view buttons + 3 hidden panels (Flowchart, Sequence, Rules) + try line.
              Manual: <img src="flowchart/NN-slug.svg"> and <div class="seq" data-flow="NN-slug">.
              diagram-design: <iframe class="diagram-frame"> in both, + the returned <div class="seq-steps"> right after the .seq box. ===== -->
-        <section class="slide flow" id="flow-01" data-title="Flow 3.1 · Example flow">
+        <section class="slide flow" id="flow-01" data-title="Flow 3.1 · Create a thing">
             <header class="flow-head">
-                <h3><span class="sec-n">3.1</span>Example flow</h3>
-                <p class="refs">US1 · P1 · FR-001 · FR-002</p>
+                <h3><span class="sec-n">3.1</span>Create a thing</h3>
+                <p class="refs">US2 · P1 · FR-002 · FR-003</p>
             </header>
             <p class="flow-line">Save a new thing. <span class="aside">Starts from Things page → New.</span></p>
-            <p class="try"><span class="aside">Try in the mock</span> <a href="mock/index.html#uc-read-list" target="_blank" rel="noopener">Read the list ↗</a> · <a href="mock/index.html#uc-read-failed" target="_blank" rel="noopener">Only failed things ↗</a> · <a href="mock/index.html#uc-read-empty" target="_blank" rel="noopener">Owner with no things ↗</a> · <a href="mock/index.html#uc-read-unreachable" target="_blank" rel="noopener">Upstream unreachable ↗</a></p>
+            <p class="try"><span class="aside">Try in the mock</span> <a href="mock/index.html#uc-create-read-only" target="_blank" rel="noopener">User without create permission ↗</a> · <a href="mock/index.html#uc-create-archived" target="_blank" rel="noopener">Archived owner ↗</a> · <a href="mock/index.html#uc-create-api" target="_blank" rel="noopener">Create over the API ↗</a></p>
             <div class="views" role="tablist" aria-label="Flow 3.1 views">
                 <button role="tab" aria-selected="false" aria-controls="flow-01-chart" id="flow-01-chart-tab">Flowchart</button>
                 <button role="tab" aria-selected="false" aria-controls="flow-01-seq" id="flow-01-seq-tab">Sequence</button>
                 <button role="tab" aria-selected="false" aria-controls="flow-01-rules" id="flow-01-rules-tab">Rules</button>
             </div>
-            <div class="panel wide" role="tabpanel" id="flow-01-chart" aria-labelledby="flow-01-chart-tab" hidden>
+            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-01-chart" aria-labelledby="flow-01-chart-tab" hidden>
                 <div class="flowchart"><img src="flowchart/01-example-flow.svg" alt="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry"></div>
             </div>
-            <div class="panel wide" role="tabpanel" id="flow-01-seq" aria-labelledby="flow-01-seq-tab" hidden>
+            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-01-seq" aria-labelledby="flow-01-seq-tab" hidden>
                 <p class="seq-legend"><span>call</span><span class="ret">response</span><span class="hot">side effect</span></p>
                 <div class="seq" data-flow="01-example-flow"></div>
             </div>
-            <div class="panel" role="tabpanel" id="flow-01-rules" aria-labelledby="flow-01-rules-tab" hidden>
+            <div class="panel" role="tabpanel" tabindex="0" id="flow-01-rules" aria-labelledby="flow-01-rules-tab" hidden>
                 <ul>
                     <li>The name is unique per owner; a duplicate returns <code>ALREADY_EXISTS</code>.</li>
                     <li>Only users with <code>thing.edit</code> see the "New" button.</li>
@@ -135,10 +136,10 @@
         <!-- ===== end flow block ===== -->
 
         <!-- Template preview only: flow 3.2 is the same flow in diagram-design mode. A real overview uses one mode for every flow. -->
-        <section class="slide flow" id="flow-02" data-title="Flow 3.2 · Example flow · diagram-design">
+        <section class="slide flow" id="flow-02" data-title="Flow 3.2 · Create a thing · diagram-design">
             <header class="flow-head">
-                <h3><span class="sec-n">3.2</span>Example flow · diagram-design</h3>
-                <p class="refs">US1 · P1 · FR-001 · FR-002</p>
+                <h3><span class="sec-n">3.2</span>Create a thing · diagram-design</h3>
+                <p class="refs">US2 · P1 · FR-002 · FR-003</p>
             </header>
             <p class="flow-line">The same flow as 3.1, drawn by diagram-design. <span class="aside">Starts from Things page → New.</span></p>
             <p class="try"><span class="aside">Try in the mock</span> <a href="mock/index.html#uc-create-read-only" target="_blank" rel="noopener">User without create permission ↗</a> · <a href="mock/index.html#uc-create-archived" target="_blank" rel="noopener">Archived owner ↗</a> · <a href="mock/index.html#uc-create-api" target="_blank" rel="noopener">Create over the API ↗</a></p>
@@ -147,10 +148,10 @@
                 <button role="tab" aria-selected="false" aria-controls="flow-02-seq" id="flow-02-seq-tab">Sequence</button>
                 <button role="tab" aria-selected="false" aria-controls="flow-02-rules" id="flow-02-rules-tab">Rules</button>
             </div>
-            <div class="panel wide" role="tabpanel" id="flow-02-chart" aria-labelledby="flow-02-chart-tab" hidden>
+            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-02-chart" aria-labelledby="flow-02-chart-tab" hidden>
                 <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
             </div>
-            <div class="panel wide" role="tabpanel" id="flow-02-seq" aria-labelledby="flow-02-seq-tab" hidden>
+            <div class="panel wide" role="tabpanel" tabindex="0" id="flow-02-seq" aria-labelledby="flow-02-seq-tab" hidden>
                 <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
                 <div class="seq-steps"><p class="seq-steps-title">Step details</p><ol>
                     <li><span class="n">1</span><code>GetThing</code> id from the route</li>
@@ -160,7 +161,7 @@
                     <li><span class="n">5</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
                 </ol></div>
             </div>
-            <div class="panel" role="tabpanel" id="flow-02-rules" aria-labelledby="flow-02-rules-tab" hidden>
+            <div class="panel" role="tabpanel" tabindex="0" id="flow-02-rules" aria-labelledby="flow-02-rules-tab" hidden>
                 <ul>
                     <li>The name is unique per owner; a duplicate returns <code>ALREADY_EXISTS</code>.</li>
                 </ul>
@@ -344,24 +345,14 @@
         <!-- Generated by scripts/use-cases-section.js from mock/shared/use-cases.js, with each flow's "Try in the mock" line. Don't hand-edit. -->
         <section class="slide" id="use-cases" data-title="Use cases">
             <h2><span class="sec-n">07</span>Use cases <a class="side-link" href="mock/index.html" target="_blank" rel="noopener">Open the mock ↗</a></h2>
-            <p class="muted">7 use cases, grouped by flow. <strong>Play</strong> opens the mock at that flow with the use case picked.</p>
-            <h3 style="margin: 40px 0 12px"><a href="#flow-01">3.1</a> Read things <span class="aside">4 use cases</span></h3>
+            <p class="muted">3 use cases, grouped by flow. <strong>Play</strong> opens the mock at that flow with the use case picked.</p>
+            <h3 class="group-head"><a href="#flow-01">3.1</a> Create a thing <span class="aside">3 use cases</span></h3>
             <div class="table-wrap"><table>
                 <thead><tr><th>Use case</th><th>Story</th><th></th></tr></thead><tbody>
-                    <tr id="uc-read-list"><td>Read the list<br><span class="aside">Second thing shows as Pending, First thing as Ready.</span></td><td style="white-space:nowrap">US1 · AC1</td><td style="white-space:nowrap"><a href="mock/index.html#uc-read-list" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                    <tr id="uc-read-failed"><td>Only failed things<br><span class="aside">&quot;No things match this filter&quot; — not an error.</span></td><td style="white-space:nowrap">US1 · AC3</td><td style="white-space:nowrap"><a href="mock/index.html#uc-read-failed" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                    <tr id="uc-read-empty"><td>Owner with no things<br><span class="aside">&quot;Nothing yet&quot; empty state — not an error.</span></td><td style="white-space:nowrap">US1 · AC2</td><td style="white-space:nowrap"><a href="mock/index.html#uc-read-empty" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                    <tr id="uc-read-unreachable"><td>Upstream unreachable<br><span class="aside">&quot;The service could not be reached. Try again.&quot; with Retry — never an empty list.</span></td><td style="white-space:nowrap">FR-001</td><td style="white-space:nowrap"><a href="mock/index.html#uc-read-unreachable" target="_blank" rel="noopener">Play ↗</a></td></tr>
+                    <tr id="uc-create-read-only"><td>User without create permission<br><span class="aside">No Create button: the app hides it without things.create.</span></td><td class="nowrap">FR-003</td><td class="nowrap"><a href="mock/index.html#uc-create-read-only" target="_blank" rel="noopener">Play ↗</a></td></tr>
+                    <tr id="uc-create-archived"><td>Archived owner<br><span class="aside">Create is shown unavailable, with &quot;This owner is archived. Things cannot be created.&quot; in its tooltip.</span></td><td class="nowrap">US2 · AC4</td><td class="nowrap"><a href="mock/index.html#uc-create-archived" target="_blank" rel="noopener">Play ↗</a></td></tr>
+                    <tr id="uc-create-api"><td>Create over the API<br><span class="aside">A Pending thing and one audit row.</span></td><td class="nowrap">US2 · AC1</td><td class="nowrap"><a href="mock/index.html#uc-create-api" target="_blank" rel="noopener">Play ↗</a></td></tr>
                 </tbody></table></div>
-            <h3 style="margin: 40px 0 12px"><a href="#flow-02">3.2</a> Create a thing <span class="aside">3 use cases</span></h3>
-            <div class="table-wrap"><table>
-                <thead><tr><th>Use case</th><th>Story</th><th></th></tr></thead><tbody>
-                    <tr id="uc-create-read-only"><td>User without create permission<br><span class="aside">No Create button: the app hides it without things.create.</span></td><td style="white-space:nowrap">FR-003</td><td style="white-space:nowrap"><a href="mock/index.html#uc-create-read-only" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                    <tr id="uc-create-archived"><td>Archived owner<br><span class="aside">Create is shown unavailable, with &quot;This owner is archived. Things cannot be created.&quot; in its tooltip.</span></td><td style="white-space:nowrap">US2 · AC4</td><td style="white-space:nowrap"><a href="mock/index.html#uc-create-archived" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                    <tr id="uc-create-api"><td>Create over the API<br><span class="aside">A Pending thing and one audit row.</span></td><td style="white-space:nowrap">US2 · AC1</td><td style="white-space:nowrap"><a href="mock/index.html#uc-create-api" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                </tbody></table></div>
-            <h3 style="margin: 40px 0 12px"><a href="#flow-03">3.3</a> Backfill old things <span class="aside">0 use cases</span></h3>
-            <p class="muted">An operator script, run once per environment. No screen to play.</p>
         </section>
 
         <!-- ============ 08 OPEN QUESTIONS ============ -->
@@ -380,6 +371,7 @@
         <button type="button" id="openAll" aria-pressed="false" title="Open every flow view">Open all</button>
         <button type="button" id="zoomToggle" aria-pressed="false" title="Scroll over a diagram to zoom">Zoom</button>
         <button type="button" id="presentBtn" aria-pressed="false" title="Present one section at a time ( P )">Present <kbd>P</kbd></button>
+        <button type="button" id="keysBtn" aria-haspopup="dialog" aria-label="Keyboard shortcuts" title="Keyboard shortcuts ( ? )"><kbd>?</kbd></button>
     </div>
 
     <!-- presentation bar: shown only in presentation mode (P) -->
@@ -387,8 +379,24 @@
         <button type="button" id="prevSlide" aria-label="Previous section">←</button>
         <span id="hudLabel">1 / 1</span>
         <button type="button" id="nextSlide" aria-label="Next section">→</button>
-        <button type="button" id="exitPresent" class="hud-exit">Esc</button>
+        <button type="button" id="exitPresent" class="hud-exit" aria-label="Leave presentation">Esc</button>
+        <span class="hud-keys" aria-hidden="true">? keys</span>
     </div>
+
+    <!-- shortcut sheet: "?" or the ? tool opens it -->
+    <dialog class="keys" id="keys" aria-labelledby="keysTitle">
+        <h2 id="keysTitle">Keyboard shortcuts</h2>
+        <button type="button" class="keys-close" aria-label="Close">✕</button>
+        <dl>
+            <dt><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></dt><dd>Open Flowchart, Sequence or Rules of the flow on screen</dd>
+            <dt><kbd>P</kbd></dt><dd>Start or leave presentation</dd>
+            <dt><kbd>←</kbd> <kbd>→</kbd> <kbd>Space</kbd></dt><dd>Step while presenting</dd>
+            <dt><kbd>Esc</kbd></dt><dd>Leave presentation, close a dialog</dd>
+            <dt><kbd>[</kbd></dt><dd>Hide or show the index</dd>
+            <dt><kbd>/</kbd></dt><dd>Search the index</dd>
+            <dt><kbd>?</kbd></dt><dd>This sheet</dd>
+        </dl>
+    </dialog>
 
     <script src="assets/overview.js"></script>
     <!-- sequence diagrams: render.js first, then one script per flow file, then draw -->

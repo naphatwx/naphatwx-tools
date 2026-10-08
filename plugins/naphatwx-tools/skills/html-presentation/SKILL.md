@@ -7,11 +7,7 @@ description: Create a single-file 16:9 HTML slide deck, one click per slide, fro
 
 Create a single-file HTML slide presentation from a bundled template.
 
-The template uses a minimal style with two themes.
-
-- Dark theme is the default (`#1a1a1a` background).
-- Light theme uses a light grey background (`#d3d3d3`).
-- A toggle button (top right) or the `t` key switches themes.
+The template uses a minimal, dark-only style. Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
 
 ## User Input
 
@@ -38,7 +34,7 @@ The output **must** keep all of these:
 4. First slide → cannot go to previous.
 5. Last slide → cannot go to next.
 6. Single self-contained file. No external CSS, JS, or images.
-7. Dark theme is the default. Light theme reachable through the toggle.
+7. Dark only. Add no light theme, theme toggle, or other palette.
 
 ## Workflow
 
@@ -53,9 +49,8 @@ The output **must** keep all of these:
 - If not, keep the placeholder random content.
 - Keep 4-6 slides unless the user asks otherwise.
 - Only edit text inside `<section class="slide">` blocks.
-- Keep the minimal style and the two themes.
-- Keep dark theme as the default.
-- Do not change the navigation script, theme toggle, or the layout CSS.
+- Keep the minimal style. Color with the theme tokens, never new hex values.
+- Do not change the navigation script or the layout CSS.
 
 ### 3. Write the file
 
@@ -68,4 +63,3 @@ The output **must** keep all of these:
 
 - Output: `✅ Presentation created at: {path}`
 - Remind the user: click left or right to move, arrow keys also work.
-- Remind the user: click the toggle or press `t` to switch dark and light themes.

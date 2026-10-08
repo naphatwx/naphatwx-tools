@@ -1,0 +1,48 @@
+/* naphatwx theme "Quiet Sheet": dark only. Source of truth for every HTML a skill makes.
+   Edit here, then run `node scripts/sync-theme.mjs`; it copies this block into each template. */
+:root {
+    color-scheme: dark;
+
+    /* Surfaces, darkest first */
+    --bg: #121316;
+    --surface: #18191d;
+    --surface-2: #1f2025;
+    --surface-3: #24262c;
+    --line: #26282e;
+    --line-strong: #363940;
+    --line-3: #4a4d55;
+
+    /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+    --text: #e2e3e7;
+    --text-2: #c6c8cf;
+    --text-3: #a3a6b0;
+
+    /* One accent */
+    --accent: #8ab0ff;
+    --accent-fill: #1b2232;
+    --accent-soft: rgba(138, 176, 255, 0.12);
+
+    /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+    --ok: #8fd694;
+    --warn: #f0c26b;
+    --bad: #f28b8d;
+    --neutral: #a3a6b0;
+    --ok-soft: rgba(143, 214, 148, 0.12);
+    --warn-soft: rgba(240, 194, 107, 0.12);
+    --bad-soft: rgba(242, 139, 141, 0.12);
+    --neutral-soft: rgba(163, 166, 176, 0.12);
+    --add: var(--ok);
+    --change: var(--warn);
+    --drop: var(--bad);
+
+    /* Diagrams: connectors and their labels */
+    --connector: #6b6e78;
+
+    /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+    --radius: 6px;
+    --radius-lg: 10px;
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+}

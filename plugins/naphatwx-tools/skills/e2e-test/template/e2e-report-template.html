@@ -5,68 +5,168 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>E2E Report</title>
 <style>
+  /* theme:tokens:start */
+  /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
   :root {
-    --bg: #ffffff; --panel: #f6f7f9; --line: #e3e6ea; --text: #16191d; --muted: #5f6873;
-    --pass: #1a7f37; --pass-bg: #e6f4ea; --fail: #c62828; --fail-bg: #fdecea;
-    --skip: #6b7280; --skip-bg: #eef0f2; --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color-scheme: dark;
+
+      /* Surfaces, darkest first */
+      --bg: #121316;
+      --surface: #18191d;
+      --surface-2: #1f2025;
+      --surface-3: #24262c;
+      --line: #26282e;
+      --line-strong: #363940;
+      --line-3: #4a4d55;
+
+      /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+      --text: #e2e3e7;
+      --text-2: #c6c8cf;
+      --text-3: #a3a6b0;
+
+      /* One accent */
+      --accent: #8ab0ff;
+      --accent-fill: #1b2232;
+      --accent-soft: rgba(138, 176, 255, 0.12);
+
+      /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+      --ok: #8fd694;
+      --warn: #f0c26b;
+      --bad: #f28b8d;
+      --neutral: #a3a6b0;
+      --ok-soft: rgba(143, 214, 148, 0.12);
+      --warn-soft: rgba(240, 194, 107, 0.12);
+      --bad-soft: rgba(242, 139, 141, 0.12);
+      --neutral-soft: rgba(163, 166, 176, 0.12);
+      --add: var(--ok);
+      --change: var(--warn);
+      --drop: var(--bad);
+
+      /* Diagrams: connectors and their labels */
+      --connector: #6b6e78;
+
+      /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+      --radius: 6px;
+      --radius-lg: 10px;
+      --ease: cubic-bezier(0.2, 0, 0, 1);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0f1115; --panel: #171a20; --line: #2a2f37; --text: #e6e8eb; --muted: #9aa3ad;
-      --pass: #4ade80; --pass-bg: #12301d; --fail: #f87171; --fail-bg: #3a1616; --skip: #9ca3af; --skip-bg: #23272e;
-    }
+  /* theme:tokens:end */
+  /* theme:base:start */
+  /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
   }
-  :root[data-theme="dark"] {
-    --bg: #0f1115; --panel: #171a20; --line: #2a2f37; --text: #e6e8eb; --muted: #9aa3ad;
-    --pass: #4ade80; --pass-bg: #12301d; --fail: #f87171; --fail-bg: #3a1616; --skip: #9ca3af; --skip-bg: #23272e;
+  ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+  * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  code, kbd, pre, samp { font-family: var(--mono); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, sans-serif; }
-  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
-  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-  h1 { font-size: 20px; margin: 0; }
-  .meta { color: var(--muted); font-size: 13px; }
-  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 600; font-size: 12px; text-transform: uppercase; }
-  .passed, .expected { color: var(--pass); background: var(--pass-bg); }
-  .failed, .timedOut, .interrupted, .unexpected { color: var(--fail); background: var(--fail-bg); }
-  .skipped { color: var(--skip); background: var(--skip-bg); }
-  .tools { display: flex; gap: 8px; flex-wrap: wrap; }
-  .tools button { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
-  .tools button[aria-pressed="true"] { outline: 2px solid var(--muted); }
-  details.test { border: 1px solid var(--line); border-radius: 10px; margin-top: 14px; background: var(--panel); overflow: hidden; }
-  details.test > summary { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; list-style: none; }
+  /* theme:base:end */
+
+  body { font-size: 14px; line-height: 1.5; }
+  [hidden] { display: none !important; }
+  main { max-width: 1400px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
+  h1 { font-size: 20px; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+  h2 { font-size: 15px; margin: 0; overflow-wrap: anywhere; }
+  h3 { font-size: 15px; margin: 0; overflow-wrap: anywhere; }
+  .meta { color: var(--text-3); font-size: 13px; }
+  .summary-line { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  code { font-size: 12px; overflow-wrap: anywhere; }
+
+  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: 12px; white-space: nowrap; }
+  .tone-ok { color: var(--ok); background: var(--ok-soft); }
+  .tone-warn { color: var(--warn); background: var(--warn-soft); }
+  .tone-bad { color: var(--bad); background: var(--bad-soft); }
+  .tone-neutral { color: var(--neutral); background: var(--neutral-soft); }
+
+  button { font: inherit; font-size: 13px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
+  button:hover:not(:disabled) { background: var(--surface-3); }
+  button:disabled { opacity: .45; cursor: default; }
+  .tools { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .empty-filter { margin-top: 16px; }
+
+  details.test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 12px; background: var(--surface); overflow: hidden; }
+  details.test > summary { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; list-style: none; transition: background-color .15s var(--ease); }
   details.test > summary::-webkit-details-marker { display: none; }
-  .steps { padding: 0 16px 16px; display: grid; gap: 14px; }
-  .viewer { border-top: 1px solid var(--line); padding-top: 12px; outline: none; }
-  .viewer:focus-visible { box-shadow: 0 0 0 2px var(--muted); border-radius: 6px; }
-  .bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 10px; }
-  .bar h3 { font-size: 15px; margin: 0; flex: 1 1 240px; }
-  .bar button { border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
-  .bar button:disabled { opacity: .4; cursor: default; }
-  .dots { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .dots button { width: 26px; height: 26px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 11px; cursor: pointer; padding: 0; }
-  .dots button.failed { border-color: var(--fail); color: var(--fail); }
-  .dots button[aria-current="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  details.test > summary:hover { background: var(--surface-2); }
+  details.test > summary:focus-visible { outline-offset: -2px; }
+  details.test[open] > summary { border-bottom: 1px solid var(--line); }
+  .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
+  .mark::before { content: "+"; }
+  details[open] > summary .mark::before { content: "\2212"; }
+  .test-body { padding: 14px 16px 16px; display: grid; gap: 14px; min-width: 0; }
+
+  .viewer { border-radius: var(--radius); min-width: 0; }
+  .viewer:focus-visible { outline-offset: 4px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; }
+  .bar h3 { flex: 1 1 240px; }
+  .bar .btns { display: flex; gap: 6px; }
+  .vbody { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "err" "stage" "list"; }
+  .vbody > .err { grid-area: err; }
+  .vbody > .stage { grid-area: stage; }
+  .vbody > .list { grid-area: list; }
+  @media (min-width: 1100px) {
+    .vbody { grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "stage err" "stage list"; align-items: start; }
+  }
+
   .stage { position: relative; user-select: none; }
-  .stage img { width: 100%; display: block; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
-  .stage .empty { padding: 48px 16px; text-align: center; border: 1px dashed var(--line); border-radius: 6px; }
-  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; background: transparent; color: #fff; font-size: 36px; cursor: pointer; opacity: 0; transition: opacity .15s; }
+  .stage img { width: 100%; max-height: 70vh; object-fit: contain; display: block; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+  .stage .empty { padding: 48px 16px; text-align: center; border: 1px dashed var(--line-strong); border-radius: var(--radius); }
+  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; border-radius: 0; background: transparent; color: var(--text); font-size: 36px; opacity: 0; transition: opacity .15s var(--ease); }
   .stage .nav.prev { left: 0; text-align: left; padding-left: 12px; cursor: w-resize; }
   .stage .nav.next { right: 0; text-align: right; padding-right: 12px; cursor: e-resize; }
-  .stage .nav:hover:not(:disabled) { opacity: 1; text-shadow: 0 1px 6px rgb(0 0 0 / .8); }
-  .stage .nav:disabled { cursor: default; }
-  pre { font-family: var(--mono); font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; margin: 6px 0 0; }
-  dialog { border: 0; padding: 0; background: transparent; max-width: 96vw; max-height: 96vh; }
-  dialog img { max-width: 96vw; max-height: 92vh; display: block; }
+  .stage .nav:hover:not(:disabled) { opacity: 1; background: transparent; text-shadow: 0 1px 6px rgb(0 0 0 / .8); }
+  .stage .nav:disabled { cursor: default; opacity: 0; }
+
+  .list { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .list li + li { border-top: 1px solid var(--line); }
+  .list button { width: 100%; display: grid; grid-template-columns: 2.2em 1.2em minmax(0, 1fr) auto; gap: 8px; align-items: baseline; text-align: left; border: 0; border-radius: 0; background: transparent; padding: 7px 10px; }
+  .list button:hover { background: var(--surface-2); }
+  .list button:focus-visible { outline-offset: -2px; }
+  .list button[aria-current="step"] { background: var(--accent-fill); box-shadow: inset 2px 0 0 var(--accent); }
+  .list .n { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .list .g.ok { color: var(--ok); }
+  .list .g.bad { color: var(--bad); }
+  .list .g.neutral { color: var(--neutral); }
+  .list .t { overflow-wrap: anywhere; }
+  .list .ms { color: var(--text-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  pre { font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
+  .err { display: grid; gap: 4px; }
+  .err pre { margin: 0; }
+  .err-label { color: var(--bad); font-weight: 600; font-size: 13px; }
+  .rerun { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .rerun code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+
+  dialog { border: 1px solid var(--line-strong); border-radius: var(--radius-lg); padding: 0; background: var(--surface); color: var(--text); max-width: 96vw; max-height: 96vh; }
+  dialog .dhead { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  dialog img { max-width: 96vw; max-height: calc(96vh - 52px); display: block; object-fit: contain; }
   dialog::backdrop { background: rgb(0 0 0 / .75); }
 </style>
 </head>
 <body>
 <main id="app"></main>
-<dialog id="zoom"><img alt=""></dialog>
+<dialog id="zoom" aria-labelledby="zoom-title">
+  <div class="dhead"><span id="zoom-title" class="meta"></span><button type="button" id="zoom-close">Close</button></div>
+  <img alt="">
+</dialog>
 <script>
 const DATA = /*__E2E_DATA__*/null;
-try { const t = localStorage.getItem('e2e-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
 
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -75,94 +175,182 @@ const el = (tag, attrs = {}, ...kids) => {
   return n;
 };
 const ms = (v) => (v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + ' s' : v + ' ms');
-const badge = (s) => el('span', { class: 'badge ' + s }, s);
-const zoom = document.getElementById('zoom');
-zoom.onclick = () => zoom.close();
+const pad = (n) => String(n).padStart(2, '0');
+function isoLocal(v) {
+  const d = new Date(v);
+  if (isNaN(d)) return String(v ?? '');
+  const off = -d.getTimezoneOffset();
+  const z = (off >= 0 ? '+' : '-') + pad(Math.floor(Math.abs(off) / 60)) + ':' + pad(Math.abs(off) % 60);
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + z;
+}
 
-// One step at a time, like slides: click the right half for next, the left half for previous.
+// Playwright status -> word, glyph, tone. Color always comes with a glyph and the word.
+const STATUS = {
+  passed: { word: 'passed', glyph: '✓', tone: 'ok' },
+  expected: { word: 'passed', glyph: '✓', tone: 'ok' },
+  flaky: { word: 'flaky', glyph: '✓', tone: 'warn' },
+  failed: { word: 'failed', glyph: '✕', tone: 'bad' },
+  unexpected: { word: 'failed', glyph: '✕', tone: 'bad' },
+  timedOut: { word: 'timed out', glyph: '✕', tone: 'bad' },
+  timedout: { word: 'timed out', glyph: '✕', tone: 'bad' },
+  interrupted: { word: 'interrupted', glyph: '✕', tone: 'bad' },
+  skipped: { word: 'skipped', glyph: '–', tone: 'neutral' },
+};
+const st = (s) => STATUS[s] || { word: String(s), glyph: '–', tone: 'neutral' };
+const pill = (s) => el('span', { class: 'pill tone-' + st(s).tone }, el('span', { 'aria-hidden': 'true' }, st(s).glyph), st(s).word);
+const kind = (t) => (t.status === 'passed' ? (t.retry ? 'flaky' : 'passed') : t.status === 'skipped' ? 'skipped' : 'failed');
+
+async function copy(text, btn) {
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const t = el('textarea', {}, text);
+    document.body.append(t); t.select();
+    try { document.execCommand('copy'); } catch {}
+    t.remove();
+  }
+  const was = btn.textContent;
+  btn.textContent = 'Copied';
+  setTimeout(() => { btn.textContent = was; }, 1200);
+}
+
+const zoom = document.getElementById('zoom');
+const zoomImg = zoom.querySelector('img');
+document.getElementById('zoom-close').onclick = () => zoom.close();
+zoom.onclick = (e) => { if (e.target === zoom || e.target === zoomImg) zoom.close(); };
+
+// One step at a time, like slides. Controls are built once and updated in place, so focus stays put.
 function viewer(slides) {
-  let i = Math.max(0, slides.findIndex((s) => s.status === 'failed'));
-  const box = el('div', { class: 'viewer', tabindex: '0' });
-  const show = () => {
+  let i = Math.max(0, slides.findIndex((s) => s.status !== 'passed'));
+  const box = el('div', { class: 'viewer', tabindex: '0', 'aria-label': 'Step viewer, use left and right arrow keys' });
+  const title = el('h3', {});
+  const status = el('span', {});
+  const time = el('span', { class: 'meta' });
+  const count = el('span', { class: 'meta', 'aria-live': 'polite' });
+  const prev = el('button', { type: 'button' }, '‹ Prev');
+  const next = el('button', { type: 'button' }, 'Next ›');
+  const full = el('button', { type: 'button' }, 'Zoom');
+  const err = el('div', { class: 'err' }, el('div', { class: 'err-label' }, 'Error in this step'), el('pre', {}));
+  const img = el('img', { alt: '' });
+  const empty = el('div', { class: 'meta empty' }, 'No screenshot for this step.');
+  // Click halves are a mouse shortcut only; keyboard users have Prev/Next and the step list.
+  const left = el('button', { type: 'button', class: 'nav prev', tabindex: '-1', 'aria-hidden': 'true' }, '‹');
+  const right = el('button', { type: 'button', class: 'nav next', tabindex: '-1', 'aria-hidden': 'true' }, '›');
+  const stage = el('div', { class: 'stage' }, img, empty, left, right);
+  const items = slides.map((s, n) => {
+    const t = st(s.status);
+    const b = el('button', { type: 'button' }, el('span', { class: 'n' }, n + 1 + '.'),
+      el('span', { class: 'g ' + t.tone, 'aria-hidden': 'true' }, t.glyph), el('span', { class: 't' }, s.title,
+      el('span', { class: 'sr-only' }, ', ' + t.word)), el('span', { class: 'ms' }, ms(s.ms)));
+    b.onclick = () => { i = n; update(); };
+    return el('li', {}, b);
+  });
+  const list = el('ol', { class: 'list', 'aria-label': 'Steps' }, items);
+
+  const update = () => {
     const s = slides[i];
-    const prev = el('button', { type: 'button' }, '‹ Prev');
-    const next = el('button', { type: 'button' }, 'Next ›');
-    prev.disabled = i === 0;
-    next.disabled = i === slides.length - 1;
-    prev.onclick = () => go(-1);
-    next.onclick = () => go(1);
-    const full = el('button', { type: 'button' }, 'Zoom');
+    title.textContent = (i + 1) + '. ' + s.title;
+    status.replaceChildren(pill(s.status));
+    time.textContent = ms(s.ms);
+    count.textContent = 'Step ' + (i + 1) + ' / ' + slides.length;
+    prev.disabled = left.disabled = i === 0;
+    next.disabled = right.disabled = i === slides.length - 1;
     full.disabled = !s.shot;
-    full.onclick = () => { zoom.querySelector('img').src = s.shot; zoom.showModal(); };
-    const dots = el('div', { class: 'dots' }, slides.map((x, n) => {
-      const b = el('button', { type: 'button', class: x.status, 'aria-current': String(n === i), title: x.title }, n + 1);
-      b.onclick = () => { i = n; show(); };
-      return b;
-    }));
-    const stage = el('div', { class: 'stage' },
-      s.shot ? el('img', { src: s.shot, alt: s.title }) : el('div', { class: 'meta empty' }, 'No screenshot for this step.'));
-    const left = el('button', { type: 'button', class: 'nav prev', 'aria-label': 'Previous step' }, '‹');
-    const right = el('button', { type: 'button', class: 'nav next', 'aria-label': 'Next step' }, '›');
-    left.disabled = prev.disabled;
-    right.disabled = next.disabled;
-    left.onclick = () => go(-1);
-    right.onclick = () => go(1);
-    stage.append(left, right);
-    box.replaceChildren(
-      el('div', { class: 'bar' }, el('h3', {}, (i + 1) + '. ' + s.title), badge(s.status), el('span', { class: 'meta' }, ms(s.ms)),
-        el('span', { class: 'meta' }, 'Step ' + (i + 1) + ' / ' + slides.length), prev, next, full),
-      dots, stage, ...(s.error ? [el('pre', {}, s.error)] : []));
+    err.hidden = !s.error;
+    err.querySelector('pre').textContent = s.error || '';
+    img.hidden = !s.shot;
+    left.hidden = right.hidden = !s.shot;
+    empty.hidden = !!s.shot;
+    if (s.shot) { img.src = s.shot; img.alt = s.title; } else img.removeAttribute('src');
+    items.forEach((li, n) => {
+      const b = li.firstChild;
+      if (n === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    // A control that just became disabled drops focus; keep it inside the viewer.
+    if (document.activeElement?.disabled) box.focus({ preventScroll: true });
   };
-  const go = (d) => { const n = i + d; if (n >= 0 && n < slides.length) { i = n; show(); box.focus({ preventScroll: true }); } };
+  const go = (d) => { const n = i + d; if (n >= 0 && n < slides.length) { i = n; update(); } };
+  prev.onclick = left.onclick = () => go(-1);
+  next.onclick = right.onclick = () => go(1);
+  full.onclick = () => {
+    const s = slides[i];
+    zoomImg.src = s.shot; zoomImg.alt = s.title;
+    document.getElementById('zoom-title').textContent = (i + 1) + '. ' + s.title;
+    zoom.showModal();
+  };
   box.onkeydown = (e) => {
+    if (e.target.closest('pre')) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   };
-  show();
+  box.append(el('div', { class: 'bar' }, title, status, time, count, el('div', { class: 'btns' }, prev, next, full)),
+    el('div', { class: 'vbody' }, err, stage, list));
+  update();
   return box;
 }
 
-let filter = 'all';
+function testBox(t) {
+  const k = kind(t);
+  const d = el('details', { class: 'test' });
+  d.dataset.kind = k;
+  d.open = k === 'failed';
+  d.append(el('summary', {}, el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' ? t.status : k), el('h2', {}, t.title),
+    el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + (t.retry ? ' · retry ' + t.retry : '') + (t.project ? ' · ' + t.project : ''))));
+  const body = el('div', { class: 'test-body' });
+  const slides = t.steps.slice();
+  if (t.finalShot) slides.push({ title: 'Page at failure', status: 'failed', shot: t.finalShot });
+  if (slides.length) body.append(viewer(slides));
+  else body.append(el('div', { class: 'meta' }, 'This test has no named steps.'));
+  // Playwright usually repeats the failed step's error as the test error; show it once.
+  const stepErrors = t.steps.map((s) => (s.error || '').trim()).filter(Boolean);
+  if (t.error && !stepErrors.some((e) => e === t.error.trim())) body.append(el('div', {}, el('h3', {}, 'Test error'), el('pre', {}, t.error)));
+  if (k !== 'passed') {
+    const cmd = 'npx playwright test ' + t.file + (t.project ? ' --project=' + JSON.stringify(t.project).replace(/^"([\w.-]+)"$/, '$1') : '');
+    const btn = el('button', { type: 'button' }, 'Copy');
+    btn.onclick = () => copy(cmd, btn);
+    body.append(el('div', { class: 'rerun' }, el('span', { class: 'meta' }, 'Rerun:'), el('code', {}, cmd), btn,
+      t.trace ? el('a', { href: t.trace, download: '' }, 'Trace (open with npx playwright show-trace)') : null));
+  }
+  d.append(body);
+  return d;
+}
+
 function render() {
   const app = document.getElementById('app');
-  app.textContent = '';
   if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
-  const failed = DATA.tests.filter((t) => !['passed', 'skipped'].includes(t.status)).length;
-  const passed = DATA.tests.filter((t) => t.status === 'passed').length;
-  const tools = el('div', { class: 'tools' });
-  for (const f of ['all', 'failed', 'passed']) {
-    const b = el('button', { type: 'button', 'aria-pressed': String(filter === f) }, f);
-    b.onclick = () => { filter = f; render(); };
-    tools.append(b);
-  }
-  const theme = el('button', { type: 'button' }, 'Theme');
-  theme.onclick = () => {
-    const set = document.documentElement.dataset.theme;
-    const dark = set ? set === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.dataset.theme = dark ? 'light' : 'dark';
-    try { localStorage.setItem('e2e-theme', document.documentElement.dataset.theme); } catch {}
-  };
-  tools.append(theme);
+  const n = { failed: 0, passed: 0, flaky: 0, skipped: 0 };
+  for (const t of DATA.tests) n[kind(t)]++;
+  const tools = el('div', { class: 'tools', role: 'group', 'aria-label': 'Show tests' });
+  const boxes = DATA.tests.map(testBox);
+  const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
+  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['passed', 'Passed', n.passed + n.flaky], ['skipped', 'Skipped', n.skipped]];
+  const buttons = FILTERS.map(([key, label, c]) => {
+    const b = el('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + c);
+    b.onclick = () => {
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      let shown = 0;
+      for (const box of boxes) {
+        const k = box.dataset.kind === 'flaky' ? 'passed' : box.dataset.kind;
+        box.hidden = key !== 'all' && k !== key;
+        if (!box.hidden) shown++;
+      }
+      none.hidden = shown > 0;
+    };
+    return b;
+  });
+  tools.append(...buttons);
   app.append(el('header', {},
-    el('div', {}, el('h1', {}, 'E2E Report · ', DATA.name, ' ', badge(DATA.status)),
-      el('div', { class: 'meta' }, new Date(DATA.startedAt).toLocaleString() + ' · ' + passed + ' passed · ' + failed + ' failed · ' + DATA.tests.length + ' tests · ' + ms(DATA.ms) + (DATA.baseURL ? ' · ' + DATA.baseURL : ''))),
+    el('div', {}, el('h1', {}, 'E2E report · ' + DATA.name, pill(DATA.status)),
+      el('div', { class: 'summary-line meta' },
+        el('span', {}, n.passed + ' passed'), n.flaky ? el('span', {}, n.flaky + ' flaky') : null,
+        el('span', {}, n.failed + ' failed'), el('span', {}, n.skipped + ' skipped'),
+        el('span', {}, DATA.tests.length + ' tests · ' + ms(DATA.ms)),
+        el('time', { datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
+        DATA.baseURL ? el('span', {}, DATA.baseURL) : null)),
     tools));
-  for (const t of DATA.tests) {
-    const isFail = !['passed', 'skipped'].includes(t.status);
-    if (filter === 'failed' && !isFail) continue;
-    if (filter === 'passed' && t.status !== 'passed') continue;
-    const d = el('details', { class: 'test' });
-    d.open = isFail;
-    d.append(el('summary', {}, badge(t.status), el('strong', {}, t.title), el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + (t.retry ? ' · retry ' + t.retry : '') + (t.project ? ' · ' + t.project : ''))));
-    const steps = el('div', { class: 'steps' });
-    const slides = t.steps.slice();
-    if (t.finalShot) slides.push({ title: 'Page at failure', status: 'failed', shot: t.finalShot });
-    if (slides.length) steps.append(viewer(slides));
-    else steps.append(el('div', { class: 'meta' }, 'This test has no named steps.'));
-    if (t.error) steps.append(el('div', {}, el('h3', {}, 'Test error'), el('pre', {}, t.error)));
-    d.append(steps);
-    app.append(d);
-  }
+  // Failed tests first, so the report opens on what needs attention.
+  const order = { failed: 0, flaky: 1, passed: 2, skipped: 3 };
+  boxes.map((b, i) => [b, i]).sort((a, b) => order[a[0].dataset.kind] - order[b[0].dataset.kind] || a[1] - b[1]).forEach(([b]) => app.append(b));
+  app.append(none);
 }
 render();
 </script>

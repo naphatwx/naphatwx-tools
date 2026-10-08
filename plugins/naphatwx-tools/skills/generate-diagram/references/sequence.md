@@ -15,7 +15,7 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 ## diagram-design mode
 
-- Ask for a Sequence diagram with the labels above, dark theme, with no step details list in the file; save to `NN-<slug>.html`; add the height reporter (SKILL.md step 3). Skip the `.js` format.
+- Ask for a Sequence diagram with the labels above, dark theme, in the theme's colors and type (SKILL.md hard rule 4), with no step details list in the file; save to `NN-<slug>.html`; add the height reporter (SKILL.md step 3). Skip the `.js` format.
 - Return the step details as a fragment for the caller's page, in `render.js`'s markup. `n` is the step number the diagram shows; when it shows none, number the rows 1, 2, 3 in diagram order:
 
 ```html
@@ -31,6 +31,7 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 ```js
 SeqDiagrams.define("01-cut-new-version", {
+    title: "Cut a new version",
     actors: [["eng", "Engineer", "browser"], ["api", "api-service", "VersionService"]],
     steps: [
         ["phase", "1 · Open the form"],
@@ -41,6 +42,9 @@ SeqDiagrams.define("01-cut-new-version", {
     ],
 });
 ```
+
+- `title` names the flow in the SVG's accessible name (`<title>: sequence diagram, N participants, M steps`); missing → the file id.
+- The SVG never draws below its natural width (a host's `.seq svg { min-width: var(--seq-w) }`) and scales up to 1.5x on wide screens, so its 12px labels stay readable on a projector.
 
 | Step | Meaning |
 |------|---------|

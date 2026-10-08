@@ -8,6 +8,16 @@
 - Refer to other skills by bare name, e.g. the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code).
 - `plugins/naphatwx-tools/hooks/` holds the response-rules hook. It is Claude Code only, wired inline in the Claude `plugin.json`. Don't add a `hooks/hooks.json`: Claude auto-loads it too, and the hook would run twice.
 
+## Theme
+
+- Every HTML a skill makes uses one dark-only theme. No light theme, no toggle.
+- Source: `theme/tokens.css` (colors, fonts, radius) and `theme/base.css` (element defaults).
+- `node theme/sync.mjs` copies them into each template between `/* theme:tokens:start */ … end */` and `/* theme:base:start */ … end */` markers. Each skill folder stays self-contained, because `npx skills add` installs one folder only.
+- Never edit between the markers. Edit `theme/`, then run `node theme/sync.mjs`.
+- Run `node theme/sync.mjs --check` before committing. It fails on drift, on any hex color that is not a theme color, and on text tokens below 4.5:1 contrast.
+- Template CSS uses `var(--token)` only. Standalone `.svg` files use the theme hex values.
+- Exception: mock screens (`mock/page|shared|contract`) use the target app's own design system.
+
 ## Manifests
 
 | File | Tool |

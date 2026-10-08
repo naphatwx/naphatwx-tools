@@ -6,7 +6,18 @@ import type { FullConfig, FullResult, Reporter, Suite, TestCase, TestResult, Tes
 
 type Options = { name?: string; outputDir?: string; template?: string }
 type StepOut = { title: string; status: 'passed' | 'failed'; ms: number; error?: string; shot?: string }
-type TestOut = { title: string; file: string; project: string; status: string; ms: number; retry: number; error?: string; steps: StepOut[]; finalShot?: string }
+type TestOut = {
+  title: string
+  file: string
+  project: string
+  status: string
+  ms: number
+  retry: number
+  error?: string
+  steps: StepOut[]
+  finalShot?: string
+  trace?: string
+}
 
 const pad = (n) => String(n).padStart(2, '0')
 const stripAnsi = (s = '') => s.replace(/\u001b\[[0-9;]*m/g, '')
@@ -28,6 +39,10 @@ export default class OneHtmlReporter implements Reporter {
     this.started = new Date()
   }
 
+  private outDir() {
+    return join(this.configDir, this.opts.outputDir ?? 'e2e-results')
+  }
+
   onTestEnd(test: TestCase, result: TestResult) {
     const shots = result.attachments.filter((a) => a.name.startsWith('step: ') && a.body)
     const used = new Set<number>()
@@ -43,6 +58,8 @@ export default class OneHtmlReporter implements Reporter {
     // Playwright's own failure screenshot is a file on disk, not an in-memory body.
     const failShot = result.attachments.find((a) => a.name === 'screenshot' && (a.body || a.path))
     const failBody = failShot ? failShot.body ?? readFileSync(failShot.path!) : undefined
+    // The trace zip stays on disk; the report links to it relative to its own folder.
+    const trace = result.attachments.find((a) => a.name === 'trace' && a.path)
     this.tests.push({
       title: test.titlePath().slice(3).join(' › ') || test.title,
       file: relative(this.rootDir, test.location.file) + ':' + test.location.line,
@@ -53,6 +70,7 @@ export default class OneHtmlReporter implements Reporter {
       error: result.error ? stripAnsi(result.error.message) : undefined,
       steps,
       finalShot: failShot && failBody ? `data:${failShot.contentType};base64,${failBody.toString('base64')}` : undefined,
+      trace: trace ? relative(this.outDir(), trace.path!).split('\\').join('/') : undefined,
     })
   }
 
@@ -60,7 +78,7 @@ export default class OneHtmlReporter implements Reporter {
     const name = process.env.E2E_REPORT_NAME ?? this.opts.name ?? 'e2e'
     const d = this.started
     const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`
-    const outDir = join(this.configDir, this.opts.outputDir ?? 'e2e-results')
+    const outDir = this.outDir()
     // Resolved from the config folder, not __dirname: the reporter may load as ESM or CJS depending on the project.
     const template = readFileSync(join(this.configDir, this.opts.template ?? 'reporters/e2e-report-template.html'), 'utf8')
     const data = {

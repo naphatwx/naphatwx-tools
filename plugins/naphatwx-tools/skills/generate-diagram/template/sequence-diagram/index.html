@@ -1,114 +1,143 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sequence diagrams · Feature Name</title>
     <style>
-        /* Standalone viewer for manual-mode sequence files; same tokens and .seq styles as design-feature's overview.html. */
-        :root,
-        [data-theme="dark"] {
-            --bg: #121316;
-            --bg-elevated: #1f2025;
-            --border: #26282e;
-            --border-strong: #363940;
-            --text: #ececef;
-            --text-muted: #b9bbc2;
-            --text-faint: #8d909a;
-            --accent: #8ab0ff;
-            --accent-soft: rgba(138, 176, 255, 0.12);
-            --code-bg: #1f2025;
-            --card-bg: #18191d;
-            --fs-label: 0.75rem;
-            --fs-sm: 0.875rem;
+        /* Standalone viewer for manual-mode sequence files; same .seq styles as design-feature's overview. */
+        /* theme:tokens:start */
+        /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+        :root {
             color-scheme: dark;
-        }
 
-        [data-theme="light"] {
-            --bg: #d3d3d3;
-            --bg-elevated: #e4e4e4;
-            --border: #b9b9b9;
-            --border-strong: #a8a8a8;
-            --text: #1a1a1a;
-            --text-muted: #444444;
-            --text-faint: #666666;
-            --accent: #7c3aed;
-            --accent-soft: rgba(124, 58, 237, 0.12);
-            --code-bg: #c6c6c6;
-            --card-bg: #dddddd;
-            color-scheme: light;
-        }
+            /* Surfaces, darkest first */
+            --bg: #121316;
+            --surface: #18191d;
+            --surface-2: #1f2025;
+            --surface-3: #24262c;
+            --line: #26282e;
+            --line-strong: #363940;
+            --line-3: #4a4d55;
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+            /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+            --text: #e2e3e7;
+            --text-2: #c6c8cf;
+            --text-3: #a3a6b0;
+
+            /* One accent */
+            --accent: #8ab0ff;
+            --accent-fill: #1b2232;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+
+            /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+            --ok: #8fd694;
+            --warn: #f0c26b;
+            --bad: #f28b8d;
+            --neutral: #a3a6b0;
+            --ok-soft: rgba(143, 214, 148, 0.12);
+            --warn-soft: rgba(240, 194, 107, 0.12);
+            --bad-soft: rgba(242, 139, 141, 0.12);
+            --neutral-soft: rgba(163, 166, 176, 0.12);
+            --add: var(--ok);
+            --change: var(--warn);
+            --drop: var(--bad);
+
+            /* Diagrams: connectors and their labels */
+            --connector: #6b6e78;
+
+            /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+            --radius: 6px;
+            --radius-lg: 10px;
+            --ease: cubic-bezier(0.2, 0, 0, 1);
+        }
+        /* theme:tokens:end */
+        /* theme:base:start */
+        /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+        }
         ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
-        /* themed scrollbars — default ones render a white track on a dark page */
-        * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        a { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        code, kbd, pre, samp { font-family: var(--mono); }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* theme:base:end */
+
+        * { margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
 
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", system-ui, sans-serif; padding: 24px 16px 40px; }
+        body { padding: 24px 16px 40px; }
         main { max-width: 1200px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+        header { margin-bottom: 8px; }
         h1 { font-size: 1.4rem; }
         h2 { font-size: 1.1rem; margin-top: 28px; }
-        code { font-family: "SF Mono", "Cascadia Code", Consolas, monospace; font-size: 0.88em; }
-        .btn { font: inherit; font-size: var(--fs-sm); color: var(--text-muted); background: var(--card-bg); border: 1px solid var(--border-strong); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+        code { font-size: 0.88em; }
 
         /* ============ SEQUENCE DIAGRAM (.seq) ============ */
         .seq {
-            border: 1px solid var(--border);
-            background: var(--card-bg);
+            border: 1px solid var(--line);
+            background: var(--surface);
             border-radius: 12px;
             padding: 8px;
             margin: 18px 0;
             overflow-x: auto;
         }
 
-        .seq svg {
-            display: block;
-            width: 100%;
-            height: auto;
-            font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-        }
-
-        .seq .actor rect { fill: var(--bg-elevated); stroke: var(--border-strong); }
-        .seq .actor text { fill: var(--text); font-size: 13px; font-weight: 600; }
-        .seq .actor .sub { fill: var(--text-faint); font-size: 10.5px; font-weight: 400; }
-        .seq .life { stroke: var(--border-strong); stroke-dasharray: 3 4; }
-        .seq .msg { stroke: var(--text-muted); stroke-width: 1.4; fill: none; }
-        .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-faint); }
+        /* render.js sets --seq-w (the drawing's width) and a 1.5x max-width: it scales up, never below 1:1. */
+        .seq svg { display: block; width: 100%; min-width: var(--seq-w); height: auto; margin: 0 auto; font-family: var(--sans); }
+        .seq .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
+        .seq .actor text { fill: var(--text); font-size: 14px; font-weight: 600; }
+        .seq .actor .sub { fill: var(--text-3); font-size: 12px; font-weight: 400; }
+        .seq .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
+        .seq .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
+        .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
         .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-        .seq .lbl { fill: var(--text-muted); font-size: 12px; }
-        .seq .lbl.hot { fill: var(--accent); font-weight: 600; }
-        .seq .num { fill: var(--text-faint); font-size: 10px; font-weight: 600; }
-        .seq .phase line { stroke: var(--border); }
-        .seq .phase rect { fill: var(--accent-soft); }
-        .seq .phase text { fill: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
-        .seq .note rect { fill: var(--code-bg); stroke: var(--border-strong); }
-        .seq .note text { fill: var(--text-muted); font-size: 11px; }
-        .seq .frame rect.box { fill: none; stroke: var(--border-strong); stroke-width: 1.2; }
-        .seq .frame rect.tab { fill: var(--bg-elevated); stroke: var(--border-strong); }
-        .seq .frame text { fill: var(--text); font-size: 11px; font-weight: 700; }
-        .seq .frame .cond { fill: var(--text-faint); font-weight: 500; font-style: italic; }
-        .seq .frame line { stroke: var(--border-strong); stroke-dasharray: 6 4; }
-        .seq .ah { fill: var(--text-muted); }
-        .seq .ah.ret { fill: var(--text-faint); }
+        .seq .lbl { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+        .seq .lbl.hot { fill: var(--accent); }
+        .seq .num { fill: var(--text-3); font-size: 12px; font-weight: 600; }
+        .seq .phase line { stroke: var(--line); }
+        .seq .phase rect { fill: var(--surface-2); }
+        .seq .phase text { fill: var(--text-2); font-size: 12px; font-weight: 600; }
+        .seq .note rect { fill: var(--bg); stroke: var(--line-strong); }
+        .seq .note text { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+        .seq .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
+        .seq .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
+        .seq .frame text { fill: var(--text); font-size: 12px; font-weight: 700; }
+        .seq .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
+        .seq .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
+        .seq .ah { fill: var(--text-2); }
+        .seq .ah.ret { fill: var(--text-3); }
         .seq .ah.hot { fill: var(--accent); }
         .seq .step { cursor: default; }
-        .seq-steps { margin-top: 10px; font-size: var(--fs-sm); color: var(--text-muted); }
-        .seq-steps-title { margin: 0; color: var(--text-faint); font-weight: 600; }
+        .seq-steps { margin-top: 10px; font-size: 0.875rem; color: var(--text-2); }
+        .seq-steps-title { margin: 0; color: var(--text-3); font-weight: 600; }
         .seq-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
         .seq-steps li { padding: 3px 0 3px 30px; text-indent: -30px; }
-        .seq-steps .n { display: inline-block; width: 22px; margin-right: 8px; text-indent: 0; color: var(--text-faint); font-weight: 600; text-align: right; }
+        .seq-steps .n { display: inline-block; width: 22px; margin-right: 8px; text-indent: 0; color: var(--text-3); font-weight: 600; text-align: right; }
 
         .seq-legend {
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
-            font-size: var(--fs-sm);
-            color: var(--text-faint);
+            font-size: 0.875rem;
+            color: var(--text-3);
             margin-top: -6px;
         }
 
@@ -118,10 +147,10 @@
             width: 26px;
             vertical-align: middle;
             margin-right: 6px;
-            border-top: 2px solid var(--text-muted);
+            border-top: 2px solid var(--text-2);
         }
 
-        .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-faint); }
+        .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
         .seq-legend .hot::before { border-color: var(--accent); }
     </style>
 </head>
@@ -130,7 +159,6 @@
     <main>
         <header>
             <h1>Sequence diagrams · Feature Name</h1>
-            <button class="btn" id="themeToggle" type="button" aria-label="Toggle theme">🌙</button>
         </header>
         <div class="seq-legend" style="margin:10px 0 0">
             <span>call</span>
@@ -147,17 +175,6 @@
     <script src="01-example-flow.js"></script>
     <script>
         SeqDiagrams.renderAll();
-        const root = document.documentElement, toggle = document.getElementById("themeToggle");
-        const saved = localStorage.getItem("docs-theme");
-        if (saved) root.setAttribute("data-theme", saved);
-        const paint = () => { toggle.textContent = root.getAttribute("data-theme") === "light" ? "☀️" : "🌙"; };
-        paint();
-        toggle.addEventListener("click", () => {
-            const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-            root.setAttribute("data-theme", next);
-            localStorage.setItem("docs-theme", next);
-            paint();
-        });
     </script>
 </body>
 

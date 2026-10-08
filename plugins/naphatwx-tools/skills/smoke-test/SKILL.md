@@ -87,6 +87,7 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
    - Permissions: follow the repo's permission rules.
 2. **Runner** in `scripts/smoke/` (layout in `references/flow-map.md`):
    - Copy `template/run.mjs` and `template/report-template.html` unchanged.
+   - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
    - Write `envs.json`, using the base URLs the repo's config files show for each env. Ask for any you cannot find.
    - Write one `flows/<flow>.json` per flow, filled from the hop table, with `mapVersion`.
    - Add `scripts/smoke/results/` to `.gitignore`.
@@ -121,16 +122,16 @@ Report:
 node scripts/smoke/run.mjs <env> [flow ...] --out scripts/smoke/results
 ```
 
-All flows run in parallel. In each flow the hops are checked in order, and each hop is polled until its own timeout. After the first failed hop, the rest of that flow are `not-reached`, never red.
+All flows run in parallel. In each flow the hops are checked in order, and each hop is polled until its own timeout. A hop that is never observed is `timed-out`. After the first failed or timed-out hop, the rest of that flow are `not-reached`, never red.
 
 ### R3. Read the report and sum it up
 
-Open the HTML file named on the last line of the output (`report: <path>`). For each failed flow, find the first failed hop and give a likely cause from its detail:
+Open the HTML file named on the last line of the output (`report: <path>`). Failed flows come first, under a "Broken links" list, each with a copyable rerun command. For each failed flow, find the first failed hop and give a likely cause from its detail:
 
 | Detail | Likely cause |
 |---|---|
 | `env var mismatch` | The service runs with a different value than the flow map expects (a wrong queue name, URL or key). Name the env var and both values (masked for secrets). |
-| `not observed within N ms` | The message never arrived: wrong exchange, queue or route, consumer down, or a crash before the hop recorded. |
+| `not observed within N ms` (timed out) | The message never arrived: wrong exchange, queue or route, consumer down, or a crash before the hop recorded. |
 | `HTTP 401/403` | A wrong or expired credential on that link. |
 | `HTTP 404` on the trigger | The probe endpoint is not deployed in this version. This is a blocker, not a failed smoke. |
 | Hop missing from the store but found on the service | The report-to-store call is failing. The link itself works. |

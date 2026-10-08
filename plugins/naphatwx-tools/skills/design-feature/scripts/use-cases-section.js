@@ -46,9 +46,9 @@ const plural = n => `${n} use case${n === 1 ? '' : 's'}`;
 const I = '            ';
 const flowBlock = f => {
     const ucs = ucsOf(f.flow);
-    const h3 = `${I}<h3 style="margin: 40px 0 12px"><a href="#flow-${nn(f.flow)}">${esc(f.flow)}</a> ${esc(f.title)} <span class="aside">${plural(ucs.length)}</span></h3>`;
+    const h3 = `${I}<h3 class="group-head"><a href="#flow-${nn(f.flow)}">${esc(f.flow)}</a> ${esc(f.title)} <span class="aside">${plural(ucs.length)}</span></h3>`;
     if (!ucs.length) return `${h3}\n${I}<p class="muted">${esc(f.none || 'No use case to play.')}</p>`;
-    const rows = ucs.map(u => `${I}        <tr id="uc-${esc(u.id)}"><td>${esc(u.title)}<br><span class="aside">${esc(u.expect[0] || '')}</span></td><td style="white-space:nowrap">${esc(u.story)}</td><td style="white-space:nowrap"><a href="${esc(href(u))}" ${ext}>Play ↗</a></td></tr>`);
+    const rows = ucs.map(u => `${I}        <tr id="uc-${esc(u.id)}"><td>${esc(u.title)}<br><span class="aside">${esc(u.expect[0] || '')}</span></td><td class="nowrap">${esc(u.story)}</td><td class="nowrap"><a href="${esc(href(u))}" ${ext}>Play ↗</a></td></tr>`);
     return `${h3}\n${I}<div class="table-wrap"><table>\n${I}    <thead><tr><th>Use case</th><th>Story</th><th></th></tr></thead><tbody>\n${rows.join('\n')}\n${I}    </tbody></table></div>`;
 };
 const section = `<section class="slide" id="use-cases" data-title="Use cases">

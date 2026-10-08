@@ -7,7 +7,9 @@ description: Generate a styled single-file HTML docs page with sidebar navigatio
 
 Generate a single-file HTML documentation page from a bundled template.
 
-The template is a dark-mode docs layout with a left sidebar, search box, a light/dark theme toggle, and a base font size picker (small 14px / normal 16px / big 18px, default normal). The style is inspired by the Clerk docs.
+The template is a dark-only docs layout with a left sidebar, search box, and a base font size picker (small 14px / normal 16px / big 18px, default normal). The style is inspired by the Clerk docs.
+
+Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
 
 ## User Input
 
@@ -33,11 +35,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 The output **must** keep all of these:
 
 1. Single self-contained file. No external CSS, JS, fonts, or images.
-2. Dark mode is the default theme.
-3. The light/dark toggle button stays and works.
-4. The base font size picker stays and works. Default is normal (16px).
-5. The sidebar nav, search box, and active-section highlight stay and work.
-6. Every `nav-link` `href` matches a real heading `id` in the content.
+2. Dark only. Add no light theme, theme toggle, or other palette.
+3. The base font size picker stays and works. Default is normal (16px).
+4. The sidebar nav, search box, and active-section highlight stay and work.
+5. Every `nav-link` `href` matches a real heading `id` in the content.
 
 ## Workflow
 
@@ -74,7 +75,7 @@ The output **must** keep all of these:
 | Code block      | `<pre><code>…</code></pre>`                       |
 | Table           | `<div class="table-wrap"><table>…</table></div>`  |
 
-- Keep the dark default, the theme toggle, and the font size picker.
+- Keep the font size picker. Color with the theme tokens (`var(--accent)`, `var(--text-2)` …), never new hex values.
 - Size text with the `--fs-*` tokens, never hard-coded `px`. They are `rem`, so they follow the picker.
 
 ### 4. Write the file
@@ -86,4 +87,4 @@ The output **must** keep all of these:
 ### 5. Confirm
 
 - Output: `✅ Docs created at: {path}`
-- Remind the user: click the top-right button to switch light/dark, pick A / A / A to change text size, use the sidebar search to filter sections.
+- Remind the user: pick A / A / A to change text size, use the sidebar search to filter sections.

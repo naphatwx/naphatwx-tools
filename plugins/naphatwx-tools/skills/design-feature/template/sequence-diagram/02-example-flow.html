@@ -5,160 +5,179 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Example flow</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+    /* theme:tokens:start */
+    /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
     :root {
-      --color-paper:   #18191d;
-      --color-ink:     #ececef;
-      --color-muted:   #b9bbc2;
-      --font-sans:     -apple-system, "Segoe UI", system-ui, sans-serif;
-      --font-serif:    -apple-system, "Segoe UI", system-ui, sans-serif;
-      --font-mono:     ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        color-scheme: dark;
+
+        /* Surfaces, darkest first */
+        --bg: #121316;
+        --surface: #18191d;
+        --surface-2: #1f2025;
+        --surface-3: #24262c;
+        --line: #26282e;
+        --line-strong: #363940;
+        --line-3: #4a4d55;
+
+        /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+        --text: #e2e3e7;
+        --text-2: #c6c8cf;
+        --text-3: #a3a6b0;
+
+        /* One accent */
+        --accent: #8ab0ff;
+        --accent-fill: #1b2232;
+        --accent-soft: rgba(138, 176, 255, 0.12);
+
+        /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+        --ok: #8fd694;
+        --warn: #f0c26b;
+        --bad: #f28b8d;
+        --neutral: #a3a6b0;
+        --ok-soft: rgba(143, 214, 148, 0.12);
+        --warn-soft: rgba(240, 194, 107, 0.12);
+        --bad-soft: rgba(242, 139, 141, 0.12);
+        --neutral-soft: rgba(163, 166, 176, 0.12);
+        --add: var(--ok);
+        --change: var(--warn);
+        --drop: var(--bad);
+
+        /* Diagrams: connectors and their labels */
+        --connector: #6b6e78;
+
+        /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+        --radius: 6px;
+        --radius-lg: 10px;
+        --ease: cubic-bezier(0.2, 0, 0, 1);
     }
-    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink); padding: 3rem 2rem; }
-    .frame { max-width: 1200px; width: 100%; margin: 0 auto; }
-    .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
-    h1 { font-family: var(--font-serif); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
-    svg { width: 100%; min-width: 900px; display: block; }
+    /* theme:tokens:end */
+    /* theme:base:start */
+    /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+    * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    code, kbd, pre, samp { font-family: var(--mono); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
+    /* theme:base:end */
+
+    * { margin: 0; padding: 0; }
+    body { background: var(--surface); padding: 3rem 2rem; }
+    .page { max-width: 1200px; width: 100%; margin: 0 auto; }
+    .eyebrow { font-size: 0.8125rem; color: var(--text-3); margin-bottom: 0.5rem; }
+    h1 { font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1.5rem; }
+    /* Scales up to 1.5x on wide screens; never below 1:1, so a narrow window scrolls the diagram, not the page. */
+    .diagram { overflow-x: auto; }
+    .diagram svg { display: block; width: 100%; height: auto; margin: 0 auto; font-family: var(--sans); }
+    @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
+    .diagram svg { min-width: 800px; max-width: 1200px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.875rem; color: var(--text-3); margin-bottom: 12px; }
+    .legend span::before { content: ""; display: inline-block; width: 26px; vertical-align: middle; margin-right: 6px; border-top: 2px solid var(--text-2); }
+    .legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
+    .legend .hot::before { border-color: var(--accent); }
+    .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
+    .actor text { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .actor .sub { fill: var(--text-3); font-size: 12px; font-weight: 400; }
+    .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
+    .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
+    .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
+    .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
+    .lbl { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+    .lbl.hot { fill: var(--accent); }
+    .num { fill: var(--text-3); font-size: 12px; font-weight: 600; }
+    .phase line { stroke: var(--line); }
+    .phase rect { fill: var(--surface-2); }
+    .phase text { fill: var(--text-2); font-size: 12px; font-weight: 600; }
+    .note rect { fill: var(--bg); stroke: var(--line-strong); }
+    .note text { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+    .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
+    .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
+    .frame text { fill: var(--text); font-size: 12px; font-weight: 700; }
+    .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
+    .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
+    .ah { fill: var(--text-2); }
+    .ah.ret { fill: var(--text-3); }
+    .ah.hot { fill: var(--accent); }
   </style>
 </head>
 <body>
-  <div class="frame">
-    <p class="eyebrow">Flow 02 · Sequence · diagram-design</p>
+  <div class="page">
+    <p class="eyebrow">Flow 02 · Sequence</p>
     <h1>Example flow</h1>
+    <p class="legend"><span>Call</span><span class="ret">Response</span><span class="hot">Side effect (external write or audit)</span></p>
 
-    <svg viewBox="0 0 1000 772" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
-      <title id="example-flow-seq-title">Example flow</title>
-      <desc id="example-flow-seq-desc">Sequence diagram showing web-app loading a thing through api-service and Postgres, then CreateThing calling the external system and writing an audit log on 200, or returning FAILED_PRECONDITION on 400.</desc>
-      <defs>
-        <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="rgba(245,245,245,0.10)"/></pattern>
-        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#b9bbc2"/></marker>
-        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#8ab0ff"/></marker>
-      </defs>
-      <rect width="100%" height="100%" fill="#18191d"/>
-      <rect width="100%" height="100%" fill="url(#dots)" opacity="0.55"/>
-      <line x1="100" y1="80" x2="100" y2="692" stroke="rgba(245,245,245,0.22)" stroke-width="1" stroke-dasharray="3,3"/>
-      <line x1="300" y1="80" x2="300" y2="692" stroke="rgba(245,245,245,0.22)" stroke-width="1" stroke-dasharray="3,3"/>
-      <line x1="500" y1="80" x2="500" y2="692" stroke="rgba(245,245,245,0.22)" stroke-width="1" stroke-dasharray="3,3"/>
-      <line x1="700" y1="80" x2="700" y2="692" stroke="rgba(245,245,245,0.22)" stroke-width="1" stroke-dasharray="3,3"/>
-      <line x1="900" y1="80" x2="900" y2="692" stroke="rgba(245,245,245,0.22)" stroke-width="1" stroke-dasharray="3,3"/>
-      <!-- Fragment frame first, so messages draw over it -->
-      <rect x="228" y="408" width="724" height="268" rx="4" fill="none" stroke="rgba(245,245,245,0.30)" stroke-width="1"/>
-      <rect x="228" y="408" width="36" height="16" rx="2" fill="#363940"/>
-      <text x="246" y="419" fill="#ececef" font-size="8" font-weight="600" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.12em">ALT</text>
-      <text x="272" y="420" fill="#b9bbc2" font-size="9" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">[upstream 200]</text>
-      <line x1="228" y1="580" x2="952" y2="580" stroke="rgba(245,245,245,0.30)" stroke-width="1" stroke-dasharray="4,4"/>
-      <text x="236" y="596" fill="#b9bbc2" font-size="9" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">[upstream 400]</text>
-      <!-- Phases and messages, top to bottom -->
-      <line x1="16" y1="104" x2="984" y2="104" stroke="rgba(245,245,245,0.10)" stroke-width="0.8"/>
-      <rect x="16" y="96" width="68" height="16" rx="2" fill="#363940"/>
-      <text x="24" y="107" fill="#ececef" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" letter-spacing="0.12em">1 · LOAD</text>
-      <line x1="100" y1="140" x2="300" y2="140" stroke="#b9bbc2" stroke-width="1.2" marker-end="url(#arrow)"/>
-      <rect x="160" y="120" width="80" height="12" rx="2" fill="#18191d"/>
-      <text x="200" y="129" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">/THINGS/:ID</text>
-      <line x1="300" y1="176" x2="500" y2="176" stroke="#b9bbc2" stroke-width="1.2" marker-end="url(#arrow)"/>
-      <rect x="368" y="156" width="64" height="12" rx="2" fill="#18191d"/>
-      <text x="400" y="165" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">GETTHING</text>
-      <line x1="500" y1="212" x2="700" y2="212" stroke="#b9bbc2" stroke-width="1.2" marker-end="url(#arrow)"/>
-      <rect x="536" y="192" width="128" height="12" rx="2" fill="#18191d"/>
-      <text x="600" y="201" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">SELECT SCHEMA.THING</text>
-      <rect x="420" y="228" width="160" height="20" rx="4" fill="#18191d"/>
-      <rect x="420" y="228" width="160" height="20" rx="4" fill="rgba(245,245,245,0.06)" stroke="rgba(245,245,245,0.30)" stroke-width="1"/>
-      <text x="500" y="241" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">PERMISSION THING.VIEW</text>
-      <line x1="500" y1="284" x2="300" y2="284" stroke="#b9bbc2" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-      <rect x="354" y="264" width="92" height="12" rx="2" fill="#18191d"/>
-      <text x="400" y="273" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">THINGRESPONSE</text>
-      <line x1="16" y1="316" x2="984" y2="316" stroke="rgba(245,245,245,0.10)" stroke-width="0.8"/>
-      <rect x="16" y="308" width="62" height="16" rx="2" fill="#363940"/>
-      <text x="24" y="319" fill="#ececef" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" letter-spacing="0.12em">2 · ACT</text>
-      <line x1="100" y1="352" x2="300" y2="352" stroke="#b9bbc2" stroke-width="1.2" marker-end="url(#arrow)"/>
-      <rect x="172" y="332" width="56" height="12" rx="2" fill="#18191d"/>
-      <text x="200" y="341" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">CONFIRM</text>
-      <line x1="300" y1="388" x2="500" y2="388" stroke="#b9bbc2" stroke-width="1.2" marker-end="url(#arrow)"/>
-      <rect x="360" y="368" width="80" height="12" rx="2" fill="#18191d"/>
-      <text x="400" y="377" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">CREATETHING</text>
-      <line x1="500" y1="456" x2="900" y2="456" stroke="#8ab0ff" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
-      <rect x="656" y="436" width="88" height="12" rx="2" fill="#18191d"/>
-      <text x="700" y="445" fill="#8ab0ff" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">POST /THINGS</text>
-      <line x1="900" y1="492" x2="500" y2="492" stroke="#b9bbc2" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-      <rect x="684" y="472" width="32" height="12" rx="2" fill="#18191d"/>
-      <text x="700" y="481" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">200</text>
-      <line x1="500" y1="528" x2="700" y2="528" stroke="#8ab0ff" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
-      <rect x="524" y="508" width="152" height="12" rx="2" fill="#18191d"/>
-      <text x="600" y="517" fill="#8ab0ff" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">INSERT SCHEMA.AUDIT_LOG</text>
-      <line x1="500" y1="564" x2="300" y2="564" stroke="#b9bbc2" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-      <rect x="354" y="544" width="92" height="12" rx="2" fill="#18191d"/>
-      <text x="400" y="553" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">THINGRESPONSE</text>
-      <line x1="900" y1="624" x2="500" y2="624" stroke="#b9bbc2" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-      <rect x="684" y="604" width="32" height="12" rx="2" fill="#18191d"/>
-      <text x="700" y="613" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">400</text>
-      <line x1="500" y1="660" x2="300" y2="660" stroke="#b9bbc2" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-      <rect x="336" y="640" width="128" height="12" rx="2" fill="#18191d"/>
-      <text x="400" y="649" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">FAILED_PRECONDITION</text>
-      <!-- Actors last, over lifeline tops -->
-      <rect x="28" y="24" width="144" height="56" rx="6" fill="#18191d"/>
-      <rect x="28" y="24" width="144" height="56" rx="6" fill="rgba(191,192,192,0.10)" stroke="#8d909a" stroke-width="1"/>
-      <rect x="36" y="32" width="30" height="12" rx="2" fill="transparent" stroke="rgba(245,245,245,0.22)" stroke-width="0.8"/>
-      <text x="51" y="41" fill="#8d909a" font-size="7" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">USR</text>
-      <text x="100" y="60" fill="#ececef" font-size="12" font-weight="600" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" text-anchor="middle">User</text>
-      <text x="100" y="73" fill="#b9bbc2" font-size="9" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">browser</text>
-      <rect x="228" y="24" width="144" height="56" rx="6" fill="#18191d"/>
-      <rect x="228" y="24" width="144" height="56" rx="6" fill="#1f2025" stroke="#ececef" stroke-width="1"/>
-      <rect x="236" y="32" width="30" height="12" rx="2" fill="transparent" stroke="rgba(245,245,245,0.22)" stroke-width="0.8"/>
-      <text x="251" y="41" fill="#8d909a" font-size="7" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">WEB</text>
-      <text x="300" y="60" fill="#ececef" font-size="12" font-weight="600" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" text-anchor="middle">web-app</text>
-      <text x="300" y="73" fill="#b9bbc2" font-size="9" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">screen name</text>
-      <rect x="428" y="24" width="144" height="56" rx="6" fill="#18191d"/>
-      <rect x="428" y="24" width="144" height="56" rx="6" fill="#1f2025" stroke="#ececef" stroke-width="1"/>
-      <rect x="436" y="32" width="30" height="12" rx="2" fill="transparent" stroke="rgba(245,245,245,0.22)" stroke-width="0.8"/>
-      <text x="451" y="41" fill="#8d909a" font-size="7" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">API</text>
-      <text x="500" y="60" fill="#ececef" font-size="12" font-weight="600" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" text-anchor="middle">api-service</text>
-      <text x="500" y="73" fill="#b9bbc2" font-size="9" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">ServiceName</text>
-      <rect x="628" y="24" width="144" height="56" rx="6" fill="#18191d"/>
-      <rect x="628" y="24" width="144" height="56" rx="6" fill="rgba(245,245,245,0.05)" stroke="#b9bbc2" stroke-width="1"/>
-      <rect x="636" y="32" width="24" height="12" rx="2" fill="transparent" stroke="rgba(245,245,245,0.22)" stroke-width="0.8"/>
-      <text x="648" y="41" fill="#8d909a" font-size="7" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">DB</text>
-      <text x="700" y="60" fill="#ececef" font-size="12" font-weight="600" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" text-anchor="middle">Postgres</text>
-      <text x="700" y="73" fill="#b9bbc2" font-size="9" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">schema.*</text>
-      <rect x="828" y="24" width="144" height="56" rx="6" fill="#18191d"/>
-      <rect x="828" y="24" width="144" height="56" rx="6" fill="rgba(245,245,245,0.03)" stroke="rgba(245,245,245,0.30)" stroke-width="1"/>
-      <rect x="836" y="32" width="30" height="12" rx="2" fill="transparent" stroke="rgba(245,245,245,0.22)" stroke-width="0.8"/>
-      <text x="851" y="41" fill="#8d909a" font-size="7" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
-      <text x="900" y="60" fill="#ececef" font-size="12" font-weight="600" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" text-anchor="middle">External</text>
-      <text x="900" y="73" fill="#b9bbc2" font-size="9" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">upstream system</text>
-      <line x1="40" y1="712" x2="960" y2="712" stroke="rgba(245,245,245,0.10)" stroke-width="0.8"/>
-      <text x="40" y="728" fill="#b9bbc2" font-size="8" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" letter-spacing="0.18em">LEGEND</text>
-      <line x1="40" y1="750" x2="64" y2="750" stroke="#b9bbc2" stroke-width="1.2" marker-end="url(#arrow)"/>
-      <text x="76" y="754" fill="#b9bbc2" font-size="8.5" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif">Call</text>
-      <line x1="220" y1="750" x2="244" y2="750" stroke="#b9bbc2" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-      <text x="256" y="754" fill="#b9bbc2" font-size="8.5" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif">Response</text>
-      <line x1="400" y1="750" x2="424" y2="750" stroke="#8ab0ff" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
-      <text x="436" y="754" fill="#b9bbc2" font-size="8.5" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif">Side effect</text>
-      <rect x="580" y="744" width="24" height="12" rx="2" fill="none" stroke="rgba(245,245,245,0.30)" stroke-width="1"/>
-      <text x="616" y="754" fill="#b9bbc2" font-size="8.5" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif">Alt branches</text>
-
-    </svg>
+    <div class="diagram">
+      <svg viewBox="0 0 800 684" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
+        <title id="example-flow-seq-title">Example flow: sequence diagram, 5 participants, 12 steps</title>
+        <desc id="example-flow-seq-desc">web-app loads a thing through api-service and Postgres, then CreateThing calls the external system and writes an audit log on 200, or returns FAILED_PRECONDITION on 400.</desc>
+        <line class="life" x1="80" x2="80" y1="62" y2="680"/>
+        <line class="life" x1="240" x2="240" y1="62" y2="680"/>
+        <line class="life" x1="400" x2="400" y1="62" y2="680"/>
+        <line class="life" x1="560" x2="560" y1="62" y2="680"/>
+        <line class="life" x1="720" x2="720" y1="62" y2="680"/>
+        <g class="frame"><rect class="box" x="14" y="392" width="772" height="264" rx="6"/><rect class="tab" x="14" y="392" width="42" height="20" rx="4"/><text x="23" y="406.5">alt</text><text class="cond" x="64" y="406.5">[upstream 200]</text><line x1="14" x2="786" y1="562" y2="562"/><text class="cond" x="22" y="577">[upstream 400]</text></g>
+        <g class="actor"><rect x="21" y="16" width="118" height="46" rx="8"/><text x="80" y="36" text-anchor="middle">User</text><text class="sub" x="80" y="53" text-anchor="middle">browser</text></g>
+        <g class="actor"><rect x="181" y="16" width="118" height="46" rx="8"/><text x="240" y="36" text-anchor="middle">web-app</text><text class="sub" x="240" y="53" text-anchor="middle">screen name</text></g>
+        <g class="actor"><rect x="341" y="16" width="118" height="46" rx="8"/><text x="400" y="36" text-anchor="middle">api-service</text><text class="sub" x="400" y="53" text-anchor="middle">ServiceName</text></g>
+        <g class="actor"><rect x="501" y="16" width="118" height="46" rx="8"/><text x="560" y="36" text-anchor="middle">Postgres</text><text class="sub" x="560" y="53" text-anchor="middle">schema.*</text></g>
+        <g class="actor"><rect x="657.5" y="16" width="125" height="46" rx="8"/><text x="720" y="36" text-anchor="middle">External</text><text class="sub" x="720" y="53" text-anchor="middle">upstream system</text></g>
+        <g class="phase"><line x1="8" x2="792" y1="94" y2="94"/><rect x="8" y="83" width="74" height="22" rx="4"/><text x="17" y="98">1 · Load</text></g>
+        <g class="step"><line class="msg" x1="80" y1="124" x2="232" y2="124"/><path class="ah" d="M239,124 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="118" text-anchor="middle">/things/:id</text><text class="num" x="86" y="139">1</text></g>
+        <g class="step"><title>id from the route</title><line class="msg" x1="240" y1="158" x2="392" y2="158"/><path class="ah" d="M399,158 l-9,-4.5 v9 z"/><text class="lbl" x="320" y="152" text-anchor="middle">GetThing</text><text class="num" x="246" y="173">2</text></g>
+        <g class="step"><line class="msg" x1="400" y1="192" x2="552" y2="192"/><path class="ah" d="M559,192 l-9,-4.5 v9 z"/><text class="lbl" x="480" y="186" text-anchor="middle">SELECT schema.thing</text><text class="num" x="406" y="207">3</text></g>
+        <g class="note"><title>needs permission thing.view; the id must exist, or NOT_FOUND</title><rect x="312.5" y="213" width="175" height="22" rx="4"/><text x="400" y="229" text-anchor="middle">permission thing.view</text></g>
+        <g class="step"><line class="msg ret" x1="400" y1="258" x2="248" y2="258"/><path class="ah ret" d="M241,258 l9,-4.5 v9 z"/><text class="lbl" x="320" y="252" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="273">4</text></g>
+        <g class="phase"><line x1="8" x2="792" y1="298" y2="298"/><rect x="8" y="287" width="67" height="22" rx="4"/><text x="17" y="302">2 · Act</text></g>
+        <g class="step"><line class="msg" x1="80" y1="328" x2="232" y2="328"/><path class="ah" d="M239,328 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="322" text-anchor="middle">Confirm</text><text class="num" x="86" y="343">5</text></g>
+        <g class="step"><title>name, ownerId</title><line class="msg" x1="240" y1="362" x2="392" y2="362"/><path class="ah" d="M399,362 l-9,-4.5 v9 z"/><text class="lbl" x="320" y="356" text-anchor="middle">CreateThing</text><text class="num" x="246" y="377">6</text></g>
+        <g class="step"><title>timeout 10 s</title><line class="msg hot" x1="400" y1="430" x2="712" y2="430"/><path class="ah hot" d="M719,430 l-9,-4.5 v9 z"/><text class="lbl hot" x="560" y="424" text-anchor="middle">POST /things</text><text class="num" x="406" y="445">7</text></g>
+        <g class="step"><line class="msg ret" x1="720" y1="464" x2="408" y2="464"/><path class="ah ret" d="M401,464 l9,-4.5 v9 z"/><text class="lbl" x="560" y="458" text-anchor="middle">200</text><text class="num" x="406" y="479">8</text></g>
+        <g class="step"><line class="msg hot" x1="400" y1="498" x2="552" y2="498"/><path class="ah hot" d="M559,498 l-9,-4.5 v9 z"/><text class="lbl hot" x="480" y="492" text-anchor="middle">INSERT schema.audit_log</text><text class="num" x="406" y="513">9</text></g>
+        <g class="step"><line class="msg ret" x1="400" y1="532" x2="248" y2="532"/><path class="ah ret" d="M241,532 l9,-4.5 v9 z"/><text class="lbl" x="320" y="526" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="547">10</text></g>
+        <g class="step"><line class="msg ret" x1="720" y1="596" x2="408" y2="596"/><path class="ah ret" d="M401,596 l9,-4.5 v9 z"/><text class="lbl" x="560" y="590" text-anchor="middle">400</text><text class="num" x="406" y="611">11</text></g>
+        <g class="step"><title>upstream reason passed through</title><line class="msg ret" x1="400" y1="630" x2="248" y2="630"/><path class="ah ret" d="M241,630 l9,-4.5 v9 z"/><text class="lbl" x="320" y="624" text-anchor="middle">FAILED_PRECONDITION</text><text class="num" x="246" y="645">12</text></g>
+      </svg>
+    </div>
   </div>
   <script>
     // Report the real height to the host page so its iframe fits (postMessage works on file://).
-    // body, not documentElement: documentElement.scrollHeight never drops below the iframe's current height.
-    // Fractional rect height, not scrollHeight (rounds down): a 0.1px overflow shows a scrollbar strip.
-    // Thin scrollbars that match the dark paper; the default white track shows whenever the SVG overflows.
+    // body, not documentElement: its scrollHeight never drops below the iframe's height; the
+    // fractional rect height avoids a 0.1px overflow showing a scrollbar strip.
     const style = document.createElement("style");
-    style.textContent = `* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
-      ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 8px; }`;
+    style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }`;
     document.head.append(style);
+    // Never draw a diagram below its viewBox width, so 12px labels stay 12px; a narrow frame scrolls it sideways.
+    document.querySelectorAll("svg[viewBox]:not(svg svg)").forEach(svg => {
+      svg.style.minWidth = svg.viewBox.baseVal.width + "px";
+      if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
+      const box = document.createElement("div");
+      box.style.overflowX = "auto";
+      svg.before(box);
+      box.append(svg);
+    });
     if (parent !== window) {
-      // Embedded: the host sizes the height; slimmer padding and a 720px floor fit an 880px column without a scrollbar.
+      // Embedded: the host sizes the height.
       document.documentElement.style.overflowY = "hidden";
       document.body.style.padding = "1rem";
-      document.querySelectorAll("svg").forEach(svg => { svg.style.minWidth = "min(720px, 100%)"; });
     }
     const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
     addEventListener("load", postHeight);
     new ResizeObserver(postHeight).observe(document.body);
   </script>
-
 </body>
 </html>

@@ -1,6 +1,7 @@
 // Flow 01 · Example flow (US1 · P1). Rendered by render.js into <div class="seq" data-flow="01-example-flow">.
 // Steps: [phase, text] · [call|ret|hot, from, to, label, (detail)] · [note, at, text, (to), (detail)] · [alt|opt|loop, cond] … [else, cond] … [end].
 SeqDiagrams.define("01-example-flow", {
+    title: "Example flow",
     actors: [
         ["user", "User", "browser"],
         ["web", "web-app", "screen name"],

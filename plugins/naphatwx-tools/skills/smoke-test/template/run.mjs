@@ -3,7 +3,7 @@
 // Node 18+, no dependencies. Usage: node scripts/smoke/run.mjs <env> [flow ...] [--out <dir>]
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -14,6 +14,10 @@ const fatal = (line) => {
 }
 
 const args = process.argv.slice(2)
+// How this run was started, relative to the cwd, so the report can show copyable rerun commands.
+const script = relative(process.cwd(), fileURLToPath(import.meta.url)) || 'run.mjs'
+const quote = (a) => (/^[\w@%+=:,./-]+$/.test(a) ? a : `'${a.replace(/'/g, `'\\''`)}'`)
+const command = ['node', script, ...args].map(quote).join(' ')
 const outIdx = args.indexOf('--out')
 const outDir = outIdx >= 0 ? args.splice(outIdx, 2)[1] : join(HERE, 'results')
 const [envName, ...onlyFlows] = args
@@ -57,6 +61,8 @@ function authHeaders(auth) {
   throw new Error(`unknown auth type ${auth.type}`)
 }
 
+const BODY_LIMIT = 2000
+
 async function call(service, method, path, { auth, body } = {}) {
   const url = baseOf(service) + path
   const started = Date.now()
@@ -73,7 +79,7 @@ async function call(service, method, path, { auth, body } = {}) {
   } catch {
     // not JSON — keep the text only
   }
-  return { url, status: res.status, json, text: text.slice(0, 2000), ms: Date.now() - started }
+  return { url, status: res.status, json, text: text.slice(0, BODY_LIMIT), truncated: text.length > BODY_LIMIT, ms: Date.now() - started }
 }
 
 const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`)
@@ -142,7 +148,7 @@ async function runHop(flow, hop, vars) {
     await sleep(hop.pollMs ?? 1000)
   }
   const ms = Date.now() - started
-  if (!last) return { ...shell(hop, 'fail'), ms, detail: `not observed within ${timeoutMs} ms` }
+  if (!last) return { ...shell(hop, 'timed-out'), ms, detail: `not observed within ${timeoutMs} ms` }
   const envChecks = checkEnv(hop.envVars, last.env)
   const envOk = envChecks.every((c) => c.ok)
   return {
@@ -152,19 +158,26 @@ async function runHop(flow, hop, vars) {
     detail: mask(last.detail) + (envOk ? '' : ' · env var mismatch'),
     env: envChecks.map((c) => ({ ...c, value: mask(c.value), note: mask(c.note) })),
     evidence: last.evidence
-      ? { url: last.evidence.url, status: last.evidence.status, ms: last.evidence.ms, body: mask(last.evidence.text) }
+      ? { url: last.evidence.url, status: last.evidence.status, ms: last.evidence.ms, body: mask(last.evidence.text), truncated: last.evidence.truncated }
       : undefined,
   }
 }
 
 async function runFlow(flow) {
   const started = Date.now()
-  const result = { flow: flow.flow, description: flow.description, hops: [], startedAt: new Date().toISOString() }
+  const result = {
+    flow: flow.flow,
+    description: flow.description,
+    entry: flow.entry.service,
+    rerun: ['node', script, envName, flow.flow, ...(outIdx >= 0 ? ['--out', outDir] : [])].map(quote).join(' '),
+    hops: [],
+    startedAt: new Date().toISOString(),
+  }
   try {
     const e = flow.entry
     const trigger = await call(e.service, e.method ?? 'POST', e.path, { auth: e.auth, body: { ...(e.body ?? {}), flow: flow.flow } })
     const probeId = pick(trigger.json, e.probeIdField ?? 'probeId')
-    result.trigger = { url: trigger.url, status: trigger.status, ms: trigger.ms, body: mask(trigger.text) }
+    result.trigger = { url: trigger.url, status: trigger.status, ms: trigger.ms, body: mask(trigger.text), truncated: trigger.truncated }
     if (trigger.status >= 300 || !probeId) throw new Error(`trigger answered HTTP ${trigger.status} without ${e.probeIdField ?? 'probeId'}`)
     result.probeId = probeId
   } catch (e) {
@@ -183,7 +196,7 @@ async function runFlow(flow) {
     }
     const r = await runHop(flow, hop, vars)
     result.hops.push(r)
-    if (r.status === 'fail') broken = true
+    if (r.status !== 'pass') broken = true
   }
   result.status = broken ? 'fail' : 'pass'
   result.ms = Date.now() - started
@@ -195,6 +208,7 @@ const results = await Promise.all(flows.map(runFlow))
 const report = {
   env: envName,
   startedAt: startedAt.toISOString(),
+  command,
   ms: Date.now() - startedAt.getTime(),
   status: results.every((r) => r.status === 'pass') ? 'pass' : 'fail',
   flows: results,

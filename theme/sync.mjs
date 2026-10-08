@@ -1,0 +1,89 @@
+#!/usr/bin/env node
+// Copies theme/tokens.css and theme/base.css into every skill template between marker comments,
+// so each skill folder stays self-contained (`npx skills add` installs one folder only).
+// Usage: node theme/sync.mjs          write the blocks
+//        node theme/sync.mjs --check  fail on drift, off-palette hex colors, or low contrast
+import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const SKILLS = join(ROOT, 'plugins/naphatwx-tools/skills');
+const CHECK = process.argv.includes('--check');
+const out = (s) => process.stdout.write(s + '\n');
+const err = (s) => process.stderr.write(s + '\n');
+
+// Mock screens and their shared code use the target app's own design system, not this theme.
+const IGNORE = [/\/mock\/(page|shared|contract)\//, /\/generate-mock-ui\/template\/(page|shared|contract)\//];
+
+const stripHeader = (css) => css.replace(/^\/\*[\s\S]*?\*\/\s*/, '').trimEnd();
+const BLOCKS = {
+    tokens: stripHeader(readFileSync(join(ROOT, 'theme/tokens.css'), 'utf8')),
+    base: stripHeader(readFileSync(join(ROOT, 'theme/base.css'), 'utf8')),
+};
+
+// ---- palette: every hex in tokens.css, plus pure white / black ----
+function norm(h) {
+    h = h.toLowerCase();
+    return h.length === 4 ? '#' + [...h.slice(1)].map((c) => c + c).join('') : h;
+}
+const hexes = (s) => (s.match(/#[0-9a-fA-F]{3,8}\b/g) || []).map(norm);
+const PALETTE = new Set([...hexes(BLOCKS.tokens), '#ffffff', '#000000']);
+
+// ---- contrast: text tokens must read on every surface ----
+const tok = Object.fromEntries([...BLOCKS.tokens.matchAll(/--([\w-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]));
+function lum(hex) {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+
+const problems = [];
+for (const fg of ['text', 'text-2', 'text-3', 'accent', 'ok', 'warn', 'bad', 'neutral']) {
+    for (const bg of ['bg', 'surface', 'surface-2', 'surface-3', 'accent-fill']) {
+        const r = ratio(tok[fg], tok[bg]);
+        if (r < 4.5) problems.push(`contrast: --${fg} on --${bg} is ${r.toFixed(2)}:1 (needs 4.5)`);
+    }
+}
+
+// ---- walk templates ----
+function* walk(dir) {
+    for (const name of readdirSync(dir)) {
+        const p = join(dir, name);
+        if (statSync(p).isDirectory()) yield* walk(p);
+        else if (/\.(html|css|svg)$/.test(name)) yield p;
+    }
+}
+
+const MARK = /^([ \t]*)\/\* theme:(tokens|base):start \*\/[\s\S]*?\/\* theme:\2:end \*\//gm;
+let synced = 0;
+for (const file of walk(SKILLS)) {
+    const rel = relative(ROOT, file);
+    if (!rel.includes('/template/') || IGNORE.some((re) => re.test(rel))) continue;
+    const src = readFileSync(file, 'utf8');
+
+    const next = src.replace(MARK, (_, ind, name) => {
+        const body = BLOCKS[name].split('\n').map((l) => (l ? ind + l : l)).join('\n');
+        return `${ind}/* theme:${name}:start */\n${ind}/* Synced from theme/${name}.css by theme/sync.mjs. Do not edit here. */\n${body}\n${ind}/* theme:${name}:end */`;
+    });
+    if (next !== src) {
+        synced++;
+        if (CHECK) problems.push(`drift: ${rel} (run node theme/sync.mjs)`);
+        else writeFileSync(file, next);
+    }
+
+    // Off-palette colors outside the synced blocks.
+    next.replace(MARK, '').split('\n').forEach((line) => {
+        for (const h of hexes(line)) {
+            if (h.length === 7 && !PALETTE.has(h)) problems.push(`palette: ${rel}: ${h} is not a theme color ("${line.trim().slice(0, 80)}")`);
+        }
+    });
+}
+
+if (!CHECK) out(`theme: ${synced} file(s) updated`);
+if (problems.length) {
+    err(problems.join('\n'));
+    process.exit(CHECK ? 1 : 0);
+}
+if (CHECK) out('theme: all templates in sync');

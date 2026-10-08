@@ -6,38 +6,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ER diagram · Feature Name</title>
     <style>
+        /* theme:tokens:start */
+        /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
         :root {
-            --bg: #121316;
-            --bg-elevated: #18191d;
-            --border: #26282e;
-            --border-strong: #363940;
-            --text: #ececef;
-            --text-muted: #b9bbc2;
-            --text-faint: #8d909a;
-            --accent: #8ab0ff;
-            --accent-soft: rgba(138, 176, 255, 0.12);
-            --card-bg: #1f2025;
-            --add: #8fd694;
-            --change: #f0c26b;
-            --drop: #f28b8d;
             color-scheme: dark;
+
+            /* Surfaces, darkest first */
+            --bg: #121316;
+            --surface: #18191d;
+            --surface-2: #1f2025;
+            --surface-3: #24262c;
+            --line: #26282e;
+            --line-strong: #363940;
+            --line-3: #4a4d55;
+
+            /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+            --text: #e2e3e7;
+            --text-2: #c6c8cf;
+            --text-3: #a3a6b0;
+
+            /* One accent */
+            --accent: #8ab0ff;
+            --accent-fill: #1b2232;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+
+            /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+            --ok: #8fd694;
+            --warn: #f0c26b;
+            --bad: #f28b8d;
+            --neutral: #a3a6b0;
+            --ok-soft: rgba(143, 214, 148, 0.12);
+            --warn-soft: rgba(240, 194, 107, 0.12);
+            --bad-soft: rgba(242, 139, 141, 0.12);
+            --neutral-soft: rgba(163, 166, 176, 0.12);
+            --add: var(--ok);
+            --change: var(--warn);
+            --drop: var(--bad);
+
+            /* Diagrams: connectors and their labels */
+            --connector: #6b6e78;
+
+            /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+            --radius: 6px;
+            --radius-lg: 10px;
+            --ease: cubic-bezier(0.2, 0, 0, 1);
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
-
-        /* themed scrollbars — default ones render a white track on a dark page */
-        * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
-
+        /* theme:tokens:end */
+        /* theme:base:start */
+        /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
         body {
+            margin: 0;
             background: var(--bg);
             color: var(--text);
-            font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-            padding: 40px 24px 48px;
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
         }
+        ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        a { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        code, kbd, pre, samp { font-family: var(--mono); }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* theme:base:end */
+
+        * { margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
+
+        body { padding: 40px 24px 48px; }
 
         header {
             display: flex;
@@ -50,15 +95,15 @@
         }
 
         h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.015em; }
-        .sub { color: var(--text-faint); font-size: 0.875rem; margin-top: 4px; }
+        .sub { color: var(--text-3); font-size: 0.875rem; margin-top: 4px; }
         .actions { display: flex; gap: 8px; }
 
         .btn {
             font: inherit;
             font-size: 0.875rem;
-            color: var(--text-muted);
-            background: var(--card-bg);
-            border: 1px solid var(--border-strong);
+            color: var(--text-2);
+            background: var(--surface-2);
+            border: 1px solid var(--line-strong);
             border-radius: 8px;
             padding: 6px 12px;
             cursor: pointer;
@@ -70,14 +115,15 @@
         .canvas {
             max-width: 1400px;
             margin: 0 auto;
-            border: 1px solid var(--border);
+            border: 1px solid var(--line);
             border-radius: 12px;
-            background: var(--bg-elevated);
+            background: var(--surface);
             overflow-x: auto;
             padding: 12px;
         }
 
-        .canvas svg { display: block; margin: 0 auto; font-family: -apple-system, "Segoe UI", system-ui, sans-serif; }
+        /* Scales up to fill the canvas; render() also sets min-width and a max-height floor at 1:1 so text never shrinks below 12px. */
+        .canvas svg { display: block; width: 100%; height: auto; max-height: 80vh; margin: 0 auto; font-family: var(--sans); }
 
         .legend {
             max-width: 1400px;
@@ -86,36 +132,38 @@
             flex-wrap: wrap;
             gap: 18px;
             font-size: 0.8rem;
-            color: var(--text-faint);
+            color: var(--text-3);
         }
 
-        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--border-strong); border-radius: 3px; }
+        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
         .legend .write { border-color: var(--accent); }
         .legend .external { border-style: dashed; }
         .legend .fk { height: 0; border-width: 1.5px 0 0; border-radius: 0; }
 
         /* svg parts */
-        .t-box { fill: var(--card-bg); stroke: var(--border-strong); stroke-width: 1.2; }
+        .t-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
         .t-box.write { stroke: var(--accent); stroke-width: 1.6; }
         .t-box.external { stroke-dasharray: 5 4; }
-        .t-head { fill: var(--bg-elevated); }
-        .t-name { fill: var(--text); font-size: 13px; font-weight: 600; font-family: "SF Mono", "Cascadia Code", Consolas, monospace; }
-        .t-tag { fill: var(--text-faint); font-size: 10px; font-weight: 600; }
+        .t-head { fill: var(--surface-3); }
+        .t-name { fill: var(--text); font-size: 14px; font-weight: 600; font-family: var(--mono); }
+        .t-tag { fill: var(--text-3); font-size: 12px; font-weight: 600; }
         .write .t-tag, .t-tag.write { fill: var(--accent); }
         .r-zebra { fill: var(--text); opacity: 0.025; }
-        .r-line { stroke: var(--border); }
-        .r-col { fill: var(--text); font-size: 12px; font-family: "SF Mono", "Cascadia Code", Consolas, monospace; }
-        .r-type { fill: var(--text-faint); font-size: 11px; }
-        .r-key { fill: var(--text-faint); font-size: 10px; font-weight: 700; }
+        .r-line { stroke: var(--line); }
+        .r-col { fill: var(--text); font-size: 12px; font-family: var(--mono); }
+        .r-type { fill: var(--text-3); font-size: 12px; }
+        .r-key { fill: var(--text-3); font-size: 12px; font-weight: 700; }
         .r-drop .r-col, .r-drop .r-type { fill: var(--drop); text-decoration: line-through; }
         .r-drop .r-key { fill: var(--drop); }
         .r-add .r-col, .r-add .r-key { fill: var(--add); }
         .r-change .r-col, .r-change .r-key { fill: var(--change); }
-        .fk { fill: none; stroke: var(--text-faint); stroke-width: 1.4; }
+        .fk { fill: none; stroke: var(--connector); stroke-width: 1.4; }
         .fk.new { stroke: var(--accent); stroke-width: 1.8; }
-        .fk-card { fill: var(--text-muted); font-size: 10px; font-weight: 700; }
-        .fk-dot { fill: var(--text-faint); }
+        .fk-card { fill: var(--text-2); font-size: 12px; font-weight: 700; }
+        .fk-dot { fill: var(--connector); }
         .fk-dot.new { fill: var(--accent); }
+        .table { outline: none; cursor: default; }
+        .table:focus-visible .t-box { stroke: var(--accent); stroke-width: 2.4; }
         .dim { opacity: 0.25; }
     </style>
 </head>
@@ -124,7 +172,7 @@
     <header>
         <div>
             <h1>ER diagram · Feature Name</h1>
-            <p class="sub">Hover a table to trace its relations.</p>
+            <p class="sub">Hover or tab to a table to trace its relations.</p>
         </div>
         <div class="actions">
             <a class="btn" href="../overview.html#database">← Overview</a>
@@ -167,7 +215,7 @@
         };
 
         (function render({ tables, rels }) {
-            const W = 280, HEAD = 34, ROW = 24, GX = 150, GY = 70, PAD = 30;
+            const W = 310, HEAD = 36, ROW = 26, GX = 150, GY = 70, PAD = 30;
             const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
             const byId = Object.fromEntries(tables.map(t => [t.id, t]));
             const height = t => HEAD + t.cols.length * ROW;
@@ -229,25 +277,26 @@
                     return `<g class="${mark ? "r-" + mark : ""}">`
                         + (i % 2 ? `<rect class="r-zebra" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>` : "")
                         + (i ? `<line class="r-line" x1="${t.x}" x2="${t.x + W}" y1="${y}" y2="${y}"/>` : "")
-                        + `<text class="r-col" x="${t.x + 12}" y="${y + 16}">${esc(col)}</text>`
-                        + `<text class="r-key" x="${t.x + 150}" y="${y + 16}">${esc(key)}</text>`
-                        + `<text class="r-type" x="${t.x + W - 12}" y="${y + 16}" text-anchor="end">${esc(type)}</text></g>`;
+                        + `<text class="r-col" x="${t.x + 12}" y="${y + 17}">${esc(col)}</text>`
+                        + `<text class="r-key" x="${t.x + 170}" y="${y + 17}">${esc(key)}</text>`
+                        + `<text class="r-type" x="${t.x + W - 12}" y="${y + 17}" text-anchor="end">${esc(type)}</text></g>`;
                 }).join("");
-                return `<g class="table ${kind}" data-id="${t.id}">`
+                return `<g class="table ${kind}" data-id="${t.id}" tabindex="0" role="group" aria-label="${esc(t.name)}${t.tag ? ", " + esc(t.tag) : ""}">`
                     + `<rect class="t-box ${kind}" x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/>`
                     + `<path class="t-head" d="M${t.x + 1},${t.y + HEAD} V${t.y + 8} a7,7 0 0 1 7,-7 H${t.x + W - 8} a7,7 0 0 1 7,7 V${t.y + HEAD} Z"/>`
-                    + `<text class="t-name" x="${t.x + 12}" y="${t.y + 22}">${esc(t.name)}</text>`
-                    + `<text class="t-tag${kind === "write" ? " write" : ""}" x="${t.x + W - 12}" y="${t.y + 22}" text-anchor="end">${esc(t.tag || "")}</text>`
+                    + `<text class="t-name" x="${t.x + 12}" y="${t.y + 23}">${esc(t.name)}</text>`
+                    + `<text class="t-tag${kind === "write" ? " write" : ""}" x="${t.x + W - 12}" y="${t.y + 23}" text-anchor="end">${esc(t.tag || "")}</text>`
                     + rows + `</g>`;
             });
 
             const el = document.getElementById("er");
-            el.innerHTML = `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" role="img" aria-label="ER diagram">${lines.join("")}${boxes.join("")}</svg>`;
+            el.innerHTML = `<svg viewBox="0 0 ${svgW} ${svgH}" style="min-width:${svgW}px;max-height:max(80vh, ${svgH}px)" role="img" aria-label="ER diagram, ${tables.length} tables, ${rels.length} foreign keys">${lines.join("")}${boxes.join("")}</svg>`;
 
-            // Hover a table: dim everything not related to it.
+            // Hover or focus a table: dim everything not related to it.
+            const clear = () => el.querySelectorAll(".dim").forEach(n => n.classList.remove("dim"));
             el.querySelectorAll(".table").forEach(g => {
                 const id = g.dataset.id;
-                g.addEventListener("mouseenter", () => {
+                const trace = () => {
                     const near = new Set([id]);
                     el.querySelectorAll(".rel").forEach(r => {
                         const hit = r.dataset.a === id || r.dataset.b === id;
@@ -255,10 +304,14 @@
                         if (hit) { near.add(r.dataset.a); near.add(r.dataset.b); }
                     });
                     el.querySelectorAll(".table").forEach(t => t.classList.toggle("dim", !near.has(t.dataset.id)));
-                });
-                g.addEventListener("mouseleave", () => el.querySelectorAll(".dim").forEach(n => n.classList.remove("dim")));
+                };
+                g.addEventListener("mouseenter", trace);
+                g.addEventListener("focus", trace);
+                g.addEventListener("mouseleave", () => { if (!g.contains(document.activeElement)) clear(); });
+                g.addEventListener("blur", clear);
             });
         })(ER);
+
     </script>
 </body>
 
