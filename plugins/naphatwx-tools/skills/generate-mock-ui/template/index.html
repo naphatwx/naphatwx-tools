@@ -61,6 +61,10 @@
             --fs-xl: 1.75rem;
             --fs-2xl: 2.75rem;
 
+            /* Page frame: every page centers its content at the same width */
+            --page-w: 1200px;
+            --gutter: clamp(16px, 3vw, 24px);
+
             --radius: 6px;
             --radius-lg: 10px;
             --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -92,6 +96,7 @@
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; }
         /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
+        .page { max-width: var(--page-w); margin: 0 auto; padding-inline: var(--gutter); }
         .measure { max-width: 48ch; }
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
@@ -129,7 +134,7 @@
 </head>
 
 <body>
-    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-8 space-y-14">
+    <div class="page py-8 space-y-14">
         <header>
             <a href="../overview.html#use-cases" class="link text-sm">← Feature plan</a>
             <h1 class="text-2xl font-bold mt-2">Mock UI · Feature name</h1>

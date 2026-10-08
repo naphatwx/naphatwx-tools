@@ -54,6 +54,10 @@
     --fs-xl: 1.75rem;
     --fs-2xl: 2.75rem;
 
+    /* Page frame: every page centers its content at the same width */
+    --page-w: 1200px;
+    --gutter: clamp(16px, 3vw, 24px);
+
     --radius: 6px;
     --radius-lg: 10px;
     --ease: cubic-bezier(0.2, 0, 0, 1);

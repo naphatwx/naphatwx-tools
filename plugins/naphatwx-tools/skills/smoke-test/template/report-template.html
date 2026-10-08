@@ -58,6 +58,10 @@
       --fs-xl: 1.75rem;
       --fs-2xl: 2.75rem;
 
+      /* Page frame: every page centers its content at the same width */
+      --page-w: 1200px;
+      --gutter: clamp(16px, 3vw, 24px);
+
       --radius: 6px;
       --radius-lg: 10px;
       --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -87,7 +91,7 @@
 
   body { font-size: var(--fs-sm); line-height: 1.5; }
   [hidden] { display: none !important; }
-  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  main { max-width: var(--page-w); margin: 0 auto; padding: 24px var(--gutter) 64px; }
   h1 { font-size: var(--fs-xl); line-height: 1.2; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
   h1 .pill { font-size: var(--fs-sm); }
   h2 { font-size: var(--fs-lg); line-height: 1.3; margin: 32px 0 10px; }
@@ -308,7 +312,6 @@ function hopRow(f, h) {
   if (h.evidence) body.append(evidence(h.polling ? 'Last poll' : 'Evidence', h.evidence, h.service + ' in ' + f.flow));
   if (!body.childNodes.length) body.append(el('div', { class: 'meta' }, 'The runner recorded no request for this hop.'));
   d.append(body);
-  d.open = h.status !== 'pass';
   return d;
 }
 
@@ -322,7 +325,7 @@ function flowBox(f) {
     f.description ? el('span', { class: 'meta' }, f.description) : null, el('span', { class: 'meta' }, ms(f.ms)));
   const set = (open) => { toggle.setAttribute('aria-expanded', String(open)); panel.hidden = !open; };
   toggle.onclick = () => set(panel.hidden);
-  set(failed);
+  set(false);
   box.append(el('h3', { class: 'flow-head' }, toggle), panel);
 
   const chain = el('div', { class: 'chain', role: 'list', 'aria-label': 'Hop chain' });
@@ -351,7 +354,6 @@ function flowBox(f) {
     t.append(el('summary', {}, el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(f.error ? 'fail' : 'pass'),
       el('span', { class: 'route' }, 'trigger → ' + entryOf(f)), el('span', { class: 'meta' }, ms(f.trigger.ms))),
       el('div', { class: 'hop-body' }, evidence('Trigger', f.trigger, 'trigger of ' + f.flow)));
-    t.open = !!f.error;
     panel.append(t);
   }
   for (const h of f.hops) panel.append(hopRow(f, h));

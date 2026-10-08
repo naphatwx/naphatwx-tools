@@ -107,7 +107,7 @@ Run it the way the repo's guide says to run tools (for example in its Docker ser
 The reporter prints `E2E report: <path>`. Open the file and check:
 - every test is listed
 - every step has a screenshot
-- the failed tests are listed first and open, with their error
+- the failed tests are listed first; every test starts closed, and opening a failed one shows its error
 
 Reply with:
 - the scenario file path and the spec files written

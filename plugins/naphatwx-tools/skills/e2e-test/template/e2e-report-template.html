@@ -58,6 +58,10 @@
       --fs-xl: 1.75rem;
       --fs-2xl: 2.75rem;
 
+      /* Page frame: every page centers its content at the same width */
+      --page-w: 1200px;
+      --gutter: clamp(16px, 3vw, 24px);
+
       --radius: 6px;
       --radius-lg: 10px;
       --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -87,7 +91,7 @@
 
   body { font-size: var(--fs-sm); line-height: 1.5; }
   [hidden] { display: none !important; }
-  main { max-width: 1400px; margin: 0 auto; padding: 24px 16px 64px; }
+  main { max-width: var(--page-w); margin: 0 auto; padding: 24px var(--gutter) 64px; }
   header { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 8px; }
   h1 { font-size: var(--fs-xl); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
   h2 { font-size: var(--fs-lg); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
@@ -391,7 +395,7 @@ function testBox(t) {
       t.trace ? cmdRow('Trace', 'npx playwright show-trace ' + t.trace, 'trace command for ' + t.title) : null));
   }
   box.append(head, body);
-  setOpen(k === 'failed');
+  setOpen(false);
   return box;
 }
 
