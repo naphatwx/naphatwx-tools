@@ -89,12 +89,12 @@ code, kbd, pre, samp { font-family: var(--mono); }
 :root {
     --fs-body: var(--fs-md);
     --fs-code: var(--fs-sm);
-    /* Three sizes only, as in the reports: titles --fs-lg, all other text --fs-md, code / kbd / pills --fs-sm.
-       Hierarchy comes from weight and color. Diagram labels inside SVGs are drawings and keep their own sizes. */
+    /* Headings step down h1 > h2 > h3 for the projector. Everything else is one body size (--fs-md),
+       with code / kbd / pills at --fs-sm. Diagram labels inside SVGs are drawings and keep their own sizes. */
     --fs-lead: var(--fs-md);
-    --fs-h3: var(--fs-md);
-    --fs-h2: var(--fs-lg);
-    --fs-h1: var(--fs-lg);
+    --fs-h3: var(--fs-lg);
+    --fs-h2: var(--fs-xl);
+    --fs-h1: var(--fs-2xl);
     --measure: 72ch;
     /* running prose: ch ("0") is wider than an average glyph, so 50ch reads as about 68 characters */
     --prose: 50ch;
@@ -477,7 +477,7 @@ td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var
 
 /* ============ PRESENT MODE: one step per screen; long steps scroll down, never sideways ============ */
 /* a flow's h3 is its slide title here, so it takes the h2 size */
-html[data-present="on"] { --fs-h3: var(--fs-lg); }
+html[data-present="on"] { --fs-h3: var(--fs-xl); }
 html[data-present="on"], html[data-present="on"] body { overflow-x: hidden; }
 html[data-present="on"] .rail, html[data-present="on"] .rail-edge, html[data-present="on"] .tools,
 html[data-present="on"] .zoom-tools, html[data-present="on"] .zoom-shield, html[data-present="on"] details.more, html[data-present="on"] .step-off,
@@ -527,6 +527,7 @@ html[data-present="on"] .slide > .api { margin-top: 8px; }
     .menu { display: grid; }
     .facts { grid-template-columns: 1fr; gap: 2px; }
     .facts dd { margin-bottom: 12px; }
+    :root { --fs-h1: var(--fs-xl); }
     /* phones: a solid top bar holds ☰ and the tools, so nothing floats over the text */
     html { scroll-padding-top: 80px; }
     body::before { content: ""; position: fixed; inset: 0 0 auto; height: 68px; z-index: 24; background: var(--bg); border-bottom: 1px solid var(--line); }
