@@ -63,8 +63,8 @@
         --fs-h2: var(--fs-xl);
         --fs-h1: var(--fs-2xl);
 
-        /* Page frame: every page centers its content at the same width */
-        --page-w: 1200px;
+        /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+        --page-w: min(80%, 900px);
         --gutter: clamp(16px, 3vw, 24px);
 
         --radius: 6px;
@@ -96,14 +96,16 @@
 
     * { margin: 0; padding: 0; }
     body { background: var(--surface); padding: 1.5rem var(--gutter); }
-    .page { max-width: var(--page-w); width: 100%; margin: 0 auto; }
+    .page { width: 100%; margin: 0 auto; }
+    /* text stays at the reading width; only the diagram is full width */
+    .page > :not(.diagram) { max-width: var(--page-w); margin-inline: auto; }
     .eyebrow { font-size: var(--fs-md); color: var(--text-3); margin-bottom: 0.25rem; }
     h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1rem; }
     /* Drawn at 1:1 (every label 14px), never scaled; a narrow window scrolls the diagram, not the page. */
     .diagram { overflow-x: auto; }
     .diagram svg { display: block; width: 949px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
-    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: var(--fs-sm); color: var(--text-3); margin-bottom: 8px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: var(--fs-sm); color: var(--text-3); max-width: var(--page-w); margin: 8px auto 0; }
     .legend span::before { content: ""; display: inline-block; width: 26px; vertical-align: middle; margin-right: 6px; border-top: 2px solid var(--text-2); }
     .legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
     .legend .hot::before { border-color: var(--accent); }
@@ -136,8 +138,6 @@
   <div class="page">
     <p class="eyebrow">Flow 02 · Sequence</p>
     <h1>Example flow</h1>
-    <p class="legend"><span>Call</span><span class="ret">Response</span><span class="hot">Side effect (external write or audit)</span></p>
-
     <div class="diagram">
       <svg viewBox="0 0 949 646" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
         <title id="example-flow-seq-title">Example flow: sequence diagram, 5 participants, 12 steps</title>
@@ -184,6 +184,7 @@
         <g class="step"><title>upstream reason passed through</title>
         <line class="msg ret" x1="455" y1="606" x2="248" y2="606"/><path class="ah ret" d="M241,606 l9,-4.5 v9 z"/><text class="lbl" x="358.5" y="599" text-anchor="middle">FAILED_PRECONDITION</text><text class="num" x="246" y="599">12</text></g>
       </svg>
+      <p class="legend"><span>Call</span><span class="ret">Response</span><span class="hot">Side effect (external write or audit)</span></p>
     </div>
   </div>
   <script>

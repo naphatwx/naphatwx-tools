@@ -110,7 +110,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 | `flowchart` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>` (no inline height) |
 | `flowchart` · manual | `<img src="<dir>/NN-<slug>.svg" alt="…">` |
 | `sequence` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>`, plus its `<div class="seq-steps">` fragment (see the sequence reference) |
-| `sequence` · manual | `<div class="seq" data-flow="NN-<slug>"></div>`, plus `<script src="<dir>/render.js">` once, `<script src="<dir>/NN-<slug>.js">` per flow, then `SeqDiagrams.renderAll()` |
+| `sequence` · manual | `<div class="seq" data-flow="NN-<slug>">` with the `.seq-legend` line inside it (it stays under the drawing), plus `<script src="<dir>/render.js">` once, `<script src="<dir>/NN-<slug>.js">` per flow, then `SeqDiagrams.renderAll()` |
 | `er` · either | `<a href="<dir>/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a>` (one link per page when split) |
 
 - Every `TBD` and open question found.

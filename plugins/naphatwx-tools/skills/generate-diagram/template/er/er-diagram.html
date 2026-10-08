@@ -64,8 +64,8 @@
             --fs-h2: var(--fs-xl);
             --fs-h1: var(--fs-2xl);
 
-            /* Page frame: every page centers its content at the same width */
-            --page-w: 1200px;
+            /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+            --page-w: min(80%, 900px);
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
@@ -101,6 +101,8 @@
         ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
 
         body { padding: 20px var(--gutter) 32px; }
+        /* text stays at the reading width; only the diagram is full width */
+        body > :not(.canvas) { max-width: var(--page-w); margin-inline: auto; }
 
         header {
             display: flex;
@@ -108,7 +110,6 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            max-width: 1400px;
             margin: 0 auto 12px;
         }
 
@@ -131,7 +132,6 @@
         .btn:hover { color: var(--text); }
 
         .canvas {
-            max-width: 1400px;
             margin: 0 auto;
             border: 1px solid var(--line);
             border-radius: 12px;
@@ -143,8 +143,9 @@
         /* render() sets the SVG's width and height: it draws at 1:1, so every label renders at 14px; a wider one scrolls. */
         .canvas svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
 
+        /* inside the canvas, under the svg, at the text width */
         .legend {
-            max-width: 1400px;
+            max-width: var(--page-w);
             margin: 10px auto 0;
             display: flex;
             flex-wrap: wrap;
@@ -197,14 +198,14 @@
         </div>
     </header>
 
-    <div class="canvas" id="er"></div>
-
-    <div class="legend">
-        <span><i class="write"></i>new table</span>
-        <span><i></i>existing table (altered or read)</span>
-        <span><i class="external"></i>external (another service owns it)</span>
-        <span><i class="fk"></i>foreign key, column to column</span>
-        <span><i class="fk write"></i>new or changed foreign key</span>
+    <div class="canvas" id="er">
+        <div class="legend">
+            <span><i class="write"></i>new table</span>
+            <span><i></i>existing table (altered or read)</span>
+            <span><i class="external"></i>external (another service owns it)</span>
+            <span><i class="fk"></i>foreign key, column to column</span>
+            <span><i class="fk write"></i>new or changed foreign key</span>
+        </div>
     </div>
 
     <script>
@@ -315,7 +316,9 @@
             });
 
             const el = document.getElementById("er");
-            el.innerHTML = `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" role="img" aria-label="ER diagram, ${tables.length} tables, ${rels.length} foreign keys">${lines.join("")}${boxes.join("")}</svg>`;
+            // the legend inside the canvas stays, under the svg
+            el.querySelector(":scope > svg")?.remove();
+            el.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" role="img" aria-label="ER diagram, ${tables.length} tables, ${rels.length} foreign keys">${lines.join("")}${boxes.join("")}</svg>`);
 
             // Hover or focus a table: dim everything not related to it.
             const clear = () => el.querySelectorAll(".dim").forEach(n => n.classList.remove("dim"));

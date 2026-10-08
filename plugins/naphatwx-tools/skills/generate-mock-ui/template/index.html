@@ -66,8 +66,8 @@
             --fs-h2: var(--fs-xl);
             --fs-h1: var(--fs-2xl);
 
-            /* Page frame: every page centers its content at the same width */
-            --page-w: 1200px;
+            /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+            --page-w: min(80%, 900px);
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
@@ -101,7 +101,9 @@
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; overflow-x: clip; }
         /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
-        .page { max-width: var(--page-w); margin: 0 auto; padding-inline: var(--gutter); }
+        /* the text column is exactly the frame column of the use-case row below, so both line up */
+        :root { --row-w: min(100vw - 2 * var(--gutter) - 12px, 1920px); --side-l: calc(17rem + 24px); --side-r: calc(20rem + 24px); }
+        .page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
         .measure { max-width: 48ch; }
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
@@ -120,13 +122,13 @@
         /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
            the guide sits beside the frame, not above it, so steps and the whole screen show at once;
            on mid widths it tops the side list: the open use case matters more than the others */
-        .uc-row { --row-w: min(100vw - 2 * var(--gutter) - 12px, 1880px); width: var(--row-w); margin-left: calc(50% - var(--row-w) / 2); display: grid; grid-template-columns: 17rem minmax(0, 1fr) 20rem; grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
+        .uc-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: 17rem minmax(0, 1fr) 20rem; grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
         .uc-row > .tabs { grid-area: tabs; } .uc-row > .card { grid-area: card; } .uc-row > .guide { grid-area: guide; }
         .tabs, .guide { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
         .tabs { display: flex; flex-direction: column; gap: 2px; padding: 4px; }
         .guide { padding: 12px 16px; }
-        @media (max-width: 1400px) { .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; max-height: none; } }
-        @media (max-width: 900px) { .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
+        @media (max-width: 1400px) { :root { --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; max-height: none; } }
+        @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
         .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
         .tab-n { min-width: 2ch; text-align: right; }

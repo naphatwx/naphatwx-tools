@@ -17,6 +17,8 @@
 - Run `node theme/sync.mjs --check` before committing. It fails on drift, on any hex color that is not a theme color, and on text tokens below 4.5:1 contrast.
 - Template CSS uses `var(--token)` only. Standalone `.svg` files use the theme hex values.
 - Exception: mock screens (`mock/page|shared|contract`) use the target app's own design system.
+- Review layout changes in `theme/gallery/index.html`: every template, live at 1300, 1920 and 2560px.
+- The deploy-plan, smoke and e2e examples are built from `theme/gallery/data/`. Run `node theme/gallery/build.mjs` after changing those templates.
 
 ## Manifests
 

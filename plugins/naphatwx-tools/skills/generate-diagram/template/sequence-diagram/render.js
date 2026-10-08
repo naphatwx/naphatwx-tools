@@ -98,7 +98,10 @@ var SeqDiagrams = (function () {
         root.querySelectorAll('.seq[data-flow]').forEach(el => {
             const spec = flows[el.dataset.flow];
             const [drawing, list] = spec ? svg(el.dataset.flow, spec) : [`<p>Missing diagram file for <code>${esc(el.dataset.flow)}</code>.</p>`, ''];
+            // a .seq-legend inside the box stays, under the drawing
+            const legend = el.querySelector(':scope > .seq-legend');
             el.innerHTML = drawing;
+            if (legend) el.append(legend);
             // the list sits on the page after the box, so zoom and the lightbox leave it out
             if (el.nextElementSibling?.classList.contains('seq-steps')) el.nextElementSibling.remove();
             el.insertAdjacentHTML('afterend', list);

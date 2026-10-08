@@ -59,8 +59,8 @@
     --fs-h2: var(--fs-xl);
     --fs-h1: var(--fs-2xl);
 
-    /* Page frame: every page centers its content at the same width */
-    --page-w: 1200px;
+    /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+    --page-w: min(80%, 900px);
     --gutter: clamp(16px, 3vw, 24px);
 
     --radius: 6px;
@@ -96,10 +96,9 @@ code, kbd, pre, samp { font-family: var(--mono); }
     --fs-code: var(--fs-sm);
     /* Headings and lead come from the theme (--fs-h1/h2/h3/lead). Everything else is one body size (--fs-md),
        with code / kbd / pills at --fs-sm. Diagram labels inside SVGs are drawings and keep their own sizes. */
-    --measure: 72ch;
+    --measure: var(--page-w);
     /* running prose: ch ("0") is wider than an average glyph, so 50ch reads as about 68 characters */
     --prose: 50ch;
-    --wide: 1120px;
     --rail-w: 320px;
 }
 
@@ -196,7 +195,8 @@ html[data-rail="collapsed"] .sheet { margin-left: 0; }
 .slide { max-width: var(--measure); margin: 0 auto; }
 .slide + .slide { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
 .slide.flow + .slide.flow, #flows + .flow { border-top-color: transparent; margin-top: 36px; padding-top: 0; }
-.wide { width: min(var(--wide), calc(100vw - var(--rail-w) - 80px)); margin-left: 50%; transform: translateX(-50%); }
+/* diagram panels: no max width, as wide as the window beside the rail */
+.wide { width: calc(100vw - var(--rail-w) - 80px); margin-left: 50%; transform: translateX(-50%); }
 
 .kicker { font-size: var(--fs-body); color: var(--text-3); margin-bottom: 8px; }
 h1 { font-size: var(--fs-h1); line-height: 1.08; letter-spacing: -0.025em; color: var(--text); font-weight: 650; text-wrap: balance; }
@@ -280,7 +280,8 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0 0 48px; }
 .diagram-frame { display: block; width: 100%; height: 560px; border: 0; background: var(--surface); }
 
-.seq-legend { display: flex; gap: 20px; font-size: var(--fs-body); color: var(--text-3); margin-bottom: 6px; }
+/* inside the diagram box, under the drawing, at the text width */
+.seq-legend { display: flex; flex-wrap: wrap; gap: 20px; font-size: var(--fs-body); color: var(--text-3); max-width: var(--measure); margin: 10px auto 0; }
 .seq-legend span::before { content: ""; display: inline-block; width: 22px; vertical-align: middle; margin-right: 8px; border-top: 1.5px solid var(--text-2); }
 .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
 .seq-legend .hot::before { border-top: 2px solid var(--accent); }

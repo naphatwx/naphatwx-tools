@@ -64,8 +64,8 @@
             --fs-h2: var(--fs-xl);
             --fs-h1: var(--fs-2xl);
 
-            /* Page frame: every page centers its content at the same width */
-            --page-w: 1200px;
+            /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+            --page-w: min(80%, 900px);
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
@@ -116,18 +116,14 @@
             overflow: hidden;
         }
 
-        /* 16:9 stage, centered, scales to fit viewport */
+        /* the stage fills the whole window: no max width, no letterbox */
         .stage {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 100vw;
-            height: 56.25vw;
-            /* 16:9 */
-            max-height: 100vh;
-            max-width: 177.78vh;
-            /* 16:9 */
+            height: 100vh;
             background: var(--bg);
             overflow: hidden;
         }

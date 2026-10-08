@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theme gallery</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+<style>
+    body { font-size: var(--fs-md); line-height: 1.55; padding: 24px var(--gutter) 64px; }
+    header { max-width: var(--page-w); margin: 0 auto 24px; }
+    h1 { font-size: var(--fs-h1); margin: 0; }
+    h2 { font-size: var(--fs-h3); margin: 0; }
+    .lead { color: var(--text-2); margin: 6px 0 16px; }
+    code { font-size: var(--fs-sm); color: var(--text); }
+    .bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 0; background: var(--bg); }
+    .bar button { font: inherit; font-size: var(--fs-sm); color: var(--text-2); background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 4px 12px; cursor: pointer; }
+    .bar button[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+    .bar .meta { color: var(--text-3); font-size: var(--fs-sm); margin-left: 8px; }
+    section { margin-top: 32px; }
+    .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-bottom: 8px; }
+    .head .meta { color: var(--text-3); font-size: var(--fs-sm); font-family: var(--mono); }
+    .shots { display: grid; gap: 16px; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); }
+    figure { margin: 0; }
+    figcaption { color: var(--text-3); font-size: var(--fs-sm); font-family: var(--mono); margin-bottom: 4px; }
+    .view { position: relative; overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--radius-lg); background: var(--surface); }
+    .view iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--bg); }
+</style>
+</head>
+<body>
+<header>
+    <h1>Theme gallery</h1>
+    <p class="lead">Every skill template rendered live at real window widths, then scaled to fit. Text stays at <code>--page-w</code>; diagrams and the mock row go wider. Report examples come from <code>data/</code>: run <code>node theme/gallery/build.mjs</code> after a template change.</p>
+    <div class="bar" role="group" aria-label="Window width">
+        <button type="button" data-w="1300">1300px</button>
+        <button type="button" data-w="1920">1920px</button>
+        <button type="button" data-w="2560">2560px</button>
+        <button type="button" data-w="all">All three</button>
+        <span class="meta">Each frame is a real window of that width, 1000px tall.</span>
+    </div>
+</header>
+<main id="pages"></main>
+<script>
+const S = '../../plugins/naphatwx-tools/skills/';
+const PAGES = [
+    ['design-feature · plan overview', S + 'design-feature/template/overview.html'],
+    ['design-feature · mock UI', S + 'design-feature/template/mock/index.html'],
+    ['design-feature · flowchart', S + 'design-feature/template/flowchart/02-example-flow.html'],
+    ['design-feature · sequence diagram', S + 'design-feature/template/sequence-diagram/02-example-flow.html'],
+    ['design-feature · ER diagram', S + 'design-feature/template/database/er-diagram.html'],
+    ['generate-mock-ui', S + 'generate-mock-ui/template/index.html'],
+    ['generate-diagram · sequence', S + 'generate-diagram/template/sequence-diagram/index.html'],
+    ['generate-diagram · ER', S + 'generate-diagram/template/er/er-diagram.html'],
+    ['deploy-plan · example', 'examples/deploy-plan.html'],
+    ['smoke-test · example report', 'examples/smoke-report.html'],
+    ['e2e-test · example report', 'examples/e2e-report.html'],
+    ['html-document', S + 'html-document/template/index.html'],
+    ['html-presentation', S + 'html-presentation/template/index.html'],
+];
+const WIDTHS = [1300, 1920, 2560], H = 1000;
+const root = document.getElementById('pages');
+
+function fit(view) {
+    const w = +view.dataset.w, s = view.clientWidth / w;
+    view.style.height = Math.round(H * s) + 'px';
+    view.firstElementChild.style.transform = `scale(${s})`;
+}
+const ro = new ResizeObserver((entries) => entries.forEach((e) => fit(e.target)));
+
+function render(mode) {
+    try { localStorage.setItem('gallery-width', mode); } catch {}
+    document.querySelectorAll('.bar button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.w === mode)));
+    const widths = mode === 'all' ? WIDTHS : [+mode];
+    ro.disconnect();
+    root.innerHTML = PAGES.map(([name, src]) => `
+        <section>
+            <div class="head"><h2>${name}</h2><a class="meta" href="${src}" target="_blank" rel="noopener">${src.replace(S, 'skills/')} ↗</a></div>
+            <div class="shots" style="--cols:${widths.length}">
+                ${widths.map((w) => `<figure><figcaption>${w}px window</figcaption>
+                    <div class="view" data-w="${w}"><iframe src="${src}" width="${w}" height="${H}" loading="lazy" title="${name} at ${w}px"></iframe></div></figure>`).join('')}
+            </div>
+        </section>`).join('');
+    root.querySelectorAll('.view').forEach((v) => { fit(v); ro.observe(v); });
+}
+
+document.querySelectorAll('.bar button').forEach((b) => b.addEventListener('click', () => render(b.dataset.w)));
+let start = '1920';
+try { start = localStorage.getItem('gallery-width') || start; } catch {}
+render(start);
+</script>
+</body>
+</html>

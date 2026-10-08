@@ -1,6 +1,6 @@
 ---
 name: html-presentation
-description: Create a single-file 16:9 HTML slide deck, one click per slide, from a topic. Use when the user says "make HTML slides about X", "build a presentation" or "make a slideshow". Slides only; a scrolling docs page is html-document, an end-user guide is user-guide.
+description: Create a single-file full-window HTML slide deck, one click per slide, from a topic. Use when the user says "make HTML slides about X", "build a presentation" or "make a slideshow". Slides only; a scrolling docs page is html-document, an end-user guide is user-guide.
 ---
 
 # HTML Presentation Generator
@@ -28,7 +28,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 The output **must** keep all of these:
 
-1. Aspect ratio 16:9, centered, scales to fit the viewport.
+1. The stage fills the whole window: no max width, no letterbox.
 2. Click left area → previous slide. Click right area → next slide.
 3. Fade transition when changing slides.
 4. First slide → cannot go to previous.

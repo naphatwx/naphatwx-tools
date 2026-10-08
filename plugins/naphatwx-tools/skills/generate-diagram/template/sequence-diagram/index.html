@@ -65,8 +65,8 @@
             --fs-h2: var(--fs-xl);
             --fs-h1: var(--fs-2xl);
 
-            /* Page frame: every page centers its content at the same width */
-            --page-w: 1200px;
+            /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+            --page-w: min(80%, 900px);
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
@@ -102,7 +102,9 @@
         ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
 
         body { padding: 20px var(--gutter) 32px; }
-        main { max-width: var(--page-w); margin: 0 auto; }
+        main { margin: 0 auto; }
+        /* text stays at the reading width; only the diagram is full width */
+        main > :not(.seq) { max-width: var(--page-w); margin-inline: auto; }
         header { margin-bottom: 8px; }
         h1 { font-size: var(--fs-h1); }
         h2 { font-size: var(--fs-h2); margin-top: 20px; }
@@ -156,7 +158,9 @@
             gap: 18px;
             font-size: var(--fs-sm);
             color: var(--text-3);
-            margin-top: -6px;
+            /* inside the diagram box, at the text width */
+            max-width: var(--page-w);
+            margin: 12px auto 4px;
         }
 
         .seq-legend span::before {
@@ -178,15 +182,16 @@
         <header>
             <h1>Sequence diagrams · Feature Name</h1>
         </header>
-        <div class="seq-legend" style="margin:10px 0 0">
-            <span>call</span>
-            <span class="ret">response</span>
-            <span class="hot">side effect (external write / audit)</span>
-        </div>
 
-        <!-- one h2 + .seq per flow file -->
+        <!-- one h2 + .seq per flow file; the .seq-legend inside stays under the drawing -->
         <h2>1. Example flow</h2>
-        <div class="seq" data-flow="01-example-flow"></div>
+        <div class="seq" data-flow="01-example-flow">
+            <div class="seq-legend">
+                <span>call</span>
+                <span class="ret">response</span>
+                <span class="hot">side effect (external write / audit)</span>
+            </div>
+        </div>
     </main>
 
     <script src="render.js"></script>
