@@ -375,7 +375,8 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 .tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; align-items: start; }
 .tables + p { margin-top: 10px; }
 .tbl { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; scroll-margin-top: 32px; }
-.tbl.new { border-color: var(--line-strong); }
+.tbl.new { border-color: var(--add); }
+.tbl.drop { border-color: var(--drop); }
 .tbl.ext { border-style: dashed; }
 .tbl-head {
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px;
@@ -384,9 +385,13 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 }
 .tbl-head > :first-child { min-width: 0; overflow-wrap: break-word; }
 .tbl-head .tag { margin-left: auto; }
-.tbl.new .tbl-head { background: var(--surface); }
+.tbl.new .tbl-head { background: var(--ok-soft); }
+.tbl.drop .tbl-head { background: var(--bad-soft); }
+.tbl.drop .tbl-head > :first-child { text-decoration: line-through; text-decoration-thickness: 1px; }
 .tag { flex: none; white-space: nowrap; font: 500 var(--fs-body) var(--sans); color: var(--text-2); }
-.tbl.new .tag { color: var(--accent); }
+.tbl.new .tag { color: var(--add); }
+.tbl.drop .tag { color: var(--drop); }
+.tbl.drop .row .col, .tbl.drop .row .type { color: var(--text-3); text-decoration: line-through; text-decoration-thickness: 1px; }
 /* name | type | key: the name column keeps one edge per card; the key mark stays small so names lead */
 .row {
     display: grid; grid-template-columns: minmax(14ch, max-content) minmax(0, 1fr) auto; align-items: baseline; gap: 2px 16px;
