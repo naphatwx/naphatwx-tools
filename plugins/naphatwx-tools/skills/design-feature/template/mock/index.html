@@ -99,7 +99,7 @@
 
         /* Index chrome only. The screens inside the frames use the target app's own design system. */
         html { scroll-padding-top: 24px; }
-        body { line-height: 1.55; }
+        body { line-height: 1.55; overflow-x: clip; }
         /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
         .page { max-width: var(--page-w); margin: 0 auto; padding-inline: var(--gutter); }
         .measure { max-width: 48ch; }
@@ -123,11 +123,19 @@
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
         a.panel { color: inherit; text-decoration: none; transition: border-color .15s var(--ease); }
         a.panel:hover { border-color: var(--accent); }
-        /* chips wrap onto more rows rather than scroll out of sight on a narrow screen */
-        .tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
-        .tab { flex-shrink: 0; min-width: 9rem; max-width: 14rem; padding: 6px 14px; margin-bottom: -1px; color: var(--text-2); background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; }
+        /* the use-case row (side list + frame) breaks out of the text column so the frame gets the width */
+        .uc-row { --row-w: min(100vw - 2 * var(--gutter) - 12px, 1880px); width: var(--row-w); margin-left: calc(50% - var(--row-w) / 2); display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 24px; align-items: start; }
+        .tabs { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        @media (max-width: 900px) { .uc-row { grid-template-columns: minmax(0, 1fr); } .tabs { position: static; max-height: none; } }
+        .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
+        .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
+        .tab-n { min-width: 2ch; text-align: right; }
+        .tab-s { text-transform: uppercase; }
+        .tab-t { flex: 1; min-width: 0; }
         .tab:hover { color: var(--text); background: var(--surface); }
-        .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+        /* solid accent fill: the picked use case reads at a glance among 8+ rows */
+        .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
+        .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
         .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
         .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-sm); background: var(--surface-2); border-bottom: 1px solid var(--line); }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
@@ -212,10 +220,12 @@
             return `
               <section id="flow-${nn(f.flow)}" data-flow="${f.flow}">
                 ${head}
+                <div class="uc-row">
                 <div class="tabs" role="tablist" aria-label="Use cases of flow ${f.flow}">
-                  ${ucs.map(u => `<button type="button" role="tab" class="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)">${UI.esc(u.title)}</button>`).join('')}
+                  ${ucs.map((u, i) => `<button type="button" role="tab" class="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)"><span class="tab-n">${i + 1}</span><span class="tab-t">${UI.esc(u.title)}</span><span class="tab-s">${UI.esc(u.surface || '')}</span></button>`).join('')}
                 </div>
-                <div class="card mt-3"></div>
+                <div class="card"></div>
+                </div>
                 ${skipped.map(u => `<p class="meta measure mt-2">Not in the mock: ${UI.esc(u.title)} — ${UI.esc(u.skip)}</p>`).join('')}
               </section>`;
         }).join('');
@@ -260,7 +270,7 @@
             box.style.height = Math.round(SCREEN_H * s) + 'px';
             block.querySelector('.scale-label').textContent = `${Math.round(s * 100)}% of ${SCREEN_W} px`;
         }
-        new ResizeObserver(() => document.querySelectorAll('section[data-flow]').forEach(fit)).observe(document.getElementById('flows'));
+        new ResizeObserver(() => document.querySelectorAll('section[data-flow]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #flows
 
         function renderLog() {
             const rows = FakeApi.log();

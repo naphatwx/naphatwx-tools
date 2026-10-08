@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.157
+
+**generate-mock-ui, design-feature: use cases in a side list next to the frame**
+
+- Each flow's use cases are now a sticky numbered list on the left of the frame. Titles show in full and wrap; nothing is cut. Each row shows its `surface` tag (`UI`, `API`, `JOB`).
+- The picked use case has a solid accent fill.
+- The row (list + frame) breaks out of the text column, up to 1880px, so the mock screen scales larger on wide screens. Under 900px the list stacks above the frame.
+
 ## 1.9.156
 
 **design-feature: floating tools always bottom right**
