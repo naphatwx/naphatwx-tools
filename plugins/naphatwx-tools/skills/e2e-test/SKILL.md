@@ -1,0 +1,116 @@
+---
+name: e2e-test
+description: End-to-end UI test for a feature. Generates UI test scenarios with the generate-test-scenario skill (target ui), writes Playwright scripts into the target repo (one sub-agent per scenario group, in parallel), runs them with a screenshot at every step, and writes ONE self-contained HTML report. Use when the user asks for an e2e test, a Playwright test, a UI regression test, or "test this feature in the browser with screenshots".
+argument-hint: "<spec folder | spec number | feature description> [--env <name>] [--base-url <url>]"
+---
+
+# E2E Test
+
+```text
+1 scenarios     generate-test-scenario (target ui) ─► scenario file
+2 harness       Playwright config + login + step helper + one-html reporter (once per repo)
+3 write         1 writer agent per scenario group, in parallel ─► <group>.e2e.spec.ts
+4 run           Playwright, parallel workers for independent files
+5 report        1 HTML: test ─► step ─► screenshot, pass/fail, error
+```
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
+
+- **Source**: a spec folder, a spec number, or a feature description. If none is given, ask once.
+- `--env <name>` / `--base-url <url>`: where to run. If neither is given, use the repo's local dev URL and say which one.
+
+## Rules
+
+- **Read the target repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, per-app guides). Their rules for where tests live, how to run tools and who edits app code win over this skill.
+- **Tests only.** Never change application code to make a test pass. A missing selector or a real bug goes in the report as a finding.
+- **A screenshot at every step**, through the `step()` helper. A test with no `step()` calls is incomplete.
+- **One HTML report per run.** Raw Playwright output is not a substitute.
+- **Own your data.** Create records prefixed `__e2e_`, delete them, and check they are gone. Never touch records you did not create.
+- Never run against production unless the user named it for this run.
+
+---
+
+## 1. Scenarios
+
+Run the `generate-test-scenario` skill (`naphatwx-tools:generate-test-scenario` in Claude Code) with **target ui** and the source. It writes a scenario file with pages, user actions, selectors, on-screen expectations, the sign-in role and the viewport.
+
+- If a scenario file for this source already exists, ask whether to reuse it or generate a new one.
+- Read the file. Group its test cases by page or flow. Each group becomes one spec file, so a group should have about 3–8 cases.
+
+## 2. Harness (once per repo)
+
+Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, a login helper, `@playwright/test` in `package.json`.
+
+| Found | Do |
+|---|---|
+| Config + login exist | Reuse them. Add only what is missing below. |
+| Nothing | Add `@playwright/test` as a dev dependency where the repo keeps web dev dependencies, a config, and a login setup. Follow the repo's run rules (for example "run inside Docker"). |
+
+Then add these, next to the e2e folder, **unchanged** from this skill's `template/`:
+
+- `step.ts`: wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
+- `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded.
+
+Wire the config:
+
+```ts
+reporter: [
+  ['list'],
+  ['./reporters/one-html-reporter.ts', { name: '<feature>', outputDir: 'e2e-results', template: 'reporters/e2e-report-template.html' }],
+],
+use: {
+  baseURL: process.env.PW_BASE_URL ?? '<local url>',
+  viewport: { width: 1280, height: 800 },   // keeps screenshots small; a scenario may set its own
+  screenshot: 'only-on-failure',
+  storageState: '<login state file>',
+},
+fullyParallel: false,   // tests inside one file stay in order; files run on separate workers
+workers: <number of spec files, max 4>,
+```
+
+`template` and `outputDir` are relative to the folder that holds the Playwright config. Add `e2e-results/` to `.gitignore`.
+
+**Login**: sign in once in a global setup and save `storageState`. Every test reuses it. Use the repo's own login helper or dev-login if it has one. Never put a real password in a file: read credentials from env vars.
+
+## 3. Write: one writer agent per group, in parallel
+
+Spawn one agent per group **in one message**, with the prompt in `references/writer-agent.md`. Each writes one `<group>.e2e.spec.ts` and runs nothing.
+
+Agents with no sub-agents write the groups one after another with the same prompt.
+
+When they are done:
+- Check every file imports `step` and wraps each action in it.
+- Collect the selectors reported missing and the code/scenario mismatches.
+
+## 4. Run
+
+```bash
+PW_BASE_URL=<url> E2E_REPORT_NAME=<feature> npx playwright test <e2e-dir>/<feature-files>
+```
+
+Run it the way the repo's guide says to run tools (for example in its Docker service). Spec files run in parallel workers, and the tests inside a file run in order.
+
+- A failure caused by the environment (server down, a cold compile timeout, an expired session) is not a product failure. Fix the environment and re-run only the failed files once.
+- A real failure: keep it. Do not bend the assertion to pass. If the scenario itself was wrong (the code is right and the spec says so), fix the test and say so.
+- Check that no `__e2e_` records are left behind.
+
+## 5. Report
+
+The reporter prints `E2E report: <path>`. Open the file and check:
+- every test is listed
+- every step has a screenshot
+- the failed tests are open, with their error
+
+Reply with:
+- the scenario file path and the spec files written
+- passed / failed / skipped counts
+- each failure: its test, its step, and the likely cause (product bug, missing selector, wrong scenario, environment)
+- missing selectors and code/scenario mismatches, as findings for the app owner
+- whether cleanup is confirmed
+- the **full path** of the HTML report

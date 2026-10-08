@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smoke Report</title>
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f6f7f9; --line: #e3e6ea; --text: #16191d; --muted: #5f6873;
+    --pass: #1a7f37; --pass-bg: #e6f4ea; --fail: #c62828; --fail-bg: #fdecea;
+    --skip: #6b7280; --skip-bg: #eef0f2; --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1115; --panel: #171a20; --line: #2a2f37; --text: #e6e8eb; --muted: #9aa3ad;
+      --pass: #4ade80; --pass-bg: #12301d; --fail: #f87171; --fail-bg: #3a1616; --skip: #9ca3af; --skip-bg: #23272e;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1115; --panel: #171a20; --line: #2a2f37; --text: #e6e8eb; --muted: #9aa3ad;
+    --pass: #4ade80; --pass-bg: #12301d; --fail: #f87171; --fail-bg: #3a1616; --skip: #9ca3af; --skip-bg: #23272e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  h1 { font-size: 20px; margin: 0; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  .pass { color: var(--pass); background: var(--pass-bg); }
+  .fail { color: var(--fail); background: var(--fail-bg); }
+  .not-reached { color: var(--skip); background: var(--skip-bg); }
+  button.theme { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .flow { border: 1px solid var(--line); border-radius: 10px; margin-top: 20px; background: var(--panel); overflow: hidden; }
+  .flow-head { padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; border-bottom: 1px solid var(--line); }
+  .flow-head h2 { font-size: 16px; margin: 0; }
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 14px 16px; }
+  .node { padding: 6px 10px; border-radius: 8px; font-weight: 600; font-size: 13px; }
+  .arrow { color: var(--muted); font-size: 12px; }
+  .verdict { padding: 0 16px 12px; color: var(--muted); }
+  details.hop { border-top: 1px solid var(--line); }
+  details.hop summary { padding: 10px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; list-style: none; }
+  details.hop summary::-webkit-details-marker { display: none; }
+  .hop-body { padding: 0 16px 14px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 6px 0; }
+  th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; }
+  pre { font-family: var(--mono); font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; margin: 6px 0 0; }
+  code { font-family: var(--mono); font-size: 12px; }
+  @media (max-width: 600px) { .chain { flex-direction: column; align-items: flex-start; } .arrow { transform: rotate(90deg); } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+const DATA = /*__SMOKE_DATA__*/null;
+const theme = (() => { try { return localStorage.getItem('smoke-theme') } catch { return null } })();
+if (theme) document.documentElement.dataset.theme = theme;
+
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
+  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return n;
+};
+const badge = (s) => el('span', { class: 'badge ' + s }, s.replace('-', ' '));
+const ms = (v) => (v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + ' s' : v + ' ms');
+
+function verdict(f) {
+  if (f.error) return 'Trigger failed: ' + f.error;
+  const broken = f.hops.find((h) => h.status === 'fail');
+  const ok = f.hops.filter((h) => h.status === 'pass').map((h) => h.service);
+  if (!broken) return 'Every hop answered: ' + ok.join(' → ') + '.';
+  return (ok.length ? ok.join(' → ') + ' OK; ' : '') + (broken.from ? broken.from + ' → ' : '') + broken.service + ' FAILED (' + (broken.detail || '') + ').';
+}
+
+function hopRow(h) {
+  const d = el('details', { class: 'hop' });
+  d.append(el('summary', {}, badge(h.status), el('strong', {}, h.service), el('span', { class: 'meta' }, (h.from ? h.from + ' → ' : '') + h.service + (h.transport ? ' via ' + h.transport : '')), el('span', { class: 'meta' }, ms(h.ms)), el('span', { class: 'meta' }, h.detail || '')));
+  const body = el('div', { class: 'hop-body' });
+  if (h.status === 'not-reached') body.append(el('div', { class: 'meta' }, 'Not checked: an earlier hop failed.'));
+  if (h.instance) body.append(el('div', { class: 'meta' }, 'Instance: ', el('code', {}, h.instance)));
+  if (h.env?.length) {
+    body.append(el('table', {}, el('tr', {}, el('th', {}, 'Env var'), el('th', {}, 'Used'), el('th', {}, 'Check')),
+      h.env.map((e) => el('tr', {}, el('td', {}, el('code', {}, e.name)), el('td', {}, el('code', {}, e.value ?? '')), el('td', {}, badge(e.ok ? 'pass' : 'fail'), ' ', e.note || '')))));
+  }
+  if (h.evidence) body.append(el('div', { class: 'meta' }, 'Evidence: HTTP ' + h.evidence.status + ' · ' + ms(h.evidence.ms) + ' · ', el('code', {}, h.evidence.url)), el('pre', {}, h.evidence.body || ''));
+  d.append(body);
+  if (h.status === 'fail') d.open = true;
+  return d;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
+  const btn = el('button', { class: 'theme', type: 'button' }, 'Theme');
+  btn.onclick = () => {
+    const set = document.documentElement.dataset.theme;
+    const dark = set ? set === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('smoke-theme', next) } catch {}
+  };
+  const passed = DATA.flows.filter((f) => f.status === 'pass').length;
+  app.append(el('header', {},
+    el('div', {}, el('h1', {}, 'Smoke Report · ', DATA.env, ' ', badge(DATA.status)),
+      el('div', { class: 'meta' }, new Date(DATA.startedAt).toLocaleString() + ' · ' + passed + ' / ' + DATA.flows.length + ' flows passed · ' + ms(DATA.ms))),
+    btn));
+  for (const f of DATA.flows) {
+    const box = el('section', { class: 'flow' });
+    box.append(el('div', { class: 'flow-head' }, el('h2', {}, f.flow), badge(f.status), el('span', { class: 'meta' }, f.description || ''), el('span', { class: 'meta' }, f.probeId ? 'probe ' + f.probeId : ''), el('span', { class: 'meta' }, ms(f.ms))));
+    const chain = el('div', { class: 'chain' }, el('span', { class: 'node ' + (f.error ? 'fail' : 'pass') }, 'trigger'));
+    for (const h of f.hops) chain.append(el('span', { class: 'arrow' }, '→'), el('span', { class: 'node ' + h.status }, h.service));
+    box.append(chain, el('div', { class: 'verdict' }, verdict(f)));
+    if (f.trigger) box.append(el('details', { class: 'hop' }, el('summary', {}, el('strong', {}, 'Trigger'), el('span', { class: 'meta' }, 'HTTP ' + f.trigger.status + ' · ' + ms(f.trigger.ms))), el('div', { class: 'hop-body' }, el('code', {}, f.trigger.url), el('pre', {}, f.trigger.body || ''))));
+    for (const h of f.hops) box.append(hopRow(h));
+    app.append(box);
+  }
+}
+render();
+</script>
+</body>
+</html>

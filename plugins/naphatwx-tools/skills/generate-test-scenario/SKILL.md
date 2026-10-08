@@ -1,12 +1,13 @@
 ---
 name: generate-test-scenario
-description: Generate an AI-runnable test scenario file from a spec folder, targeting MCP tools or backend APIs. Use when the user gives a spec number or spec folder path and asks for test scenarios, test cases, or a test plan. Generates only — it never executes the tests.
+description: Generate an AI-runnable test scenario file from a spec folder (or a feature description), targeting MCP tools or backend APIs by default, or the web UI with `--target ui` (pages, user actions, selectors, on-screen expectations — the input for the e2e-test skill). Use when the user gives a spec number, spec folder path or feature and asks for test scenarios, test cases, or a test plan. Generates only — it never executes the tests.
 ---
 
 # Test Scenario Generator
 
 Read a spec and its related code, then write a test scenario file that an AI
-agent can execute later through MCP tools or backend API calls.
+agent can execute later through MCP tools or backend API calls — or, with
+`--target ui`, through a browser (see `references/ui-target.md`).
 
 **This skill only writes the file. Never run any test case here.** The user
 runs it in a separate request.
@@ -22,14 +23,20 @@ $ARGUMENTS
 
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
-**Expected format:** a spec folder path, or a spec number.
+**Expected format:** a spec folder path, a spec number, or a feature description — plus an optional `--target api|ui` (default `api`).
 
 Examples:
 
 ```text
 /generate-test-scenario <repo>/specs/127-app-env-deploy-status
 /generate-test-scenario 127
+/generate-test-scenario 127 --target ui
+/generate-test-scenario "the What's New overlay on the announcements page" --target ui
 ```
+
+**`--target ui`**: follow every step below, plus the UI additions in
+`references/ui-target.md` for steps 3, 4, 5, 6 and 8. It replaces the MCP
+surface (step 4) and the case format (step 6).
 
 ---
 
@@ -42,6 +49,10 @@ Examples:
   working directory. One match → use it. Several matches → list them and ask
   which one, then stop until answered.
 - **Nothing found** → say so and stop. Do not guess another spec.
+- **Feature description given** (no spec) → there is no `<spec-path>`. Skip
+  step 2; the description is the requirement. Find the code in step 3 from the
+  names in the description, and list in the file's header what you treated as
+  the requirements so the user can correct them.
 
 ### 2. Read the Spec
 
@@ -218,8 +229,12 @@ Always save inside the spec folder:
 ```
 
 - Create `PRIVATE/test/` if it does not exist.
+- `--target ui` → name it `test-scenario-ui-<n>.md` (its own numbering).
+- No spec folder (a feature description) → save under
+  `test-scenarios/<feature-slug>/` at the repo root instead, and ask once
+  whether that folder should be gitignored.
 - `<n>` is a running number starting at `1`. Read the folder, find the highest
-  existing `test-scenario-<n>.md`, and use the next number.
+  existing file of the same kind, and use the next number.
 - **Never overwrite an existing file.**
 
 Confirm with: `✅ Test scenario created at: {path} ({n} test cases)`

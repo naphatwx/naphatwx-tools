@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E2E Report</title>
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f6f7f9; --line: #e3e6ea; --text: #16191d; --muted: #5f6873;
+    --pass: #1a7f37; --pass-bg: #e6f4ea; --fail: #c62828; --fail-bg: #fdecea;
+    --skip: #6b7280; --skip-bg: #eef0f2; --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1115; --panel: #171a20; --line: #2a2f37; --text: #e6e8eb; --muted: #9aa3ad;
+      --pass: #4ade80; --pass-bg: #12301d; --fail: #f87171; --fail-bg: #3a1616; --skip: #9ca3af; --skip-bg: #23272e;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1115; --panel: #171a20; --line: #2a2f37; --text: #e6e8eb; --muted: #9aa3ad;
+    --pass: #4ade80; --pass-bg: #12301d; --fail: #f87171; --fail-bg: #3a1616; --skip: #9ca3af; --skip-bg: #23272e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  h1 { font-size: 20px; margin: 0; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  .passed, .expected { color: var(--pass); background: var(--pass-bg); }
+  .failed, .timedOut, .interrupted, .unexpected { color: var(--fail); background: var(--fail-bg); }
+  .skipped { color: var(--skip); background: var(--skip-bg); }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tools button { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .tools button[aria-pressed="true"] { outline: 2px solid var(--muted); }
+  details.test { border: 1px solid var(--line); border-radius: 10px; margin-top: 14px; background: var(--panel); overflow: hidden; }
+  details.test > summary { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; list-style: none; }
+  details.test > summary::-webkit-details-marker { display: none; }
+  .steps { padding: 0 16px 16px; display: grid; gap: 14px; }
+  .step { border-top: 1px solid var(--line); padding-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 14px; }
+  .step h3 { font-size: 14px; margin: 0 0 4px; }
+  .step img { width: 100%; border: 1px solid var(--line); border-radius: 6px; cursor: zoom-in; background: var(--bg); }
+  pre { font-family: var(--mono); font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; margin: 6px 0 0; }
+  dialog { border: 0; padding: 0; background: transparent; max-width: 96vw; max-height: 96vh; }
+  dialog img { max-width: 96vw; max-height: 92vh; display: block; }
+  dialog::backdrop { background: rgb(0 0 0 / .75); }
+  @media (max-width: 700px) { .step { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<dialog id="zoom"><img alt=""></dialog>
+<script>
+const DATA = /*__E2E_DATA__*/null;
+try { const t = localStorage.getItem('e2e-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
+  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return n;
+};
+const ms = (v) => (v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + ' s' : v + ' ms');
+const badge = (s) => el('span', { class: 'badge ' + s }, s);
+const zoom = document.getElementById('zoom');
+zoom.onclick = () => zoom.close();
+const shot = (src, alt) => {
+  const img = el('img', { src, alt, loading: 'lazy' });
+  img.onclick = () => { zoom.querySelector('img').src = src; zoom.showModal(); };
+  return img;
+};
+
+let filter = 'all';
+function render() {
+  const app = document.getElementById('app');
+  app.textContent = '';
+  if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
+  const failed = DATA.tests.filter((t) => !['passed', 'skipped'].includes(t.status)).length;
+  const passed = DATA.tests.filter((t) => t.status === 'passed').length;
+  const tools = el('div', { class: 'tools' });
+  for (const f of ['all', 'failed', 'passed']) {
+    const b = el('button', { type: 'button', 'aria-pressed': String(filter === f) }, f);
+    b.onclick = () => { filter = f; render(); };
+    tools.append(b);
+  }
+  const theme = el('button', { type: 'button' }, 'Theme');
+  theme.onclick = () => {
+    const set = document.documentElement.dataset.theme;
+    const dark = set ? set === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('e2e-theme', document.documentElement.dataset.theme); } catch {}
+  };
+  tools.append(theme);
+  app.append(el('header', {},
+    el('div', {}, el('h1', {}, 'E2E Report · ', DATA.name, ' ', badge(DATA.status)),
+      el('div', { class: 'meta' }, new Date(DATA.startedAt).toLocaleString() + ' · ' + passed + ' passed · ' + failed + ' failed · ' + DATA.tests.length + ' tests · ' + ms(DATA.ms) + (DATA.baseURL ? ' · ' + DATA.baseURL : ''))),
+    tools));
+  for (const t of DATA.tests) {
+    const isFail = !['passed', 'skipped'].includes(t.status);
+    if (filter === 'failed' && !isFail) continue;
+    if (filter === 'passed' && t.status !== 'passed') continue;
+    const d = el('details', { class: 'test' });
+    d.open = isFail;
+    d.append(el('summary', {}, badge(t.status), el('strong', {}, t.title), el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + (t.retry ? ' · retry ' + t.retry : '') + (t.project ? ' · ' + t.project : ''))));
+    const steps = el('div', { class: 'steps' });
+    t.steps.forEach((s, i) => {
+      steps.append(el('div', { class: 'step' },
+        el('div', {}, el('h3', {}, (i + 1) + '. ' + s.title), badge(s.status), ' ', el('span', { class: 'meta' }, ms(s.ms)), s.error ? el('pre', {}, s.error) : null),
+        s.shot ? shot(s.shot, s.title) : el('div', { class: 'meta' }, 'No screenshot for this step.')));
+    });
+    if (!t.steps.length) steps.append(el('div', { class: 'meta' }, 'This test has no named steps.'));
+    if (t.error) steps.append(el('div', {}, el('h3', {}, 'Test error'), el('pre', {}, t.error)));
+    if (t.finalShot) steps.append(el('div', {}, el('h3', {}, 'Page at failure'), shot(t.finalShot, 'page at failure')));
+    d.append(steps);
+    app.append(d);
+  }
+}
+render();
+</script>
+</body>
+</html>
