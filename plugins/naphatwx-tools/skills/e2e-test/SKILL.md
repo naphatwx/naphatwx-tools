@@ -11,7 +11,7 @@ argument-hint: "<spec folder | spec number | feature description> [--env <name>]
 2 harness       Playwright config + login + step helper + one-html reporter (once per repo)
 3 write         1 writer agent per scenario group, in parallel ─► <group>.e2e.spec.ts
 4 run           Playwright, parallel workers for independent files
-5 report        1 HTML: test ─► step ─► screenshot, pass/fail, error
+5 report        1 HTML: test ─► steps paged like slides ─► screenshot, pass/fail, error
 ```
 
 ## User Input
@@ -55,7 +55,7 @@ Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, 
 Then add these, next to the e2e folder, **unchanged** from this skill's `template/`:
 
 - `step.ts`: wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
-- `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded.
+- `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded. Each test shows its steps one at a time: click the right half of the screenshot for the next step, the left half for the previous one (or use ← / →). A failed test opens on its failed step.
 
 Wire the config:
 

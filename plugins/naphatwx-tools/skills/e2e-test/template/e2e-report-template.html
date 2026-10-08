@@ -37,14 +37,28 @@
   details.test > summary { padding: 12px 16px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; list-style: none; }
   details.test > summary::-webkit-details-marker { display: none; }
   .steps { padding: 0 16px 16px; display: grid; gap: 14px; }
-  .step { border-top: 1px solid var(--line); padding-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 14px; }
-  .step h3 { font-size: 14px; margin: 0 0 4px; }
-  .step img { width: 100%; border: 1px solid var(--line); border-radius: 6px; cursor: zoom-in; background: var(--bg); }
+  .viewer { border-top: 1px solid var(--line); padding-top: 12px; outline: none; }
+  .viewer:focus-visible { box-shadow: 0 0 0 2px var(--muted); border-radius: 6px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 10px; }
+  .bar h3 { font-size: 15px; margin: 0; flex: 1 1 240px; }
+  .bar button { border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .bar button:disabled { opacity: .4; cursor: default; }
+  .dots { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .dots button { width: 26px; height: 26px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 11px; cursor: pointer; padding: 0; }
+  .dots button.failed { border-color: var(--fail); color: var(--fail); }
+  .dots button[aria-current="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .stage { position: relative; user-select: none; }
+  .stage img { width: 100%; display: block; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+  .stage .empty { padding: 48px 16px; text-align: center; border: 1px dashed var(--line); border-radius: 6px; }
+  .stage .nav { position: absolute; top: 0; bottom: 0; width: 50%; border: 0; background: transparent; color: #fff; font-size: 36px; cursor: pointer; opacity: 0; transition: opacity .15s; }
+  .stage .nav.prev { left: 0; text-align: left; padding-left: 12px; cursor: w-resize; }
+  .stage .nav.next { right: 0; text-align: right; padding-right: 12px; cursor: e-resize; }
+  .stage .nav:hover:not(:disabled) { opacity: 1; text-shadow: 0 1px 6px rgb(0 0 0 / .8); }
+  .stage .nav:disabled { cursor: default; }
   pre { font-family: var(--mono); font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; margin: 6px 0 0; }
   dialog { border: 0; padding: 0; background: transparent; max-width: 96vw; max-height: 96vh; }
   dialog img { max-width: 96vw; max-height: 92vh; display: block; }
   dialog::backdrop { background: rgb(0 0 0 / .75); }
-  @media (max-width: 700px) { .step { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -64,11 +78,49 @@ const ms = (v) => (v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + ' s' : v
 const badge = (s) => el('span', { class: 'badge ' + s }, s);
 const zoom = document.getElementById('zoom');
 zoom.onclick = () => zoom.close();
-const shot = (src, alt) => {
-  const img = el('img', { src, alt, loading: 'lazy' });
-  img.onclick = () => { zoom.querySelector('img').src = src; zoom.showModal(); };
-  return img;
-};
+
+// One step at a time, like slides: click the right half for next, the left half for previous.
+function viewer(slides) {
+  let i = Math.max(0, slides.findIndex((s) => s.status === 'failed'));
+  const box = el('div', { class: 'viewer', tabindex: '0' });
+  const show = () => {
+    const s = slides[i];
+    const prev = el('button', { type: 'button' }, '‹ Prev');
+    const next = el('button', { type: 'button' }, 'Next ›');
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    prev.onclick = () => go(-1);
+    next.onclick = () => go(1);
+    const full = el('button', { type: 'button' }, 'Zoom');
+    full.disabled = !s.shot;
+    full.onclick = () => { zoom.querySelector('img').src = s.shot; zoom.showModal(); };
+    const dots = el('div', { class: 'dots' }, slides.map((x, n) => {
+      const b = el('button', { type: 'button', class: x.status, 'aria-current': String(n === i), title: x.title }, n + 1);
+      b.onclick = () => { i = n; show(); };
+      return b;
+    }));
+    const stage = el('div', { class: 'stage' },
+      s.shot ? el('img', { src: s.shot, alt: s.title }) : el('div', { class: 'meta empty' }, 'No screenshot for this step.'));
+    const left = el('button', { type: 'button', class: 'nav prev', 'aria-label': 'Previous step' }, '‹');
+    const right = el('button', { type: 'button', class: 'nav next', 'aria-label': 'Next step' }, '›');
+    left.disabled = prev.disabled;
+    right.disabled = next.disabled;
+    left.onclick = () => go(-1);
+    right.onclick = () => go(1);
+    stage.append(left, right);
+    box.replaceChildren(
+      el('div', { class: 'bar' }, el('h3', {}, (i + 1) + '. ' + s.title), badge(s.status), el('span', { class: 'meta' }, ms(s.ms)),
+        el('span', { class: 'meta' }, 'Step ' + (i + 1) + ' / ' + slides.length), prev, next, full),
+      dots, stage, ...(s.error ? [el('pre', {}, s.error)] : []));
+  };
+  const go = (d) => { const n = i + d; if (n >= 0 && n < slides.length) { i = n; show(); box.focus({ preventScroll: true }); } };
+  box.onkeydown = (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+  };
+  show();
+  return box;
+}
 
 let filter = 'all';
 function render() {
@@ -103,14 +155,11 @@ function render() {
     d.open = isFail;
     d.append(el('summary', {}, badge(t.status), el('strong', {}, t.title), el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + (t.retry ? ' · retry ' + t.retry : '') + (t.project ? ' · ' + t.project : ''))));
     const steps = el('div', { class: 'steps' });
-    t.steps.forEach((s, i) => {
-      steps.append(el('div', { class: 'step' },
-        el('div', {}, el('h3', {}, (i + 1) + '. ' + s.title), badge(s.status), ' ', el('span', { class: 'meta' }, ms(s.ms)), s.error ? el('pre', {}, s.error) : null),
-        s.shot ? shot(s.shot, s.title) : el('div', { class: 'meta' }, 'No screenshot for this step.')));
-    });
-    if (!t.steps.length) steps.append(el('div', { class: 'meta' }, 'This test has no named steps.'));
+    const slides = t.steps.slice();
+    if (t.finalShot) slides.push({ title: 'Page at failure', status: 'failed', shot: t.finalShot });
+    if (slides.length) steps.append(viewer(slides));
+    else steps.append(el('div', { class: 'meta' }, 'This test has no named steps.'));
     if (t.error) steps.append(el('div', {}, el('h3', {}, 'Test error'), el('pre', {}, t.error)));
-    if (t.finalShot) steps.append(el('div', {}, el('h3', {}, 'Page at failure'), shot(t.finalShot, 'page at failure')));
     d.append(steps);
     app.append(d);
   }
