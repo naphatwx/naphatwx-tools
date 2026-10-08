@@ -211,9 +211,9 @@
         document.getElementById('flows').innerHTML = USE_CASE_FLOWS.map(f => {
             const ucs = ucsOf(f.flow);
             const head = `
-              <div class="flex items-baseline justify-between gap-x-4 gap-y-1 flex-wrap mb-2">
+              <div class="mb-2">
                 <h2 class="font-bold"><span class="meta mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
-                <span class="t-code font-mono meta">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="link">plan</a></span>
+                <div class="t-code font-mono meta mt-1">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="link">plan</a></div>
               </div>`;
             const skipped = USE_CASES_SKIPPED.filter(u => u.flow === f.flow);
             if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="muted measure">${UI.esc(f.none || skipped[0]?.skip || 'No use case to play.')}</p></section>`;
