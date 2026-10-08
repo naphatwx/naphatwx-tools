@@ -463,12 +463,6 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 #hudLabel { padding: 0 10px; font: var(--fs-code) var(--mono); color: var(--text); font-variant-numeric: tabular-nums; min-width: 14ch; text-align: center; }
 .hud-exit { color: var(--text-3) !important; font-family: var(--mono) !important; font-size: var(--fs-code) !important; }
 .hud-keys { padding: 0 8px 0 4px; color: var(--text-3); font: var(--fs-code) var(--mono); white-space: nowrap; }
-/* wide screens with the index open: the tools sit at the foot of the rail, so they never cover a diagram */
-@media (min-width: 881px) {
-    html:not([data-rail="collapsed"]) .rail { padding-bottom: 76px; }
-    html:not([data-rail="collapsed"]) .tools { left: 14px; right: auto; bottom: 14px; width: calc(var(--rail-w) - 28px); justify-content: space-between; }
-    html:not([data-rail="collapsed"]) .tools button { padding: 0 8px; }
-}
 
 /* ============ SHORTCUT SHEET ( ? ) ============ */
 .keys { margin: auto; padding: 24px 28px; width: min(440px, calc(100vw - 32px)); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); }

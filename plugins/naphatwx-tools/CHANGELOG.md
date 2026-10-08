@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.156
+
+**design-feature: floating tools always bottom right**
+
+- `Open all`, `Zoom`, `Present` and `?` now sit at the bottom right of the page, even with the index rail open. They no longer move to the foot of the rail. Phones keep them top right.
+
 ## 1.9.155
 
 **generate-use-case: new skill; use cases shared by the plan, the mock and the tests**
