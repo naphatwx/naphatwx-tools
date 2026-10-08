@@ -1,6 +1,6 @@
 ---
 name: e2e-test
-description: End-to-end UI test for a feature. Generates UI test scenarios with the generate-test-scenario skill (target ui), writes Playwright scripts into the target repo (one sub-agent per scenario group, in parallel), runs them with a screenshot at every step, and writes ONE self-contained HTML report. Use when the user asks for an e2e test, a Playwright test, a UI regression test, or "test this feature in the browser with screenshots".
+description: Browser E2E test for a feature. UI scenarios from generate-test-scenario --target ui, Playwright scripts with a screenshot at every step, then one self-contained HTML report.
 argument-hint: "<spec folder | spec number | feature description> [--env <name>] [--base-url <url>]"
 ---
 

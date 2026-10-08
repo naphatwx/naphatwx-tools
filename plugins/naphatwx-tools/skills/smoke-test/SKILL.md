@@ -1,6 +1,6 @@
 ---
 name: smoke-test
-description: Quick post-deployment smoke test that proves the services of a real flow can talk to each other. `setup` explores the target repo (one sub-agent per flow), then builds a simulation API/RPC that runs the real path through every service (web → backend → queue → worker → CI → git host → callback) doing no real work, plus a runner script in the repo. `run` triggers it on an environment, checks every hop and the env vars each service used, and writes one HTML report. Use when the user asks for a smoke test, a post-deploy check, "check the services can talk to each other", or to set up or run a simulation / probe flow.
+description: Post-deploy smoke test that checks the services of a real flow can talk to each other. `setup` builds a no-op simulation probe and a runner script in the repo; `run <env>` checks every hop and env var and writes one HTML report.
 argument-hint: "setup [flow ...] | run <env> [flow ...]"
 ---
 

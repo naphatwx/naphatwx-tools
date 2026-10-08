@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.9.141
+
+**smoke-test, e2e-test: shorter descriptions; plugin.json lists get-mr-diffs**
+
+- Shorter `description` for smoke-test and e2e-test, so the skill list has room to show them and requests trigger the right skill.
+- `get-mr-diffs` added to the `skills` list in the Claude `plugin.json` (it was the only skill missing).
+
+## 1.9.140
+
+**smoke-test, e2e-test: new skills; generate-test-scenario: UI target**
+
+- New `smoke-test`: `setup` maps the repo, explores each picked flow with one read-only sub-agent per flow in parallel, then builds a simulation probe (one entry RPC, a smoke marker on every transport, no real side effects, hops reported to a shared store with a TTL) plus `scripts/smoke/` in the target repo (`run.mjs`, `report-template.html`, `envs.json`, `flows/<flow>.json` with the commit it was mapped at). `run <env>` runs every flow in parallel, checks each hop in order and the env vars each service used (secrets as `sha256:<8 hex>`), marks hops after a break "not reached", and writes one HTML report.
+- New `e2e-test`: scenarios from generate-test-scenario `--target ui`, a one-time Playwright harness (shared login, `step()` helper with a JPEG screenshot per step, a reporter that writes one self-contained HTML file), one writer sub-agent per scenario group in parallel, then a run and the report.
+- generate-test-scenario: new `--target ui` (`references/ui-target.md`: routes, a Selectors table, exact on-screen copy, sign-in role, viewport, keyboard and focus cases, one action per step) and a feature description as input instead of a spec folder.
+
 ## 1.9.139
 
 **design-feature, generate-mock-ui: mock review and control rule**
