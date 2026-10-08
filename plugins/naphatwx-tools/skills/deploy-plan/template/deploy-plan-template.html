@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deploy Plan</title>
+<style>
+  /* theme:tokens:start */
+  /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+  :root {
+      color-scheme: dark;
+
+      /* Surfaces, darkest first */
+      --bg: #121316;
+      --surface: #18191d;
+      --surface-2: #1f2025;
+      --surface-3: #24262c;
+      --line: #26282e;
+      --line-strong: #363940;
+      --line-3: #4a4d55;
+
+      /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+      --text: #e2e3e7;
+      --text-2: #c6c8cf;
+      --text-3: #a3a6b0;
+
+      /* One accent */
+      --accent: #8ab0ff;
+      --accent-fill: #1b2232;
+      --accent-soft: rgba(138, 176, 255, 0.12);
+
+      /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+      --ok: #8fd694;
+      --warn: #f0c26b;
+      --bad: #f28b8d;
+      --neutral: #a3a6b0;
+      --ok-soft: rgba(143, 214, 148, 0.12);
+      --warn-soft: rgba(240, 194, 107, 0.12);
+      --bad-soft: rgba(242, 139, 141, 0.12);
+      --neutral-soft: rgba(163, 166, 176, 0.12);
+      --add: var(--ok);
+      --change: var(--warn);
+      --drop: var(--bad);
+
+      /* Diagrams: connectors and their labels */
+      --connector: #6b6e78;
+
+      /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+      /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
+         --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+      --fs-xs: 0.75rem;
+      --fs-sm: 0.875rem;
+      --fs-md: 1rem;
+      --fs-lg: 1.25rem;
+      --fs-xl: 1.5rem;
+      --fs-2xl: 2rem;
+      /* Headings and lead line: the same steps on every page */
+      --fs-lead: var(--fs-lg);
+      --fs-h3: var(--fs-lg);
+      --fs-h2: var(--fs-xl);
+      --fs-h1: var(--fs-2xl);
+
+      /* Page frame: every page centers its content at the same width */
+      --page-w: 1200px;
+      --gutter: clamp(16px, 3vw, 24px);
+
+      --radius: 6px;
+      --radius-lg: 10px;
+      --ease: cubic-bezier(0.2, 0, 0, 1);
+  }
+  /* theme:tokens:end */
+  /* theme:base:start */
+  /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+  * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  code, kbd, pre, samp { font-family: var(--mono); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+  /* theme:base:end */
+
+  body { font-size: var(--fs-md); line-height: 1.5; }
+  [hidden] { display: none !important; }
+  main { max-width: var(--page-w); margin: 0 auto; padding: 16px var(--gutter) 48px; }
+  header { display: grid; gap: 8px; margin-bottom: 12px; }
+  h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
+  h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; }
+  .meta { color: var(--text-3); }
+  .meta code { color: var(--text-2); }
+  code { font-size: var(--fs-sm); overflow-wrap: anywhere; }
+  .facts { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+
+  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
+  .tone-ok { color: var(--ok); background: var(--ok-soft); }
+  .tone-warn { color: var(--warn); background: var(--warn-soft); }
+  .tone-bad { color: var(--bad); background: var(--bad-soft); }
+  .tone-neutral { color: var(--neutral); background: var(--neutral-soft); }
+  .tone-accent { color: var(--accent); background: var(--accent-soft); }
+
+  .notes { margin: 0; padding: 8px 12px 8px 30px; background: var(--warn-soft); border-radius: var(--radius); }
+  .notes li { color: var(--text); }
+
+  /* Progress: a count plus a bar, so the number is readable without the color */
+  .progress { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+  .bar { flex: 1 1 200px; height: 8px; background: var(--surface-3); border-radius: 999px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s var(--ease); }
+  .bar.full > span { background: var(--ok); }
+  .count { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .tools { display: flex; gap: 6px; flex-wrap: wrap; }
+  button { font: inherit; font-size: var(--fs-md); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
+  button:hover { background: var(--surface-3); }
+  button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  button.small { font-size: var(--fs-sm); padding: 1px 8px; }
+
+  .phase { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); margin-top: 12px; overflow: hidden; }
+  .phase-head { display: grid; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .phase-title { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+  .phase.done { border-color: var(--ok); }
+
+  .steps { list-style: none; margin: 0; padding: 0; }
+  .steps > li + li { border-top: 1px solid var(--line); }
+  /* The whole row toggles the step; buttons and links inside it keep their own click */
+  .step { display: grid; grid-template-columns: 22px 2.5ch minmax(0, 1fr); gap: 4px 10px; padding: 8px 14px; cursor: pointer; transition: background-color .15s var(--ease); }
+  .step:hover { background: var(--surface-2); }
+  .step input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ok); cursor: pointer; }
+  .step .n { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
+  .step .body { display: grid; gap: 4px; min-width: 0; }
+  .step .line { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+  .step label { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+  .step .detail { color: var(--text-2); overflow-wrap: anywhere; }
+  .step .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .step .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+  .step.is-done { background: var(--ok-soft); }
+  .step.is-done label { color: var(--text-3); text-decoration: line-through; font-weight: 500; }
+  .step.is-done .detail, .step.is-done .cmd { opacity: .7; }
+  .empty { padding: 10px 14px; color: var(--text-3); }
+
+  /* PDF export goes through the print dialog. Keep the dark theme, show every step, drop the buttons. */
+  @page { margin: 0; }
+  @media print {
+    html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    main { padding: 16px; max-width: none; }
+    .tools, .cmd button { display: none !important; }
+    .steps > li[hidden] { display: block !important; }
+    .step { break-inside: avoid; }
+    .phase-head { break-after: avoid; }
+  }
+
+  @media (max-width: 600px) {
+    .step { grid-template-columns: 22px minmax(0, 1fr); }
+    .step .n { display: none; }
+  }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div id="announce" class="sr-only" aria-live="polite"></div>
+<script>
+const DATA = /*__PLAN_DATA__*/null;
+
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
+  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return n;
+};
+const say = (msg) => { const a = document.getElementById('announce'); a.textContent = ''; setTimeout(() => { a.textContent = msg; }, 50); };
+
+// Ticks live in this browser only. Storage can throw (private mode), so the page works without it.
+const KEY = 'deploy-plan:' + (DATA && DATA.id || location.pathname);
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
+function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} }
+let state = load();
+let hideDone = false;
+
+async function copy(text, btn) {
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const t = el('textarea', {}, text);
+    document.body.append(t); t.select();
+    try { document.execCommand('copy'); } catch {}
+    t.remove();
+  }
+  const was = btn.textContent;
+  btn.textContent = 'Copied';
+  say('Copied ' + btn.dataset.what);
+  setTimeout(() => { btn.textContent = was; }, 1200);
+}
+const copyBtn = (text, what, label = 'Copy') => {
+  const b = el('button', { type: 'button', class: 'small', 'aria-label': 'Copy ' + what, 'data-what': what }, label);
+  b.addEventListener('click', () => copy(text, b));
+  return b;
+};
+
+const TAGS = { db: 'DB', env: 'Env', infra: 'Infra', flag: 'Flag', api: 'API', data: 'Data', comms: 'Comms', check: 'Check' };
+const stepId = (p, i) => p.key + ':' + i;
+
+function markdown() {
+  const lines = ['# ' + (DATA.title || 'Deploy plan') + (DATA.env ? ' (' + DATA.env + ')' : ''), ''];
+  for (const p of DATA.phases) {
+    lines.push('## ' + p.title, '');
+    p.steps.forEach((s, i) => {
+      lines.push('- [' + (state[stepId(p, i)] ? 'x' : ' ') + '] ' + s.text + (s.risk === 'high' ? ' **(high risk)**' : ''));
+      if (s.cmd) lines.push('  `' + s.cmd + '`');
+    });
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
+const refs = [];
+function update() {
+  let done = 0, total = 0;
+  for (const r of refs) {
+    let d = 0;
+    r.rows.forEach(({ row, box, id }) => {
+      const on = !!state[id];
+      box.checked = on;
+      row.classList.toggle('is-done', on);
+      row.parentElement.hidden = hideDone && on;
+      if (on) d++;
+    });
+    done += d; total += r.rows.length;
+    r.count.textContent = d + ' / ' + r.rows.length;
+    r.bar.style.width = (r.rows.length ? d / r.rows.length * 100 : 0) + '%';
+    const full = r.rows.length > 0 && d === r.rows.length;
+    r.bar.parentElement.classList.toggle('full', full);
+    r.section.classList.toggle('done', full);
+    r.pill.hidden = !full;
+  }
+  totalCount.textContent = done + ' / ' + total + ' done';
+  totalBar.style.width = (total ? done / total * 100 : 0) + '%';
+  totalBar.parentElement.classList.toggle('full', total > 0 && done === total);
+}
+
+const totalCount = el('span', { class: 'count' });
+const totalBar = el('span');
+
+function render() {
+  const app = document.getElementById('app');
+  if (!DATA) { app.append(el('p', {}, 'No data in this plan.')); return; }
+  document.title = (DATA.title || 'Deploy plan') + (DATA.env ? ' · ' + DATA.env : '');
+
+  const hideBtn = el('button', { type: 'button', 'aria-pressed': 'false' }, 'Hide done');
+  hideBtn.addEventListener('click', () => { hideDone = !hideDone; hideBtn.setAttribute('aria-pressed', String(hideDone)); update(); });
+  const resetBtn = el('button', { type: 'button' }, 'Reset');
+  resetBtn.addEventListener('click', () => { if (confirm('Clear every tick on this plan?')) { state = {}; save(state); update(); say('All ticks cleared'); } });
+  // The browser has no direct PDF API; its print dialog offers "Save as PDF". The title names the file.
+  const pdfBtn = el('button', { type: 'button' }, 'Export PDF');
+  pdfBtn.addEventListener('click', () => window.print());
+  const mdBtn =el('button', { type: 'button', 'data-what': 'plan as Markdown' }, 'Copy as Markdown');
+  mdBtn.addEventListener('click', () => copy(markdown(), mdBtn));
+
+  app.append(el('header', {},
+    el('h1', {}, DATA.title || 'Deploy plan', DATA.env ? el('span', { class: 'pill tone-accent' }, DATA.env) : null),
+    el('div', { class: 'facts' },
+      DATA.services && DATA.services.length ? el('span', { class: 'meta' }, 'Services: ', DATA.services.flatMap((s, i) => [i ? ', ' : null, el('code', {}, s)])) : null,
+      DATA.order ? el('span', { class: 'meta' }, 'Order: ', el('span', {}, DATA.order)) : null,
+      DATA.source ? el('span', { class: 'meta' }, 'Source: ', /^https?:/.test(DATA.source) ? el('a', { href: DATA.source, target: '_blank', rel: 'noopener' }, DATA.source) : el('code', {}, DATA.source)) : null,
+      DATA.createdAt ? el('time', { class: 'meta', datetime: DATA.createdAt }, DATA.createdAt) : null),
+    DATA.notes && DATA.notes.length ? el('ul', { class: 'notes' }, DATA.notes.map((t) => el('li', {}, t))) : null,
+    el('div', { class: 'progress' }, totalCount, el('div', { class: 'bar', 'aria-hidden': 'true' }, totalBar)),
+    el('div', { class: 'tools' }, hideBtn, mdBtn, pdfBtn, resetBtn)));
+
+  for (const p of DATA.phases) {
+    const count = el('span', { class: 'count meta' });
+    const bar = el('span');
+    const pill = el('span', { class: 'pill tone-ok' }, el('span', { 'aria-hidden': 'true' }, '✓'), 'done');
+    const list = el('ol', { class: 'steps' });
+    const section = el('section', { class: 'phase', 'aria-labelledby': 'h-' + p.key },
+      el('div', { class: 'phase-head' },
+        el('div', { class: 'phase-title' }, el('h2', { id: 'h-' + p.key }, p.title), count, pill),
+        el('div', { class: 'bar', 'aria-hidden': 'true' }, bar)),
+      list);
+    const rows = [];
+    if (!p.steps.length) list.append(el('li', { class: 'empty' }, 'No steps.'));
+    p.steps.forEach((s, i) => {
+      const id = stepId(p, i);
+      const boxId = 'c-' + id.replace(/[^a-z0-9]/gi, '-');
+      const box = el('input', { type: 'checkbox', id: boxId });
+      box.addEventListener('change', () => { state[id] = box.checked; save(state); update(); say((box.checked ? 'Done: ' : 'Not done: ') + s.text); });
+      const row = el('div', { class: 'step' },
+        box,
+        el('span', { class: 'n', 'aria-hidden': 'true' }, i + 1),
+        el('div', { class: 'body' },
+          el('div', { class: 'line' },
+            el('label', { for: boxId }, s.text),
+            s.risk === 'high' ? el('span', { class: 'pill tone-bad' }, el('span', { 'aria-hidden': 'true' }, '!'), 'high risk') : null,
+            s.check ? el('span', { class: 'pill tone-warn' }, el('span', { 'aria-hidden': 'true' }, '?'), 'confirm') : null,
+            s.tag ? el('span', { class: 'pill tone-neutral' }, TAGS[s.tag] || s.tag) : null),
+          s.detail ? el('div', { class: 'detail' }, s.detail) : null,
+          s.cmd ? el('div', { class: 'cmd' }, el('code', {}, s.cmd), copyBtn(s.cmd, 'command')) : null,
+          s.source ? el('div', { class: 'meta' }, 'From ', el('code', {}, s.source)) : null));
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('input, label, button, a, code')) return;
+        box.checked = !box.checked;
+        box.dispatchEvent(new Event('change'));
+      });
+      list.append(el('li', {}, row));
+      rows.push({ row, box, id });
+    });
+    refs.push({ section, count, bar, pill, rows });
+    app.append(section);
+  }
+  update();
+}
+render();
+</script>
+</body>
+</html>
