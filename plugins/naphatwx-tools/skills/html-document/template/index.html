@@ -58,6 +58,11 @@
             --fs-lg: 1.25rem;
             --fs-xl: 1.75rem;
             --fs-2xl: 2.75rem;
+            /* Headings and lead line: the same steps on every page */
+            --fs-lead: var(--fs-lg);
+            --fs-h3: var(--fs-lg);
+            --fs-h2: var(--fs-xl);
+            --fs-h1: var(--fs-2xl);
 
             /* Page frame: every page centers its content at the same width */
             --page-w: 1200px;
@@ -109,9 +114,7 @@
             --fs-label: 0.75rem;
             --fs-sm: 0.875rem;
             --fs-body: 1rem;
-            --fs-lead: 1.15rem;
-            --fs-h2: 1.5rem;
-            --fs-h1: 2.2rem;
+            /* --fs-h1 / h2 / h3 / lead come from the theme, so headings match every other page */
             --fs-icon: 1.25rem;
             /* em, not rem: inline code must scale with the text around it */
             --fs-code: 0.88em;
@@ -366,14 +369,14 @@
         }
 
         .content h3 {
-            font-size: var(--fs-lead);
+            font-size: var(--fs-h3);
             font-weight: 600;
             margin: 30px 0 10px;
             scroll-margin-top: 80px;
         }
 
         .lead {
-            font-size: var(--fs-body);
+            font-size: var(--fs-lead);
             color: var(--text-muted);
             margin-bottom: 8px;
         }

@@ -128,10 +128,9 @@ const steps = slides.flatMap(slide => {
 });
 let current = 0;
 const presenting = () => root.getAttribute("data-present") === "on";
-// ===== Present fit: the step's diagram is scaled to the room above the bar, up to the box width.
-// Never below 1:1 (diagrams draw every label at 12px or more): a taller one scrolls in its box with a cue.
+// ===== Present fit: the step's diagram box ends at the room above the bar. Diagrams draw at 1:1
+// (every label 14px), never scaled: a taller one scrolls in its box with a cue, a wider one sideways.
 const fitted = new Set();
-const postFit = (frame, height) => frame.contentWindow?.postMessage({ type: "diagram-fit", height }, "*");
 function updateCue(box) {
     const cue = box.querySelector(":scope > .more-cue");
     if (cue) cue.hidden = !fitted.has(box) || box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
@@ -140,10 +139,6 @@ function unfit() {
     fitted.forEach(box => {
         box.style.maxHeight = "";
         box.classList.remove("fitted");
-        const art = box.querySelector("img, svg");
-        if (art) art.style.width = "";
-        const frame = box.querySelector(".diagram-frame");
-        if (frame && +frame.dataset.fit) { frame.dataset.fit = 0; postFit(frame, 0); }
     });
     const was = [...fitted];
     fitted.clear();
@@ -160,19 +155,10 @@ function fitRoom() {
     const top = sheetTop + box.getBoundingClientRect().top - slide.getBoundingClientRect().top;
     const cs = getComputedStyle(box);
     const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + box.clientTop * 2;
-    const width = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     const height = Math.max(200, Math.floor(room - top - padY));
     fitted.add(box);
     box.classList.add("fitted");
     box.style.maxHeight = height + padY + "px";
-    const frame = box.querySelector(".diagram-frame");
-    if (frame) { frame.dataset.fit = height; postFit(frame, height); }
-    else {
-        const art = box.querySelector("img, svg");
-        const vb = art?.viewBox?.baseVal;
-        const [w, h] = art?.tagName === "IMG" ? [art.naturalWidth, art.naturalHeight] : [vb?.width, vb?.height];
-        if (w && h) art.style.width = Math.floor(w * Math.max(1, Math.min(width / w, height / h))) + "px";
-    }
     if (!box.querySelector(":scope > .more-cue")) {
         box.insertAdjacentHTML("beforeend", '<div class="more-cue" aria-hidden="true" hidden>continues ↓</div>');
         box.addEventListener("scroll", () => updateCue(box), { passive: true });
@@ -270,15 +256,12 @@ document.addEventListener("keydown", (e) => {
     else if (k === "ArrowLeft" || k === "PageUp" || (k === " " && e.shiftKey)) { e.preventDefault(); show(current - 1); }
 });
 
-// ===== Fit each diagram-design iframe to the height its file posts (works on file://).
-// Presenting, the frame is sent a fit height; one that loaded after it was sent (lazy) gets it again.
+// ===== Fit each diagram-design iframe to the height its file posts (works on file://) =====
 addEventListener("message", (e) => {
     if (!e.data || e.data.type !== "diagram-height") return;
     const frame = [...document.querySelectorAll(".diagram-frame")].find(f => f.contentWindow === e.source);
     if (!frame) return;
     frame.style.height = Math.ceil(e.data.height) + "px";
-    const want = +frame.dataset.fit || 0;
-    if ((+e.data.fit || 0) !== want) postFit(frame, want);
     const box = frame.closest(".flowchart, .seq");
     if (box) updateCue(box);
 });
@@ -292,6 +275,8 @@ function setZoom(on) {
     zoomToggle.setAttribute("aria-pressed", String(on));
     store.set("plan-zoom", on ? "on" : "off");
     if (!on) zooms.forEach(z => z.reset());
+    // zoom pans with a drag instead of the box's sideways scroll
+    else document.querySelectorAll(".zoomable").forEach(b => { b.scrollLeft = 0; });
 }
 setZoom(store.get("plan-zoom") === "on");
 zoomToggle.addEventListener("click", () => setZoom(!zoomOn()));
@@ -357,7 +342,9 @@ function caption(box) {
 }
 function openLightbox(box, stage, reset) {
     const opener = document.activeElement;
-    const ratio = stage.offsetHeight / stage.offsetWidth || 1;
+    // the drawing's own ratio: at 1:1 it can be narrower than the stage
+    const art = (stage.querySelector(":scope > svg, :scope > img") || stage).getBoundingClientRect();
+    const ratio = art.height / art.width || 1;
     const spot = document.createElement("div");
     spot.style.height = box.offsetHeight + "px";
     lightbox.querySelector(".lightbox-caption").textContent = caption(box);

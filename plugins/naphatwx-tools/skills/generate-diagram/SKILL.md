@@ -38,7 +38,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Manual mode: every template's `<style>` holds the synced theme block (`theme:tokens` and `theme:base` markers). Keep it as-is and style only with its tokens (`var(--surface)`, `var(--accent)`, `var(--mono)`…); the standalone flowchart `.svg` uses the same hex values.
     - diagram-design mode: use the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) and skip its first-run style-guide question (the answer is always "proceed with the default"). Brief it so its output matches manual mode:
         - Colors: only the theme's values, the hexes in the `theme:tokens` block of `template/er/er-diagram.html`. Map its defaults: paper `#2d3142` → `#18191d`; `#393e53` → `#1f2025`; `#41465b` → `#363940`; ink `#f5f5f5` → `#e2e3e7`; muted `#bfc0c0` → `#c6c8cf`; tags `#8e98ac` → `#a3a6b0`; accent `#f08a59` → `#8ab0ff`; blue `#274a73` → `#1b2232`; amber → `#f0c26b`; red `#ab5258` → `#f28b8d`; connectors `#6b6e78`.
-        - Type: every label at least 12px (`font-size` ≥ 12 in viewBox units), viewBox at most about 840 wide so it shows at 1:1 or larger. Sentence case labels (`Yes`, `Retry`, `1 · Load`): no all-caps or letter-spaced tags. No dot-grid or patterned background.
+        - Type: every label 14px (`font-size` 14 in viewBox units), sans and mono alike, with shapes sized to fit it. Hosts draw the SVG at 1:1, never scaled, so keep the viewBox at most about 1000 wide (wider scrolls sideways). Sentence case labels (`Yes`, `Retry`, `1 · Load`): no all-caps or letter-spaced tags. No dot-grid or patterned background.
         - Fonts: the OS font, never a web font. Delete the Google Fonts `<link>` (and any `preconnect`) and swap the font stacks: Geist and Instrument Serif → `-apple-system, "Segoe UI", system-ui, sans-serif`; Geist Mono → `ui-monospace, "SF Mono", Menlo, Consolas, monospace` (single quotes inside SVG `font-family="…"` attributes).
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
 6. A diagram file never holds a step details list. The caller's page shows it (see the sequence reference).
@@ -61,15 +61,14 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Read the reference for the type and follow it: [flowchart](references/flowchart.md), [sequence](references/sequence.md), [er](references/er.md).
 - diagram-design mode, `flowchart` and `sequence`: add this embed script just before `</body>` of every saved `.html`, unchanged. It is the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
-    - Height: it posts `diagram-height` on every resize, so the host sizes the iframe (the SVG shrinks with the iframe's width, so a fixed height leaves empty space).
+    - Height: it posts `diagram-height` on every resize, so the host sizes the iframe to the content (no fixed height).
     - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
-    - Fit: a host that presents posts `diagram-fit` with a height; the SVG scales to fit it, up to the frame width, never below 1:1, and the host scrolls what is still taller.
-    - Width: each SVG stays at least its viewBox width (labels stay 12px or larger) and scrolls sideways in a narrow window instead of overflowing the page.
+    - Width: each SVG draws at exactly its viewBox width (1:1, so 14px labels render at 14px) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host.
 
 ```html
 <script>
   // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
-  // Out: {type: "diagram-height", height, fit} on every resize. In: {type: "diagram-fit", height}, 0 = off.
+  // Out: {type: "diagram-height", height} on every resize, so the host sizes the iframe.
   const embedded = parent !== window;
   const style = document.createElement("style");
   style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
@@ -78,10 +77,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
   document.head.append(style);
   // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
   if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
-  // Never draw a diagram below its viewBox width, so 12px labels stay 12px; a narrow frame scrolls it sideways.
+  // Draw each diagram at its viewBox width, never scaled, so 14px labels render at 14px; a narrow frame scrolls it sideways.
   const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
   svgs.forEach(svg => {
-    svg.style.minWidth = svg.viewBox.baseVal.width + "px";
+    Object.assign(svg.style, { width: svg.viewBox.baseVal.width + "px", maxWidth: "none", height: "auto" });
     if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
     const box = document.createElement("div");
     box.style.overflowX = "auto";
@@ -89,26 +88,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     box.append(svg);
   });
   // body, not documentElement: its scrollHeight never drops below the iframe's height
-  let fit = 0;
-  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, fit }, "*");
-  // Fit (host presenting): scale to the given height, up to the frame width, never below 1:1; taller → the host scrolls.
-  function applyFit() {
-    svgs.forEach(svg => { svg.style.width = ""; svg.style.maxWidth = ""; });
-    if (!fit) return;
-    const rest = document.body.getBoundingClientRect().height - svgs.reduce((h, svg) => h + svg.getBoundingClientRect().height, 0);
-    svgs.forEach(svg => {
-      const vb = svg.viewBox.baseVal;
-      const s = Math.max(1, Math.min(svg.parentElement.clientWidth / vb.width, (fit - rest) / svgs.length / vb.height));
-      svg.style.width = vb.width * s + "px";
-      svg.style.maxWidth = "none";
-    });
-  }
-  addEventListener("message", (e) => {
-    if (e.source !== parent || e.data?.type !== "diagram-fit") return;
-    fit = +e.data.height || 0;
-    applyFit();
-    postHeight();
-  });
+  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
   addEventListener("load", postHeight);
   new ResizeObserver(postHeight).observe(document.body);
 </script>

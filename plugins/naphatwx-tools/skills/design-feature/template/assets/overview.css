@@ -53,6 +53,11 @@
     --fs-lg: 1.25rem;
     --fs-xl: 1.75rem;
     --fs-2xl: 2.75rem;
+    /* Headings and lead line: the same steps on every page */
+    --fs-lead: var(--fs-lg);
+    --fs-h3: var(--fs-lg);
+    --fs-h2: var(--fs-xl);
+    --fs-h1: var(--fs-2xl);
 
     /* Page frame: every page centers its content at the same width */
     --page-w: 1200px;
@@ -89,12 +94,8 @@ code, kbd, pre, samp { font-family: var(--mono); }
 :root {
     --fs-body: var(--fs-md);
     --fs-code: var(--fs-sm);
-    /* Headings step down h1 > h2 > h3 for the projector. Everything else is one body size (--fs-md),
+    /* Headings and lead come from the theme (--fs-h1/h2/h3/lead). Everything else is one body size (--fs-md),
        with code / kbd / pills at --fs-sm. Diagram labels inside SVGs are drawings and keep their own sizes. */
-    --fs-lead: var(--fs-md);
-    --fs-h3: var(--fs-lg);
-    --fs-h2: var(--fs-xl);
-    --fs-h1: var(--fs-2xl);
     --measure: 72ch;
     /* running prose: ch ("0") is wider than an average glyph, so 50ch reads as about 68 characters */
     --prose: 50ch;
@@ -270,9 +271,10 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
     border-radius: 12px;
     /* deep bottom edge: the floating tools sit bottom right, so a drawing ends above them */
     padding: 24px 24px 64px;
-    overflow: hidden;
+    /* diagrams draw at 1:1 (labels 14px): a wider one scrolls sideways in its box, never shrinks */
+    overflow: auto hidden;
 }
-.flowchart img { display: block; max-width: 100%; max-height: 72vh; height: auto; margin: 0 auto; }
+.flowchart img { display: block; max-width: none; height: auto; margin: 0 auto; }
 .flowchart:has(.diagram-frame), .seq:has(.diagram-frame) { padding: 0 0 48px; }
 .diagram-frame { display: block; width: 100%; height: 480px; border: 0; background: var(--surface); }
 
@@ -281,26 +283,26 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
 .seq-legend .hot::before { border-top: 2px solid var(--accent); }
 
-.seq svg { display: block; width: 100%; height: auto; margin: 0 auto; font-family: var(--sans); }
-/* projector floor: no diagram text below 12px */
+.seq svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
+/* every label is --fs-sm (14px): the SVG draws at its own width and height, never scaled */
 .seq .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
-.seq .actor text { fill: var(--text); font-size: 13px; font-weight: 600; }
-.seq .actor .sub { fill: var(--text-3); font-size: 12px; font-weight: 400; }
+.seq .actor text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; }
+.seq .actor .sub { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 400; }
 .seq .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
 .seq .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
 .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
 .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-.seq .lbl { fill: var(--text-2); font-size: 13px; font-family: var(--mono); }
+.seq .lbl { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
 .seq .lbl.hot { fill: var(--accent); }
-.seq .num { fill: var(--text-3); font-size: 12px; font-weight: 600; }
+.seq .num { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 600; }
 .seq .phase line { stroke: var(--line); }
 .seq .phase rect { fill: var(--surface-2); }
-.seq .phase text { fill: var(--text-2); font-size: 12px; font-weight: 600; }
+.seq .phase text { fill: var(--text-2); font-size: var(--fs-sm); font-weight: 600; }
 .seq .note rect { fill: var(--bg); stroke: var(--line-strong); }
-.seq .note text { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+.seq .note text { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
 .seq .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
 .seq .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
-.seq .frame text { fill: var(--text); font-size: 12px; font-weight: 700; }
+.seq .frame text { fill: var(--text); font-size: var(--fs-sm); font-weight: 700; }
 .seq .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
 .seq .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
 .seq .ah { fill: var(--text-2); }
@@ -318,6 +320,7 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 
 /* zoom + lightbox */
 .zoomable { touch-action: none; }
+html[data-zoom="on"] .zoomable, .zoomable.in-lightbox { overflow: hidden; }
 html[data-zoom="on"] .zoomable { cursor: grab; }
 .zoomable.panning { cursor: grabbing; }
 .zoom-stage { transform-origin: 0 0; }
@@ -347,7 +350,7 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
     border-color: var(--line-strong); background: var(--surface);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
-.zoomable.in-lightbox img { width: 100%; max-width: none; max-height: none; }
+.zoomable.in-lightbox img, .zoomable.in-lightbox .zoom-stage > svg { width: 100%; height: auto; max-width: none; max-height: none; }
 .zoomable.in-lightbox .zoom-stage { flex: none; }
 .lightbox-caption {
     position: absolute; left: 0; right: 0; bottom: 0; height: 5vh; margin: 0;
@@ -491,7 +494,7 @@ html[data-present="on"] .slide.current { display: block; margin: auto !important
 html[data-present="on"] .slide.current p, html[data-present="on"] .slide.current .facts { max-width: var(--prose); }
 html[data-present="on"] .wide { width: 100%; margin-left: 0; transform: none; }
 html[data-present="on"] .panel { animation: none !important; }
-/* fitRoom() sizes the diagram to the room above the bar, never below 1:1 (labels stay >= 12px);
+/* fitRoom() ends the box at the room above the bar; the diagram stays 1:1 (labels 14px), and
    a taller one scrolls inside its box, with a "continues" cue on the bottom edge */
 html[data-present="on"] .flowchart, html[data-present="on"] .seq { padding-bottom: 24px; }
 html[data-present="on"] .flowchart:has(.diagram-frame), html[data-present="on"] .seq:has(.diagram-frame) { padding-bottom: 0; }

@@ -57,6 +57,11 @@
         --fs-lg: 1.25rem;
         --fs-xl: 1.75rem;
         --fs-2xl: 2.75rem;
+        /* Headings and lead line: the same steps on every page */
+        --fs-lead: var(--fs-lg);
+        --fs-h3: var(--fs-lg);
+        --fs-h2: var(--fs-xl);
+        --fs-h1: var(--fs-2xl);
 
         /* Page frame: every page centers its content at the same width */
         --page-w: 1200px;
@@ -93,17 +98,16 @@
     body { background: var(--surface); padding: 3rem 2rem; }
     .frame { max-width: 1200px; width: 100%; margin: 0 auto; }
     .eyebrow { font-size: 0.8125rem; color: var(--text-3); margin-bottom: 0.5rem; }
-    h1 { font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1.5rem; }
-    /* Scales up to 1.5x on wide screens; never below 1:1, so a narrow window scrolls the diagram, not the page. */
+    h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1.5rem; }
+    /* Drawn at 1:1 (every label 14px), never scaled; a narrow window scrolls the diagram, not the page. */
     .diagram { overflow-x: auto; }
-    .diagram svg { display: block; width: 100%; height: auto; margin: 0 auto; font-family: var(--sans); }
+    .diagram svg { display: block; width: 760px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
-    .diagram svg { min-width: 760px; max-width: 1140px; }
     .conn { fill: none; stroke: var(--connector); stroke-width: 1.6; }
     .ah { fill: var(--connector); }
-    .exit { fill: var(--text-3); font-size: 13px; text-anchor: middle; }
-    .node text { fill: var(--text); font-size: 14px; font-weight: 600; text-anchor: middle; }
-    .node .detail { fill: var(--text-2); font-family: var(--mono); font-size: 12px; font-weight: 400; }
+    .exit { fill: var(--text-3); font-size: var(--fs-sm); text-anchor: middle; }
+    .node text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; text-anchor: middle; }
+    .node .detail { fill: var(--text-2); font-family: var(--mono); font-size: var(--fs-sm); font-weight: 400; }
     .pill { fill: var(--bg); stroke: var(--line-3); stroke-width: 1.4; }
     .box { fill: var(--surface-3); stroke: var(--line-strong); stroke-width: 1.2; }
     .decision { fill: var(--accent-fill); stroke: var(--accent); stroke-width: 1.4; }
@@ -124,22 +128,22 @@
         <!-- Connectors first, behind nodes. The retry loop enters "Name valid?" on its own edge, not on the Yes connector. -->
         <g class="conn" marker-end="url(#ah)">
           <path d="M380,70 V103"/>
-          <path d="M490,165 H578"/>
+          <path d="M500,165 H578"/>
           <path d="M380,225 V263"/>
-          <path d="M490,325 H578"/>
-          <path d="M270,325 H202"/>
+          <path d="M500,325 H578"/>
+          <path d="M260,325 H202"/>
           <path d="M660,355 V418"/>
           <path d="M120,293 V258 H325 V293"/>
         </g>
-        <text class="exit" x="534" y="157">No</text>
+        <text class="exit" x="539" y="157">No</text>
         <text class="exit" x="398" y="250">Yes</text>
-        <text class="exit" x="534" y="317">Yes</text>
-        <text class="exit" x="236" y="317">No</text>
+        <text class="exit" x="539" y="317">Yes</text>
+        <text class="exit" x="231" y="317">No</text>
         <text class="exit" x="222" y="250">Retry</text>
         <g class="node"><rect class="pill" x="300" y="20" width="160" height="50" rx="25"/><text x="380" y="41">Open the form</text><text class="detail" x="380" y="59">/things/:id</text></g>
-        <g class="node"><polygon class="decision" points="380,105 490,165 380,225 270,165"/><text x="380" y="160">Can edit?</text><text class="detail" x="380" y="180">thing.edit</text></g>
+        <g class="node"><polygon class="decision" points="380,105 500,165 380,225 260,165"/><text x="380" y="160">Can edit?</text><text class="detail" x="380" y="180">thing.edit</text></g>
         <g class="node"><rect class="pill" x="580" y="140" width="160" height="50" rx="25"/><text x="660" y="161">No Edit button</text><text class="detail" x="660" y="179">read-only view</text></g>
-        <g class="node"><polygon class="decision" points="380,265 490,325 380,385 270,325"/><text x="380" y="320">Name valid?</text><text class="detail" x="380" y="340">name max 64 chars</text></g>
+        <g class="node"><polygon class="decision" points="380,265 500,325 380,385 260,325"/><text x="380" y="320">Name valid?</text><text class="detail" x="380" y="340">name max 64 chars</text></g>
         <g class="node"><rect class="box" x="40" y="295" width="160" height="60" rx="8"/><text x="120" y="320">Show error</text><text class="detail" x="120" y="340">INVALID_ARGUMENT</text></g>
         <g class="node"><rect class="box" x="580" y="295" width="160" height="60" rx="8"/><text x="660" y="320">Save record</text><text class="detail" x="660" y="340">CreateThing</text></g>
         <g class="node"><rect class="pill" x="580" y="420" width="160" height="50" rx="25"/><text x="660" y="441">Saved</text><text class="detail" x="660" y="459">status = ACTIVE</text></g>
@@ -148,7 +152,7 @@
   </div>
   <script>
     // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
-    // Out: {type: "diagram-height", height, fit} on every resize. In: {type: "diagram-fit", height}, 0 = off.
+    // Out: {type: "diagram-height", height} on every resize, so the host sizes the iframe.
     const embedded = parent !== window;
     const style = document.createElement("style");
     style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
@@ -157,10 +161,10 @@
     document.head.append(style);
     // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
     if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
-    // Never draw a diagram below its viewBox width, so 12px labels stay 12px; a narrow frame scrolls it sideways.
+    // Draw each diagram at its viewBox width, never scaled, so 14px labels render at 14px; a narrow frame scrolls it sideways.
     const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
     svgs.forEach(svg => {
-      svg.style.minWidth = svg.viewBox.baseVal.width + "px";
+      Object.assign(svg.style, { width: svg.viewBox.baseVal.width + "px", maxWidth: "none", height: "auto" });
       if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
       const box = document.createElement("div");
       box.style.overflowX = "auto";
@@ -168,26 +172,7 @@
       box.append(svg);
     });
     // body, not documentElement: its scrollHeight never drops below the iframe's height
-    let fit = 0;
-    const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, fit }, "*");
-    // Fit (host presenting): scale to the given height, up to the frame width, never below 1:1; taller → the host scrolls.
-    function applyFit() {
-      svgs.forEach(svg => { svg.style.width = ""; svg.style.maxWidth = ""; });
-      if (!fit) return;
-      const rest = document.body.getBoundingClientRect().height - svgs.reduce((h, svg) => h + svg.getBoundingClientRect().height, 0);
-      svgs.forEach(svg => {
-        const vb = svg.viewBox.baseVal;
-        const s = Math.max(1, Math.min(svg.parentElement.clientWidth / vb.width, (fit - rest) / svgs.length / vb.height));
-        svg.style.width = vb.width * s + "px";
-        svg.style.maxWidth = "none";
-      });
-    }
-    addEventListener("message", (e) => {
-      if (e.source !== parent || e.data?.type !== "diagram-fit") return;
-      fit = +e.data.height || 0;
-      applyFit();
-      postHeight();
-    });
+    const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
     addEventListener("load", postHeight);
     new ResizeObserver(postHeight).observe(document.body);
   </script>

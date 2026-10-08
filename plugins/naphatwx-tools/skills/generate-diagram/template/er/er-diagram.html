@@ -58,6 +58,11 @@
             --fs-lg: 1.25rem;
             --fs-xl: 1.75rem;
             --fs-2xl: 2.75rem;
+            /* Headings and lead line: the same steps on every page */
+            --fs-lead: var(--fs-lg);
+            --fs-h3: var(--fs-lg);
+            --fs-h2: var(--fs-xl);
+            --fs-h1: var(--fs-2xl);
 
             /* Page frame: every page centers its content at the same width */
             --page-w: 1200px;
@@ -107,7 +112,7 @@
             margin: 0 auto 16px;
         }
 
-        h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.015em; }
+        h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; }
         .sub { color: var(--text-3); font-size: 0.875rem; margin-top: 4px; }
         .actions { display: flex; gap: 8px; }
 
@@ -135,8 +140,8 @@
             padding: 12px;
         }
 
-        /* Scales up to fill the canvas; render() also sets min-width and a max-height floor at 1:1 so text never shrinks below 12px. */
-        .canvas svg { display: block; width: 100%; height: auto; max-height: 80vh; margin: 0 auto; font-family: var(--sans); }
+        /* render() sets the SVG's width and height: it draws at 1:1, so every label renders at 14px; a wider one scrolls. */
+        .canvas svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
 
         .legend {
             max-width: 1400px;
@@ -144,7 +149,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
-            font-size: 0.8rem;
+            font-size: var(--fs-sm);
             color: var(--text-3);
         }
 
@@ -158,21 +163,21 @@
         .t-box.write { stroke: var(--accent); stroke-width: 1.6; }
         .t-box.external { stroke-dasharray: 5 4; }
         .t-head { fill: var(--surface-3); }
-        .t-name { fill: var(--text); font-size: 14px; font-weight: 600; font-family: var(--mono); }
-        .t-tag { fill: var(--text-3); font-size: 12px; font-weight: 600; }
+        .t-name { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; font-family: var(--mono); }
+        .t-tag { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 600; }
         .write .t-tag, .t-tag.write { fill: var(--accent); }
         .r-zebra { fill: var(--text); opacity: 0.025; }
         .r-line { stroke: var(--line); }
-        .r-col { fill: var(--text); font-size: 12px; font-family: var(--mono); }
-        .r-type { fill: var(--text-3); font-size: 12px; }
-        .r-key { fill: var(--text-3); font-size: 12px; font-weight: 700; }
+        .r-col { fill: var(--text); font-size: var(--fs-sm); font-family: var(--mono); }
+        .r-type { fill: var(--text-3); font-size: var(--fs-sm); }
+        .r-key { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 700; }
         .r-drop .r-col, .r-drop .r-type { fill: var(--drop); text-decoration: line-through; }
         .r-drop .r-key { fill: var(--drop); }
         .r-add .r-col, .r-add .r-key { fill: var(--add); }
         .r-change .r-col, .r-change .r-key { fill: var(--change); }
         .fk { fill: none; stroke: var(--connector); stroke-width: 1.4; }
         .fk.new { stroke: var(--accent); stroke-width: 1.8; }
-        .fk-card { fill: var(--text-2); font-size: 12px; font-weight: 700; }
+        .fk-card { fill: var(--text-2); font-size: var(--fs-sm); font-weight: 700; }
         .fk-dot { fill: var(--connector); }
         .fk-dot.new { fill: var(--accent); }
         .table { outline: none; cursor: default; }
@@ -228,8 +233,15 @@
         };
 
         (function render({ tables, rels }) {
-            const W = 310, HEAD = 36, ROW = 26, GX = 150, GY = 70, PAD = 30;
+            const HEAD = 40, ROW = 30, GX = 150, GY = 70, PAD = 30;
             const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+            // Text is 14px; one width fits every table's longest name, key and type (estimated per character, on the wide side).
+            const MONO = 8.6, SANS = 7.9, BOLD = 8.8;
+            const widest = (list, per) => Math.max(0, ...list.map(v => String(v || "").length * per));
+            const cols = tables.flatMap(t => t.cols);
+            const KEY_X = Math.round(12 + widest(cols.map(c => c[0]), MONO) + 20);
+            const W = Math.round(Math.max(300, KEY_X + widest(cols.map(c => c[2]), BOLD) + 20 + widest(cols.map(c => c[1]), SANS) + 12,
+                ...tables.map(t => 12 + t.name.length * MONO + 20 + String(t.tag || "").length * BOLD + 12)));
             const byId = Object.fromEntries(tables.map(t => [t.id, t]));
             const height = t => HEAD + t.cols.length * ROW;
 
@@ -290,20 +302,20 @@
                     return `<g class="${mark ? "r-" + mark : ""}">`
                         + (i % 2 ? `<rect class="r-zebra" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>` : "")
                         + (i ? `<line class="r-line" x1="${t.x}" x2="${t.x + W}" y1="${y}" y2="${y}"/>` : "")
-                        + `<text class="r-col" x="${t.x + 12}" y="${y + 17}">${esc(col)}</text>`
-                        + `<text class="r-key" x="${t.x + 170}" y="${y + 17}">${esc(key)}</text>`
-                        + `<text class="r-type" x="${t.x + W - 12}" y="${y + 17}" text-anchor="end">${esc(type)}</text></g>`;
+                        + `<text class="r-col" x="${t.x + 12}" y="${y + 20}">${esc(col)}</text>`
+                        + `<text class="r-key" x="${t.x + KEY_X}" y="${y + 20}">${esc(key)}</text>`
+                        + `<text class="r-type" x="${t.x + W - 12}" y="${y + 20}" text-anchor="end">${esc(type)}</text></g>`;
                 }).join("");
                 return `<g class="table ${kind}" data-id="${t.id}" tabindex="0" role="group" aria-label="${esc(t.name)}${t.tag ? ", " + esc(t.tag) : ""}">`
                     + `<rect class="t-box ${kind}" x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/>`
                     + `<path class="t-head" d="M${t.x + 1},${t.y + HEAD} V${t.y + 8} a7,7 0 0 1 7,-7 H${t.x + W - 8} a7,7 0 0 1 7,7 V${t.y + HEAD} Z"/>`
-                    + `<text class="t-name" x="${t.x + 12}" y="${t.y + 23}">${esc(t.name)}</text>`
-                    + `<text class="t-tag${kind === "write" ? " write" : ""}" x="${t.x + W - 12}" y="${t.y + 23}" text-anchor="end">${esc(t.tag || "")}</text>`
+                    + `<text class="t-name" x="${t.x + 12}" y="${t.y + 25}">${esc(t.name)}</text>`
+                    + `<text class="t-tag${kind === "write" ? " write" : ""}" x="${t.x + W - 12}" y="${t.y + 25}" text-anchor="end">${esc(t.tag || "")}</text>`
                     + rows + `</g>`;
             });
 
             const el = document.getElementById("er");
-            el.innerHTML = `<svg viewBox="0 0 ${svgW} ${svgH}" style="min-width:${svgW}px;max-height:max(80vh, ${svgH}px)" role="img" aria-label="ER diagram, ${tables.length} tables, ${rels.length} foreign keys">${lines.join("")}${boxes.join("")}</svg>`;
+            el.innerHTML = `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" role="img" aria-label="ER diagram, ${tables.length} tables, ${rels.length} foreign keys">${lines.join("")}${boxes.join("")}</svg>`;
 
             // Hover or focus a table: dim everything not related to it.
             const clear = () => el.querySelectorAll(".dim").forEach(n => n.classList.remove("dim"));

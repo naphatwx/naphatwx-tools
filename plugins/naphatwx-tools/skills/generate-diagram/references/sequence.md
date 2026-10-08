@@ -45,7 +45,7 @@ SeqDiagrams.define("01-cut-new-version", {
 ```
 
 - `title` names the flow in the SVG's accessible name (`<title>: sequence diagram, N participants, M steps`); missing → the file id.
-- The SVG never draws below its natural width (a host's `.seq svg { min-width: var(--seq-w) }`) and scales up to 1.5x on wide screens, so its 12px labels stay readable on a projector.
+- Every label is 14px. `render.js` spreads the participants until their boxes and message labels fit (`gap` is the minimum), and gives the SVG its own `width` / `height`: hosts draw it at 1:1, never scaled, and a box narrower than it scrolls sideways.
 
 | Step | Meaning |
 |------|---------|

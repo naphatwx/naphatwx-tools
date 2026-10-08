@@ -59,6 +59,11 @@
             --fs-lg: 1.25rem;
             --fs-xl: 1.75rem;
             --fs-2xl: 2.75rem;
+            /* Headings and lead line: the same steps on every page */
+            --fs-lead: var(--fs-lg);
+            --fs-h3: var(--fs-lg);
+            --fs-h2: var(--fs-xl);
+            --fs-h1: var(--fs-2xl);
 
             /* Page frame: every page centers its content at the same width */
             --page-w: 1200px;
@@ -99,8 +104,8 @@
         body { padding: 24px 16px 40px; }
         main { max-width: 1200px; margin: 0 auto; }
         header { margin-bottom: 8px; }
-        h1 { font-size: 1.4rem; }
-        h2 { font-size: 1.1rem; margin-top: 28px; }
+        h1 { font-size: var(--fs-h1); }
+        h2 { font-size: var(--fs-h2); margin-top: 28px; }
         code { font-size: 0.88em; }
 
         /* ============ SEQUENCE DIAGRAM (.seq) ============ */
@@ -113,26 +118,26 @@
             overflow-x: auto;
         }
 
-        /* render.js sets --seq-w (the drawing's width) and a 1.5x max-width: it scales up, never below 1:1. */
-        .seq svg { display: block; width: 100%; min-width: var(--seq-w); height: auto; margin: 0 auto; font-family: var(--sans); }
+        /* render.js sets the SVG's width and height: it draws at 1:1, so every label renders at 14px; a wider one scrolls. */
+        .seq svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
         .seq .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
-        .seq .actor text { fill: var(--text); font-size: 14px; font-weight: 600; }
-        .seq .actor .sub { fill: var(--text-3); font-size: 12px; font-weight: 400; }
+        .seq .actor text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; }
+        .seq .actor .sub { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 400; }
         .seq .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
         .seq .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
         .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
         .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-        .seq .lbl { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+        .seq .lbl { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
         .seq .lbl.hot { fill: var(--accent); }
-        .seq .num { fill: var(--text-3); font-size: 12px; font-weight: 600; }
+        .seq .num { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 600; }
         .seq .phase line { stroke: var(--line); }
         .seq .phase rect { fill: var(--surface-2); }
-        .seq .phase text { fill: var(--text-2); font-size: 12px; font-weight: 600; }
+        .seq .phase text { fill: var(--text-2); font-size: var(--fs-sm); font-weight: 600; }
         .seq .note rect { fill: var(--bg); stroke: var(--line-strong); }
-        .seq .note text { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+        .seq .note text { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
         .seq .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
         .seq .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
-        .seq .frame text { fill: var(--text); font-size: 12px; font-weight: 700; }
+        .seq .frame text { fill: var(--text); font-size: var(--fs-sm); font-weight: 700; }
         .seq .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
         .seq .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
         .seq .ah { fill: var(--text-2); }

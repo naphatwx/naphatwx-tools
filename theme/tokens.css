@@ -50,6 +50,11 @@
     --fs-lg: 1.25rem;
     --fs-xl: 1.75rem;
     --fs-2xl: 2.75rem;
+    /* Headings and lead line: the same steps on every page */
+    --fs-lead: var(--fs-lg);
+    --fs-h3: var(--fs-lg);
+    --fs-h2: var(--fs-xl);
+    --fs-h1: var(--fs-2xl);
 
     /* Page frame: every page centers its content at the same width */
     --page-w: 1200px;

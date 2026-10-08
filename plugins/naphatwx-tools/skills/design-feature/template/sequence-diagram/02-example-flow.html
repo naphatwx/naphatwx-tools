@@ -57,6 +57,11 @@
         --fs-lg: 1.25rem;
         --fs-xl: 1.75rem;
         --fs-2xl: 2.75rem;
+        /* Headings and lead line: the same steps on every page */
+        --fs-lead: var(--fs-lg);
+        --fs-h3: var(--fs-lg);
+        --fs-h2: var(--fs-xl);
+        --fs-h1: var(--fs-2xl);
 
         /* Page frame: every page centers its content at the same width */
         --page-w: 1200px;
@@ -93,34 +98,33 @@
     body { background: var(--surface); padding: 3rem 2rem; }
     .page { max-width: 1200px; width: 100%; margin: 0 auto; }
     .eyebrow { font-size: 0.8125rem; color: var(--text-3); margin-bottom: 0.5rem; }
-    h1 { font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1.5rem; }
-    /* Scales up to 1.5x on wide screens; never below 1:1, so a narrow window scrolls the diagram, not the page. */
+    h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1.5rem; }
+    /* Drawn at 1:1 (every label 14px), never scaled; a narrow window scrolls the diagram, not the page. */
     .diagram { overflow-x: auto; }
-    .diagram svg { display: block; width: 100%; height: auto; margin: 0 auto; font-family: var(--sans); }
+    .diagram svg { display: block; width: 901px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
-    .diagram svg { min-width: 800px; max-width: 1200px; }
     .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.875rem; color: var(--text-3); margin-bottom: 12px; }
     .legend span::before { content: ""; display: inline-block; width: 26px; vertical-align: middle; margin-right: 6px; border-top: 2px solid var(--text-2); }
     .legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
     .legend .hot::before { border-color: var(--accent); }
     .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
-    .actor text { fill: var(--text); font-size: 14px; font-weight: 600; }
-    .actor .sub { fill: var(--text-3); font-size: 12px; font-weight: 400; }
+    .actor text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; }
+    .actor .sub { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 400; }
     .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
     .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
     .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
     .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-    .lbl { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+    .lbl { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
     .lbl.hot { fill: var(--accent); }
-    .num { fill: var(--text-3); font-size: 12px; font-weight: 600; }
+    .num { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 600; }
     .phase line { stroke: var(--line); }
     .phase rect { fill: var(--surface-2); }
-    .phase text { fill: var(--text-2); font-size: 12px; font-weight: 600; }
+    .phase text { fill: var(--text-2); font-size: var(--fs-sm); font-weight: 600; }
     .note rect { fill: var(--bg); stroke: var(--line-strong); }
-    .note text { fill: var(--text-2); font-size: 12px; font-family: var(--mono); }
+    .note text { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
     .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
     .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
-    .frame text { fill: var(--text); font-size: 12px; font-weight: 700; }
+    .frame text { fill: var(--text); font-size: var(--fs-sm); font-weight: 700; }
     .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
     .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
     .ah { fill: var(--text-2); }
@@ -135,41 +139,41 @@
     <p class="legend"><span>Call</span><span class="ret">Response</span><span class="hot">Side effect (external write or audit)</span></p>
 
     <div class="diagram">
-      <svg viewBox="0 0 800 684" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
+      <svg viewBox="0 0 901 784" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
         <title id="example-flow-seq-title">Example flow: sequence diagram, 5 participants, 12 steps</title>
         <desc id="example-flow-seq-desc">web-app loads a thing through api-service and Postgres, then CreateThing calls the external system and writes an audit log on 200, or returns FAILED_PRECONDITION on 400.</desc>
-        <line class="life" x1="80" x2="80" y1="62" y2="680"/>
-        <line class="life" x1="240" x2="240" y1="62" y2="680"/>
-        <line class="life" x1="400" x2="400" y1="62" y2="680"/>
-        <line class="life" x1="560" x2="560" y1="62" y2="680"/>
-        <line class="life" x1="720" x2="720" y1="62" y2="680"/>
-        <g class="frame"><rect class="box" x="14" y="392" width="772" height="264" rx="6"/><rect class="tab" x="14" y="392" width="42" height="20" rx="4"/><text x="23" y="406.5">alt</text><text class="cond" x="64" y="406.5">[upstream 200]</text><line x1="14" x2="786" y1="562" y2="562"/><text class="cond" x="22" y="577">[upstream 400]</text></g>
-        <g class="actor"><rect x="21" y="16" width="118" height="46" rx="8"/><text x="80" y="36" text-anchor="middle">User</text><text class="sub" x="80" y="53" text-anchor="middle">browser</text></g>
-        <g class="actor"><rect x="181" y="16" width="118" height="46" rx="8"/><text x="240" y="36" text-anchor="middle">web-app</text><text class="sub" x="240" y="53" text-anchor="middle">screen name</text></g>
-        <g class="actor"><rect x="341" y="16" width="118" height="46" rx="8"/><text x="400" y="36" text-anchor="middle">api-service</text><text class="sub" x="400" y="53" text-anchor="middle">ServiceName</text></g>
-        <g class="actor"><rect x="501" y="16" width="118" height="46" rx="8"/><text x="560" y="36" text-anchor="middle">Postgres</text><text class="sub" x="560" y="53" text-anchor="middle">schema.*</text></g>
-        <g class="actor"><rect x="657.5" y="16" width="125" height="46" rx="8"/><text x="720" y="36" text-anchor="middle">External</text><text class="sub" x="720" y="53" text-anchor="middle">upstream system</text></g>
-        <g class="phase"><line x1="8" x2="792" y1="94" y2="94"/><rect x="8" y="83" width="74" height="22" rx="4"/><text x="17" y="98">1 · Load</text></g>
-        <g class="step"><line class="msg" x1="80" y1="124" x2="232" y2="124"/><path class="ah" d="M239,124 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="118" text-anchor="middle">/things/:id</text><text class="num" x="86" y="139">1</text></g>
-        <g class="step"><title>id from the route</title><line class="msg" x1="240" y1="158" x2="392" y2="158"/><path class="ah" d="M399,158 l-9,-4.5 v9 z"/><text class="lbl" x="320" y="152" text-anchor="middle">GetThing</text><text class="num" x="246" y="173">2</text></g>
-        <g class="step"><line class="msg" x1="400" y1="192" x2="552" y2="192"/><path class="ah" d="M559,192 l-9,-4.5 v9 z"/><text class="lbl" x="480" y="186" text-anchor="middle">SELECT schema.thing</text><text class="num" x="406" y="207">3</text></g>
-        <g class="note"><title>needs permission thing.view; the id must exist, or NOT_FOUND</title><rect x="312.5" y="213" width="175" height="22" rx="4"/><text x="400" y="229" text-anchor="middle">permission thing.view</text></g>
-        <g class="step"><line class="msg ret" x1="400" y1="258" x2="248" y2="258"/><path class="ah ret" d="M241,258 l9,-4.5 v9 z"/><text class="lbl" x="320" y="252" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="273">4</text></g>
-        <g class="phase"><line x1="8" x2="792" y1="298" y2="298"/><rect x="8" y="287" width="67" height="22" rx="4"/><text x="17" y="302">2 · Act</text></g>
-        <g class="step"><line class="msg" x1="80" y1="328" x2="232" y2="328"/><path class="ah" d="M239,328 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="322" text-anchor="middle">Confirm</text><text class="num" x="86" y="343">5</text></g>
-        <g class="step"><title>name, ownerId</title><line class="msg" x1="240" y1="362" x2="392" y2="362"/><path class="ah" d="M399,362 l-9,-4.5 v9 z"/><text class="lbl" x="320" y="356" text-anchor="middle">CreateThing</text><text class="num" x="246" y="377">6</text></g>
-        <g class="step"><title>timeout 10 s</title><line class="msg hot" x1="400" y1="430" x2="712" y2="430"/><path class="ah hot" d="M719,430 l-9,-4.5 v9 z"/><text class="lbl hot" x="560" y="424" text-anchor="middle">POST /things</text><text class="num" x="406" y="445">7</text></g>
-        <g class="step"><line class="msg ret" x1="720" y1="464" x2="408" y2="464"/><path class="ah ret" d="M401,464 l9,-4.5 v9 z"/><text class="lbl" x="560" y="458" text-anchor="middle">200</text><text class="num" x="406" y="479">8</text></g>
-        <g class="step"><line class="msg hot" x1="400" y1="498" x2="552" y2="498"/><path class="ah hot" d="M559,498 l-9,-4.5 v9 z"/><text class="lbl hot" x="480" y="492" text-anchor="middle">INSERT schema.audit_log</text><text class="num" x="406" y="513">9</text></g>
-        <g class="step"><line class="msg ret" x1="400" y1="532" x2="248" y2="532"/><path class="ah ret" d="M241,532 l9,-4.5 v9 z"/><text class="lbl" x="320" y="526" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="547">10</text></g>
-        <g class="step"><line class="msg ret" x1="720" y1="596" x2="408" y2="596"/><path class="ah ret" d="M401,596 l9,-4.5 v9 z"/><text class="lbl" x="560" y="590" text-anchor="middle">400</text><text class="num" x="406" y="611">11</text></g>
-        <g class="step"><title>upstream reason passed through</title><line class="msg ret" x1="400" y1="630" x2="248" y2="630"/><path class="ah ret" d="M241,630 l9,-4.5 v9 z"/><text class="lbl" x="320" y="624" text-anchor="middle">FAILED_PRECONDITION</text><text class="num" x="246" y="645">12</text></g>
+        <line class="life" x1="80" x2="80" y1="68" y2="780"/>
+        <line class="life" x1="240" x2="240" y1="68" y2="780"/>
+        <line class="life" x1="431" x2="431" y1="68" y2="780"/>
+        <line class="life" x1="657" x2="657" y1="68" y2="780"/>
+        <line class="life" x1="817" x2="817" y1="68" y2="780"/>
+        <g class="frame"><rect class="box" x="14" y="446" width="873" height="308" rx="6"/><rect class="tab" x="14" y="446" width="46" height="22" rx="4"/><text x="24" y="462">alt</text><text class="cond" x="68" y="462">[upstream 200]</text><line x1="14" x2="887" y1="642" y2="642"/><text class="cond" x="22" y="659">[upstream 400]</text></g>
+        <g class="actor"><rect x="21" y="16" width="118" height="52" rx="8"/><text x="80" y="38" text-anchor="middle">User</text><text class="sub" x="80" y="57" text-anchor="middle">browser</text></g>
+        <g class="actor"><rect x="181" y="16" width="118" height="52" rx="8"/><text x="240" y="38" text-anchor="middle">web-app</text><text class="sub" x="240" y="57" text-anchor="middle">screen name</text></g>
+        <g class="actor"><rect x="370.5" y="16" width="121" height="52" rx="8"/><text x="431" y="38" text-anchor="middle">api-service</text><text class="sub" x="431" y="57" text-anchor="middle">ServiceName</text></g>
+        <g class="actor"><rect x="598" y="16" width="118" height="52" rx="8"/><text x="657" y="38" text-anchor="middle">Postgres</text><text class="sub" x="657" y="57" text-anchor="middle">schema.*</text></g>
+        <g class="actor"><rect x="745.5" y="16" width="143" height="52" rx="8"/><text x="817" y="38" text-anchor="middle">External</text><text class="sub" x="817" y="57" text-anchor="middle">upstream system</text></g>
+        <g class="phase"><line x1="8" x2="893" y1="102" y2="102"/><rect x="8" y="90" width="90" height="24" rx="4"/><text x="18" y="107">1 · Load</text></g>
+        <g class="step"><line class="msg" x1="80" y1="136" x2="232" y2="136"/><path class="ah" d="M239,136 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="129" text-anchor="middle">/things/:id</text><text class="num" x="86" y="153">1</text></g>
+        <g class="step"><title>id from the route</title><line class="msg" x1="240" y1="176" x2="423" y2="176"/><path class="ah" d="M430,176 l-9,-4.5 v9 z"/><text class="lbl" x="335.5" y="169" text-anchor="middle">GetThing</text><text class="num" x="246" y="193">2</text></g>
+        <g class="step"><line class="msg" x1="431" y1="216" x2="649" y2="216"/><path class="ah" d="M656,216 l-9,-4.5 v9 z"/><text class="lbl" x="544" y="209" text-anchor="middle">SELECT schema.thing</text><text class="num" x="437" y="233">3</text></g>
+        <g class="note"><title>needs permission thing.view; the id must exist, or NOT_FOUND</title><rect x="328.5" y="244" width="205" height="24" rx="4"/><text x="431" y="261" text-anchor="middle">permission thing.view</text></g>
+        <g class="step"><line class="msg ret" x1="431" y1="290" x2="248" y2="290"/><path class="ah ret" d="M241,290 l9,-4.5 v9 z"/><text class="lbl" x="335.5" y="283" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="307">4</text></g>
+        <g class="phase"><line x1="8" x2="893" y1="336" y2="336"/><rect x="8" y="324" width="82" height="24" rx="4"/><text x="18" y="341">2 · Act</text></g>
+        <g class="step"><line class="msg" x1="80" y1="370" x2="232" y2="370"/><path class="ah" d="M239,370 l-9,-4.5 v9 z"/><text class="lbl" x="160" y="363" text-anchor="middle">Confirm</text><text class="num" x="86" y="387">5</text></g>
+        <g class="step"><title>name, ownerId</title><line class="msg" x1="240" y1="410" x2="423" y2="410"/><path class="ah" d="M430,410 l-9,-4.5 v9 z"/><text class="lbl" x="335.5" y="403" text-anchor="middle">CreateThing</text><text class="num" x="246" y="427">6</text></g>
+        <g class="step"><title>timeout 10 s</title><line class="msg hot" x1="431" y1="486" x2="809" y2="486"/><path class="ah hot" d="M816,486 l-9,-4.5 v9 z"/><text class="lbl hot" x="624" y="479" text-anchor="middle">POST /things</text><text class="num" x="437" y="503">7</text></g>
+        <g class="step"><line class="msg ret" x1="817" y1="526" x2="439" y2="526"/><path class="ah ret" d="M432,526 l9,-4.5 v9 z"/><text class="lbl" x="624" y="519" text-anchor="middle">200</text><text class="num" x="437" y="543">8</text></g>
+        <g class="step"><line class="msg hot" x1="431" y1="566" x2="649" y2="566"/><path class="ah hot" d="M656,566 l-9,-4.5 v9 z"/><text class="lbl hot" x="544" y="559" text-anchor="middle">INSERT schema.audit_log</text><text class="num" x="437" y="583">9</text></g>
+        <g class="step"><line class="msg ret" x1="431" y1="606" x2="248" y2="606"/><path class="ah ret" d="M241,606 l9,-4.5 v9 z"/><text class="lbl" x="335.5" y="599" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="623">10</text></g>
+        <g class="step"><line class="msg ret" x1="817" y1="682" x2="439" y2="682"/><path class="ah ret" d="M432,682 l9,-4.5 v9 z"/><text class="lbl" x="624" y="675" text-anchor="middle">400</text><text class="num" x="437" y="699">11</text></g>
+        <g class="step"><title>upstream reason passed through</title><line class="msg ret" x1="431" y1="722" x2="248" y2="722"/><path class="ah ret" d="M241,722 l9,-4.5 v9 z"/><text class="lbl" x="335.5" y="715" text-anchor="middle">FAILED_PRECONDITION</text><text class="num" x="246" y="739">12</text></g>
       </svg>
     </div>
   </div>
   <script>
     // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
-    // Out: {type: "diagram-height", height, fit} on every resize. In: {type: "diagram-fit", height}, 0 = off.
+    // Out: {type: "diagram-height", height} on every resize, so the host sizes the iframe.
     const embedded = parent !== window;
     const style = document.createElement("style");
     style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
@@ -178,10 +182,10 @@
     document.head.append(style);
     // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
     if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
-    // Never draw a diagram below its viewBox width, so 12px labels stay 12px; a narrow frame scrolls it sideways.
+    // Draw each diagram at its viewBox width, never scaled, so 14px labels render at 14px; a narrow frame scrolls it sideways.
     const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
     svgs.forEach(svg => {
-      svg.style.minWidth = svg.viewBox.baseVal.width + "px";
+      Object.assign(svg.style, { width: svg.viewBox.baseVal.width + "px", maxWidth: "none", height: "auto" });
       if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
       const box = document.createElement("div");
       box.style.overflowX = "auto";
@@ -189,26 +193,7 @@
       box.append(svg);
     });
     // body, not documentElement: its scrollHeight never drops below the iframe's height
-    let fit = 0;
-    const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, fit }, "*");
-    // Fit (host presenting): scale to the given height, up to the frame width, never below 1:1; taller → the host scrolls.
-    function applyFit() {
-      svgs.forEach(svg => { svg.style.width = ""; svg.style.maxWidth = ""; });
-      if (!fit) return;
-      const rest = document.body.getBoundingClientRect().height - svgs.reduce((h, svg) => h + svg.getBoundingClientRect().height, 0);
-      svgs.forEach(svg => {
-        const vb = svg.viewBox.baseVal;
-        const s = Math.max(1, Math.min(svg.parentElement.clientWidth / vb.width, (fit - rest) / svgs.length / vb.height));
-        svg.style.width = vb.width * s + "px";
-        svg.style.maxWidth = "none";
-      });
-    }
-    addEventListener("message", (e) => {
-      if (e.source !== parent || e.data?.type !== "diagram-fit") return;
-      fit = +e.data.height || 0;
-      applyFit();
-      postHeight();
-    });
+    const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
     addEventListener("load", postHeight);
     new ResizeObserver(postHeight).observe(document.body);
   </script>

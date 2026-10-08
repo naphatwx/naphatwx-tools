@@ -22,7 +22,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
     - Layout: at most 4 grid columns; put a child next to its parent; keep FK lines short and avoid lines that cross a table.
 - The `← Overview` link points at `../overview.html#database` for design-feature. No such page → remove the link.
 - It draws any number of tables; split by area only when one page gets hard to read (more than about 12 tables).
-- The diagram fills the page width (up to 80% of the window height) and never shrinks below 1:1, so its 12px text stays readable; hovering or tabbing to a table traces its relations.
+- Every label is 14px; tables share one width that fits their longest name, key and type. The diagram draws at 1:1, never scaled, and scrolls sideways when wider than the window; hovering or tabbing to a table traces its relations.
 
 ## Checks
 
