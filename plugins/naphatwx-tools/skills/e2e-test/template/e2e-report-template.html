@@ -283,9 +283,9 @@ const NO_SHOT = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://w
   + '<text x="640" y="440" fill="#a3a6b0" font-family="-apple-system, Segoe UI, system-ui, sans-serif" font-size="32" text-anchor="middle">No screenshot for this step</text></svg>');
 const isTall = (img) => img.naturalWidth > 0 && img.naturalHeight / img.naturalWidth > 1.5;
 
-// One step at a time, like slides. Controls are built once and updated in place, so focus stays put.
+// One step at a time, like slides. Built once per test, so collapse and re-expand keeps the last step seen.
 function viewer(slides) {
-  let i = Math.max(0, slides.findIndex((s) => s.status !== 'passed'));
+  let i = 0;
   const box = el('div', { class: 'viewer', tabindex: '0', 'aria-label': 'Step viewer, use left and right arrow keys' });
   const title = el('h3', {});
   const status = el('span', {});
