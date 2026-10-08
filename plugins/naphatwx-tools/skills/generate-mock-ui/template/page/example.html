@@ -33,10 +33,11 @@
         }
         function setStatus(v) { S.status = v; load(); }
 
-        // A control the user may not use is shown unavailable with the reason, never hidden (spec control rules).
+        // No permission → hidden, as the real app hides it. A reason the spec names → shown unavailable with a tooltip;
         // aria-disabled, not native disabled: a disabled button gets no hover, so the tooltip would never show.
         function createBtn() {
-            const reason = Scenarios.current.perms.includes('things.create') ? '' : 'You do not have permission to create things.';
+            if (!Scenarios.current.perms.includes('things.create')) return '';
+            const reason = Scenarios.current.blocked;
             if (!reason) return UI.btn('primary', 'md', 'Create', 'onclick="alert(\'Create form\')"');
             return `<span class="relative group inline-block">${UI.btn('primary', 'md', 'Create', 'aria-disabled="true" aria-describedby="createReason"')
                 .replace('class="', 'class="opacity-50 cursor-not-allowed ')}

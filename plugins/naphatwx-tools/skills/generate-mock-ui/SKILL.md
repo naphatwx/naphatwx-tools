@@ -65,7 +65,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 9. No absolute local paths in any file. Code comments max 3 lines.
 10. **Use cases are data, and the only source of truth for them.** `shared/use-cases.js` holds two globals, each a strict-JSON array (double quotes, no trailing commas, no comments inside), so other tools can parse it after stripping `var NAME = `. The overview's Use cases section and every "Try in the mock" line are generated from it by a script — never typed by hand — so the plan can't drift from the mock.
 11. **Every count you report is computed** (by `scripts/check-use-cases.js`), never estimated: use cases per flow, total, console runs.
-12. **Follow the spec's control rules.** A control the user may not use is shown unavailable — `aria-disabled="true"` plus a tooltip with the reason — when the spec says so; never silently hidden. Use `aria-disabled`, not native `disabled`: a disabled button gets no hover, so its tooltip never shows.
+12. **Controls follow the spec, then the real app.**
+    - No permission → do what the real app does: a control the app hides is **hidden** in the mock too.
+    - Shown unavailable with a reason (`aria-disabled="true"` + a tooltip) only where the spec says so (e.g. an ineligible repository, a frozen environment). Use `aria-disabled`, not native `disabled`: a disabled button gets no hover, so its tooltip never shows.
 
 ## Workflow (standalone)
 
@@ -175,9 +177,15 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 - Check every relative `href` / `src` resolves to a file.
 - Grep for absolute local paths and remove them.
 
+### 8b. Review the mock (always)
+
+- Follow [references/mock-review.md](references/mock-review.md): two fresh review-only agents (UI fidelity, functional) in parallel, then one fresh fix agent, then step 7 and step 8 again.
+- Run by the design-feature skill → skip it here; design-feature runs the review as its step 6b, after its own checks.
+
 ### 9. Confirm
 
 - Output: `✅ Mock created at: {output}/mock/index.html`
 - Use cases per flow and the total, copied from `check-use-cases.js` output — never counted by eye.
+- The review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
 - List the pages and scenarios, and what could not be copied from the real design system (logos, images, fonts), plus the CDNs the pages need.
 - Remind the user: open `mock/index.html` directly; no server or build is needed.

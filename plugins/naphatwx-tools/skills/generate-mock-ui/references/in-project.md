@@ -66,7 +66,7 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - Every interaction works: submit, edit, delete, filter, sort, paginate, open / close modal, confirm, cancel.
 - Deep links: read extra query params (`?mode=`, `?line=`) so each plan flow can open the exact state.
 - `page.tsx` at the folder root: one block per flow (`3.N` + name), each listing its use cases as links to `<screen>?scenario=<id>&uc=<id>` with the first `expect` line; a flow with none shows its `none` sentence.
-- Controls follow the spec's control rules: a control the user may not use is shown unavailable (`aria-disabled` + tooltip with the reason), never silently hidden.
+- Controls follow the spec, then the real app: a control the user has no permission for is hidden when the real app hides it; shown unavailable with a reason (`aria-disabled` + tooltip) only where the spec says so.
 
 ### 5. Link the plan (when a plan folder exists)
 
@@ -80,6 +80,10 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - Grep the mock folder for `fetch(`, the app's API client imports and server actions; remove any (Hard Rule 2).
 - Dev server running and a headless browser available → open every screen × scenario, check the console for errors and look at the screenshots. Not running → don't start a long-lived server unasked; list the URLs instead.
 - Grep the mock folder for absolute local paths and remove them.
+
+### 6b. Review the mock
+
+- Follow [mock-review.md](mock-review.md) (skip it when the design-feature skill runs this; it reviews in its step 6b). The functional reviewer traces each use case through `_mock/` instead of a Node `vm`.
 
 ### 7. Confirm
 

@@ -94,7 +94,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Tables read and written, relations, and any external (read-through) tables.
     - Error mapping: cause → code → what the user sees.
     - Acceptance scenarios, edge cases and refusal rows, each with its story / AC id (or FR / decision id) and the exact user-facing message. They become the use cases (step 5).
-    - Control rules: which control is hidden vs shown unavailable, and the reason text, when the spec says.
+    - Control rules: which control is hidden and which is shown unavailable with a reason, as the spec says. No permission → whatever the real app does today (usually hidden).
     - Blockers and open questions.
 - No source → ask once where the content is (use AskUserQuestion when the agent has it).
 - Write the extract to `<output>/.parts/brief.md`: one heading per item above, flows numbered `NN-<slug>`, names exactly as the source spells them, and the source file for each fact. Every sub-agent reads it instead of re-reading the spec.
@@ -212,17 +212,28 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Presentation mode, in the same browser at 1440×900 and 1024×768: press `P` and step through every step; on each, the page is no wider than the window (`document.documentElement.scrollWidth <= innerWidth`) and the step's diagram or tables show whole across.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
+### 6b. Review the mock (always, when a mock exists)
+
+- Run after step 6 passes, before step 8. Follow the generate-mock-ui skill's `references/mock-review.md`:
+    - two **fresh**, review-only agents in one message, in parallel: a UI fidelity reviewer ("Would a user think this IS the real app?") and a functional reviewer ("Does every use case behave as the spec says?");
+    - merge their reports; settle each conflict against the spec first, then the real code, and note which won;
+    - one **fresh** fix agent applies every fix (never a reviewer);
+    - then `node <this skill dir>/scripts/use-cases-section.js <output>` and re-run step 6.
+- Don't run the reviewers again unless the fix agent reports a finding it could not apply.
+- No mock → skip.
+
 ### 7. Confirm
 
 - Output: `✅ Plan created at: {output}/overview.html`
 - Say the diagram mode (diagram-design or manual).
 - List the flows (one line each), the ER diagram page(s), and which mock was built (standalone, in-project with its folder, or none).
 - Use cases: the total and the count per flow, copied from the script output.
+- Mock review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
 - Remind the user: each diagram is edited in its own file under `flowchart/`, `sequence-diagram/` or `database/`; the overview picks up the change on reload.
 
 ### 8. Publish as a claude.ai Artifact (only when asked)
 
-Publish from a copy, never the plan folder itself. Two things break inside claude.ai:
+Publish only after step 6b (when a mock exists). Publish from a copy, never the plan folder itself. Two things break inside claude.ai:
 
 - A `target="_blank"` link opens the artifact's internal frame URL in a new tab, which claude.ai refuses (`ERR_BLOCKED_BY_RESPONSE`). The copy drops `target` / `rel` from every link.
 - The entry page is published as `index.html`, so links back to `overview.html` (`../overview.html` from the ER diagram's `← Overview` and the mock's `← Feature plan`) must point at `index.html` in the copy.

@@ -15,7 +15,9 @@ var Scenarios = (function () {
         { id: 'normal', ownerId: 1204, perms: RW, faults: {}, label: 'Normal — pluto', flow: '01 · 02', hint: 'Happy path with real-looking data.' },
         { id: 'empty', ownerId: 1310, perms: RW, faults: {}, label: 'Empty — neptune', flow: '01', hint: 'No rows yet: the empty state, not an error.' },
         { id: 'unreachable', ownerId: 1204, perms: RW, faults: { readUnavailableOnce: true }, label: 'Upstream unreachable', flow: '01', hint: 'First read fails; Retry works. Never shown as empty.' },
-        { id: 'read-only', ownerId: 1204, perms: RO, faults: {}, label: 'Read-only user — pluto', flow: '02', hint: 'No things.create: Create is shown unavailable (aria-disabled + tooltip), never hidden.' },
+        { id: 'read-only', ownerId: 1204, perms: RO, faults: {}, label: 'Read-only user — pluto', flow: '02', hint: 'No things.create: Create is hidden, as the real app hides it.' },
+        // `blocked` = a reason the spec says to show on an unavailable control (not a permission)
+        { id: 'archived', ownerId: 1204, perms: RW, faults: {}, blocked: 'This owner is archived. Things cannot be created.', label: 'Archived owner — pluto', flow: '02', hint: 'Create is shown unavailable with the reason in its tooltip, as the spec says.' },
     ];
     const params = new URLSearchParams(location.search);
     const current = LIST.find(s => s.id === params.get('scenario')) || LIST[0];
