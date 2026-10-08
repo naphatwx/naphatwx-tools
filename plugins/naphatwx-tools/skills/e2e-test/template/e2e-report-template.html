@@ -145,6 +145,13 @@
   .test.open .mark::before { content: "\2212"; }
   .test-body { padding: 10px 14px 12px; display: grid; gap: 10px; min-width: 0; }
 
+  /* Native <details> slide too where the browser can animate to auto height. */
+  @supports (interpolate-size: allow-keywords) {
+    :root { interpolate-size: allow-keywords; }
+    details::details-content { height: 0; overflow: hidden; transition: height .2s var(--ease), content-visibility .2s allow-discrete; }
+    details[open]::details-content { height: auto; }
+  }
+
   .viewer { border-radius: var(--radius); min-width: 0; }
   .viewer:focus-visible { outline-offset: 4px; }
   .bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 8px; }
@@ -380,6 +387,24 @@ function viewer(slides) {
 
 const NOTE = { skip: 'Skipped', fixme: 'Fixme', fail: 'Expected to fail' };
 let uid = 0;
+// Slides a row's panel open or shut; a click mid-slide reverses from the current height.
+const EASE = getComputedStyle(document.documentElement).getPropertyValue('--ease').trim() || 'ease';
+const calm = matchMedia('(prefers-reduced-motion: reduce)');
+function slide(panel, open, instant) {
+  const from = panel.hidden ? 0 : panel.getBoundingClientRect().height;
+  panel.getAnimations().forEach((a) => a.cancel());
+  panel.style.overflow = '';
+  panel.hidden = false;
+  const to = open ? panel.getBoundingClientRect().height : 0;
+  if (instant || calm.matches || from === to) { panel.hidden = !open; return; }
+  const cs = getComputedStyle(panel);
+  const at = (h) => h ? { height: h + 'px', paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, opacity: 1 }
+    : { height: '0px', paddingTop: '0px', paddingBottom: '0px', opacity: 0 };
+  panel.style.overflow = 'hidden';
+  const a = panel.animate([at(from), at(to)], { duration: 220, easing: EASE, fill: 'forwards' });
+  a.onfinish = () => { panel.hidden = !open; panel.style.overflow = ''; a.cancel(); };
+}
+
 let closeOpen = null;
 
 function testBox(t) {
@@ -396,17 +421,17 @@ function testBox(t) {
   // The whole row is a mouse target; keyboard and screen readers use the heading's button.
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
   const body = el('div', { class: 'test-body', id: id + '-b' });
-  const setOpen = (o) => { box.classList.toggle('open', o); toggle.setAttribute('aria-expanded', String(o)); body.hidden = !o; };
+  const setOpen = (o, instant) => { box.classList.toggle('open', o); toggle.setAttribute('aria-expanded', String(o)); slide(body, o, instant); };
   toggle.onclick = () => {
     const o = !box.classList.contains('open');
-    // Only one test open at a time; closing one above shifts this row, so bring it back into view.
+    // Only one test open at a time; the other shuts at once so this row can be scrolled back into view.
     const other = o && closeOpen && closeOpen !== close;
-    if (other) closeOpen();
+    if (other) closeOpen(true);
     closeOpen = o ? close : null;
     setOpen(o);
     if (other) head.scrollIntoView({ block: 'nearest' });
   };
-  const close = () => setOpen(false);
+  const close = (instant) => setOpen(false, instant);
 
   const notes = t.annotations || [];
   if (notes.length) body.append(el('ul', { class: 'notes', 'aria-label': 'Annotations' },
@@ -429,7 +454,7 @@ function testBox(t) {
       t.trace ? cmdRow('Trace', 'npx playwright show-trace ' + t.trace, 'trace command for ' + t.title) : null));
   }
   box.append(head, body);
-  setOpen(false);
+  setOpen(false, true);
   return box;
 }
 
