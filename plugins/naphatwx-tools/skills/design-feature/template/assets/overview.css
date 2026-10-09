@@ -467,13 +467,13 @@ table { width: 100%; border-collapse: collapse; font-size: var(--fs-body); }
 th { text-align: left; font-weight: 500; color: var(--text-3); padding: 0 16px 6px 0; border-bottom: 1px solid var(--line-strong); }
 td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
 
-.blocker-line { margin: 4px 0 6px; padding: 8px 14px; border-radius: var(--radius-lg); background: var(--warn-soft); color: var(--text); max-width: var(--prose); }
+.blocker-line { margin: 4px 0 6px; padding: 8px 14px; border-radius: var(--radius-lg); background: var(--warn-soft); color: var(--text); }
 .blocker-line + .blocker-line { margin-top: 8px; }
 .blocker { display: inline-block; margin-right: 8px; color: var(--warn); font: 600 var(--fs-code)/1.4 var(--mono); }
 .questions { list-style: none; padding: 0; counter-reset: q; }
 .questions li { counter-increment: q; display: grid; grid-template-columns: 2rem 1fr; gap: 2px 8px; padding: 8px 0; border-bottom: 1px solid var(--line); margin: 0; }
 .questions li::before { content: counter(q); grid-row: span 2; font: 500 var(--fs-code)/1.65 var(--mono); color: var(--text-3); }
-.questions p { color: var(--text); max-width: var(--prose); }
+.questions p { color: var(--text); }
 .questions .who { font-size: var(--fs-body); color: var(--text-3); }
 
 /* ============ FLOATING TOOLS + HUD ============ */
@@ -519,6 +519,8 @@ html[data-present="on"] .sheet { margin-left: 0; padding: 28px 48px calc(var(--h
 html[data-present="on"] .slide { display: none; margin: 0 auto !important; padding: 0 !important; border: 0 !important; }
 html[data-present="on"] .slide.current { display: block; margin: auto !important; width: min(1080px, 100%); max-width: none; animation: slide-in 0.32s var(--ease); }
 html[data-present="on"] .slide.current p, html[data-present="on"] .slide.current .facts { max-width: var(--prose); }
+/* open questions use the full section width, in both views */
+html[data-present="on"] .slide.current .blocker-line, html[data-present="on"] .slide.current .questions p { max-width: none; }
 html[data-present="on"] .wide { width: 100%; margin-left: 0; transform: none; }
 html[data-present="on"] .panel { animation: none !important; }
 /* fitRoom() ends the box at the room above the bar; the diagram stays 1:1 (labels 14px), and
