@@ -114,9 +114,8 @@ code { color: var(--text); }
 strong { color: var(--text); font-weight: 600; }
 .aside { color: inherit; }
 .muted { color: var(--text); max-width: var(--prose); }
-.group-head { margin: 24px 0 8px; }
 /* subordinate text under a title or in a table cell: lighter than the title it follows */
-.group-head .aside, td .aside { color: var(--text-2); font-size: var(--fs-body); font-weight: 400; }
+td .aside { color: var(--text-2); font-size: var(--fs-body); font-weight: 400; }
 .nowrap { white-space: nowrap; }
 .skip {
     position: fixed; top: 12px; left: 12px; z-index: 60;
@@ -262,8 +261,6 @@ html[data-all="on"] .views { display: none; }
 html[data-all="on"] .panel[hidden] { display: block; }
 html[data-all="on"] .panel::before { content: attr(data-label); display: block; font-size: var(--fs-body); color: var(--text-3); margin-bottom: 8px; }
 .panel ul { color: var(--text); }
-.try { margin-top: 10px; font-size: var(--fs-body); }
-.try .aside { margin-right: 8px; color: var(--text-3); }
 
 /* ============ DIAGRAMS ============ */
 .flowchart, .seq {
@@ -487,7 +484,6 @@ html[data-present="on"] { --fs-h3: var(--fs-xl); }
 html[data-present="on"], html[data-present="on"] body { overflow-x: hidden; }
 html[data-present="on"] .rail, html[data-present="on"] .rail-edge, html[data-present="on"] .tools,
 html[data-present="on"] .zoom-tools, html[data-present="on"] .zoom-shield, html[data-present="on"] details.more, html[data-present="on"] .step-off,
-html[data-present="on"] .try { display: none !important; }
 html[data-present="on"] .refs { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* flex column + auto margins: a short step sits in the middle, a tall one starts at the top and scrolls */
 /* bottom padding = the bar's footprint (set by show()) + 24px, so the last line clears it */

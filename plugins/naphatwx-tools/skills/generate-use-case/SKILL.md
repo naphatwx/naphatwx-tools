@@ -10,7 +10,7 @@ Turn a spec into one `use-cases.js` file: what a user can do with the feature an
 
 ```
 spec ─► generate-use-case ─► <plan>/use-cases.js
-                                 ├─► design-feature          section 07 "Use cases"
+                                 ├─► design-feature          each flow's "Use cases" view
                                  ├─► generate-mock-ui        adds how to play each one (mock/shared/use-case-play.js)
                                  └─► generate-test-scenario  one test case per use case, same id ─► e2e-test report
 ```
@@ -98,4 +98,4 @@ Start from `template/use-cases.js`.
 
 - Output: `✅ Use cases written at: {path}`.
 - The total and the count per flow, copied from `check.js` output.
-- Next steps, one line each: design-feature shows them in section 07, generate-mock-ui makes them playable, generate-test-scenario turns them into test cases.
+- Next steps, one line each: design-feature shows them in each flow's Use cases view, generate-mock-ui makes them playable, generate-test-scenario turns them into test cases.

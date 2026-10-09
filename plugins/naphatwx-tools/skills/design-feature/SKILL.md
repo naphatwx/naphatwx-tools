@@ -21,9 +21,9 @@ Turn a spec, ticket or idea into a plan folder people can open in a browser.
 │   └── 02-<flow-slug>.js
 ├── database/
 │   └── er-diagram.html        every related table and FK, opened from the Database section
-├── use-cases.js               the use cases, by the generate-use-case skill; section 07 is generated from it
+├── use-cases.js               the use cases, by the generate-use-case skill; each flow's Use cases view is generated from it
 └── mock/                      optional, standalone mock by the generate-mock-ui skill
-    └── shared/use-case-play.js   how to play each use case; adds the Play and "Try in the mock" links
+    └── shared/use-case-play.js   how to play each use case; adds the Play links
                                (in-project mock lives in the app instead)
 ```
 
@@ -31,7 +31,7 @@ Scripts in this skill's `scripts/` (Node, no install):
 
 | Script | Does |
 |--------|------|
-| `use-cases-section.js <output>` | writes section 07 "Use cases" from `use-cases.js`, and every flow's "Try in the mock" line from `mock/shared/use-case-play.js` when a mock exists; prints the counts |
+| `use-cases-panels.js <output>` | writes every flow's "Use cases (N)" view from `use-cases.js`, with Play links from `mock/shared/use-case-play.js` when a mock exists; removes the old section 07 and "Try in the mock" lines; prints the counts |
 | `publish-copy.js <output> <copy-dir>` | builds a copy that works as a claude.ai Artifact (step 8) and prints the publish arguments |
 
 Every diagram is drawn by the `generate-diagram` skill (`naphatwx-tools:generate-diagram` in Claude Code): it uses diagram-design when installed, else its own templates. This skill picks the **mode** once (step 2) so all diagrams match, and embeds what it returns:
@@ -62,14 +62,14 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Hard Rules
 
 1. `overview.html` starts from `template/overview.html`. Its styles and script live in `template/assets/overview.css` and `overview.js`: copy them unchanged, and keep the rail, its search, the rail edge button, the floating tools, the presentation bar and the shortcut sheet (`#keys`) markup. Pages are always dark, in the Quiet Sheet theme: its colors are the `/* theme:tokens */` block at the top of `overview.css` (one blue accent; green, amber and red only mark the diffs + ~ −). Use `var(--token)`, never a hex. Don't edit between the `theme:` markers: change `theme/` in this plugin's repo and run `node theme/sync.mjs`. Dark only: add no light theme, theme toggle or other palette. Diagrams use the same palette and paper (the generate-diagram skill sets it).
-    - Rail: always open on the left, numbered `01`–`08`, with flows, changed tables and changed APIs nested as `3.N` / `4.N` / `5.N`. The round edge button or `[` hides it; `/` focuses its search.
-    - Floating tools (bottom right of the page, top right on phones): `Open all` shows every flow view stacked; `Zoom` makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the top right resets; off by default); `Present` (or `P`) starts presentation mode; `?` opens the shortcut sheet (`#keys` dialog: `1`/`2`/`3`, `P`, `←`/`→`, `Esc`, `[`, `/`, `?`).
+    - Rail: always open on the left, numbered `01`–`07`, with flows, changed tables and changed APIs nested as `3.N` / `4.N` / `5.N`. The round edge button or `[` hides it; `/` focuses its search.
+    - Floating tools (bottom right of the page, top right on phones): `Open all` shows every flow view stacked; `Zoom` makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the top right resets; off by default); `Present` (or `P`) starts presentation mode; `?` opens the shortcut sheet (`#keys` dialog: `1`–`4`, `P`, `←`/`→`, `Esc`, `[`, `/`, `?`).
     - Keep the skip link (`.skip` → `#sheet`) as the first element of `<body>`.
     - Each diagram has a border and a `⛶` button at its top right that opens it in a lightbox: the page dims behind, the diagram sits in a frame 80% of the window's width and 90% of its height, fitted whole inside it, with its flow name and view as a caption below. Zoom works there even with the switch off (`✕`, Esc or a backdrop click closes it).
-    - Presentation mode shows one step per screen with a `← N / M · label →` bar: each flow gives one step per view, the API section an intro step plus one per `.api[data-part]`, every other `.slide` one step. A long step scrolls down; nothing scrolls sideways. A diagram draws at 1:1, never scaled (every label 14px); its box ends above the bar, and a taller one scrolls inside its box with a `continues ↓` cue on the bottom edge; the `Try in the mock` line is hidden and the refs line keeps to one line. `←` / `→` / Space step, Esc leaves. Full schema and full contracts stay out of it.
+    - Presentation mode shows one step per screen with a `← N / M · label →` bar: each flow gives one step per view, the API section an intro step plus one per `.api[data-part]`, every other `.slide` one step. A long step scrolls down; nothing scrolls sideways. A diagram draws at 1:1, never scaled (every label 14px); its box ends above the bar, and a taller one scrolls inside its box with a `continues ↓` cue on the bottom edge; the refs line keeps to one line. `←` / `→` / Space step, Esc leaves. Full schema and full contracts stay out of it.
     - The browser remembers each viewer's settings (`localStorage`): rail collapse, zoom and Open all.
 2. **Every flow has both diagrams**: `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
-3. Each flow is one `<section class="slide flow" id="flow-NN" data-title="Flow 3.N · <name>">` with three view buttons (disclosure buttons in a `role="group"` `.views` row: Flowchart, Sequence, Rules, each `aria-expanded` + `aria-controls`) and their three panels (`role="region"`), all closed by default (`aria-expanded="false"`, every `.panel` `hidden`). A click opens one panel at a time; a second click closes it.
+3. Each flow is one `<section class="slide flow" id="flow-NN" data-title="Flow 3.N · <name>">` with four view buttons (disclosure buttons in a `role="group"` `.views` row: Flowchart, Sequence, Rules, Use cases, each `aria-expanded` + `aria-controls`) and their four panels (`role="region"`), all closed by default (`aria-expanded="false"`, every `.panel` `hidden`). A click opens one panel at a time; a second click closes it.
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
     - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`. Its embed script (the `generate-diagram` skill adds it) hides the file's own eyebrow and title inside the frame and draws the diagram at 1:1.
@@ -79,8 +79,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 6. No external scripts, styles or fonts in `overview.html` or the diagram files: text uses the OS font. `assets/`, `render.js` and the flow files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
-9. Use cases are written only by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code) to `<output>/use-cases.js`. Section 07 "Use cases" and the "Try in the mock" lines are generated from it by `scripts/use-cases-section.js`, never typed by hand, so they can't drift from the mock. Every count you report (use cases per flow, total) comes from a script's output, never an estimate.
-10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. Section 07 uses its two utility classes, `.group-head` (the per-flow `<h3>`) and `.nowrap` (Story and Play cells).
+9. Use cases are written only by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code) to `<output>/use-cases.js`. Each flow's Use cases button and panel are generated from it by `scripts/use-cases-panels.js`, never typed by hand, so they can't drift from the mock. Every count you report (use cases per flow, total) comes from a script's output, never an estimate.
+10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. The Use cases panel uses its `.nowrap` utility class (Story and Play cells).
 
 ## Workflow
 
@@ -120,7 +120,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 | API | the section (API rules in step 4) | `.parts/api.html` |
 | Use cases | `generate-use-case` with `<output>` and `.parts/brief.md`, flows numbered as in the brief | `use-cases.js` |
 
-- The main agent keeps the short sections: Overview, Scope, Errors, Use cases (generated in step 4), Open questions.
+- The main agent keeps the short sections: Overview, Scope, Errors, Open questions, and runs `use-cases-panels.js` (step 4).
 - Each sub-agent prompt gives:
     - The path of this `SKILL.md` and the rules to follow, the path of `.parts/brief.md`, the mode and `<output>`.
     - For diagrams: run the `generate-diagram` skill with the type, `.parts/brief.md` as source, the output path above, the mode, and "embedded in design-feature's `overview.html`" (manual sequence then skips its standalone viewer).
@@ -133,17 +133,20 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Merge the sub-agent fragments from `.parts/` into their sections, add their open questions to Open questions, then delete `.parts/`.
 - Replace the `<title>`, the rail brand (`.rail-mark` letter + name) and the kicker (spec number, ticket, status).
-- Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="sec-n">` (`02`–`08` in the `<h2>`, `01` at the start of the Overview kicker; flows `3.N`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
+- Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="sec-n">` (`02`–`07` in the `<h2>`, `01` at the start of the Overview kicker; flows `3.N`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
     1. **Overview**: the `<h1>`, a one-sentence `.lead` + a `<dl class="facts">` of 3–4 key facts (key decision, data impact, API impact, UI impact or eligibility/scale), each `<dd>` one short line; a fact about data or API ends with a link to its section.
     2. **Scope**: the `.scope` block, full width: `<h3>In scope</h3>` with its bullet list, then `<h3>Out of scope</h3>` with its bullet list below it. Each out-of-scope item ends with its reason in `<span class="aside">— why</span>`.
-    3. **Flows**: one muted line naming the three views, then an `ol.flow-index` with one row per flow (`3.N` + name, link to `#flow-NN`, user story and priority on the right). Then one block per flow (copy the block between the `one block per flow` comments):
+    3. **Flows**: one muted line naming the four views, then an `ol.flow-index` with one row per flow (`3.N` + name, link to `#flow-NN`, user story and priority on the right). Then one block per flow (copy the block between the `one block per flow` comments):
         - `<header class="flow-head">`: `<h3>` with `<span class="sec-n">3.N</span>` + the flow name, then `<p class="refs">` with its tags (user story, requirement ids joined by ` · `; no file names).
         - `<p class="flow-line">`: what the flow achieves in one sentence, then `<span class="aside">Starts from <trigger>.</span>`.
-        - The `<p class="try">` line (`Try in the mock` + one link per use case of the flow) right under the flow line, above the `.views` row. Leave it out here: `use-cases-section.js` writes it once a mock exists (step 5), for every flow with a playable use case.
-        - The `.views` button row and three panels, ids `flow-NN-chart`, `flow-NN-seq`, `flow-NN-rules` (buttons `…-tab`, linked by `aria-controls` / `aria-labelledby`):
+        - The `.views` button row and four panels, ids `flow-NN-chart`, `flow-NN-seq`, `flow-NN-rules`, `flow-NN-uc` (buttons `…-tab`, linked by `aria-controls` / `aria-labelledby`):
             - Flowchart panel (`.panel.wide`): `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
             - Sequence panel (`.panel.wide`): manual → `<div class="seq" data-flow="NN-<slug>">` with the `.seq-legend` line inside it; diagram-design → `<div class="seq">` + the returned `<iframe class="diagram-frame">`, then the returned `<div class="seq-steps">` right after the `.seq` box, not inside it.
             - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
+            - Use cases button and panel (`.panel`, not wide, always last in the block): leave them out of the fragment. `node <this skill dir>/scripts/use-cases-panels.js <output>`, run once the flow blocks are in, writes them from `use-cases.js`:
+                - Button `Use cases (K)`, K = the flow's use case count.
+                - A `.table-wrap` table: Use case (title + first expect line in `.aside`) | Story | with a mock, `Play ↗` → `mock/index.html#uc-<id>` (new tab), or "not in the mock" for a skipped one. A flow with no use case → one `.muted` line with its `none` sentence.
+                - With a mock, it also adds `.side-link` "Open the mock ↗" (new tab) to the Flows `<h2>`.
     4. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
         - **ER diagram ↗** link, inside the `<h2 id="database">` right after its text: `<a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one link per page (`ER diagram · catalog ↗`). No related table → no page and no link.
         - **Facts** (`dl.facts`): `Migration`, `Changed` (each table + `new` / `altered`), `Left alone` (tables read but not changed, each with why). Name indexes and constraints here too.
@@ -177,11 +180,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - An API another service owns → `.tbl.ext`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
     6. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
-    7. **Use cases** (`id="use-cases"`, `data-title="Use cases"`, rail label `Use cases`): generated from `use-cases.js` by `node <this skill dir>/scripts/use-cases-section.js <output>`, run once the flow blocks are in. What the script writes:
-        - `<h2>` "Use cases", + `.side-link` "Open the mock ↗" to `mock/index.html` (new tab) when a mock exists.
-        - One muted line: "<N> use cases, grouped by flow." + "**Play** opens the mock at that flow with the use case picked." (mock) or "No mock was built, so there is nothing to play." (no mock).
-        - Per flow: `<h3 class="group-head"><a href="#flow-NN">3.N</a> <name> <span class="aside">K use cases</span></h3>` (an `<h3>`: an `<h4>` is too small), then a `.table-wrap` table: Use case (title + first expect line in `.aside`) | Story | with a mock, `Play ↗` → `mock/index.html#uc-<id>` (or "not in the mock" for a skipped one). A flow with no use case → one `.muted` line with its `none` sentence.
-    8. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker (a tinted amber band with the label), then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
+    7. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker (a tinted amber band with the label), then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per flow before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the rail to match, one `<li>` per section in page order, numbers matching each `.sec-n`:
     - Flows: one nested link per flow (`#flow-NN`, `3.N` + flow name).
@@ -195,9 +194,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - **In project** (recommended when the frontend app is found): mock pages inside the real app at `<routes-root>/mock/spec<NNN>/` (e.g. `apps/<web-app>/app/(main)/mock/spec164/`), built from its real components and types, with local data and no API / RPC calls. The user manages the branch and ignores the folder.
     - **Standalone HTML**: `<output>/mock/`, opens from disk, no app needed.
     - **No mock**.
-- In project / Standalone → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder and the chosen mode (`in-project` / `standalone`). It reads `<output>/use-cases.js`, writes the mock with `mock/shared/use-case-play.js` (how to play each use case) and re-runs `scripts/use-cases-section.js`, which adds the Play and "Try in the mock" links.
-- After it returns, re-run `node <this skill dir>/scripts/use-cases-section.js <output>` yourself if you changed any flow block since (it is safe to re-run), and keep its printed counts for step 7.
-- No mock → nothing to do: section 07 already lists the use cases without Play links, and no flow has a "Try in the mock" line.
+- In project / Standalone → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder and the chosen mode (`in-project` / `standalone`). It reads `<output>/use-cases.js`, writes the mock with `mock/shared/use-case-play.js` (how to play each use case) and re-runs `scripts/use-cases-panels.js`, which adds the Play links and "Open the mock ↗".
+- After it returns, re-run `node <this skill dir>/scripts/use-cases-panels.js <output>` yourself if you changed any flow block since (it is safe to re-run), and keep its printed counts for step 7.
+- No mock → nothing to do: each flow's Use cases view already lists its use cases, without Play links.
 
 ### 6. Verify
 
@@ -207,10 +206,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Database "Full schema" lists every table in the sequence diagrams; API "Full contracts" lists every API in them.
 - Every table in the Full schema appears on an ER diagram page, and every ER button points to a page that exists.
 - `.parts/` is deleted.
-- Every `href="#…"` on the page (rail, flow index, section 07's `#flow-NN`, `#uc-…`) resolves to an id.
-- Each flow keeps one name everywhere: rail, flow index, `data-title`, its `<h3>` and its `USE_CASE_FLOWS` title (section 07). Its "Try in the mock" links are use cases of that flow only.
+- Every `href="#…"` on the page (rail, flow index) resolves to an id.
+- Each flow keeps one name everywhere: rail, flow index, `data-title`, its `<h3>` and its `USE_CASE_FLOWS` title. Its Use cases panel lists use cases of that flow only.
 - Run the generate-use-case skill's `scripts/check.js <output>/use-cases.js` and fix every error it reports.
-- Mock built (standalone) → run the generate-mock-ui skill's `scripts/check-use-cases.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, one play entry per use case, every scenario id in `scenarios.js`, and every API / console use case run against the fake API with a result matching its `expect`. Then check section 07's counts and links match `use-cases.js` (re-run `use-cases-section.js` if not).
+- Mock built (standalone) → run the generate-mock-ui skill's `scripts/check-use-cases.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, one play entry per use case, every scenario id in `scenarios.js`, and every API / console use case run against the fake API with a result matching its `expect`. Then check each flow's Use cases count and Play links match `use-cases.js` (re-run `use-cases-panels.js` if not).
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
 - Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
 - Presentation mode, in the same browser at 1440×900, 1280×720 and 1024×768: press `P` and step through every step; on each, the page is no wider than the window (`document.documentElement.scrollWidth <= innerWidth`), the step's diagram or tables show whole across, the diagram box ends above the bar, every diagram label renders at 14px (not scaled up or down), and a box that scrolls shows the `continues ↓` cue.
@@ -222,7 +221,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - two **fresh**, review-only agents in one message, in parallel: a UI fidelity reviewer ("Would a user think this IS the real app?") and a functional reviewer ("Does every use case behave as the spec says?");
     - merge their reports; settle each conflict against the spec first, then the real code, and note which won;
     - one **fresh** fix agent applies every fix (never a reviewer);
-    - then `node <this skill dir>/scripts/use-cases-section.js <output>` and re-run step 6.
+    - then `node <this skill dir>/scripts/use-cases-panels.js <output>` and re-run step 6.
 - Don't run the reviewers again unless the fix agent reports a finding it could not apply.
 - No mock → skip.
 

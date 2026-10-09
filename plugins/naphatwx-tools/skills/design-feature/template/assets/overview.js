@@ -92,7 +92,7 @@ viewButtons.forEach(btn => {
     btn.addEventListener("click", () => selectView(btn));
 });
 document.querySelectorAll(".panel").forEach(p => p.addEventListener("animationend", () => p.classList.remove("entering")));
-// the flow a 1/2/3 key acts on: the current slide when presenting, else the flow nearest the top of the screen
+// the flow a 1–4 key acts on: the current slide when presenting, else the flow nearest the top of the screen
 function flowInView() {
     if (presenting()) return steps[current]?.slide.classList.contains("flow") ? steps[current].slide : null;
     let best = null;
@@ -241,7 +241,7 @@ document.addEventListener("keydown", (e) => {
     if (k === "/") { e.preventDefault(); small.matches ? setDrawer(true) : setCollapsed(false); search.focus(); return; }
     if (k === "p" || k === "P") { setPresent(!presenting()); return; }
     if (k === "?") { openKeys(); return; }
-    if (k === "1" || k === "2" || k === "3") {
+    if (["1", "2", "3", "4"].includes(k)) {
         const tab = flowInView()?.querySelectorAll(".views button[aria-controls]")[+k - 1];
         if (!tab || tab.disabled) return;
         selectView(tab);

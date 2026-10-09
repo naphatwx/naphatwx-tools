@@ -72,9 +72,9 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 
 ### 5. Link the plan (when a plan folder exists)
 
-- Run the design-feature skill's `scripts/use-cases-section.js` with the in-project source and links:
-  `node <design-feature skill dir, sibling of this skill>/scripts/use-cases-section.js <plan-folder> --play-file <mock-folder>/_mock/use-case-play.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?scenario={scenario}&uc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
-- It writes section 07 "Use cases" and every flow's "Try in the mock" line. Then add one muted line under the section's first line: the mock runs in the app, start it with the app's dev command.
+- Run the design-feature skill's `scripts/use-cases-panels.js` with the in-project source and links:
+  `node <design-feature skill dir, sibling of this skill>/scripts/use-cases-panels.js <plan-folder> --play-file <mock-folder>/_mock/use-case-play.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?scenario={scenario}&uc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
+- It writes every flow's "Use cases (N)" view and the "Open the mock ↗" link. Then add one muted line under the Flows section's first line: the mock runs in the app, start it with the app's dev command.
 
 ### 6. Verify
 
@@ -90,6 +90,6 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 ### 7. Confirm
 
 - Output: `✅ Mock created at: <mock-folder>` (repo-relative) and the index URL `http://localhost:<port>/mock/spec<NNN>`.
-- Use cases per flow and the total, as printed by `use-cases-section.js` — never counted by eye.
+- Use cases per flow and the total, as printed by `use-cases-panels.js` — never counted by eye.
 - List the screens and scenarios, the types still marked `TODO: not generated yet`, and any route line the user must add (Hard Rule 1).
 - Note when `git check-ignore` says the folder is not ignored yet.

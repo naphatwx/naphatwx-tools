@@ -61,6 +61,6 @@ Question: **"Does every use case behave as the spec says?"**
 - When the UI review and a use case disagree (e.g. the mock has a control the real app lacks), settle it against the **spec first, then the real code**. Write down which won and why.
 - Apply every fix with **one fresh fix agent** — never one of the reviewers. Give it the merged list and the files; it reports each finding as fixed or not fixable, with why.
     - A missing or wrong use case (title, `expect`, a gap) is fixed in `<plan>/use-cases.js` with the `generate-use-case` skill's rules, then `scripts/check.js` there. Everything else is fixed in the mock.
-- Then regenerate the overview's Use cases section (`use-cases-section.js`, see `SKILL.md` step 7) and re-run Verify.
+- Then regenerate the overview's Use cases views (`use-cases-panels.js`, see `SKILL.md` step 7) and re-run Verify.
 - Don't run the reviewers a second time, unless the fix agent reports a finding it could not apply.
 - Confirm step: the two verdicts, the number of findings by severity, how many were fixed, and every conflict with the side that won.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.163
+
+**design-feature: use cases move into each flow**
+
+- Each flow has a 4th view after Rules: `Use cases (N)`, with the flow's use cases and their `Play ↗` links. Key `4` opens it.
+- Section 07 "Use cases" and the "Try in the mock" line are gone. Open questions is now 07. "Open the mock ↗" moves to the Flows heading.
+- `use-cases-section.js` is now `use-cases-panels.js`. Re-running it on an old plan moves the use cases into the flows.
+
 ## 1.9.157
 
 **generate-mock-ui, design-feature: use cases in a side list next to the frame**

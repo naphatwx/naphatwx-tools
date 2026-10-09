@@ -67,7 +67,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 7. **Mock-only UI is obvious**: the scenario panel stays pink and dashed. Nothing mock-only uses product styling.
 8. Wrap every `sessionStorage` / `localStorage` call in `try/catch`; the mock must still work when storage is blocked.
 9. No absolute local paths in any file. Code comments max 3 lines.
-10. **Use cases are data, owned by `<plan>/use-cases.js`.** Never add, remove or rename a use case here; when one is wrong or missing, fix it with the `generate-use-case` skill. The mock adds only `shared/use-case-play.js`: one entry per use case id, a strict-JSON array (double quotes, no trailing commas, no comments inside) so other tools can parse it after stripping `var NAME = `. The overview's Use cases section and every "Try in the mock" line are generated from both files by a script — never typed by hand — so the plan can't drift from the mock.
+10. **Use cases are data, owned by `<plan>/use-cases.js`.** Never add, remove or rename a use case here; when one is wrong or missing, fix it with the `generate-use-case` skill. The mock adds only `shared/use-case-play.js`: one entry per use case id, a strict-JSON array (double quotes, no trailing commas, no comments inside) so other tools can parse it after stripping `var NAME = `. Each flow's Use cases view in the overview is generated from both files by a script — never typed by hand — so the plan can't drift from the mock.
 11. **Every count you report is computed** (by `scripts/check-use-cases.js`), never estimated: use cases per flow, total, console runs.
 12. **Controls follow the spec, then the real app.**
     - No permission → do what the real app does: a control the app hides is **hidden** in the mock too.
@@ -165,7 +165,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 
 ### 7. Link the plan (when a plan folder exists)
 
-- Run `node <design-feature skill dir>/scripts/use-cases-section.js <plan-folder>` (the design-feature skill is this skill's sibling folder, `../design-feature/`). It rewrites `overview.html` section 07 "Use cases" and every flow's "Try in the mock" line (each playable use case → `mock/index.html#uc-<id>`, new tab) from `use-cases.js` and `use-case-play.js`, and adds the line to flows that had none. Don't edit those parts by hand; re-run the script after any change to the use cases.
+- Run `node <design-feature skill dir>/scripts/use-cases-panels.js <plan-folder>` (the design-feature skill is this skill's sibling folder, `../design-feature/`). It rewrites every flow's "Use cases (N)" view in `overview.html` (each playable use case → `Play ↗` to `mock/index.html#uc-<id>`, new tab) from `use-cases.js` and `use-case-play.js`, and adds "Open the mock ↗" to the Flows heading. Don't edit those parts by hand; re-run the script after any change to the use cases.
 
 ### 8. Verify
 
