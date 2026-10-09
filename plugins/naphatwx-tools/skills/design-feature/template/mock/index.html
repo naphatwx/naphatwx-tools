@@ -127,9 +127,9 @@
         body { line-height: 1.55; overflow-x: clip; }
         /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
         /* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
-        /* the frame column takes 80% of the row (up to 1920px) but leaves each side card at least 13rem;
+        /* the frame column takes 70% of the row (up to 1920px) but leaves each side card at least 13rem;
            the side cards split what is left evenly */
-        :root { --row-w: calc(100vw - 2 * var(--gutter) - 12px); --frame-col: min(1920px, 0.8 * var(--row-w), var(--row-w) - 26rem - 48px); --text-w: var(--frame-col); --side-l: calc((var(--row-w) - var(--text-w)) / 2); --side-r: var(--side-l); }
+        :root { --row-w: calc(100vw - 2 * var(--gutter) - 12px); --frame-col: min(1920px, 0.7 * var(--row-w), var(--row-w) - 26rem - 48px); --text-w: var(--frame-col); --side-l: calc((var(--row-w) - var(--text-w)) / 2); --side-r: var(--side-l); }
         .page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
         .measure { max-width: 48ch; }
         .muted { color: var(--text-2); }
