@@ -257,8 +257,7 @@ h2 + .facts { margin-top: 0; }
 .uc-index .aside { color: var(--text-3); font-size: var(--fs-body); }
 .uc-index .n { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
 
-.uc-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
-.uc-head .refs { min-width: 0; margin-left: auto; text-align: right; }
+.uc-head { display: flex; flex-direction: column; gap: 2px; }
 .refs { font: var(--fs-code)/1.6 var(--mono); color: var(--text-3); }
 .uc-line { margin-top: 2px; color: var(--text); }
 .uc-line .aside { margin-left: 4px; }

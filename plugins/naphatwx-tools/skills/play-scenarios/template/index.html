@@ -154,9 +154,8 @@
         .tabs { display: flex; flex-direction: column; padding: 4px; overflow-y: hidden; }
         .tabs-title { padding: 8px 10px 4px; }
         .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; }
-        /* refs sit right of the title, like the plan's use case heading */
-        .uc-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
-        .uc-head .refs { min-width: 0; margin-left: auto; text-align: right; }
+        /* refs sit below the title, like the plan's use case heading */
+        .uc-head { display: flex; flex-direction: column; gap: 2px; }
         .guide { padding: 12px 16px; }
         @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs { overflow-y: visible; } }
         @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
