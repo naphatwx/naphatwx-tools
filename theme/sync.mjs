@@ -17,7 +17,8 @@ const err = (s) => process.stderr.write(s + '\n');
 // Mock screens and their shared code use the target app's own design system, not this theme.
 const IGNORE = [/\/mock\/(page|shared|contract)\//, /\/generate-mock-ui\/template\/(page|shared|contract)\//];
 
-const stripHeader = (css) => css.replace(/^\/\*[\s\S]*?\*\/\s*/, '').trimEnd();
+// CRLF to LF: a Windows checkout has CRLF sources, and a bare '\r' line would get indented.
+const stripHeader = (css) => css.replace(/\r\n/g, '\n').replace(/^\/\*[\s\S]*?\*\/\s*/, '').trimEnd();
 // Marker name -> source file. pdf-js goes inside a <script>; the rest inside a <style> or .css file.
 const SOURCES = { tokens: 'tokens.css', base: 'base.css', pdf: 'pdf.css', 'pdf-js': 'pdf.js' };
 const BLOCKS = Object.fromEntries(Object.entries(SOURCES)
@@ -60,7 +61,7 @@ function* walk(dir) {
 const MARK = /^([ \t]*)\/\* theme:([\w-]+):start \*\/[\s\S]*?\/\* theme:\2:end \*\//gm;
 let synced = 0;
 for (const file of walk(SKILLS)) {
-    const rel = relative(ROOT, file);
+    const rel = relative(ROOT, file).split(sep).join('/');
     if (!rel.includes('/template/') || IGNORE.some((re) => re.test(rel))) continue;
     const src = readFileSync(file, 'utf8');
 
