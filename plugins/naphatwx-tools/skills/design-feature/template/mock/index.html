@@ -126,8 +126,10 @@
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; overflow-x: clip; }
         /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
-        /* the text column is exactly the frame column of the use-case row below, so both line up */
-        :root { --row-w: min(100vw - 2 * var(--gutter) - 12px, 1920px); --side-l: calc(17rem + 24px); --side-r: calc(20rem + 24px); }
+        /* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
+        /* the frame column takes 80% of the row (up to 1920px) but leaves each side card at least 13rem;
+           the side cards split what is left evenly */
+        :root { --row-w: calc(100vw - 2 * var(--gutter) - 12px); --frame-col: min(1920px, 0.8 * var(--row-w), var(--row-w) - 26rem - 48px); --text-w: var(--frame-col); --side-l: calc((var(--row-w) - var(--text-w)) / 2); --side-r: var(--side-l); }
         .page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
         .measure { max-width: 48ch; }
         .muted { color: var(--text-2); }
@@ -145,19 +147,20 @@
         a.panel { color: inherit; text-decoration: none; transition: border-color .15s var(--ease); }
         a.panel:hover { border-color: var(--accent); }
         /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
-           the guide sits beside the frame, not above it, so steps and the whole screen show at once;
-           on mid widths it tops the side list: the open scenario matters more than the others */
-        .uc-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: 17rem minmax(0, 1fr) 20rem; grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
+           the middle column shrinks to the frame's real width (--frame-w, set by fit()) and the side cards fill the rest;
+           on mid widths the guide tops the side list: the open scenario matters more than the others */
+        .uc-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: minmax(0, 1fr) var(--frame-w, var(--frame-col)) minmax(0, 1fr); grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
         .uc-row > .tabs { grid-area: tabs; } .uc-row > .card { grid-area: card; } .uc-row > .guide { grid-area: guide; }
-        .tabs, .guide { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
-        .tabs { padding: 4px; }
+        /* side cards match the frame's top and height (set by fit()); longer content scrolls inside */
+        .tabs, .guide { position: sticky; top: 16px; height: var(--frame-h, auto); margin-top: var(--frame-top, 0); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        .tabs { display: flex; flex-direction: column; padding: 4px; overflow-y: hidden; }
         .tabs-title { padding: 8px 10px 4px; }
-        .tab-list { display: flex; flex-direction: column; gap: 2px; }
+        .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; }
         /* refs sit right of the title, like the plan's use case heading */
         .uc-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
         .uc-head .refs { min-width: 0; margin-left: auto; text-align: right; }
         .guide { padding: 12px 16px; }
-        @media (max-width: 1400px) { :root { --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; max-height: none; } }
+        @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs { overflow-y: visible; } }
         @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
         .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
@@ -186,7 +189,7 @@
             .page { width: auto; margin: 0; padding: 16px; }
             .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
             .tabs, .btn-ghost { display: none !important; }
-            .guide { position: static; max-height: none; }
+            .guide { position: static; height: auto; margin-top: 0; max-height: none; }
         }
     </style>
     <script src="contract/rules.js"></script>
@@ -241,7 +244,7 @@
         }
         /* theme:pdf-js:end */
         addExportPdf();
-        const SCREEN_W = 1600, SCREEN_H = 940;
+        const SCREEN_W = 1920, SCREEN_H = 1080; // 16:9; the frame scales to the column width and keeps this ratio
         const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
         const nn = ucId => ucId.slice(2).padStart(2, '0');
         const scsOf = ucId => SCENARIOS.filter(s => s.useCase === ucId);
@@ -264,6 +267,7 @@
         }
 
         // ---------------------------------------------------------------- one block per use case
+        const heads = {}; // use case heading, drawn above the frame by pick() so it is exactly as wide
         document.getElementById('use-cases').innerHTML = USE_CASES.map(uc => {
             const scs = scsOf(uc.id);
             const head = `
@@ -271,11 +275,11 @@
                 <h2 class="font-bold"><span class="meta mr-2">${uc.id}</span>${UI.esc(uc.title)}</h2>
                 <div class="refs t-code font-mono meta">${UI.esc(uc.refs)} · <a href="../overview.html#uc-${nn(uc.id)}" class="link">plan</a></div>
               </div>`;
+            heads[uc.id] = head;
             const skipped = SCENARIOS_SKIPPED.filter(s => s.useCase === uc.id);
             if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted measure">${UI.esc(uc.none || skipped[0]?.skip || 'No scenario to play.')}</p></section>`;
             return `
               <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
-                ${head}
                 <div class="uc-row">
                 <div class="tabs">
                   <div class="label tabs-title" id="sc-title-${nn(uc.id)}">Scenarios</div>
@@ -295,7 +299,7 @@
             const block = document.querySelector(`section[data-use-case="${sc.useCase}"]`);
             block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sc === id)));
             if (fromClick) { clearStore(); history.replaceState(null, '', '#sc-' + id); }
-            block.querySelector('.card').innerHTML = `
+            block.querySelector('.card').innerHTML = `${heads[sc.useCase]}
               <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="font-semibold">${UI.esc(sc.title)}</h3><span class="t-code font-mono meta">${UI.esc(sc.story)} · ${UI.esc(stateOf(sc).label)}</span></div>
               <div class="frame mt-2">
                 <div class="toolbar">
@@ -317,12 +321,20 @@
 
         function fit(block) {
             const box = block.querySelector('.fit'); if (!box) return;
-            // fit the card's width and the window's height: the use case heading, title, toolbar and frame show without scrolling
-            const above = box.getBoundingClientRect().top - block.getBoundingClientRect().top;
-            const s = Math.min(1, block.querySelector('.card').clientWidth / SCREEN_W, (innerHeight - above - 48) / SCREEN_H);
+            // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
+            const row = block.querySelector('.uc-row');
+            row.style.removeProperty('--frame-w'); // measure the full column, not the last fit's frame
+            const s = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_W);
             box.querySelector('iframe').style.transform = `scale(${s})`;
             box.style.height = Math.round(SCREEN_H * s) + 'px';
-            box.closest('.frame').style.width = Math.round(SCREEN_W * s) + 2 + 'px';
+            const frame = box.closest('.frame');
+            frame.style.width = Math.round(SCREEN_W * s) + 2 + 'px';
+            row.style.setProperty('--frame-w', frame.style.width);
+            row.style.setProperty('--frame-h', frame.offsetHeight + 'px');
+            row.style.setProperty('--frame-top', frame.getBoundingClientRect().top - row.getBoundingClientRect().top + 'px');
+            // the text column (page title, audit log) takes the frame's real width, so all of it lines up
+            const ws = [...document.querySelectorAll('.uc-row')].map(r => parseFloat(r.style.getPropertyValue('--frame-w'))).filter(Boolean);
+            document.documentElement.style.setProperty('--text-w', Math.max(...ws) + 'px');
             block.querySelector('.scale-label').textContent = `${Math.round(s * 100)}% of ${SCREEN_W} px`;
         }
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
