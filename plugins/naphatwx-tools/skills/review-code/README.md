@@ -32,7 +32,7 @@ graph TD
     M --> C
     F --> C
     C --> G[load guidelines: CONTRIBUTING.md, AGENTS.md, root + module, referenced docs/]
-    G --> R[review each hunk: what changed, works?, breaks callers?, breaks guidelines?]
+    G --> R[review each hunk: what changed, works?, breaks callers?, breaks guidelines?, re-builds or repeats code?]
     R --> K[scope check: drop findings not on a changed line]
     K --> O[print report: PASS or FAIL]
     O --> P{"specs/<branch>/ exists?"}
@@ -52,6 +52,7 @@ Rules the diagrams don't show:
 
 - Every finding's `file:line` must be in the changed-lines map, or it is dropped.
 - A pre-existing problem counts only when the change makes it worse or newly reachable. It gets a `[pre-existing]` label.
+- Reuse check: each new function, component, constant or logic block is searched for in the repo (`utils/`, `components/`, `hooks/` and the like first). A re-built one or a repeat inside the change is a WARNING that names what to reuse.
 - Breaking a loaded guideline is CRITICAL. Any CRITICAL finding means FAIL.
 - MR findings use line numbers from the MR head.
 

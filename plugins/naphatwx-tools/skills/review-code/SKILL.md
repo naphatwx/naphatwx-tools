@@ -1,7 +1,7 @@
 ---
 name: review-code
 description: Review only the changed lines of staged changes, files or a GitLab merge request against the repo's guidelines. Use when the user says "review my staged changes" or "review this MR". Reports only, never edits code. Fetching the diff alone is get-mr-diffs.
-argument-hint: [staged | <merge-request-url> | file paths...]
+argument-hint: "[staged | <merge-request-url> | file paths...]"
 allowed-tools: Skill, Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), Bash(git fetch:*), Bash(git status:*), Bash(git -C:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__get_file_contents
 ---
 
@@ -72,6 +72,9 @@ names:
 Read wider context (the full file, or a `-U20` diff) **only** to judge a
 changed line — not to hunt for issues elsewhere.
 
+Exception: step 4's reuse search reads the rest of the repo to find code the
+change could reuse. The finding still anchors to the changed line.
+
 ### 3. Load Guidelines
 
 Default (staged, files, or an MR of the repo currently checked out — compare
@@ -97,6 +100,34 @@ For each changed hunk, ask in order:
 3. Does it break something that used to work (removed lines, changed
    signature, changed default, callers)?
 4. Does it violate the loaded guidelines?
+5. Does it re-build something the repo already has, or repeat itself?
+
+#### Reuse & Duplication (required)
+
+The user wants clean code: if something reusable exists, the change must use it.
+
+1. **List what the change adds**: new functions, methods, components, hooks,
+   classes, types, constants, regexes, SQL queries, styles, and any added
+   block of 5+ lines of logic.
+2. **Search the repo for an existing equivalent** of each item (Grep / Glob):
+   - The same or a similar name (synonyms too: `format`/`render`,
+     `get`/`fetch`/`load`, `is`/`has`/`check`).
+   - Key lines of its body (a distinctive call, literal, regex or query).
+   - Shared places first: `utils/`, `helpers/`, `lib/`, `common/`, `shared/`,
+     `components/`, `hooks/`, `services/`, `constants/`, `types/`, and the
+     framework's or a dependency's built-ins.
+3. **Check the change against itself**: the same logic, markup or style
+   written twice or more across the changed lines or files.
+4. **Report** each hit as a finding on the changed line:
+   - Re-implements an existing function, component or constant → WARNING.
+     Name the existing one (`path:line`) and show the call that replaces it.
+   - Same logic repeated inside the change → WARNING. Propose one shared
+     function or component, with its name and where it should live.
+   - Nearly the same as existing code, differing by a value or two →
+     SUGGESTION: extend the existing one with a parameter instead.
+   - CRITICAL when a loaded guideline requires reuse of that thing.
+5. Do not report: a match that only looks alike but means something else,
+   test fixtures, generated code, or a 1–3 line idiom.
 
 Check the changed lines for:
 
@@ -129,7 +160,7 @@ Check the changed lines for:
 - Missing indexes (for database changes)
 
 #### Best Practices
-- DRY violations
+- DRY violations (see Reuse & Duplication above)
 - SOLID principles
 - Proper abstraction levels
 - Test coverage considerations
@@ -188,6 +219,12 @@ Every finding uses this shape:
   Fix: <concrete change>
 ```
 
+A reuse finding also names what to reuse:
+
+```text
+  Reuse: <existing path:line and symbol> | <new shared name + where it lives>
+```
+
 For an MR review, use line numbers from the MR head so findings map to the MR
 diff.
 
@@ -215,7 +252,7 @@ folder **if one exists**:
 ## Review Severity Levels
 
 - **CRITICAL**: Security vulnerabilities, data loss risks, breaking changes, violations of project guidelines (AGENTS.md, CONTRIBUTING.md, or any loaded docs)
-- **WARNING**: Bugs, performance issues, minor inconsistencies
+- **WARNING**: Bugs, performance issues, minor inconsistencies, duplicated code, re-built helpers or components that already exist
 - **SUGGESTION**: Style improvements, refactoring opportunities
 
 ## Out of Scope — Never Report

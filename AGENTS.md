@@ -3,7 +3,8 @@
 ## Layout
 
 - `plugins/naphatwx-tools/skills/<name>/SKILL.md` is the single source for every tool. Edit only here.
-- Frontmatter: `name` + `description` are required by every agent. Claude-only keys (`allowed-tools`, `argument-hint`, `disable-model-invocation`) are allowed; other agents ignore them.
+- Frontmatter: `name` + `description` are required by every agent. Claude-only keys (`allowed-tools`, `argument-hint`, `disable-model-invocation`, `context`, `background`) are allowed; other agents ignore them.
+- `context: fork` runs a skill in a fresh sub-agent that does not see the chat. Use it only for skills that ask the user nothing and return one report (e.g. `check-job`). Add `background: false` when the skill needs MCP tools.
 - Keep skill bodies agent-neutral: name a Claude-only tool as an option ("use AskUserQuestion when the agent has it"), and give a fallback for `$ARGUMENTS`.
 - Refer to other skills by bare name, e.g. the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code).
 - `skills/<name>/README.md` is for people; agents follow `SKILL.md` only. `template/README.md` ships inside the generated folder.

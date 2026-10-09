@@ -2,6 +2,8 @@
 name: check-job
 description: Watch a Jenkins build from its URL until it ends, then explain any failure. Use when the user pastes a build link or says "why did the build fail". Read-only.
 argument-hint: <jenkins-build-url>
+context: fork
+background: false
 allowed-tools: Bash(sleep:*), mcp__jenkins__get_item, mcp__jenkins__get_build, mcp__jenkins__get_build_failure_excerpt, mcp__jenkins__get_build_console_tail, mcp__jenkins__get_build_console_chunk, mcp__jenkins__search_build_console, mcp__jenkins__get_build_test_report
 ---
 
