@@ -125,13 +125,11 @@
         /* Index chrome only. The frames show the running app with its own design system. */
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; overflow-x: clip; }
-        /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
         /* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
         /* the frame column takes 70% of the row (up to 1920px) but leaves each side card at least 13rem;
            the side cards split what is left evenly */
         :root { --row-w: calc(100vw - 2 * var(--gutter) - 12px); --frame-col: min(1920px, 0.7 * var(--row-w), var(--row-w) - 26rem - 48px); --text-w: var(--frame-col); --side-l: calc((var(--row-w) - var(--text-w)) / 2); --side-r: var(--side-l); }
         .page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
-        .measure { max-width: 48ch; }
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
         /* Headings use the shared theme steps; other text --fs-md, code and the frame's toolbar --fs-sm. */
@@ -225,7 +223,7 @@
         <header>
             <a href="../overview.html#use-cases" class="link">← Feature plan</a>
             <h1 class="font-bold mt-2">Play · Feature name</h1>
-            <p class="muted measure mt-1">Each frame is the running app. Picking a scenario creates new data for it through the app's API, then opens it.</p>
+            <p class="muted mt-1">Each frame is the running app. Picking a scenario creates new data for it through the app's API, then opens it.</p>
         </header>
 
         <div id="banner"></div>
@@ -234,7 +232,7 @@
 
         <section>
             <h2 class="font-bold mb-1">Results</h2>
-            <p class="meta mb-3 measure">Saved in this browser only. Mark each scenario after you play it, then copy the table.</p>
+            <p class="meta mb-3">Saved in this browser only. Mark each scenario after you play it, then copy the table.</p>
             <div id="results"></div>
         </section>
     </div>
@@ -315,7 +313,7 @@
               </div>`;
             heads[uc.id] = head;
             const skipped = SCENARIOS_SKIPPED.filter(s => s.useCase === uc.id);
-            if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted measure">${esc(uc.none || skipped[0]?.skip || 'No scenario to play.')}</p></section>`;
+            if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted">${esc(uc.none || skipped[0]?.skip || 'No scenario to play.')}</p></section>`;
             return `
               <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
                 <div class="uc-row">
@@ -328,7 +326,7 @@
                 <div class="card"></div>
                 <aside class="guide" aria-label="How to play and what you should see"></aside>
                 </div>
-                ${skipped.map(s => `<p class="meta measure mt-2">Not played live: ${esc(s.title)} — ${esc(s.skip)}</p>`).join('')}
+                ${skipped.map(s => `<p class="meta mt-2">Not played live: ${esc(s.title)} — ${esc(s.skip)}</p>`).join('')}
               </section>`;
         }).join('');
 
@@ -365,7 +363,7 @@
               ${sc.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="t-code meta break-words">${esc(sc.seed)}</code>` : ''}`;
             fit(block);
             if (run || !needsServer(sc)) load(sc, block);
-            else overlay(block, `<p class="muted measure">${sc.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${esc(roleOf(sc))} first.`}</p><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">▶ Open</button>`);
+            else overlay(block, `<p class="muted">${sc.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${esc(roleOf(sc))} first.`}</p><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">▶ Open</button>`);
         }
 
         function overlay(block, html) {
@@ -395,7 +393,7 @@
             const box = block.querySelector('.fit'); if (!box) return;
             // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
             const row = block.querySelector('.uc-row');
-            row.style.removeProperty('--frame-w'); // measure the full column, not the last fit's frame
+            row.style.removeProperty('--frame-w'); // the full column, not the last fit's frame
             const s = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_W);
             box.querySelector('iframe').style.transform = `scale(${s})`;
             box.style.height = Math.round(SCREEN_H * s) + 'px';
