@@ -174,7 +174,7 @@
         .tab-n.pass, .tab[aria-selected="true"] .tab-n.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
         .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
         .tab[aria-selected="true"] .tab-n { border-color: var(--bg); }
-        .tabs-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .tabs-title { display: flex; flex-direction: column; gap: 2px; }
         .tabs-count { font-size: var(--fs-sm); font-weight: 400; white-space: nowrap; }
         .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
         /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
