@@ -88,6 +88,8 @@
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   code, kbd, pre, samp { font-family: var(--mono); }
+  /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
+  .label, th, dt { color: var(--text-2); font-weight: 600; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -190,7 +192,7 @@
 
   /* Hops are a numbered table-like list: fixed columns so status, route and time line up row to row.
      The cause lives in the opened row, not the summary, so a closed row stays one line. */
-  .hops-label { padding: 0 14px 4px; color: var(--text-3); }
+  .hops-label { padding: 0 14px 4px; }
   .hops { list-style: none; margin: 0 14px 12px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
   .hops > li + li { border-top: 1px solid var(--line); }
   .hop-row { display: grid; grid-template-columns: 1ch 2ch 8.5em minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 5px 12px; }
@@ -214,7 +216,7 @@
   .table-wrap { overflow-x: auto; margin: 8px 0; }
   table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: var(--fs-md); }
   th, td { text-align: left; padding: 3px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { color: var(--text-3); font-weight: 500; white-space: nowrap; }
+  th { white-space: nowrap; }
   td:first-child code { white-space: nowrap; overflow-wrap: normal; }
   .evidence-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 10px; }
   pre { font-size: var(--fs-sm); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 360px; overflow-y: auto; }
@@ -467,7 +469,7 @@ function flowBox(f) {
     list.append(el('li', {}, t));
   }
   f.hops.forEach((h, i) => list.append(hopRow(f, h, String(i + 1))));
-  panel.append(el('div', { class: 'hops-label' }, 'Hops'), list);
+  panel.append(el('div', { class: 'label hops-label' }, 'Hops'), list);
   return box;
 }
 

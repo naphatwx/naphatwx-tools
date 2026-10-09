@@ -77,14 +77,14 @@
             <h2><span class="sec-n">02</span>Scope</h2>
             <div class="scope">
                 <div>
-                    <h3>In scope</h3>
+                    <h3 class="label">In scope</h3>
                     <ul>
                         <li>Create a thing from the Things page.</li>
                         <li>Filter things by source.</li>
                     </ul>
                 </div>
                 <div>
-                    <h3>Out of scope</h3>
+                    <h3 class="label">Out of scope</h3>
                     <ul>
                         <li>Bulk import <span class="aside">— needs a queue, next quarter</span></li>
                         <li>Editing a thing's owner <span class="aside">— separate ticket</span></li>
@@ -162,7 +162,7 @@
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-02-seq" aria-labelledby="uc-02-seq-tab" hidden>
                 <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
-                <div class="seq-steps"><p class="seq-steps-title">Step details · only steps with extra detail, by their number in the diagram</p><ol>
+                <div class="seq-steps"><p class="label seq-steps-title">Step details · only steps with extra detail, by their number in the diagram</p><ol>
                     <li><span class="n">2</span><code>GetThing</code> id from the route</li>
                     <li><span class="n">·</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
                     <li><span class="n">6</span><code>CreateThing</code> name, ownerId</li>

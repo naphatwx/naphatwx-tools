@@ -84,6 +84,8 @@ body {
 a { color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 code, kbd, pre, samp { font-family: var(--mono); }
+/* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
+.label, th, dt { color: var(--text-2); font-weight: 600; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -236,13 +238,13 @@ li + li { margin-top: 2px; }
 li::marker { color: var(--text-3); }
 
 .facts { display: grid; grid-template-columns: 9.5rem 1fr; gap: 4px 24px; margin-top: 20px; font-size: var(--fs-body); }
-.facts dt { color: var(--text-3); font-size: var(--fs-body); padding-top: 2px; }
+.facts dt { font-size: var(--fs-body); padding-top: 2px; }
 .facts dd { color: var(--text); }
 h2 + .facts { margin-top: 0; }
 
 /* in scope, then out of scope below it, each full width */
 .scope { display: grid; gap: 24px; }
-.scope h3 { font-size: var(--fs-body); color: var(--text-3); font-weight: 500; margin-bottom: 4px; }
+.scope h3 { font-size: var(--fs-body); margin-bottom: 4px; }
 .scope ul { color: var(--text); }
 
 .side-link {
@@ -336,7 +338,7 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 
 /* sits in the wide panel but keeps the text column's measure, centred under the diagram */
 .seq-steps { max-width: var(--measure); margin: 10px auto 0; font-size: var(--fs-body); }
-.seq-steps-title { color: var(--text-3); font-size: var(--fs-body); margin-bottom: 6px; }
+.seq-steps-title { font-size: var(--fs-body); margin-bottom: 6px; }
 .seq-steps ol { list-style: none; padding: 0; }
 /* inline flow: wrapped lines return to one left edge under the label, not a ragged gutter */
 .seq-steps li { padding: 2px 0 2px 28px; text-indent: -28px; margin: 0; }
@@ -461,7 +463,7 @@ details.more > :not(summary) { margin-bottom: 12px; }
 
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: var(--fs-body); }
-th { text-align: left; font-weight: 500; color: var(--text-3); padding: 0 16px 6px 0; border-bottom: 1px solid var(--line-strong); }
+th { text-align: left; padding: 0 16px 6px 0; border-bottom: 1px solid var(--line-strong); }
 td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
 
 .blocker-line { margin: 4px 0 6px; padding: 8px 14px; border-radius: var(--radius-lg); background: var(--warn-soft); color: var(--text); }
