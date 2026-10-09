@@ -1,0 +1,2 @@
+# Secrets for playing scenarios. Never commit them.
+.env

@@ -1,6 +1,6 @@
 ---
 name: generate-use-case
-description: Write a feature's use cases (one per user goal) and their scenarios (one per acceptance scenario, edge case and refusal) to one use-cases.js file, from a spec or idea. Use when the user says "use cases for spec 127" or "list the use cases". Data only; design-feature, generate-mock-ui and generate-test-cases read the file.
+description: Write a feature's use cases (one per user goal) and their scenarios (one per acceptance scenario, edge case and refusal) to one use-cases.js file, from a spec or idea. Use when the user says "use cases for spec 127" or "list the use cases". Data only; design-feature, generate-mock-ui, play-scenarios and generate-test-cases read the file.
 argument-hint: <spec-folder | plan-folder | feature description> [output-folder]
 ---
 
@@ -12,6 +12,7 @@ Turn a spec into one `use-cases.js` file: what a user can do with the feature an
 spec ─► generate-use-case ─► <plan>/use-cases.js
                                  ├─► design-feature          each use case's "Scenarios" view
                                  ├─► generate-mock-ui        adds how to play each scenario (mock/shared/scenario-play.js)
+                                 ├─► play-scenarios          plays each scenario on the running app (live/live.js)
                                  └─► generate-test-cases  one test case per scenario, same id ─► e2e-test report
 ```
 
@@ -111,4 +112,4 @@ Start from `template/use-cases.js`.
 
 - Output: `✅ Use cases written at: {path}`.
 - The totals and the scenario count per use case, copied from `check.js` output.
-- Next steps, one line each: design-feature shows the scenarios in each use case's Scenarios view, generate-mock-ui makes them playable, generate-test-cases turns them into test cases.
+- Next steps, one line each: design-feature shows the scenarios in each use case's Scenarios view, generate-mock-ui makes them playable, play-scenarios plays them on the running app, generate-test-cases turns them into test cases.

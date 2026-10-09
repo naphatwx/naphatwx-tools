@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play · Feature name</title>
+    <!-- Tailwind: layout utilities only; the app inside the frames brings its own styles -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* theme:tokens:start */
+        /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+        :root {
+            color-scheme: dark;
+
+            /* Surfaces, darkest first */
+            --bg: #121316;
+            --surface: #18191d;
+            --surface-2: #1f2025;
+            --surface-3: #24262c;
+            --line: #26282e;
+            --line-strong: #363940;
+            --line-3: #4a4d55;
+
+            /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+            --text: #e2e3e7;
+            --text-2: #c6c8cf;
+            --text-3: #a3a6b0;
+
+            /* One accent */
+            --accent: #8ab0ff;
+            --accent-fill: #1b2232;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+
+            /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+            --ok: #8fd694;
+            --warn: #f0c26b;
+            --bad: #f28b8d;
+            --neutral: #a3a6b0;
+            --ok-soft: rgba(143, 214, 148, 0.12);
+            --warn-soft: rgba(240, 194, 107, 0.12);
+            --bad-soft: rgba(242, 139, 141, 0.12);
+            --neutral-soft: rgba(163, 166, 176, 0.12);
+            --add: var(--ok);
+            --change: var(--warn);
+            --drop: var(--bad);
+
+            /* Diagrams: connectors and their labels */
+            --connector: #6b6e78;
+
+            /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+            /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
+               --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+            --fs-xs: 0.75rem;
+            --fs-sm: 0.875rem;
+            --fs-md: 1rem;
+            --fs-lg: 1.25rem;
+            --fs-xl: 1.5rem;
+            --fs-2xl: 2rem;
+            /* Headings and lead line: the same steps on every page */
+            --fs-lead: var(--fs-lg);
+            --fs-h3: var(--fs-lg);
+            --fs-h2: var(--fs-xl);
+            --fs-h1: var(--fs-2xl);
+
+            /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+            --page-w: min(80%, 900px);
+            --gutter: clamp(16px, 3vw, 24px);
+
+            --radius: 6px;
+            --radius-lg: 10px;
+            --ease: cubic-bezier(0.2, 0, 0, 1);
+        }
+        /* theme:tokens:end */
+        /* theme:base:start */
+        /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        a { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        code, kbd, pre, samp { font-family: var(--mono); }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* theme:base:end */
+        /* theme:pdf:start */
+        /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+        .export-pdf-float {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 50;
+            padding: 6px 12px;
+            font: inherit;
+            font-size: var(--fs-sm);
+            color: var(--text);
+            background: var(--surface-2);
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        .export-pdf-float:hover { background: var(--surface-3); }
+        @page { margin: 0; }
+        @media print {
+            html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            pre, figure, img, svg, tr { break-inside: avoid; }
+            h1, h2, h3 { break-after: avoid; }
+        }
+        /* theme:pdf:end */
+
+        /* Index chrome only. The frames show the running app with its own design system. */
+        html { scroll-padding-top: 24px; }
+        body { line-height: 1.55; overflow-x: clip; }
+        /* ch ("0") is wider than an average glyph: 48ch of the element's own font is about 68 characters a line */
+        /* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
+        /* the frame column takes 70% of the row (up to 1920px) but leaves each side card at least 13rem;
+           the side cards split what is left evenly */
+        :root { --row-w: calc(100vw - 2 * var(--gutter) - 12px); --frame-col: min(1920px, 0.7 * var(--row-w), var(--row-w) - 26rem - 48px); --text-w: var(--frame-col); --side-l: calc((var(--row-w) - var(--text-w)) / 2); --side-r: var(--side-l); }
+        .page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
+        .measure { max-width: 48ch; }
+        .muted { color: var(--text-2); }
+        .meta { color: var(--text-3); }
+        /* Headings use the shared theme steps; other text --fs-md, code and the frame's toolbar --fs-sm. */
+        body { font-size: var(--fs-md); }
+        h1 { font-size: var(--fs-h1); line-height: 1.15; }
+        h2 { font-size: var(--fs-h2); line-height: 1.25; }
+        h3 { font-size: var(--fs-h3); line-height: 1.3; }
+        .t-code { font-size: var(--fs-sm); }
+        .label { color: var(--text-3); font-weight: 500; }
+        .link { color: var(--accent); text-decoration: none; }
+        .link:hover { text-decoration: underline; }
+        .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        a.panel { color: inherit; text-decoration: none; transition: border-color .15s var(--ease); }
+        a.panel:hover { border-color: var(--accent); }
+        /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
+           the middle column shrinks to the frame's real width (--frame-w, set by fit()) and the side cards fill the rest;
+           on mid widths the guide tops the side list: the open scenario matters more than the others */
+        .uc-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: minmax(0, 1fr) var(--frame-w, var(--frame-col)) minmax(0, 1fr); grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
+        .uc-row > .tabs { grid-area: tabs; } .uc-row > .card { grid-area: card; } .uc-row > .guide { grid-area: guide; }
+        /* side cards match the frame's top and height (set by fit()); longer content scrolls inside */
+        .tabs, .guide { position: sticky; top: 16px; height: var(--frame-h, auto); margin-top: var(--frame-top, 0); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        .tabs { display: flex; flex-direction: column; padding: 4px; overflow-y: hidden; }
+        .tabs-title { padding: 8px 10px 4px; }
+        .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; }
+        /* refs sit right of the title, like the plan's use case heading */
+        .uc-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
+        .uc-head .refs { min-width: 0; margin-left: auto; text-align: right; }
+        .guide { padding: 12px 16px; }
+        @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs { overflow-y: visible; } }
+        @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
+        .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
+        .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
+        .tab-s { text-transform: uppercase; }
+        .tab-t { flex: 1; min-width: 0; }
+        .tab:hover { color: var(--text); background: var(--surface); }
+        /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
+        .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
+        /* the number is a status disc: outlined until marked, then a solid green check or red cross */
+        .tab { align-items: center; }
+        .tab-n { display: grid; place-items: center; flex: none; width: 26px; height: 26px; min-width: 0; border: 1.5px solid var(--line-3); border-radius: 50%; }
+        .tab-n svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-n.pass, .tab[aria-selected="true"] .tab-n.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
+        .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
+        .tab[aria-selected="true"] .tab-n { border-color: var(--bg); }
+        .tabs-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .tabs-count { font-size: var(--fs-sm); font-weight: 400; white-space: nowrap; }
+        .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
+        .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
+        .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
+        .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-sm); background: var(--surface-2); border-bottom: 1px solid var(--line); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
+        .url { font-family: var(--mono); padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+        .btn-ghost { padding: 4px 8px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
+        .btn-ghost:hover { border-color: var(--accent); }
+        .rows > * + * { border-top: 1px solid var(--line); }
+        /* the screen renders at desktop width and is scaled down to the frame */
+        .fit { position: relative; overflow: hidden; }
+        .fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--bg); }
+        /* covers the frame while a seed runs, when it failed, or before the first play */
+        .overlay { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; background: var(--surface); }
+        .overlay[hidden] { display: none; }
+        .overlay pre { max-width: 100%; max-height: 60%; overflow: auto; margin: 0; padding: 12px; text-align: left; white-space: pre-wrap; font-size: var(--fs-sm); color: var(--text-2); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); }
+        .overlay .bad { color: var(--bad); font-weight: 600; }
+        .banner { padding: 10px 14px; color: var(--text); background: var(--warn-soft); border: 1px solid var(--warn); border-radius: var(--radius-lg); }
+        .result-btn { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+        .result-btn:hover { border-color: var(--accent); }
+        .result-btn.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
+        .result-btn.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
+        .note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
+        .res-table { width: 100%; border-collapse: collapse; }
+        .res-table th, .res-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
+        .res-table th { color: var(--text-3); font-weight: 500; border-top: 0; }
+        .st-pass { color: var(--ok); } .st-fail { color: var(--bad); } .st-none { color: var(--text-3); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
+        /* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
+        @media print {
+            .page { width: auto; margin: 0; padding: 16px; }
+            .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
+            .tabs, .btn-ghost, .overlay, .result-ctl { display: none !important; }
+            .guide { position: static; height: auto; margin-top: 0; max-height: none; }
+        }
+    </style>
+    <script src="../use-cases.js"></script>
+    <script src="live.js"></script>
+</head>
+
+<body>
+    <div class="page py-6 space-y-8">
+        <header>
+            <a href="../overview.html#use-cases" class="link">← Feature plan</a>
+            <h1 class="font-bold mt-2">Play · Feature name</h1>
+            <p class="muted measure mt-1">Each frame is the running app. Picking a scenario creates new data for it through the app's API, then opens it.</p>
+        </header>
+
+        <div id="banner"></div>
+
+        <div id="use-cases" class="space-y-8"></div>
+
+        <section>
+            <h2 class="font-bold mb-1">Results</h2>
+            <p class="meta mb-3 measure">Saved in this browser only. Mark each scenario after you play it, then copy the table.</p>
+            <div id="results"></div>
+        </section>
+    </div>
+
+    <script>
+        /* theme:pdf-js:start */
+        /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+        function addExportPdf(target, prepare) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            b.textContent = 'Export PDF';
+            b.addEventListener('click', async () => {
+                if (prepare) await prepare();
+                window.print();
+            });
+            (target || document.body).append(b);
+            return b;
+        }
+        /* theme:pdf-js:end */
+        addExportPdf();
+        const SCREEN_W = 1920, SCREEN_H = 1080; // 16:9; the frame scales to the column width and keeps this ratio
+        const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+        const list = items => (items || []).map(s => `<li>${esc(s)}</li>`).join('');
+        const nn = ucId => ucId.slice(2).padStart(2, '0');
+        const scsOf = ucId => SCENARIOS.filter(s => s.useCase === ucId);
+        const byId = id => SCENARIOS.find(s => s.id === id);
+        // server.mjs serves this page, runs the seeds and signs in; opened from disk, only plain scenarios load
+        const served = location.protocol.startsWith('http');
+        const LOGIN = LIVE_CONFIG.login || { type: 'none' };
+
+        // ---------------------------------------------------------------- where each scenario opens
+        const opened = {}; // scenario id → the URL its last seed returned
+        const pathOf = sc => opened[sc.id] || sc.url || '';
+        const roleOf = sc => sc.role || LIVE_CONFIG.role || '';
+        /** A link login wraps the URL, so every scenario signs in as its role; a post login is done by server.mjs. */
+        function screenSrc(sc) {
+            if (LOGIN.type !== 'link') return LIVE_CONFIG.base + pathOf(sc);
+            return LIVE_CONFIG.base + LOGIN.path.replace('{role}', encodeURIComponent(roleOf(sc))).replace('{next}', encodeURIComponent(pathOf(sc)));
+        }
+        const screenUrl = sc => pathOf(sc) ? (LIVE_CONFIG.base + pathOf(sc)).replace(/^https?:\/\//, '') : 'The seed sets the URL';
+        /** server.mjs is needed for a seed to run or a sign-in to post. */
+        const needsServer = sc => !!sc.seed || LOGIN.type === 'post';
+
+        // ---------------------------------------------------------------- one pick: new data, sign-in, URL (server.mjs runs one at a time)
+        function play(sc) {
+            if (!needsServer(sc)) return Promise.resolve({ ok: true });
+            if (!served) return Promise.resolve({ ok: false, output: 'Seeds and sign-in run through the play server. Start it with node live/server.mjs --up, then open the URL it prints.' });
+            return fetch('/__play/' + encodeURIComponent(sc.id), { method: 'POST', headers: { 'X-Play': '1' } })
+                .then(r => r.json())
+                .catch(e => ({ ok: false, output: 'The play server did not answer: ' + e.message }));
+        }
+
+        // ---------------------------------------------------------------- results, per viewer
+        const RESULTS_KEY = `play:${LIVE_CONFIG.slug}:results`;
+        let results = {};
+        try { results = JSON.parse(localStorage.getItem(RESULTS_KEY)) || {}; } catch { }
+        function setResult(id, patch) {
+            results[id] = { ...(results[id] || {}), ...patch, at: new Date().toISOString() };
+            try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { /* storage blocked: kept for this visit only */ }
+            renderResults();
+        }
+        function mark(id, status) {
+            setResult(id, { status: results[id]?.status === status ? '' : status });
+            const block = document.querySelector(`section[data-use-case="${byId(id).useCase}"]`);
+            block.querySelectorAll('.result-btn').forEach(b => b.setAttribute('aria-pressed', String(results[id].status === b.dataset.status)));
+        }
+
+        // ---------------------------------------------------------------- one block per use case
+        const heads = {}; // use case heading, drawn above the frame by pick() so it is exactly as wide
+        document.getElementById('use-cases').innerHTML = USE_CASES.map(uc => {
+            const scs = scsOf(uc.id);
+            const head = `
+              <div class="uc-head mb-2">
+                <h2 class="font-bold"><span class="meta mr-2">${uc.id}</span>${esc(uc.title)}</h2>
+                <div class="refs t-code font-mono meta">${esc(uc.refs)} · <a href="../overview.html#uc-${nn(uc.id)}" class="link">plan</a></div>
+              </div>`;
+            heads[uc.id] = head;
+            const skipped = SCENARIOS_SKIPPED.filter(s => s.useCase === uc.id);
+            if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted measure">${esc(uc.none || skipped[0]?.skip || 'No scenario to play.')}</p></section>`;
+            return `
+              <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
+                <div class="uc-row">
+                <div class="tabs">
+                  <div class="label tabs-title"><span id="sc-title-${nn(uc.id)}">Scenarios</span><span class="tabs-count" data-count="${uc.id}"></span></div>
+                  <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
+                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"><span class="tab-n" data-r="${s.id}" data-n="${i + 1}">${i + 1}</span><span class="tab-t">${esc(s.title)}</span><span class="tab-s">${esc(s.surface || '')}</span></button>`).join('')}
+                  </div>
+                </div>
+                <div class="card"></div>
+                <aside class="guide" aria-label="How to play and what you should see"></aside>
+                </div>
+                ${skipped.map(s => `<p class="meta measure mt-2">Not played live: ${esc(s.title)} — ${esc(s.skip)}</p>`).join('')}
+              </section>`;
+        }).join('');
+
+        /** run = seed and load now; otherwise a seeded scenario waits behind a Play button, so a page load seeds nothing. */
+        function pick(id, run) {
+            const sc = byId(id);
+            const block = document.querySelector(`section[data-use-case="${sc.useCase}"]`);
+            block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sc === id)));
+            if (run) history.replaceState(null, '', '#sc-' + id);
+            const r = results[id] || {};
+            block.querySelector('.card').innerHTML = `${heads[sc.useCase]}
+              <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="font-semibold">${esc(sc.title)}</h3><span class="t-code font-mono meta">${esc(sc.story)}${LOGIN.type !== 'none' && roleOf(sc) ? ' · as ' + esc(roleOf(sc)) : ''}</span></div>
+              <div class="frame mt-2">
+                <div class="toolbar">
+                  <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
+                  <span class="url">${esc(screenUrl(sc))}</span>
+                  <a href="${esc(screenSrc(sc))}" target="_blank" rel="noopener" class="link whitespace-nowrap open-link">Open ↗</a>
+                  <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
+                  <button type="button" onclick="pick('${sc.id}', true)" class="btn-ghost" title="${sc.seed ? 'Create new data and reload' : 'Reload'}">↻ Restart</button>
+                </div>
+                <div class="fit"><div class="overlay" hidden></div><iframe title="${esc(sc.title)} — running app" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>
+              </div>`;
+            block.querySelector('.guide').innerHTML = `
+              <div class="label mb-1">Result</div>
+              <div class="result-ctl flex gap-2 mb-2">
+                <button type="button" class="result-btn pass" data-status="pass" aria-pressed="${r.status === 'pass'}" onclick="mark('${sc.id}', 'pass')">✓ Pass</button>
+                <button type="button" class="result-btn fail" data-status="fail" aria-pressed="${r.status === 'fail'}" onclick="mark('${sc.id}', 'fail')">✗ Fail</button>
+              </div>
+              <textarea class="note result-ctl" aria-label="Note for ${esc(sc.title)}" placeholder="What you saw, if it differs" oninput="setResult('${sc.id}', { note: this.value })">${esc(r.note)}</textarea>
+              <div class="label mt-4 mb-1">How to play</div>
+              <ol class="list-decimal pl-5 space-y-1 muted">${list(sc.steps)}</ol>
+              <div class="label mt-4 mb-1">What you should see</div>
+              <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>
+              ${sc.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="t-code meta break-words">${esc(sc.seed)}</code>` : ''}`;
+            fit(block);
+            if (run || !needsServer(sc)) load(sc, block);
+            else overlay(block, `<p class="muted measure">${sc.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${esc(roleOf(sc))} first.`}</p><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">▶ Open</button>`);
+        }
+
+        function overlay(block, html) {
+            const o = block.querySelector('.overlay');
+            o.hidden = !html; o.innerHTML = html || '';
+        }
+        const loads = {}; // latest load per use case wins, when a chip is picked while a seed still runs
+        async function load(sc, block) {
+            const token = loads[sc.useCase] = {};
+            const frame = block.querySelector('iframe');
+            frame.src = 'about:blank';
+            if (needsServer(sc)) overlay(block, sc.seed ? `<p class="muted">Creating data…</p><code class="t-code meta">${esc(sc.seed)}</code>` : `<p class="muted">Signing in as ${esc(roleOf(sc))}…</p>`);
+            const r = await play(sc);
+            if (loads[sc.useCase] !== token) return;
+            if (!r.ok) {
+                overlay(block, `<p class="bad">${sc.seed ? 'Seed' : 'Sign-in'} failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</p><pre>${esc(r.output)}</pre><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">↻ Try again</button>`);
+                return;
+            }
+            if (r.url) opened[sc.id] = r.url;
+            block.querySelector('.url').textContent = screenUrl(sc);
+            block.querySelector('.open-link').href = screenSrc(sc);
+            overlay(block, '');
+            frame.src = screenSrc(sc);
+        }
+
+        function fit(block) {
+            const box = block.querySelector('.fit'); if (!box) return;
+            // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
+            const row = block.querySelector('.uc-row');
+            row.style.removeProperty('--frame-w'); // measure the full column, not the last fit's frame
+            const s = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_W);
+            box.querySelector('iframe').style.transform = `scale(${s})`;
+            box.style.height = Math.round(SCREEN_H * s) + 'px';
+            const frame = box.closest('.frame');
+            frame.style.width = Math.round(SCREEN_W * s) + 2 + 'px';
+            row.style.setProperty('--frame-w', frame.style.width);
+            row.style.setProperty('--frame-h', frame.offsetHeight + 'px');
+            row.style.setProperty('--frame-top', frame.getBoundingClientRect().top - row.getBoundingClientRect().top + 'px');
+            // the text column (page title, results) takes the frame's real width, so all of it lines up
+            const ws = [...document.querySelectorAll('.uc-row')].map(r => parseFloat(r.style.getPropertyValue('--frame-w'))).filter(Boolean);
+            document.documentElement.style.setProperty('--text-w', Math.max(...ws) + 'px');
+            block.querySelector('.scale-label').textContent = `${Math.round(s * 100)}% of ${SCREEN_W} px`;
+        }
+        new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
+        addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer
+
+        // ---------------------------------------------------------------- results table
+        const STATUS = { pass: '✓ Pass', fail: '✗ Fail', '': 'Not played' };
+        const ICON = {
+            pass: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+            fail: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+        };
+        function renderResults() {
+            document.querySelectorAll('.tab-n[data-r]').forEach(el => {
+                const st = results[el.dataset.r]?.status || '';
+                el.className = 'tab-n ' + st;
+                el.innerHTML = st ? `${ICON[st]}<span class="sr-only">${el.dataset.n}, ${STATUS[st]}</span>` : el.dataset.n;
+            });
+            document.querySelectorAll('[data-count]').forEach(el => {
+                const sts = scsOf(el.dataset.count).map(s => results[s.id]?.status || '');
+                const n = st => sts.filter(x => x === st).length;
+                el.innerHTML = n('') === sts.length ? '' : `<span class="pass">${n('pass')} pass</span> · <span class="fail">${n('fail')} fail</span> · ${n('')} left`;
+            });
+            const rows = SCENARIOS.map(s => ({ s, st: results[s.id]?.status || '', note: results[s.id]?.note || '' }));
+            const n = st => rows.filter(r => r.st === st).length;
+            document.getElementById('results').innerHTML = `
+              <p class="mb-2"><span class="st-pass">${n('pass')} pass</span> · <span class="st-fail">${n('fail')} fail</span> · <span class="st-none">${n('')} not played</span> · ${SCENARIOS_SKIPPED.length} not played live
+                <button type="button" class="btn-ghost ml-2 result-ctl" onclick="copyResults(this)">Copy as Markdown</button></p>
+              <div class="panel overflow-x-auto"><table class="res-table">
+                <tr><th>Use case</th><th>Scenario</th><th>Result</th><th>Note</th></tr>
+                ${rows.map(r => `<tr><td class="font-mono t-code meta">${r.s.useCase}</td><td><a class="link" href="#sc-${r.s.id}">${esc(r.s.title)}</a></td><td class="st-${r.st || 'none'} whitespace-nowrap">${STATUS[r.st]}</td><td class="muted">${esc(r.note)}</td></tr>`).join('')}
+              </table></div>`;
+        }
+        function copyResults(btn) {
+            const cell = v => String(v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+            const md = ['| Use case | Scenario | Result | Note |', '|---|---|---|---|']
+                .concat(SCENARIOS.map(s => `| ${s.useCase} | ${cell(s.title)} | ${STATUS[results[s.id]?.status || '']} | ${cell(results[s.id]?.note || '')} |`)).join('\n');
+            navigator.clipboard.writeText(md).then(() => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy as Markdown'; }, 1500); });
+        }
+
+        // what stops a play before it starts: no server, the app down, or a session to open by hand
+        const notes = [];
+        if (!served && SCENARIOS.some(needsServer)) notes.push('Opened from disk: seeds and sign-in do not run. Start <code>node live/server.mjs --up</code> and open the URL it prints.');
+        if (LOGIN.type === 'manual') notes.push('Sign in once in the app with Open ↗. The frames share that session.');
+        const banner = () => { document.getElementById('banner').innerHTML = notes.map(n => `<div class="banner mb-2">${n}</div>`).join(''); };
+        banner();
+        if (served) fetch('/__status', { headers: { 'X-Play': '1' } }).then(r => r.json()).then(st => {
+            if (st.missing?.length) { notes.push(`Missing in <code>live/.env</code>: ${st.missing.map(esc).join(', ')}. Copy <code>.env.example</code> to <code>.env</code> and fill them in; the next pick reads it.`); banner(); }
+            if (!st.up) { notes.push(`The app does not answer at <code>${esc(st.health)}</code>. ${st.start ? `Start it with <code>${esc(st.start)}</code>, or r` : 'R'}estart the play server with <code>--up</code>.`); banner(); }
+        }).catch(() => { });
+        renderResults();
+        // first scenario of every use case, or the one in the URL (#sc-<id>, from the plan's links); only that one runs
+        const wanted = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
+        USE_CASES.forEach(uc => { const first = scsOf(uc.id)[0]; if (first) pick(wanted?.useCase === uc.id ? wanted.id : first.id, wanted?.useCase === uc.id); });
+        if (wanted) document.querySelector(`section[data-use-case="${wanted.useCase}"]`).scrollIntoView();
+        addEventListener('hashchange', () => {
+            const sc = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
+            if (sc) { pick(sc.id, true); document.querySelector(`section[data-use-case="${sc.useCase}"]`).scrollIntoView(); }
+        });
+    </script>
+</body>
+
+</html>

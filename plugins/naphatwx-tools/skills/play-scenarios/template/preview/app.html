@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview app</title>
+    <style>
+        /* theme:tokens:start */
+        /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+        :root {
+            color-scheme: dark;
+
+            /* Surfaces, darkest first */
+            --bg: #121316;
+            --surface: #18191d;
+            --surface-2: #1f2025;
+            --surface-3: #24262c;
+            --line: #26282e;
+            --line-strong: #363940;
+            --line-3: #4a4d55;
+
+            /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+            --text: #e2e3e7;
+            --text-2: #c6c8cf;
+            --text-3: #a3a6b0;
+
+            /* One accent */
+            --accent: #8ab0ff;
+            --accent-fill: #1b2232;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+
+            /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+            --ok: #8fd694;
+            --warn: #f0c26b;
+            --bad: #f28b8d;
+            --neutral: #a3a6b0;
+            --ok-soft: rgba(143, 214, 148, 0.12);
+            --warn-soft: rgba(240, 194, 107, 0.12);
+            --bad-soft: rgba(242, 139, 141, 0.12);
+            --neutral-soft: rgba(163, 166, 176, 0.12);
+            --add: var(--ok);
+            --change: var(--warn);
+            --drop: var(--bad);
+
+            /* Diagrams: connectors and their labels */
+            --connector: #6b6e78;
+
+            /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+            /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
+               --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+            --fs-xs: 0.75rem;
+            --fs-sm: 0.875rem;
+            --fs-md: 1rem;
+            --fs-lg: 1.25rem;
+            --fs-xl: 1.5rem;
+            --fs-2xl: 2rem;
+            /* Headings and lead line: the same steps on every page */
+            --fs-lead: var(--fs-lg);
+            --fs-h3: var(--fs-lg);
+            --fs-h2: var(--fs-xl);
+            --fs-h1: var(--fs-2xl);
+
+            /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
+            --page-w: min(80%, 900px);
+            --gutter: clamp(16px, 3vw, 24px);
+
+            --radius: 6px;
+            --radius-lg: 10px;
+            --ease: cubic-bezier(0.2, 0, 0, 1);
+        }
+        /* theme:tokens:end */
+        /* theme:base:start */
+        /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        a { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        code, kbd, pre, samp { font-family: var(--mono); }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* theme:base:end */
+        /* Preview only: stands in for the running app, so the template plays from disk. Delete preview/ in a real run. */
+        body { padding: 48px 64px; font-size: 22px; line-height: 1.5; }
+        .box { max-width: 900px; padding: 32px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        code { color: var(--accent); }
+        .meta { color: var(--text-3); }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <p class="meta">Your running app shows here.</p>
+        <h1 id="route"></h1>
+        <p>Signed in as <code id="user"></code></p>
+        <p class="meta">In a real run, live.js points <code>base</code> at the app, e.g. <code>http://localhost:3000</code>.</p>
+    </div>
+    <script>
+        // #/dev/login?as=<user>&next=<path> stands in for the app's dev login route
+        function route() {
+            const [path, query] = location.hash.slice(1).split('?');
+            const q = new URLSearchParams(query);
+            if (path === '/dev/login') {
+                try { sessionStorage.setItem('preview:user', q.get('as')); } catch { }
+                location.replace('#' + q.get('next'));
+                return;
+            }
+            let user = 'nobody';
+            try { user = sessionStorage.getItem('preview:user') || user; } catch { }
+            document.getElementById('route').textContent = location.hash.slice(1) || '/';
+            document.getElementById('user').textContent = user;
+        }
+        addEventListener('hashchange', route);
+        route();
+    </script>
+</body>
+
+</html>
