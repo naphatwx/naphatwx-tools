@@ -15,6 +15,7 @@ It is generic: it needs a way to start the app, a health URL and an HTTP API. It
 ```
 <plan>/use-cases.js        USE_CASES + SCENARIOS (generate-use-case); read-only here
 live/
+├── README.md              how to run the page, for teammates; copied from template/ as is
 ├── index.html             one block per use case: side list, framed app, guide with Pass / Fail; results table
 ├── live.js                LIVE_CONFIG (app, API, pre-test, login) + LIVE_PLAY (seed, url, role, steps per scenario)
 ├── server.mjs             serves the plan folder on localhost; runs the pre-test; on each pick: seed, sign in, return the URL
@@ -30,102 +31,7 @@ live/
 
 ## How it works
 
-Four phases. The agent builds the page once, the user fills in `.env` once, the pre-test starts the app once, then the user plays any scenario any number of times:
-
-```mermaid
-graph TD
-    subgraph AGENT["Agent, once"]
-        A1[use-cases.js] --> A2[scan the app: routes, API, auth, start command]
-        A2 --> A2b[ask the user about app changes: dev login route, frame headers]
-        A2b --> A3[write live/: live.js, seeds/*.mjs, .env.example, .gitignore]
-        A3 --> A4[check-live.js: config, secrets, syntax]
-    end
-    subgraph ENV["The user, once"]
-        E1[copy .env.example to .env] --> E2[paste the values: API key, token, ...]
-    end
-    subgraph PRE["Pre-test, once"]
-        P1[start the app the repo's way: compose up, make dev, npm run dev] --> P2[wait for the health URL]
-        P2 --> P3[server.mjs on localhost:4000, warns about missing keys]
-    end
-    subgraph TEST["Test, the user, many times"]
-        T1[pick a scenario] --> T2[seed: new data through the API]
-        T2 --> T3[sign in as the scenario's role]
-        T3 --> T4[frame opens the URL the seed returned]
-        T4 --> T5[play the steps, mark Pass or Fail]
-        T5 -->|Restart: new data again| T2
-        T5 --> T6[Copy results as Markdown]
-    end
-    AGENT --> ENV --> PRE --> TEST
-```
-
-One pick, step by step:
-
-```mermaid
-sequenceDiagram
-    actor U as You
-    participant P as Play page (localhost:4000)
-    participant S as server.mjs
-    participant D as Seed (seeds/x.mjs)
-    participant A as App API + web (localhost:3000)
-    U->>P: pick a scenario
-    P->>S: POST /__play/<scenario id>
-    Note over P: "Creating data…"
-    S->>S: read live/.env, get the API credential (apiAuth: header, command or login as the role)
-    S->>D: run the scenario's seed, credential in PLAY_API_AUTH
-    D->>A: ensure shared data (find, create if missing)
-    D->>A: create a new entity "pluto-cut-0412"
-    A-->>D: id 1311
-    opt the data needs a background job
-        D->>A: poll until READY
-    end
-    D-->>S: last line {"url": "/repositories/1311?tab=versions"}
-    opt login type post
-        S->>A: POST login route as the scenario's role
-        A-->>S: Set-Cookie
-    end
-    S-->>P: { ok, url } + the same Set-Cookie
-    P->>A: frame opens localhost:3000/repositories/1311?tab=versions
-    Note over P,A: cookies ignore the port, so the frame is signed in
-    A-->>U: the real screen, ready to play
-```
-
-What a seed creates:
-
-```mermaid
-graph LR
-    subgraph SHARED["Shared: create if missing, kept"]
-        O[org Astro Payments]
-        E[environment dev]
-    end
-    subgraph NEW["New on every pick"]
-        N1[repo pluto-cut-0412: first pick]
-        N2[repo pluto-cut-0415: Restart]
-        N3[repo pluto-cut-0420: Restart]
-    end
-    N1 --> O
-    N2 --> O
-    N3 --> O
-    N1 --> E
-```
-
-- Read-only scenarios only use shared data (or none), so their picks are fast.
-- Writing scenarios get a new entity on every pick, so every play starts clean. Restart never deletes anything; it creates again.
-- The seed returns the URL, so no id is ever written in `live.js` or the steps.
-
-Where secrets live, and what keeps them private:
-
-```mermaid
-graph TD
-    EX[".env.example: key names + where to get each, no values"] -->|the user copies and fills in| ENVF[.env]
-    EX -.->|committed| GIT[(git)]
-    ENVF -.-x|.gitignore| GIT
-    ENVF -.-x|dotfile path: 404| BR[browser]
-    ENVF -.-x|never read or printed| AG[agent and chat]
-    ENVF -->|re-read on every pick, a shell value wins| SRV[server.mjs]
-    SRV -->|apiAuth: login as the role, command, or header| CRED[credential]
-    CRED -->|PLAY_API_AUTH, this seed run only| LIB["seeds/lib.mjs api(): sent on every call"]
-    SRV -->|output to the page: every secret replaced by ***| PG[play page]
-```
+Flow diagrams: [README.md](README.md).
 
 ## User Input
 

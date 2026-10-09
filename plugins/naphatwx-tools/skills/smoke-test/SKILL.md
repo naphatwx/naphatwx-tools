@@ -87,12 +87,13 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
    - Permissions: follow the repo's permission rules.
 2. **Runner** in `scripts/smoke/` (layout in `references/flow-map.md`):
    - Copy `template/run.mjs` and `template/report-template.html` unchanged.
+   - Copy `template/README.md` to `scripts/smoke/README.md` unchanged: how teammates run it and read failures.
    - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
    - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
    - Write `envs.json`, using the base URLs the repo's config files show for each env. Ask for any you cannot find.
    - Write one `flows/<flow>.json` per flow, filled from the hop table, with `mapVersion`.
    - Add `scripts/smoke/results/` to `.gitignore`.
-3. **How to run**: add a short section to the repo's README or contributor guide. It names the command, the env vars the runner needs (`SMOKE_TOKEN` and others, names only) and the one-time manual steps.
+3. **How to run**: add a short section to the repo's README or contributor guide. It names the command, the env vars the runner needs (`SMOKE_TOKEN` and others, names only) and the one-time manual steps, and links `scripts/smoke/README.md`.
 4. Run the repo's normal build and lint for each changed service, the same way its guide says to run them.
 
 ### S5. Prove it once

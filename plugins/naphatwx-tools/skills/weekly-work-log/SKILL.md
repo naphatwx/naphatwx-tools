@@ -18,17 +18,18 @@ ready to paste into the company "My Weekly Achievements" page.
 
 ## Repos to scan
 
-Default: auto-discover every git repo under the work root `C:\Users\naphat.wat\Work`
-(a directory containing `.git`, max 2 levels deep). Do not hardcode repo names —
-the user works on different repos over time.
+Default: the current directory is the work root. The user `cd`s there before running this skill.
+
+- The current directory is a git repo → scan only that repo.
+- Otherwise → scan every git repo under it (a directory containing `.git`, max 2 levels deep).
+  Do not hardcode repo names; the user works on different repos over time.
 
 ```bash
-find /c/Users/naphat.wat/Work -maxdepth 3 -name .git -prune | sed 's|/.git$||'
+find . -maxdepth 3 -name .git -prune | sed 's|/.git$||'
 ```
 
-If the user named specific repos, resolve each name against the work root
-(`<work-root>/<name>`); if a path is missing or not a git repo, skip it and note
-that in the reply.
+If the user named specific repos, resolve each name against the current directory
+(`./<name>`); if a path is missing or not a git repo, skip it and note that in the reply.
 
 ## Steps
 
@@ -36,7 +37,7 @@ that in the reply.
    (via the Bash tool, all repos in parallel):
 
    ```bash
-   git -C <repo-path> log --all --author="naphat" --since="<YYYY-MM-DD> 00:00" --until="<YYYY-MM-DD> 23:59" \
+   git -C <repo-path> log --all --author="$(git -C <repo-path> config user.email)" --since="<YYYY-MM-DD> 00:00" --until="<YYYY-MM-DD> 23:59" \
      --pretty=format:"%h|%ad|%s" --date=format:"%Y-%m-%d %H:%M" --no-merges
    ```
 
