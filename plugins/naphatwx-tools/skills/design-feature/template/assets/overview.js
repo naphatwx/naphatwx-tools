@@ -1,3 +1,19 @@
+/* theme:pdf-js:start */
+/* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+function addExportPdf(target, prepare) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    b.textContent = 'Export PDF';
+    b.addEventListener('click', async () => {
+        if (prepare) await prepare();
+        window.print();
+    });
+    (target || document.body).append(b);
+    return b;
+}
+/* theme:pdf-js:end */
 const root = document.documentElement;
 const typing = (e) => e.target.closest("input, textarea, select, [contenteditable]");
 const bare = (e) => !e.metaKey && !e.ctrlKey && !e.altKey;
@@ -110,6 +126,15 @@ function setAll(on) {
 }
 setAll(store.get("plan-all") === "on");
 openAll.addEventListener("click", () => setAll(root.getAttribute("data-all") !== "on"));
+// Lazy diagram frames never load off screen, so the PDF would print them empty: load them all first.
+const frames = [...document.querySelectorAll("iframe.diagram-frame")];
+frames.forEach(f => f.addEventListener("load", () => { f.dataset.loaded = "1"; }, { once: true }));
+const loadFrames = () => Promise.all(frames.filter(f => !f.dataset.loaded).map(f => new Promise(done => {
+    f.addEventListener("load", () => setTimeout(done, 200), { once: true }); // 200 ms: the frame posts its height
+    setTimeout(done, 2000);
+    f.loading = "eager";
+})));
+document.getElementById("keysBtn").before(addExportPdf(document.querySelector(".tools"), loadFrames));
 
 // ===== Present: one step per screen. A use case gives one step per view; an API section one per RPC.
 // Long steps scroll down; nothing scrolls sideways. ← → or Space step, Esc leaves.

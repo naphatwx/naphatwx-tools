@@ -93,6 +93,31 @@
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   }
   /* theme:base:end */
+  /* theme:pdf:start */
+  /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+  .export-pdf-float {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 50;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: var(--fs-sm);
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      cursor: pointer;
+  }
+  .export-pdf-float:hover { background: var(--surface-3); }
+  @page { margin: 0; }
+  @media print {
+      html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+      pre, figure, img, svg, tr { break-inside: avoid; }
+      h1, h2, h3 { break-after: avoid; }
+  }
+  /* theme:pdf:end */
 
   body { font-size: var(--fs-md); line-height: 1.5; }
   [hidden] { display: none !important; }
@@ -220,6 +245,14 @@
   dialog img { max-width: 96vw; max-height: calc(96vh - 52px); display: block; object-fit: contain; }
   dialog.tall img { max-height: none; height: auto; }
   dialog::backdrop { background: rgb(0 0 0 / .75); }
+  .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
+
+  /* PDF: the tests as filtered and opened on screen, full height, no controls. */
+  @media print {
+    main { max-width: none; padding: 16px; }
+    .tools, .bar .btns, .hint, .edge { display: none !important; }
+    .stage img, .stage.tall .frame, pre { max-height: none; overflow: visible; }
+  }
 </style>
 </head>
 <body>
@@ -230,6 +263,22 @@
 </dialog>
 <div id="announce" class="sr-only" aria-live="polite"></div>
 <script>
+/* theme:pdf-js:start */
+/* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+function addExportPdf(target, prepare) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    b.textContent = 'Export PDF';
+    b.addEventListener('click', async () => {
+        if (prepare) await prepare();
+        window.print();
+    });
+    (target || document.body).append(b);
+    return b;
+}
+/* theme:pdf-js:end */
 const DATA = /*__E2E_DATA__*/null;
 
 const el = (tag, attrs = {}, ...kids) => {
@@ -503,7 +552,8 @@ function render() {
         el('span', { class: 'meta' }, DATA.tests.length + ' tests · ' + ms(DATA.ms)),
         el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
         DATA.baseURL ? el('span', { class: 'meta' }, DATA.baseURL) : null)),
-    tools));
+    el('div', { class: 'head-row' }, tools)));
+  addExportPdf(app.querySelector('.head-row'));
   // Failed tests first (inside each use case), so the report opens on what needs attention.
   const order = { failed: 0, flaky: 1, passed: 2, skipped: 3 };
   const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => order[a[0].dataset.kind] - order[b[0].dataset.kind] || a[1] - b[1]);

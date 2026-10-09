@@ -86,7 +86,7 @@ Wait for answers. If the user says go on, keep those steps marked `check`.
    - The page is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers.
 2. Replace `/*__PLAN_DATA__*/null` with the plan JSON below. Change nothing else in the file.
 3. Escape `</` as `<\/` inside JSON strings, so the script tag stays closed.
-4. The page has an **Export PDF** button. It opens the print dialog; pick "Save as PDF". The PDF shows every step with its current tick.
+4. The page has an **Export PDF** button (synced `theme:pdf` blocks). It opens the print dialog; pick "Save as PDF". The PDF shows every step with its current tick.
 
 ```json
 {

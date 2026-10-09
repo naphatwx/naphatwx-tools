@@ -96,6 +96,31 @@
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
         }
         /* theme:base:end */
+        /* theme:pdf:start */
+        /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+        .export-pdf-float {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 50;
+            padding: 6px 12px;
+            font: inherit;
+            font-size: var(--fs-sm);
+            color: var(--text);
+            background: var(--surface-2);
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        .export-pdf-float:hover { background: var(--surface-3); }
+        @page { margin: 0; }
+        @media print {
+            html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            pre, figure, img, svg, tr { break-inside: avoid; }
+            h1, h2, h3 { break-after: avoid; }
+        }
+        /* theme:pdf:end */
 
         /* Index chrome only. The screens inside the frames use the target app's own design system. */
         html { scroll-padding-top: 24px; }
@@ -151,6 +176,13 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
+        /* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
+        @media print {
+            .page { width: auto; margin: 0; padding: 16px; }
+            .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
+            .tabs, .btn-ghost { display: none !important; }
+            .guide { position: static; max-height: none; }
+        }
     </style>
     <script src="contract/rules.js"></script>
     <script src="contract/data.js"></script>
@@ -187,6 +219,23 @@
     </div>
 
     <script>
+        /* theme:pdf-js:start */
+        /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+        function addExportPdf(target, prepare) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            b.textContent = 'Export PDF';
+            b.addEventListener('click', async () => {
+                if (prepare) await prepare();
+                window.print();
+            });
+            (target || document.body).append(b);
+            return b;
+        }
+        /* theme:pdf-js:end */
+        addExportPdf();
         const SCREEN_W = 1600, SCREEN_H = 940;
         const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
         const nn = ucId => ucId.slice(2).padStart(2, '0');

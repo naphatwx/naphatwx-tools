@@ -10,6 +10,7 @@ Generate a single-file HTML documentation page from a bundled template.
 The template is a dark-only docs layout with a left sidebar, search box, and a base font size picker (small 14px / normal 16px / big 18px, default normal). The style is inspired by the Clerk docs.
 
 Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
+The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
 
 ## User Input
 

@@ -93,6 +93,31 @@
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   }
   /* theme:base:end */
+  /* theme:pdf:start */
+  /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+  .export-pdf-float {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 50;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: var(--fs-sm);
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      cursor: pointer;
+  }
+  .export-pdf-float:hover { background: var(--surface-3); }
+  @page { margin: 0; }
+  @media print {
+      html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+      pre, figure, img, svg, tr { break-inside: avoid; }
+      h1, h2, h3 { break-after: avoid; }
+  }
+  /* theme:pdf:end */
 
   body { font-size: var(--fs-md); line-height: 1.5; }
   [hidden] { display: none !important; }
@@ -198,6 +223,15 @@
   .full > summary:hover { background: none; text-decoration: underline; }
   .full-head { display: flex; justify-content: flex-end; margin-top: 6px; }
   .note { color: var(--warn); margin-top: 4px; }
+  .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
+  .head-row > button { padding: 4px 10px; }
+
+  /* PDF: the flows as filtered and opened on screen, full height, no controls. */
+  @media print {
+    main { max-width: none; padding: 16px; }
+    .tools, .full-head, header button { display: none !important; }
+    pre { max-height: none; overflow: visible; }
+  }
 
   @media (max-width: 600px) {
     .chain { flex-direction: column; align-items: flex-start; }
@@ -213,6 +247,22 @@
 <main id="app"></main>
 <div id="announce" class="sr-only" aria-live="polite"></div>
 <script>
+/* theme:pdf-js:start */
+/* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+function addExportPdf(target, prepare) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    b.textContent = 'Export PDF';
+    b.addEventListener('click', async () => {
+        if (prepare) await prepare();
+        window.print();
+    });
+    (target || document.body).append(b);
+    return b;
+}
+/* theme:pdf-js:end */
 const DATA = {"env":"staging","status":"fail","startedAt":"2026-10-08T10:20:00+07:00","command":"node smoke/run.mjs staging","ms":14200,"flows":[{"flow":"create-version","description":"Cut a version: web → grpc → worker → Groot","entry":"thanos-web","status":"pass","ms":3100,"rerun":"node smoke/run.mjs staging create-version","startedAt":"2026-10-08T10:20:00+07:00","probeId":"probe-7f3a","trigger":{"url":"https://thanos-web.staging.example.com/api/smoke","status":202,"ms":120,"body":"{\"probeId\":\"probe-7f3a\"}"},"hops":[{"id":"grpc","service":"thanos-grpc","from":"thanos-web","transport":"gRPC","status":"pass","ms":240,"instance":"thanos-grpc-6c9d-2","detail":"probe stored","env":[{"name":"GROOT_URL","value":"https://groot.staging.example.com","ok":true},{"name":"DEPLOY_STATUS_TTL","value":"300","ok":true}],"evidence":{"url":"https://thanos-grpc.staging.example.com/smoke/probe-7f3a","status":200,"ms":40,"body":"{\"stored\":true}"}},{"id":"worker","service":"thanos-worker","from":"thanos-grpc","transport":"RabbitMQ","status":"pass","ms":1900,"instance":"thanos-worker-55b1-1","detail":"message consumed","evidence":{"url":"https://thanos-worker.staging.example.com/smoke/probe-7f3a","status":200,"ms":35,"body":"{\"consumed\":true}"}}]},{"flow":"read-history","description":"Read version history: web → grpc → Groot","entry":"thanos-web","status":"fail","ms":11000,"rerun":"node smoke/run.mjs staging read-history","startedAt":"2026-10-08T10:20:00+07:00","probeId":"probe-91c2","trigger":{"url":"https://thanos-web.staging.example.com/api/smoke","status":202,"ms":110,"body":"{\"probeId\":\"probe-91c2\"}"},"hops":[{"id":"grpc","service":"thanos-grpc","from":"thanos-web","transport":"gRPC","status":"fail","ms":300,"instance":"thanos-grpc-6c9d-1","detail":"GROOT_URL = http://localhost:8080 (expected an https URL)","envMismatch":["GROOT_URL"],"env":[{"name":"GROOT_URL","value":"http://localhost:8080","ok":false,"note":"expected an https URL"}],"evidence":{"url":"https://thanos-grpc.staging.example.com/smoke/probe-91c2","status":200,"ms":52,"body":"{\"stored\":true,\"env\":{\"GROOT_URL\":\"http://localhost:8080\"}}"}},{"id":"groot","service":"groot","from":"thanos-grpc","transport":"HTTP","status":"not-reached"}]},{"flow":"audit-log","description":"Write an audit row: grpc → Postgres","entry":"thanos-grpc","status":"fail","ms":10100,"rerun":"node smoke/run.mjs staging audit-log","startedAt":"2026-10-08T10:20:01+07:00","probeId":"probe-a810","trigger":{"url":"https://thanos-grpc.staging.example.com/smoke","status":202,"ms":90,"body":"{\"probeId\":\"probe-a810\"}"},"hops":[{"id":"audit","service":"audit-writer","from":"thanos-grpc","transport":"RabbitMQ","status":"timed-out","ms":10000,"detail":"not observed within 10000 ms · 10 polls, last HTTP 404","polling":{"polls":10,"method":"GET","lastUrl":"https://audit.staging.example.com/smoke/probe-a810","lastStatus":404,"sameStatus":true,"lastReason":"probe not found","waitedMs":10000},"evidence":{"url":"https://audit.staging.example.com/smoke/probe-a810","status":404,"ms":30,"body":"{\"error\":\"probe not found\"}"}}]}]};
 
 const el = (tag, attrs = {}, ...kids) => {
@@ -455,7 +505,8 @@ function render() {
         el('span', { class: 'meta' }, DATA.flows.length + ' flows · ' + ms(DATA.ms)),
         el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt))),
       DATA.command ? el('div', { class: 'summary-line' }, el('span', { class: 'meta' }, 'Command: ', el('code', {}, DATA.command)), copyBtn(DATA.command, 'run command')) : null),
-    tools));
+    el('div', { class: 'head-row' }, tools)));
+  addExportPdf(app.querySelector('.head-row'));
   app.append(...boxes, none);
 }
 render();

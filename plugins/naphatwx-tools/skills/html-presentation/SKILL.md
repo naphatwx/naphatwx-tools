@@ -8,6 +8,7 @@ description: Create a single-file full-window HTML slide deck, one click per sli
 Create a single-file HTML slide presentation from a bundled template.
 
 The template uses a minimal, dark-only style. Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
+The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. The PDF has one 16:9 page per slide.
 
 ## User Input
 

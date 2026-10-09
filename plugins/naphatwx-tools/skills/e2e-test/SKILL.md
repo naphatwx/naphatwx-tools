@@ -59,6 +59,7 @@ Then add these, next to the e2e folder, **unchanged** from this skill's `templat
 - Tests are grouped under their use case (`UC<n> <title>`, from the `use case` annotation), in use case order; tests with no use case come last under "Other tests". Each test shows its scenario id (`scenario` annotation) next to its file.
 - The report has one card per test, keyed by test id. With retries it keeps the final attempt, puts the earlier ones under "Earlier attempts", and marks a test that passed on retry as flaky. Header counts and filters (Failed, Flaky, Passed, Skipped) use Playwright's own outcome, so they match its summary. A skipped test shows its `skip` / `fixme` reason; a `test.fail()` test shows that annotation.
 - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
+- The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
 
 Wire the config:
 

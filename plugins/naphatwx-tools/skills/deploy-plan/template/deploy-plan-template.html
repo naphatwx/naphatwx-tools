@@ -93,6 +93,31 @@
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   }
   /* theme:base:end */
+  /* theme:pdf:start */
+  /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+  .export-pdf-float {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 50;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: var(--fs-sm);
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      cursor: pointer;
+  }
+  .export-pdf-float:hover { background: var(--surface-3); }
+  @page { margin: 0; }
+  @media print {
+      html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+      pre, figure, img, svg, tr { break-inside: avoid; }
+      h1, h2, h3 { break-after: avoid; }
+  }
+  /* theme:pdf:end */
 
   body { font-size: var(--fs-md); line-height: 1.5; }
   [hidden] { display: none !important; }
@@ -152,10 +177,8 @@
   .step.is-done .detail, .step.is-done .cmd { opacity: .7; }
   .empty { padding: 10px 14px; color: var(--text-3); }
 
-  /* PDF export goes through the print dialog. Keep the dark theme, show every step, drop the buttons. */
-  @page { margin: 0; }
+  /* PDF: show every step, drop the buttons. */
   @media print {
-    html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     main { padding: 16px; max-width: none; }
     .tools, .cmd button { display: none !important; }
     .steps > li[hidden] { display: block !important; }
@@ -173,6 +196,22 @@
 <main id="app"></main>
 <div id="announce" class="sr-only" aria-live="polite"></div>
 <script>
+/* theme:pdf-js:start */
+/* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+function addExportPdf(target, prepare) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    b.textContent = 'Export PDF';
+    b.addEventListener('click', async () => {
+        if (prepare) await prepare();
+        window.print();
+    });
+    (target || document.body).append(b);
+    return b;
+}
+/* theme:pdf-js:end */
 const DATA = /*__PLAN_DATA__*/null;
 
 const el = (tag, attrs = {}, ...kids) => {
@@ -262,10 +301,7 @@ function render() {
   hideBtn.addEventListener('click', () => { hideDone = !hideDone; hideBtn.setAttribute('aria-pressed', String(hideDone)); update(); });
   const resetBtn = el('button', { type: 'button' }, 'Reset');
   resetBtn.addEventListener('click', () => { if (confirm('Clear every tick on this plan?')) { state = {}; save(state); update(); say('All ticks cleared'); } });
-  // The browser has no direct PDF API; its print dialog offers "Save as PDF". The title names the file.
-  const pdfBtn = el('button', { type: 'button' }, 'Export PDF');
-  pdfBtn.addEventListener('click', () => window.print());
-  const mdBtn =el('button', { type: 'button', 'data-what': 'plan as Markdown' }, 'Copy as Markdown');
+  const mdBtn = el('button', { type: 'button', 'data-what': 'plan as Markdown' }, 'Copy as Markdown');
   mdBtn.addEventListener('click', () => copy(markdown(), mdBtn));
 
   app.append(el('header', {},
@@ -277,7 +313,10 @@ function render() {
       DATA.createdAt ? el('time', { class: 'meta', datetime: DATA.createdAt }, DATA.createdAt) : null),
     DATA.notes && DATA.notes.length ? el('ul', { class: 'notes' }, DATA.notes.map((t) => el('li', {}, t))) : null,
     el('div', { class: 'progress' }, totalCount, el('div', { class: 'bar', 'aria-hidden': 'true' }, totalBar)),
-    el('div', { class: 'tools' }, hideBtn, mdBtn, pdfBtn, resetBtn)));
+    el('div', { class: 'tools' }, hideBtn, mdBtn)));
+  const tools = app.querySelector('.tools');
+  addExportPdf(tools);
+  tools.append(resetBtn);
 
   for (const p of DATA.phases) {
     const count = el('span', { class: 'count meta' });

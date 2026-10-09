@@ -1,0 +1,23 @@
+/* Export to PDF goes through the print dialog ("Save as PDF"). Keeps the dark theme; pages add their own print layout. */
+.export-pdf-float {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 50;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: var(--fs-sm);
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+.export-pdf-float:hover { background: var(--surface-3); }
+@page { margin: 0; }
+@media print {
+    html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+    pre, figure, img, svg, tr { break-inside: avoid; }
+    h1, h2, h3 { break-after: avoid; }
+}

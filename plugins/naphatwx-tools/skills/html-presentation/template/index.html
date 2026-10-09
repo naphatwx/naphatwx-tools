@@ -94,6 +94,31 @@
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
         }
         /* theme:base:end */
+        /* theme:pdf:start */
+        /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+        .export-pdf-float {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 50;
+            padding: 6px 12px;
+            font: inherit;
+            font-size: var(--fs-sm);
+            color: var(--text);
+            background: var(--surface-2);
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        .export-pdf-float:hover { background: var(--surface-3); }
+        @page { margin: 0; }
+        @media print {
+            html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            pre, figure, img, svg, tr { break-inside: avoid; }
+            h1, h2, h3 { break-after: avoid; }
+        }
+        /* theme:pdf:end */
 
         /* Slide roles mapped onto the synced theme; hint and counter stay at --text-3 or brighter for contrast. */
         :root {
@@ -245,6 +270,52 @@
         .hint.right {
             right: 3%;
         }
+
+        /* the bottom corners hold the hints */
+        .export-pdf-float {
+            top: 16px;
+            bottom: auto;
+        }
+
+        /* PDF: one 16:9 page per slide, every slide shown, no navigation. */
+        @page {
+            size: 16in 9in;
+        }
+
+        @media print {
+            html,
+            body {
+                height: auto;
+                overflow: visible;
+            }
+
+            .stage {
+                position: static;
+                transform: none;
+                width: 100vw;
+                height: auto;
+                overflow: visible;
+            }
+
+            .slide {
+                position: relative;
+                height: 100vh;
+                opacity: 1;
+                visibility: visible;
+                transition: none;
+                break-after: page;
+            }
+
+            .slide:last-of-type {
+                break-after: auto;
+            }
+
+            .nav-zone,
+            .hint,
+            .counter {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -294,6 +365,24 @@
     </div>
 
     <script>
+        /* theme:pdf-js:start */
+        /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+        function addExportPdf(target, prepare) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            b.textContent = 'Export PDF';
+            b.addEventListener('click', async () => {
+                if (prepare) await prepare();
+                window.print();
+            });
+            (target || document.body).append(b);
+            return b;
+        }
+        /* theme:pdf-js:end */
+        addExportPdf();
+
         const slides = document.querySelectorAll(".slide");
         const curEl = document.getElementById("cur");
         const leftHint = document.querySelector(".hint.left");

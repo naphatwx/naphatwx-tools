@@ -95,6 +95,31 @@
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
         }
         /* theme:base:end */
+        /* theme:pdf:start */
+        /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+        .export-pdf-float {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 50;
+            padding: 6px 12px;
+            font: inherit;
+            font-size: var(--fs-sm);
+            color: var(--text);
+            background: var(--surface-2);
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        .export-pdf-float:hover { background: var(--surface-3); }
+        @page { margin: 0; }
+        @media print {
+            html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            pre, figure, img, svg, tr { break-inside: avoid; }
+            h1, h2, h3 { break-after: avoid; }
+        }
+        /* theme:pdf:end */
 
         * { margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -174,6 +199,12 @@
 
         .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
         .seq-legend .hot::before { border-color: var(--accent); }
+
+        /* PDF: shrink each diagram to the page width instead of cutting it off. */
+        @media print {
+            .seq { overflow: visible; break-inside: avoid; }
+            .seq svg { max-width: 100%; height: auto; }
+        }
     </style>
 </head>
 
@@ -197,7 +228,24 @@
     <script src="render.js"></script>
     <script src="01-example-flow.js"></script>
     <script>
+        /* theme:pdf-js:start */
+        /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+        function addExportPdf(target, prepare) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            b.textContent = 'Export PDF';
+            b.addEventListener('click', async () => {
+                if (prepare) await prepare();
+                window.print();
+            });
+            (target || document.body).append(b);
+            return b;
+        }
+        /* theme:pdf-js:end */
         SeqDiagrams.renderAll();
+        addExportPdf();
     </script>
 </body>
 

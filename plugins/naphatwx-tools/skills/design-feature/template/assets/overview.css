@@ -89,6 +89,31 @@ code, kbd, pre, samp { font-family: var(--mono); }
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
 /* theme:base:end */
+/* theme:pdf:start */
+/* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+.export-pdf-float {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 50;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: var(--fs-sm);
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+.export-pdf-float:hover { background: var(--surface-3); }
+@page { margin: 0; }
+@media print {
+    html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+    pre, figure, img, svg, tr { break-inside: avoid; }
+    h1, h2, h3 { break-after: avoid; }
+}
+/* theme:pdf:end */
 
 /* Page aliases onto the theme's type scale (projector page: body --fs-md), plus layout widths. */
 :root {
@@ -262,9 +287,6 @@ html[data-all="on"] .views { display: none; }
 .panel:not(.wide).entering { animation-name: panel-in-narrow; }
 @keyframes panel-in-narrow { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 html[data-all="on"] .panel[hidden] { display: block; }
-/* the Scenarios panel carries its own h4 title, so show-all skips the generated label */
-.panel > h4:first-of-type { margin-top: 0; }
-html[data-all="on"] .panel:has(> h4)::before { content: none; }
 html[data-all="on"] .panel::before { content: attr(data-label); display: block; font-size: var(--fs-body); color: var(--text-3); margin-bottom: 8px; }
 .panel ul { color: var(--text); }
 
@@ -542,4 +564,17 @@ html[data-present="on"] .slide > .api { margin-top: 8px; }
     .tools { top: 14px; right: 14px; bottom: auto; }
     .flowchart, .seq { padding-bottom: 24px; }
     #presentBtn, #keysBtn { display: none; }
+}
+
+/* ============ PDF: every section and every use case view, full width, no rail or tools ============ */
+/* after the small-screen rules: a printed page is narrower than 880px */
+@media print {
+    .rail, .rail-edge, .menu, .tools, .hud, .skip, .zoom-tools, .zoom-shield, .more-cue { display: none !important; }
+    body::before { display: none; }
+    .sheet, html[data-rail="collapsed"] .sheet { margin-left: 0; padding: 16px; display: block; min-height: 0; }
+    .slide, html[data-present="on"] .slide { display: block !important; max-width: none; }
+    .panel[hidden] { display: block; }
+    .wide { width: 100%; margin-left: 0; transform: none; }
+    .zoom-stage { transform: none !important; }
+    .flowchart img, .seq svg { max-width: 100% !important; height: auto; }
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Copies theme/tokens.css and theme/base.css into every skill template between marker comments,
+// Copies theme/tokens.css, base.css, pdf.css and pdf.js into every skill template between marker comments,
 // so each skill folder stays self-contained (`npx skills add` installs one folder only).
 // Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS).
 // Usage: node theme/sync.mjs          write the blocks and preview copies
@@ -18,10 +18,10 @@ const err = (s) => process.stderr.write(s + '\n');
 const IGNORE = [/\/mock\/(page|shared|contract)\//, /\/generate-mock-ui\/template\/(page|shared|contract)\//];
 
 const stripHeader = (css) => css.replace(/^\/\*[\s\S]*?\*\/\s*/, '').trimEnd();
-const BLOCKS = {
-    tokens: stripHeader(readFileSync(join(ROOT, 'theme/tokens.css'), 'utf8')),
-    base: stripHeader(readFileSync(join(ROOT, 'theme/base.css'), 'utf8')),
-};
+// Marker name -> source file. pdf-js goes inside a <script>; the rest inside a <style> or .css file.
+const SOURCES = { tokens: 'tokens.css', base: 'base.css', pdf: 'pdf.css', 'pdf-js': 'pdf.js' };
+const BLOCKS = Object.fromEntries(Object.entries(SOURCES)
+    .map(([name, file]) => [name, stripHeader(readFileSync(join(ROOT, 'theme', file), 'utf8'))]));
 
 // ---- palette: every hex in tokens.css, plus pure white / black ----
 function norm(h) {
@@ -53,20 +53,21 @@ function* walk(dir) {
     for (const name of readdirSync(dir)) {
         const p = join(dir, name);
         if (statSync(p).isDirectory()) yield* walk(p);
-        else if (/\.(html|css|svg)$/.test(name)) yield p;
+        else if (/\.(html|css|svg|js)$/.test(name)) yield p;
     }
 }
 
-const MARK = /^([ \t]*)\/\* theme:(tokens|base):start \*\/[\s\S]*?\/\* theme:\2:end \*\//gm;
+const MARK = /^([ \t]*)\/\* theme:([\w-]+):start \*\/[\s\S]*?\/\* theme:\2:end \*\//gm;
 let synced = 0;
 for (const file of walk(SKILLS)) {
     const rel = relative(ROOT, file);
     if (!rel.includes('/template/') || IGNORE.some((re) => re.test(rel))) continue;
     const src = readFileSync(file, 'utf8');
 
-    const next = src.replace(MARK, (_, ind, name) => {
+    const next = src.replace(MARK, (whole, ind, name) => {
+        if (!BLOCKS[name]) { problems.push(`marker: ${rel}: unknown block theme:${name}`); return whole; }
         const body = BLOCKS[name].split('\n').map((l) => (l ? ind + l : l)).join('\n');
-        return `${ind}/* theme:${name}:start */\n${ind}/* Synced from theme/${name}.css by theme/sync.mjs. Do not edit here. */\n${body}\n${ind}/* theme:${name}:end */`;
+        return `${ind}/* theme:${name}:start */\n${ind}/* Synced from theme/${SOURCES[name]} by theme/sync.mjs. Do not edit here. */\n${body}\n${ind}/* theme:${name}:end */`;
     });
     if (next !== src) {
         synced++;
@@ -74,7 +75,8 @@ for (const file of walk(SKILLS)) {
         else writeFileSync(file, next);
     }
 
-    // Off-palette colors outside the synced blocks.
+    // Off-palette colors outside the synced blocks. Script files only take part in the sync.
+    if (rel.endsWith('.js')) continue;
     next.replace(MARK, '').split('\n').forEach((line) => {
         for (const h of hexes(line)) {
             if (h.length === 7 && !PALETTE.has(h)) problems.push(`palette: ${rel}: ${h} is not a theme color ("${line.trim().slice(0, 80)}")`);

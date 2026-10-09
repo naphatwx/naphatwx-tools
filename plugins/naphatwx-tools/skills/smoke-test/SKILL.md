@@ -88,6 +88,7 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
 2. **Runner** in `scripts/smoke/` (layout in `references/flow-map.md`):
    - Copy `template/run.mjs` and `template/report-template.html` unchanged.
    - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
+   - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
    - Write `envs.json`, using the base URLs the repo's config files show for each env. Ask for any you cannot find.
    - Write one `flows/<flow>.json` per flow, filled from the hop table, with `mapVersion`.
    - Add `scripts/smoke/results/` to `.gitignore`.
