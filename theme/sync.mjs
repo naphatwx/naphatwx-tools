@@ -5,7 +5,7 @@
 // Usage: node theme/sync.mjs          write the blocks and preview copies
 //        node theme/sync.mjs --check  fail on drift, stale previews, off-palette hex colors, or low contrast
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative, dirname } from 'node:path';
+import { join, relative, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -97,6 +97,8 @@ const PREVIEWS = [
 const OWN = new Set([DF + 'mock/shared/scenario-play.js', DF + 'mock/shared/states.js', DF + 'flowchart/02-example-flow.html', DF + 'sequence-diagram/02-example-flow.html']);
 // Source files the preview doesn't need: the overview embeds the diagrams, not the standalone viewer.
 const SOURCE_ONLY = new Set(['generate-diagram/template/sequence-diagram/index.html']);
+// OWN and SOURCE_ONLY use '/'; relative() returns '\' on Windows.
+const skillPath = (p) => relative(SKILLS, p).split(sep).join('/');
 const filesOf = (p) => (statSync(p).isDirectory()
     ? readdirSync(p).flatMap((n) => filesOf(join(p, n)))
     : [p]);
@@ -105,19 +107,19 @@ for (const [preview, source] of PREVIEWS) {
     const [pAbs, sAbs] = [join(SKILLS, preview), join(SKILLS, source)];
     for (const s of filesOf(sAbs)) {
         const p = join(pAbs, relative(sAbs, s));
-        const rel = relative(SKILLS, p);
-        if (OWN.has(rel) || SOURCE_ONLY.has(relative(SKILLS, s))) continue;
+        const rel = skillPath(p);
+        if (OWN.has(rel) || SOURCE_ONLY.has(skillPath(s))) continue;
         const want = readFileSync(s);
         let have = null;
         try { have = readFileSync(p); } catch {}
         if (have && want.equals(have)) continue;
         copied++;
-        if (CHECK) problems.push(`preview: ${rel} differs from ${relative(SKILLS, s)} (run node theme/sync.mjs)`);
+        if (CHECK) problems.push(`preview: ${rel} differs from ${skillPath(s)} (run node theme/sync.mjs)`);
         else writeFileSync(p, want);
     }
     if (statSync(pAbs).isDirectory()) {
         for (const p of filesOf(pAbs)) {
-            const rel = relative(SKILLS, p);
+            const rel = skillPath(p);
             let inSource = true;
             try { statSync(join(sAbs, relative(pAbs, p))); } catch { inSource = false; }
             if (!inSource && !OWN.has(rel)) problems.push(`preview: ${rel} has no source in ${source} (delete it, or list it in OWN)`);
