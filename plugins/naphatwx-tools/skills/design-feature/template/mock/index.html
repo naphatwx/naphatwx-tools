@@ -164,13 +164,32 @@
         @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
         .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
-        .tab-n { min-width: 2ch; text-align: right; }
         .tab-s { text-transform: uppercase; }
         .tab-t { flex: 1; min-width: 0; }
         .tab:hover { color: var(--text); background: var(--surface); }
         /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
         .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
         .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
+        /* the number is a status disc: outlined until marked, then a solid green check or red cross */
+        .tab { align-items: center; }
+        .tab-n { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border: 1.5px solid var(--line-3); border-radius: 50%; }
+        .tab-n svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-n.pass, .tab[aria-selected="true"] .tab-n.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
+        .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
+        .tab[aria-selected="true"] .tab-n { border-color: var(--bg); }
+        .tabs-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .tabs-count { font-size: var(--fs-sm); font-weight: 400; white-space: nowrap; }
+        .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
+        /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
+        .result-btn { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+        .result-btn:hover { border-color: var(--accent); }
+        .result-btn.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
+        .result-btn.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
+        .note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
+        .res-table { width: 100%; border-collapse: collapse; }
+        .res-table th, .res-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
+        .res-table th { color: var(--text-3); font-weight: 500; border-top: 0; }
+        .st-pass { color: var(--ok); } .st-fail { color: var(--bad); } .st-none { color: var(--text-3); }
         .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
         .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-sm); background: var(--surface-2); border-bottom: 1px solid var(--line); }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
@@ -188,7 +207,7 @@
         @media print {
             .page { width: auto; margin: 0; padding: 16px; }
             .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
-            .tabs, .btn-ghost { display: none !important; }
+            .tabs, .btn-ghost, .result-ctl { display: none !important; }
             .guide { position: static; height: auto; margin-top: 0; max-height: none; }
         }
     </style>
@@ -209,6 +228,12 @@
         </header>
 
         <div id="use-cases" class="space-y-8"></div>
+
+        <section>
+            <h2 class="font-bold mb-1">Results</h2>
+            <p class="meta mb-3 measure">Saved in this browser only. Mark each scenario after you play it, then copy the table.</p>
+            <div id="results"></div>
+        </section>
 
         <section>
             <h2 class="font-bold mb-1">Audit log (this browser session)</h2>
@@ -282,9 +307,9 @@
               <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
                 <div class="uc-row">
                 <div class="tabs">
-                  <div class="label tabs-title" id="sc-title-${nn(uc.id)}">Scenarios</div>
+                  <div class="label tabs-title"><span id="sc-title-${nn(uc.id)}">Scenarios</span><span class="tabs-count" data-count="${uc.id}"></span></div>
                   <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
-                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"><span class="tab-n">${i + 1}</span><span class="tab-t">${UI.esc(s.title)}</span><span class="tab-s">${UI.esc(s.surface || '')}</span></button>`).join('')}
+                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"><span class="tab-n" data-r="${s.id}" data-n="${i + 1}">${i + 1}</span><span class="tab-t">${UI.esc(s.title)}</span><span class="tab-s">${UI.esc(s.surface || '')}</span></button>`).join('')}
                   </div>
                 </div>
                 <div class="card"></div>
@@ -310,8 +335,15 @@
                 </div>
                 <div class="fit"><iframe title="${UI.esc(sc.title)} — interactive mock" src="${screenSrc(sc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>
               </div>`;
+            const r = results[id] || {};
             block.querySelector('.guide').innerHTML = `
-              <div class="label mb-1">How to play</div>
+              <div class="label mb-1">Result</div>
+              <div class="result-ctl flex gap-2 mb-2">
+                <button type="button" class="result-btn pass" data-status="pass" aria-pressed="${r.status === 'pass'}" onclick="mark('${sc.id}', 'pass')">✓ Pass</button>
+                <button type="button" class="result-btn fail" data-status="fail" aria-pressed="${r.status === 'fail'}" onclick="mark('${sc.id}', 'fail')">✗ Fail</button>
+              </div>
+              <textarea class="note result-ctl" aria-label="Note for ${UI.esc(sc.title)}" placeholder="What you saw, if it differs" oninput="setResult('${sc.id}', { note: this.value })">${UI.esc(r.note || '')}</textarea>
+              <div class="label mt-4 mb-1">How to play</div>
               <ol class="list-decimal pl-5 space-y-1 muted">${list(sc.steps)}</ol>
               <div class="label mt-4 mb-1">What you should see</div>
               <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>`;
@@ -340,6 +372,53 @@
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
         addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer
 
+        // ---------------------------------------------------------------- results, per reviewer (kept apart from the mock's store)
+        const RESULTS_KEY = 'mock-results:' + FakeApi.STORE;
+        const STATUS = { pass: '✓ Pass', fail: '✗ Fail', '': 'Not played' };
+        const ICON = {
+            pass: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+            fail: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+        };
+        let results = {};
+        try { results = JSON.parse(localStorage.getItem(RESULTS_KEY)) || {}; } catch { }
+        function setResult(id, patch) {
+            results[id] = { ...(results[id] || {}), ...patch, at: new Date().toISOString() };
+            try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { /* storage blocked: kept for this visit only */ }
+            renderResults();
+        }
+        function mark(id, status) {
+            setResult(id, { status: results[id]?.status === status ? '' : status });
+            const block = document.querySelector(`section[data-use-case="${SCENARIOS.find(s => s.id === id).useCase}"]`);
+            block.querySelectorAll('.result-btn').forEach(b => b.setAttribute('aria-pressed', String(results[id].status === b.dataset.status)));
+        }
+        function renderResults() {
+            document.querySelectorAll('.tab-n[data-r]').forEach(el => {
+                const st = results[el.dataset.r]?.status || '';
+                el.className = 'tab-n ' + st;
+                el.innerHTML = st ? `${ICON[st]}<span class="sr-only">${el.dataset.n}, ${STATUS[st]}</span>` : el.dataset.n;
+            });
+            document.querySelectorAll('[data-count]').forEach(el => {
+                const sts = scsOf(el.dataset.count).map(s => results[s.id]?.status || '');
+                const n = st => sts.filter(x => x === st).length;
+                el.innerHTML = n('') === sts.length ? '' : `<span class="pass">${n('pass')} pass</span> · <span class="fail">${n('fail')} fail</span> · ${n('')} left`;
+            });
+            const rows = SCENARIOS.map(s => ({ s, st: results[s.id]?.status || '', note: results[s.id]?.note || '' }));
+            const n = st => rows.filter(r => r.st === st).length;
+            document.getElementById('results').innerHTML = `
+              <p class="mb-2"><span class="st-pass">${n('pass')} pass</span> · <span class="st-fail">${n('fail')} fail</span> · <span class="st-none">${n('')} not played</span>
+                <button type="button" class="btn-ghost ml-2 result-ctl" onclick="copyResults(this)">Copy as Markdown</button></p>
+              <div class="panel overflow-x-auto"><table class="res-table">
+                <tr><th>Use case</th><th>Scenario</th><th>Result</th><th>Note</th></tr>
+                ${rows.map(r => `<tr><td class="font-mono t-code meta">${r.s.useCase}</td><td><a class="link" href="#sc-${r.s.id}">${UI.esc(r.s.title)}</a></td><td class="st-${r.st || 'none'} whitespace-nowrap">${STATUS[r.st]}</td><td class="muted">${UI.esc(r.note)}</td></tr>`).join('')}
+              </table></div>`;
+        }
+        function copyResults(btn) {
+            const cell = v => String(v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+            const md = ['| Use case | Scenario | Result | Note |', '|---|---|---|---|']
+                .concat(SCENARIOS.map(s => `| ${s.useCase} | ${cell(s.title)} | ${STATUS[results[s.id]?.status || '']} | ${cell(results[s.id]?.note || '')} |`)).join('\n');
+            navigator.clipboard.writeText(md).then(() => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy as Markdown'; }, 1500); });
+        }
+
         function renderLog() {
             const rows = FakeApi.log();
             const html = !rows.length
@@ -349,6 +428,7 @@
             if (el.innerHTML !== html) el.innerHTML = html;
         }
 
+        renderResults();
         clearStore(); // a reload starts clean too: rows written in an earlier visit would leak into every card
         // first scenario of every use case, or the one in the URL (#sc-<id>, from the plan's links)
         const wanted = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
