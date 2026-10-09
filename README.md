@@ -8,6 +8,7 @@ Each skill folder has a `README.md` with diagrams of how it works.
 
 | Skill | What it does |
 |-------|--------------|
+| [work-flow](plugins/naphatwx-tools/skills/work-flow/) | Carry one task from idea to a merge-ready branch: spec, code, your review, tests, AI review, docs, pre-merge gate |
 | [design-feature](plugins/naphatwx-tools/skills/design-feature/) | Plan a feature as a browsable HTML folder: use cases, diagrams, scenarios, database and API changes |
 | [generate-use-case](plugins/naphatwx-tools/skills/generate-use-case/) | Write a feature's use cases and scenarios to one `use-cases.js` file |
 | [generate-diagram](plugins/naphatwx-tools/skills/generate-diagram/) | Draw one flowchart, sequence diagram or ER diagram as a local file |
