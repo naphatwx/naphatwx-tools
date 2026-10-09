@@ -1,13 +1,13 @@
 ---
 name: e2e-test
-description: Write and run Playwright browser tests for a feature, with a screenshot per step and one HTML report. Use when the user says "e2e test spec 127" or "test this in the browser". A test scenario file alone is generate-test-scenario; service checks are smoke-test.
+description: Write and run Playwright browser tests for a feature, with a screenshot per step and one HTML report. Use when the user says "e2e test spec 127" or "test this in the browser". A test case file alone is generate-test-cases; service checks are smoke-test.
 argument-hint: "<spec folder | spec number | feature description> [--env <name>] [--base-url <url>]"
 ---
 
 # E2E Test
 
 ```text
-1 test cases    generate-test-scenario (target ui) ─► test scenario file (test cases linked to scenarios)
+1 test cases    generate-test-cases (target ui) ─► test case file (test cases linked to scenarios)
 2 harness       Playwright config + login + step helper + one-html reporter (once per repo)
 3 write         1 writer agent per test group, in parallel ─► <group>.e2e.spec.ts
 4 run           Playwright, parallel workers for independent files
@@ -38,9 +38,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## 1. Test cases
 
-Run the `generate-test-scenario` skill (`naphatwx-tools:generate-test-scenario` in Claude Code) with **target ui** and the source. It writes a test scenario file with pages, user actions, selectors, on-screen expectations, the sign-in role and the viewport. When the feature has a `use-cases.js` (from the `generate-use-case` skill), each test case names its scenario id and use case.
+Run the `generate-test-cases` skill (`naphatwx-tools:generate-test-cases` in Claude Code) with **target ui** and the source. It writes a test case file with pages, user actions, selectors, on-screen expectations, the sign-in role and the viewport. When the feature has a `use-cases.js` (from the `generate-use-case` skill), each test case names its scenario id and use case.
 
-- If a test scenario file for this source already exists, ask whether to reuse it or generate a new one.
+- If a test case file for this source already exists, ask whether to reuse it or generate a new one.
 - Read the file. Group its test cases by use case (their **Use case** line), else by page. Each group becomes one spec file, so a group should have about 3–8 cases.
 
 ## 2. Harness (once per repo)
@@ -111,7 +111,7 @@ The reporter prints `E2E report: <path>`. Open the file and check:
 - the failed tests are listed first; every test starts closed, and opening a failed one shows its error
 
 Reply with:
-- the test scenario file path and the spec files written
+- the test case file path and the spec files written
 - failed / flaky / passed / skipped counts
 - per use case: passed / total, and the scenario ids of the failed tests
 - each failure: its test, its step, and the likely cause (product bug, missing selector, wrong test case, environment)

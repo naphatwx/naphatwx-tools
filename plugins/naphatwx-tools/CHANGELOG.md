@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.165
+
+**generate-test-scenario is now generate-test-cases**
+
+- The skill writes a test case file, so its name no longer clashes with "scenario" (one path of a use case).
+- New files are `test-cases-<n>.md` / `test-cases-ui-<n>.md`, or `test-cases/<feature-slug>/` without a spec folder.
+- e2e-test, design-feature and generate-use-case point to the new name.
+
 ## 1.9.164
 
 **One standard for every skill: Feature → Use case → Scenario**

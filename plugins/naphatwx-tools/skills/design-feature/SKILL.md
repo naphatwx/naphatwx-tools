@@ -230,7 +230,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Output: `✅ Plan created at: {output}/overview.html`
 - Say the diagram mode (diagram-design or manual).
 - List the use cases (one line each), the ER diagram page(s), and which mock was built (standalone, in-project with its folder, or none).
-- Scenarios: the total, the count per use case and how many are playable, copied from the script output, plus the path of `use-cases.js` (generate-test-scenario reads it too).
+- Scenarios: the total, the count per use case and how many are playable, copied from the script output, plus the path of `use-cases.js` (generate-test-cases reads it too).
 - Mock review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
 - Remind the user: each diagram is edited in its own file under `flowchart/`, `sequence-diagram/` or `database/`; the overview picks up the change on reload.
 

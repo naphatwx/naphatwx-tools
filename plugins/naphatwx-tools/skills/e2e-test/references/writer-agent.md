@@ -9,7 +9,7 @@ Write ONE Playwright spec file. Do not run it, do not edit any other file.
 
 Repo: <repo-root>   Guide files to follow: <paths>
 E2E folder: <e2e-dir>   Spec file to write: <e2e-dir>/<group>.e2e.spec.ts
-Test scenario file: <path>   Your test cases: <TC-ids>
+Test case file: <path>   Your test cases: <TC-ids>
 Shared helpers (already written, import them, never copy them):
   - step:  import { step } from '<relative path to step.ts>'
   - login: <how the suite signs in — storageState path / fixture name>

@@ -1,17 +1,16 @@
 ---
-name: generate-test-scenario
-description: Generate a test scenario file an AI can run later against MCP tools, APIs or the web UI, from a spec or feature. Use when the user says "test scenarios for spec 127" or "write test cases". Writes only, never runs tests; to run browser tests use e2e-test.
+name: generate-test-cases
+description: Generate a test case file an AI can run later against MCP tools, APIs or the web UI, from a spec or feature. Use when the user says "test cases for spec 127" or "write test cases". Writes only, never runs tests; to run browser tests use e2e-test.
 ---
 
-# Test Scenario Generator
+# Test Case Generator
 
-Read a spec and its related code, then write a test scenario file that an AI
+Read a spec and its related code, then write a test case file that an AI
 agent can execute later through MCP tools or backend API calls — or, with
 `--target ui`, through a browser (see `references/ui-target.md`).
 
 The file holds test cases. Each test case covers one **scenario** from the
 `generate-use-case` skill's `use-cases.js` (same id), grouped by its **use case**.
-In this skill "test scenario file" always means the output file, never one scenario.
 
 **This skill only writes the file. Never run any test case here.** The user
 runs it in a separate request.
@@ -32,10 +31,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 Examples:
 
 ```text
-/generate-test-scenario <repo>/specs/127-app-env-deploy-status
-/generate-test-scenario 127
-/generate-test-scenario 127 --target ui
-/generate-test-scenario "the What's New overlay on the announcements page" --target ui
+/generate-test-cases <repo>/specs/127-app-env-deploy-status
+/generate-test-cases 127
+/generate-test-cases 127 --target ui
+/generate-test-cases "the What's New overlay on the announcements page" --target ui
 ```
 
 **`--target ui`**: follow every step below, plus the UI additions in
@@ -157,7 +156,7 @@ Order cases so dependencies come first, and state the dependency explicitly.
 Use this exact structure.
 
 ````markdown
-# Test Scenario: {Feature Name}
+# Test Cases: {Feature Name}
 
 - **Spec**: `{spec-folder-name}`
 - **Feature**: {one line — what it does}
@@ -267,19 +266,19 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 Always save inside the spec folder:
 
 ```text
-<spec-path>/PRIVATE/test/test-scenario-<n>.md
+<spec-path>/PRIVATE/test/test-cases-<n>.md
 ```
 
 - Create `PRIVATE/test/` if it does not exist.
-- `--target ui` → name it `test-scenario-ui-<n>.md` (its own numbering).
+- `--target ui` → name it `test-cases-ui-<n>.md` (its own numbering).
 - No spec folder (a feature description) → save under
-  `test-scenarios/<feature-slug>/` at the repo root instead, and ask once
+  `test-cases/<feature-slug>/` at the repo root instead, and ask once
   whether that folder should be gitignored.
 - `<n>` is a running number starting at `1`. Read the folder, find the highest
   existing file of the same kind, and use the next number.
 - **Never overwrite an existing file.**
 
-Confirm with: `✅ Test scenario file created at: {path} ({n} test cases, {u} from scenarios)`
+Confirm with: `✅ Test case file created at: {path} ({n} test cases, {u} from scenarios)`
 
 Then print a one-line list of the case titles and remind the user that nothing
 was executed — they can ask to run it separately.
