@@ -1,17 +1,17 @@
 ---
 name: e2e-test
-description: Write and run Playwright browser tests for a feature, with a screenshot per step and one HTML report. Use when the user says "e2e test spec 127" or "test this in the browser". A scenario file alone is generate-test-scenario; service checks are smoke-test.
+description: Write and run Playwright browser tests for a feature, with a screenshot per step and one HTML report. Use when the user says "e2e test spec 127" or "test this in the browser". A test scenario file alone is generate-test-scenario; service checks are smoke-test.
 argument-hint: "<spec folder | spec number | feature description> [--env <name>] [--base-url <url>]"
 ---
 
 # E2E Test
 
 ```text
-1 scenarios     generate-test-scenario (target ui) ─► scenario file (test cases linked to use cases)
+1 test cases    generate-test-scenario (target ui) ─► test scenario file (test cases linked to scenarios)
 2 harness       Playwright config + login + step helper + one-html reporter (once per repo)
-3 write         1 writer agent per scenario group, in parallel ─► <group>.e2e.spec.ts
+3 write         1 writer agent per test group, in parallel ─► <group>.e2e.spec.ts
 4 run           Playwright, parallel workers for independent files
-5 report        1 HTML: flow ─► test (use case id) ─► steps paged like slides ─► screenshot, pass/fail, error
+5 report        1 HTML: use case ─► test (scenario id) ─► steps paged like slides ─► screenshot, pass/fail, error
 ```
 
 ## User Input
@@ -36,12 +36,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ---
 
-## 1. Scenarios
+## 1. Test cases
 
-Run the `generate-test-scenario` skill (`naphatwx-tools:generate-test-scenario` in Claude Code) with **target ui** and the source. It writes a scenario file with pages, user actions, selectors, on-screen expectations, the sign-in role and the viewport. When the feature has a `use-cases.js` (from the `generate-use-case` skill), each test case names its use case id and flow.
+Run the `generate-test-scenario` skill (`naphatwx-tools:generate-test-scenario` in Claude Code) with **target ui** and the source. It writes a test scenario file with pages, user actions, selectors, on-screen expectations, the sign-in role and the viewport. When the feature has a `use-cases.js` (from the `generate-use-case` skill), each test case names its scenario id and use case.
 
-- If a scenario file for this source already exists, ask whether to reuse it or generate a new one.
-- Read the file. Group its test cases by flow (their **Flow** line), else by page. Each group becomes one spec file, so a group should have about 3–8 cases.
+- If a test scenario file for this source already exists, ask whether to reuse it or generate a new one.
+- Read the file. Group its test cases by use case (their **Use case** line), else by page. Each group becomes one spec file, so a group should have about 3–8 cases.
 
 ## 2. Harness (once per repo)
 
@@ -56,7 +56,7 @@ Then add these, next to the e2e folder, **unchanged** from this skill's `templat
 
 - `step.ts`: wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
 - `reporters/one-html-reporter.ts` and `reporters/e2e-report-template.html`: write one self-contained HTML file per run, with screenshots embedded. Each test shows its steps one at a time: use Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot (this works on scrolling full-page shots too). A step without a screenshot shows a "No screenshot for this step" image, so every step can be clicked through. Only one test is open at a time: expanding one collapses the others. Expanding a test starts on step 1; collapsing and re-expanding it keeps the last step seen. A failed step shows its error above the screenshot. A failed test has a copyable rerun command, and a copyable `npx playwright show-trace <path>` command when Playwright saved a trace (the path is relative to the config folder). A full-page screenshot (taller than 1.5× its width) scrolls inside the viewer instead of shrinking.
-- Tests are grouped under their flow (`3.N <flow title>`, from the `flow` annotation), in flow order; tests with no flow come last under "Other tests". Each test shows its use case id (`use case` annotation) next to its file.
+- Tests are grouped under their use case (`UC<n> <title>`, from the `use case` annotation), in use case order; tests with no use case come last under "Other tests". Each test shows its scenario id (`scenario` annotation) next to its file.
 - The report has one card per test, keyed by test id. With retries it keeps the final attempt, puts the earlier ones under "Earlier attempts", and marks a test that passed on retry as flaky. Header counts and filters (Failed, Flaky, Passed, Skipped) use Playwright's own outcome, so they match its summary. A skipped test shows its `skip` / `fixme` reason; a `test.fail()` test shows that annotation.
 - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
 
@@ -69,7 +69,7 @@ reporter: [
 ],
 use: {
   baseURL: process.env.PW_BASE_URL ?? '<local url>',
-  viewport: { width: 1280, height: 800 },   // keeps screenshots small; a scenario may set its own
+  viewport: { width: 1280, height: 800 },   // keeps screenshots small; a test case may set its own
   screenshot: 'only-on-failure',
   storageState: '<login state file>',
 },
@@ -89,7 +89,7 @@ Agents with no sub-agents write the groups one after another with the same promp
 
 When they are done:
 - Check every file imports `step` and wraps each action in it.
-- Collect the selectors reported missing and the code/scenario mismatches.
+- Collect the selectors reported missing and the code / test case mismatches.
 
 ## 4. Run
 
@@ -100,21 +100,21 @@ PW_BASE_URL=<url> E2E_REPORT_NAME=<feature> npx playwright test <e2e-dir>/<featu
 Run it the way the repo's guide says to run tools (for example in its Docker service). Spec files run in parallel workers, and the tests inside a file run in order.
 
 - A failure caused by the environment (server down, a cold compile timeout, an expired session) is not a product failure. Fix the environment and re-run only the failed files once.
-- A real failure: keep it. Do not bend the assertion to pass. If the scenario itself was wrong (the code is right and the spec says so), fix the test and say so.
+- A real failure: keep it. Do not bend the assertion to pass. If the test case itself was wrong (the code is right and the spec says so), fix the test and say so.
 - Check that no `__e2e_` records are left behind.
 
 ## 5. Report
 
 The reporter prints `E2E report: <path>`. Open the file and check:
-- every test is listed, under its flow
+- every test is listed, under its use case
 - every step has a screenshot
 - the failed tests are listed first; every test starts closed, and opening a failed one shows its error
 
 Reply with:
-- the scenario file path and the spec files written
+- the test scenario file path and the spec files written
 - failed / flaky / passed / skipped counts
-- per flow: passed / total, and the use case ids of the failed tests
-- each failure: its test, its step, and the likely cause (product bug, missing selector, wrong scenario, environment)
-- missing selectors and code/scenario mismatches, as findings for the app owner
+- per use case: passed / total, and the scenario ids of the failed tests
+- each failure: its test, its step, and the likely cause (product bug, missing selector, wrong test case, environment)
+- missing selectors and code / test case mismatches, as findings for the app owner
 - whether cleanup is confirmed
 - the **full path** of the HTML report

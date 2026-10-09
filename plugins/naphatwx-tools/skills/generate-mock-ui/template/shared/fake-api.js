@@ -1,10 +1,10 @@
 // Mock-only stand-in for the real operations, named exactly as in contract/types.ts.
 // Serves contract/data.js through contract/rules.js; swap for the real client and pages stay the same.
 // Writes and the side-effect log persist in sessionStorage under STORE, so they survive page changes;
-// index.html clears every STORE key when a use case starts, so each one starts clean.
+// index.html clears every STORE key when a scenario starts, so each one starts clean.
 
 var FakeApi = (function () {
-    const D = MOCK_DATA, sc = Scenarios.current;
+    const D = MOCK_DATA, st = States.current;
     const STORE = 'mock:<feature-slug>';
     const LATENCY = 450;
     const TIMEOUT_SIM_MS = 2600; // stands in for the real call bound, so the demo doesn't stall
@@ -15,7 +15,7 @@ var FakeApi = (function () {
     const persist = () => { save('created', mem.created); save('log', mem.log); };
     const wait = ms => new Promise(r => setTimeout(r, ms));
     const fail = err => { throw err; };
-    const need = perm => { if (!sc.perms.includes(perm)) fail({ code: 'PermissionDenied', message: `missing permission ${perm}` }); };
+    const need = perm => { if (!st.perms.includes(perm)) fail({ code: 'PermissionDenied', message: `missing permission ${perm}` }); };
 
     /** Side effects the real service writes (audit rows, events). Shown on index.html. */
     const record = message => { mem.log.unshift({ at: new Date().toISOString(), message }); persist(); };
@@ -27,7 +27,7 @@ var FakeApi = (function () {
     async function GetThings(req) {
         await wait(LATENCY);
         if (!D.owners.some(o => o.id === req.ownerId)) fail({ code: 'NotFound', message: 'owner not found' });
-        if (sc.faults.readUnavailableOnce && ++mem.reads === 1) fail(Rules.UNREACHABLE);
+        if (st.faults.readUnavailableOnce && ++mem.reads === 1) fail(Rules.UNREACHABLE);
         const limit = Math.min(req.limit || 20, Rules.MAX_LIMIT);
         let list = rows(req.ownerId).map(Rules.toResponse);
         if (req.status) list = list.filter(t => t.status === req.status);
@@ -43,20 +43,20 @@ var FakeApi = (function () {
         if (invalid) { record(`refused: ${invalid}`); fail({ code: 'InvalidArgument', message: invalid }); }
         const row = { id: Date.now() % 100000, owner_id: req.ownerId, name: req.name, state: 'QUEUED', created_at: new Date().toISOString() };
         (mem.created[req.ownerId] = mem.created[req.ownerId] || []).unshift(row);
-        if (sc.faults.createTimeout) { persist(); await wait(TIMEOUT_SIM_MS); record('timeout, outcome unknown'); fail({ code: 'Unavailable', outcomeUnknown: true, message: 'No answer in time. It may have been created — check the list before trying again.' }); }
+        if (st.faults.createTimeout) { persist(); await wait(TIMEOUT_SIM_MS); record('timeout, outcome unknown'); fail({ code: 'Unavailable', outcomeUnknown: true, message: 'No answer in time. It may have been created — check the list before trying again.' }); }
         record(`created thing #${row.id}`);
         return Rules.toResponse(row);
     }
 
-    /** Sample requests for page/console.html, one per operation (a use case's `req` overrides it). */
+    /** Sample requests for page/console.html, one per operation (a scenario's `req` overrides it). */
     const SAMPLES = {
-        GetThings: { ownerId: sc.ownerId, page: 1, limit: 10 },
-        CreateThing: { ownerId: sc.ownerId, name: 'Third thing' },
+        GetThings: { ownerId: st.ownerId, page: 1, limit: 10 },
+        CreateThing: { ownerId: st.ownerId, name: 'Third thing' },
     };
 
     return {
         GetThings, CreateThing, SAMPLES, STORE,
-        owner: () => D.owners.find(o => o.id === sc.ownerId),
+        owner: () => D.owners.find(o => o.id === st.ownerId),
         // read from storage, not memory: screens in other frames write it too
         log: () => load('log', mem.log),
         reset: () => { mem.created = {}; mem.log = []; persist(); },

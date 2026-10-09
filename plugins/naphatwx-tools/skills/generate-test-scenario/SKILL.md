@@ -9,6 +9,10 @@ Read a spec and its related code, then write a test scenario file that an AI
 agent can execute later through MCP tools or backend API calls — or, with
 `--target ui`, through a browser (see `references/ui-target.md`).
 
+The file holds test cases. Each test case covers one **scenario** from the
+`generate-use-case` skill's `use-cases.js` (same id), grouped by its **use case**.
+In this skill "test scenario file" always means the output file, never one scenario.
+
 **This skill only writes the file. Never run any test case here.** The user
 runs it in a separate request.
 
@@ -56,19 +60,20 @@ surface (step 4) and the case format (step 6).
   names in the description, and list in the file's header what you treated as
   the requirements so the user can correct them.
 
-### 1b. Find the Use Cases
+### 1b. Find the Use Cases and Scenarios
 
 Look for `use-cases.js` from the `generate-use-case` skill, first match wins:
 `<plan>/use-cases.js`, `<spec-path>/plan/use-cases.js`,
 `plans/<feature-slug>/use-cases.js`.
 
-- **Found** → read `USE_CASE_FLOWS` and `USE_CASES` (strict JSON after
-  `var NAME = `). Every use case whose `surface` matches the target (`ui` for
+- **Found** → read `USE_CASES` and `SCENARIOS` (strict JSON after
+  `var NAME = `). Every scenario whose `surface` matches the target (`ui` for
   `--target ui`, `api` otherwise) becomes one test case in step 5, with the
-  same `id` and flow. Never edit the file; a use case that looks wrong is a
-  note in the header.
+  same `id` and use case. Never edit the file; a scenario that looks wrong is
+  a note in the header. A file in the old format (`USE_CASE_FLOWS`) → say so
+  and ask to re-run the `generate-use-case` skill first.
 - **Not found** → go on from the spec alone, and say in the confirm step that
-  running the `generate-use-case` skill first links test cases to use cases.
+  running the `generate-use-case` skill first links test cases to scenarios.
 
 ### 2. Read the Spec
 
@@ -115,18 +120,18 @@ If the feature is reachable through an MCP server in this session:
 
 1. Pick the matching service tool (e.g. `AppEnvVarService`).
 2. Call it with `operation: "GetInputSchema"` to get the real request fields.
-3. Use those exact field names in the scenario. Do NOT guess payloads.
+3. Use those exact field names in the test cases. Do NOT guess payloads.
 
-Prefer the `local` MCP server for scenarios that write data; note the choice
+Prefer the `local` MCP server for test cases that write data; note the choice
 in the header. If no MCP server matches, write plain HTTP calls
 (`METHOD /path` + JSON body) instead.
 
 ### 5. Choose Coverage
 
-**Use cases first** (when step 1b found them): one case per use case of this
-target, in flow order, titled with the use case's title. Its `given` is the
+**Scenarios first** (when step 1b found them): one case per scenario of this
+target, in use case order, titled with the scenario's title. Its `given` is the
 precondition, its `when` the steps, its `expect` the expected result (made
-exact in steps 3 and 4). Then add the extra cases below that no use case
+exact in steps 3 and 4). Then add the extra cases below that no scenario
 covers; mark each one `extra`.
 
 Include a case for each row that applies. Skip what the feature does not have
@@ -134,7 +139,7 @@ Include a case for each row that applies. Skip what the feature does not have
 
 | Group | Cover |
 | ----- | ----- |
-| Happy path | The main flow, verified with a read-back call |
+| Happy path | The main success path, verified with a read-back call |
 | Requirements | One case per testable requirement in the spec |
 | Validation | Empty, wrong type, wrong format, over max length, out of range |
 | Uniqueness | Duplicate in the same scope, same value in another scope |
@@ -167,10 +172,10 @@ Use this exact structure.
 | ----------- | ---------- |
 | {FR-01 short text} | TC-01, TC-04 |
 
-| Flow | Use case | Test case |
-| ---- | -------- | --------- |
-| 3.1 {flow title} | `{use-case-id}` | TC-01 |
-| 3.1 {flow title} | `{use-case-id}` | — other target (`ui`) |
+| Use case | Scenario | Test case |
+| -------- | -------- | --------- |
+| UC1 {use case title} | `{scenario-id}` | TC-01 |
+| UC1 {use case title} | `{scenario-id}` | — other target (`ui`) |
 
 Leave this second table out when no use cases were found.
 
@@ -194,7 +199,7 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 
 ## TC-01 — {short title}
 
-**Use case**: `{use-case-id}` · **Flow**: 3.1 {flow title}
+**Scenario**: `{scenario-id}` · **Use case**: UC1 {use case title}
 **Depends on**: none
 
 **Steps**
@@ -217,7 +222,7 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 
 ## TC-0N — Input validation
 
-**Use case**: extra · **Flow**: 3.1 {flow title}
+**Scenario**: extra · **Use case**: UC1 {use case title}
 
 | # | Field | Input | Expected |
 | - | ----- | ----- | -------- |
@@ -253,9 +258,9 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 - **Mark destructive cases** with `⚠️ writes data` in the title.
 - **No secrets in the file.** Use placeholders for tokens and passwords.
 - Keep each case under ~10 steps. Split it if longer.
-- **Use case line**: every case has one. A case from a use case names its id
-  and flow; an extra case says `extra` plus the flow it belongs to, or
-  `extra` alone. Never invent a use case id.
+- **Scenario line**: every case has one. A case from a scenario names its id
+  and use case; an extra case says `extra` plus the use case it belongs to, or
+  `extra` alone. Never invent a scenario or use case id.
 
 ### 8. Save the File
 
@@ -274,7 +279,7 @@ Always save inside the spec folder:
   existing file of the same kind, and use the next number.
 - **Never overwrite an existing file.**
 
-Confirm with: `✅ Test scenario created at: {path} ({n} test cases, {u} from use cases)`
+Confirm with: `✅ Test scenario file created at: {path} ({n} test cases, {u} from scenarios)`
 
 Then print a one-line list of the case titles and remind the user that nothing
 was executed — they can ask to run it separately.

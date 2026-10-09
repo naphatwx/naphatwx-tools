@@ -4,17 +4,17 @@ Mock pages written inside the real frontend app, built from its real components 
 
 ```
 <routes-root>/mock/spec<NNN>/
-├── page.tsx                index: use cases grouped by flow, one link each
-├── <screen>/page.tsx       one route per screen; state from ?scenario=
+├── page.tsx                index: scenarios grouped by use case, one link each
+├── <screen>/page.tsx       one route per screen; state from ?state=
 └── _mock/                  private folder, not a route
     ├── types.ts            only types the app doesn't generate yet
     ├── rules.ts            spec rules as pure functions
     ├── data.ts             realistic data, typed with the real types
-    ├── scenarios.ts        scenario id → data set or forced state
+    ├── states.ts           mock state id → data set or forced state
     ├── use-cases.ts        copy of <plan>/use-cases.js as TS exports; never edited here
-    ├── use-case-play.ts    USE_CASE_PLAY: how to play each use case, same shape as standalone
+    ├── scenario-play.ts    SCENARIO_PLAY: how to play each scenario, same shape as standalone
     ├── use<Screen>.ts      one hook per screen: state + events
-    └── ScenarioPanel.tsx   mock-only scenario switcher
+    └── StatePanel.tsx      mock-only state switcher
 ```
 
 The tree uses Next.js App Router names. Another router → keep the same split with that framework's file names.
@@ -34,8 +34,8 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 4. **Real types.** Import generated proto / OpenAPI / DTO types from the app. A type the feature adds but the app doesn't generate yet goes in `_mock/types.ts`, each marked `// TODO: not generated yet — <source file>`. Never invent a field the source doesn't have.
 5. **One set of rules.** Every mapping, validation, computed value and refusal goes through `_mock/rules.ts`, exactly as strict as the spec.
 6. **One hook per screen.** `use<Screen>()` holds the screen's state and event handlers, with the return shape the real hook will have. Building the real feature then means replacing that hook.
-7. **Every state has a link.** Each edge state from the spec is a scenario, reachable as `/mock/spec<NNN>/<screen>?scenario=<id>`. Never an empty list where the real app would show an error.
-8. **Mock-only UI is obvious.** `ScenarioPanel` is fixed at the bottom right, dashed pink border, labelled `Mock scenario`. Nothing mock-only uses product styling.
+7. **Every state has a link.** Each edge state from the spec is a mock state, reachable as `/mock/spec<NNN>/<screen>?state=<id>`. Never an empty list where the real app would show an error.
+8. **Mock-only UI is obvious.** `StatePanel` is fixed at the bottom right, dashed pink border, labelled `Mock state`. Nothing mock-only uses product styling.
 9. The folder passes the app's own typecheck and lint. Code comments max 3 lines; no absolute local paths.
 
 ## Workflow
@@ -54,42 +54,42 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 
 - `types.ts`: only the types not generated yet (Hard Rule 4). Empty → leave the file out.
 - `rules.ts`: every spec rule as a pure function — status and field mapping, eligibility, validation, error classification, the user-facing messages.
-- `data.ts`: realistic names, ids, dates and volumes (enough rows to page), typed with the real types. One entity per scenario that needs different data. Keep ids consistent with the plan's diagrams.
+- `data.ts`: realistic names, ids, dates and volumes (enough rows to page), typed with the real types. One entity per state that needs different data. Keep ids consistent with the plan's diagrams.
 - `use-cases.ts`: `<plan>/use-cases.js` (from the `generate-use-case` skill) copied as-is, with `var` turned into `export const`. The app can't load a file outside itself, so this is a copy: re-copy it whenever `use-cases.js` changes, never edit it here.
-- `use-case-play.ts`: `export const USE_CASE_PLAY = [...]`, a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment), one entry per use case id.
-- `scenarios.ts`: `SCENARIOS` list (`id`, `label`, `flow` = plan flow numbers, `hint` telling the viewer what to try, the data set or forced state) and a `useScenario()` helper that reads `?scenario=`.
-- `use<Screen>.ts`: the screen's state and events. Fake latency with a short timeout so loading states show; scenario faults turn into the real error codes and messages from `rules.ts`.
-- `ScenarioPanel.tsx`: a select of the scenarios that changes `?scenario=`, plus the current hint (Hard Rule 8). With `?uc=<id>` it shows that use case's steps and expect instead, with a link back to the index.
+- `scenario-play.ts`: `export const SCENARIO_PLAY = [...]`, a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment), one entry per scenario id.
+- `states.ts`: `STATES` list (`id`, `label`, `useCase` = the plan use cases it shows, `hint` telling the viewer what to try, the data set or forced state) and a `useMockState()` helper that reads `?state=`.
+- `use<Screen>.ts`: the screen's state and events. Fake latency with a short timeout so loading states show; state faults turn into the real error codes and messages from `rules.ts`.
+- `StatePanel.tsx`: a select of the states that changes `?state=`, plus the current hint (Hard Rule 8). With `?sc=<id>` it shows that scenario's steps and expect instead, with a link back to the index.
 
 ### 4. Write the pages
 
-- Each `<screen>/page.tsx`: a client component (`'use client'` in Next.js) that uses the app's page layout, calls `use<Screen>()` and renders `<ScenarioPanel />`.
+- Each `<screen>/page.tsx`: a client component (`'use client'` in Next.js) that uses the app's page layout, calls `use<Screen>()` and renders `<StatePanel />`.
 - Show every state the real screen has: loading skeleton, error with retry, empty, filtered-empty, success toast, refusal alert, outcome-unknown.
 - Every interaction works: submit, edit, delete, filter, sort, paginate, open / close modal, confirm, cancel.
-- Deep links: read extra query params (`?mode=`, `?line=`) so each plan flow can open the exact state.
-- `page.tsx` at the folder root: one block per flow (`3.N` + name), each listing its playable use cases as links to `<screen>?scenario=<id>&uc=<id>` with the first `expect` line, then a `Not in the mock` line per skipped one; a flow with none shows its `none` sentence.
+- Deep links: read extra query params (`?mode=`, `?line=`) so each scenario can open the exact state.
+- `page.tsx` at the folder root: one block per use case (`UC<n>` + name), each listing its playable scenarios as links to `<screen>?state=<state id>&sc=<scenario id>` with the first `expect` line, then a `Not in the mock` line per skipped one; a use case with none shows its `none` sentence.
 - Controls follow the spec, then the real app: a control the user has no permission for is hidden when the real app hides it; shown unavailable with a reason (`aria-disabled` + tooltip) only where the spec says so.
 
 ### 5. Link the plan (when a plan folder exists)
 
-- Run the design-feature skill's `scripts/use-cases-panels.js` with the in-project source and links:
-  `node <design-feature skill dir, sibling of this skill>/scripts/use-cases-panels.js <plan-folder> --play-file <mock-folder>/_mock/use-case-play.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?scenario={scenario}&uc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
-- It writes every flow's "Use cases (N)" view and the "Open the mock ↗" link. Then add one muted line under the Flows section's first line: the mock runs in the app, start it with the app's dev command.
+- Run the design-feature skill's `scripts/scenarios-panels.js` with the in-project source and links:
+  `node <design-feature skill dir, sibling of this skill>/scripts/scenarios-panels.js <plan-folder> --play-file <mock-folder>/_mock/scenario-play.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?state={state}&sc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
+- It writes every use case's "Scenarios (N)" view and the "Open the mock ↗" link. Then add one muted line under the Use cases section's first line: the mock runs in the app, start it with the app's dev command.
 
 ### 6. Verify
 
 - Run the app's typecheck and lint on the mock folder (e.g. `npx tsc --noEmit -p <app>`, `npx eslint <mock-folder>`). Fix every error in the mock folder.
 - Grep the mock folder for `fetch(`, the app's API client imports and server actions; remove any (Hard Rule 2).
-- Dev server running and a headless browser available → open every screen × scenario, check the console for errors and look at the screenshots. Not running → don't start a long-lived server unasked; list the URLs instead.
+- Dev server running and a headless browser available → open every screen × state, check the console for errors and look at the screenshots. Not running → don't start a long-lived server unasked; list the URLs instead.
 - Grep the mock folder for absolute local paths and remove them.
 
 ### 6b. Review the mock
 
-- Follow [mock-review.md](mock-review.md) (skip it when the design-feature skill runs this; it reviews in its step 6b). The functional reviewer traces each use case through `_mock/` instead of a Node `vm`.
+- Follow [mock-review.md](mock-review.md) (skip it when the design-feature skill runs this; it reviews in its step 6b). The functional reviewer traces each scenario through `_mock/` instead of a Node `vm`.
 
 ### 7. Confirm
 
 - Output: `✅ Mock created at: <mock-folder>` (repo-relative) and the index URL `http://localhost:<port>/mock/spec<NNN>`.
-- Use cases per flow and the total, as printed by `use-cases-panels.js` — never counted by eye.
-- List the screens and scenarios, the types still marked `TODO: not generated yet`, and any route line the user must add (Hard Rule 1).
+- Scenarios per use case and the total, as printed by `scenarios-panels.js` — never counted by eye.
+- List the screens and mock states, the types still marked `TODO: not generated yet`, and any route line the user must add (Hard Rule 1).
 - Note when `git check-ignore` says the folder is not ignored yet.

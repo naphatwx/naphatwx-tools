@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.164
+
+**One standard for every skill: Feature → Use case → Scenario**
+
+- Use case = one user goal (`UC1 Cut a new version`). Scenario = one path with one result (`Merge request already released`). Flow = only the flowchart and sequence diagram of a use case.
+- generate-use-case: `use-cases.js` now holds `USE_CASES` (goals, `UC<n>`) and `SCENARIOS` (paths, field `useCase`). A shared step or a refusal is a scenario of its goal, not its own group. `check.js` flags the old format and a scenario titled like its use case.
+- design-feature: section 03 is **Use cases**; each one's 4th view is **Scenarios (N)**. `use-cases-panels.js` is now `scenarios-panels.js`. Ids `flow-NN` → `uc-NN`.
+- generate-mock-ui: one block per use case, a chip per scenario, links `#sc-<id>`. The mock's data setup is now a **state**: `shared/states.js`, `?state=`, "Mock state". `use-case-play.js` → `scenario-play.js`; `check-use-cases.js` → `check-scenarios.js`.
+- generate-test-scenario and e2e-test: one test case per scenario; the report groups by use case and shows the scenario id.
+- Plans made before this need a rebuild: re-run generate-use-case, then design-feature. The scripts say so instead of patching them.
+
 ## 1.9.163
 
 **design-feature: use cases move into each flow**

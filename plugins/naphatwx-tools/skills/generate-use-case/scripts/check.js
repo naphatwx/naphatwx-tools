@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Checks a use-cases.js file (USE_CASE_FLOWS + USE_CASES) and prints the count per flow.
+// Checks a use-cases.js file (USE_CASES + SCENARIOS) and prints the scenario count per use case.
 // Usage: node check.js <use-cases.js> [--json]
 // Exit 1 on any error.
 
@@ -27,41 +27,45 @@ function parseVar(src, name) {
     throw new Error(`${name}: unclosed array`);
 }
 
-let FLOWS = [], UCS = [];
+let UCS = [], SCS = [];
 try {
     const src = fs.readFileSync(file, 'utf8');
-    FLOWS = parseVar(src, 'USE_CASE_FLOWS');
-    UCS = parseVar(src, 'USE_CASES');
+    if (/\bUSE_CASE_FLOWS\s*=/.test(src)) errors.push(`${file} is in the old format (USE_CASE_FLOWS); rewrite it as USE_CASES + SCENARIOS (SKILL.md, User Input)`);
+    else { UCS = parseVar(src, 'USE_CASES'); SCS = parseVar(src, 'SCENARIOS'); }
 } catch (e) { errors.push(`${file} is missing or not strict JSON: ${e.message}`); }
 
 const SURFACES = ['ui', 'api', 'job'];
-const flowIds = new Set();
-for (const f of FLOWS) {
-    if (!/^3\.\d+$/.test(f.flow || '')) errors.push(`flow "${f.flow}": must look like 3.N`);
-    if (flowIds.has(f.flow)) errors.push(`duplicate flow: ${f.flow}`);
-    flowIds.add(f.flow);
-    if (!f.title) errors.push(`flow ${f.flow}: missing title`);
+const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+const ucIds = new Set();
+for (const c of UCS) {
+    if (!/^UC\d+$/.test(c.id || '')) errors.push(`use case "${c.id}": id must look like UC1`);
+    if (ucIds.has(c.id)) errors.push(`duplicate use case: ${c.id}`);
+    ucIds.add(c.id);
+    if (!c.title) errors.push(`use case ${c.id}: missing title`);
+    if (!c.refs) errors.push(`use case ${c.id}: missing refs`);
 }
 const ids = new Set();
-for (const u of UCS) {
-    const name = u.id || '(no id)';
-    if (ids.has(u.id)) errors.push(`duplicate use-case id: ${u.id}`);
-    ids.add(u.id);
-    if (u.id && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(u.id)) errors.push(`${name}: id must be kebab-case`);
-    for (const k of ['id', 'flow', 'title', 'story', 'surface', 'when']) if (u[k] == null || u[k] === '') errors.push(`${name}: missing ${k}`);
-    if (!Array.isArray(u.expect) || !u.expect.length) errors.push(`${name}: expect must be a non-empty array`);
-    if (u.surface && !SURFACES.includes(u.surface)) errors.push(`${name}: surface must be one of ${SURFACES.join(', ')}`);
-    if (u.flow && !flowIds.has(u.flow)) errors.push(`${name}: flow ${u.flow} is not in USE_CASE_FLOWS`);
-    for (const k of ['scenario', 'page', 'params', 'steps', 'op', 'req']) if (k in u) errors.push(`${name}: "${k}" is mock data; it goes in mock/shared/use-case-play.js`);
+for (const s of SCS) {
+    const name = s.id || '(no id)';
+    if (ids.has(s.id)) errors.push(`duplicate scenario id: ${s.id}`);
+    ids.add(s.id);
+    if (s.id && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(s.id)) errors.push(`${name}: id must be kebab-case`);
+    for (const k of ['id', 'useCase', 'title', 'story', 'surface', 'when']) if (s[k] == null || s[k] === '') errors.push(`${name}: missing ${k}`);
+    if (!Array.isArray(s.expect) || !s.expect.length) errors.push(`${name}: expect must be a non-empty array`);
+    if (s.surface && !SURFACES.includes(s.surface)) errors.push(`${name}: surface must be one of ${SURFACES.join(', ')}`);
+    if (s.useCase && !ucIds.has(s.useCase)) errors.push(`${name}: use case ${s.useCase} is not in USE_CASES`);
+    const uc = UCS.find(c => c.id === s.useCase);
+    if (uc && s.title && s.title.toLowerCase() === uc.title.toLowerCase()) errors.push(`${name}: title repeats its use case "${uc.title}"; name the path instead`);
+    for (const k of ['state', 'scenario', 'page', 'params', 'steps', 'op', 'req']) if (k in s) errors.push(`${name}: "${k}" is mock data; it goes in mock/shared/scenario-play.js`);
 }
-FLOWS.forEach(f => { if (!UCS.some(u => u.flow === f.flow) && !f.none) errors.push(`flow ${f.flow} has no use case and no "none" sentence`); });
+UCS.forEach(c => { if (!SCS.some(s => s.useCase === c.id) && !c.none) errors.push(`use case ${c.id} has no scenario and no "none" sentence`); });
 
-const perFlow = FLOWS.map(f => ({ flow: f.flow, title: f.title, count: UCS.filter(u => u.flow === f.flow).length }));
-const perSurface = Object.fromEntries(SURFACES.map(s => [s, UCS.filter(u => u.surface === s).length]));
-if (asJson) out(JSON.stringify({ total: UCS.length, perFlow, perSurface, errors }, null, 2));
+const perUseCase = UCS.map(c => ({ useCase: c.id, title: c.title, count: SCS.filter(s => s.useCase === c.id).length }));
+const perSurface = Object.fromEntries(SURFACES.map(k => [k, SCS.filter(s => s.surface === k).length]));
+if (asJson) out(JSON.stringify({ useCases: UCS.length, scenarios: SCS.length, perUseCase, perSurface, errors }, null, 2));
 else {
-    out(`${UCS.length} use cases (${SURFACES.map(s => `${perSurface[s]} ${s}`).join(', ')})`);
-    perFlow.forEach(f => out(`  ${f.flow} ${f.title}: ${f.count}`));
+    out(`${count(UCS.length, 'use case')}, ${count(SCS.length, 'scenario')} (${SURFACES.map(k => `${perSurface[k]} ${k}`).join(', ')})`);
+    perUseCase.forEach(c => out(`  ${c.useCase} ${c.title}: ${c.count}`));
     out(errors.length ? `\n${errors.length} error(s):\n- ${errors.join('\n- ')}` : '\nNo errors.');
 }
 process.exit(errors.length ? 1 : 0);

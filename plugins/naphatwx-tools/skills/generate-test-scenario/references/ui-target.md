@@ -1,4 +1,4 @@
-# `--target ui`: browser scenarios
+# `--target ui`: browser test cases
 
 These additions apply when the target is the web UI. The output feeds the `e2e-test` skill, which turns each case into a Playwright test with a screenshot at every step. Write each step so it maps to exactly one user action or one check.
 
@@ -7,7 +7,7 @@ These additions apply when the target is the web UI. The output feeds the `e2e-t
 Besides the backend items, pin down:
 
 - **Routes**: the URL of every page the feature touches, and how a user gets there (sidebar item, button, link).
-- **Controls**: for every button, input, tab, menu, dialog and toast in the flow, the selector in this order:
+- **Controls**: for every button, input, tab, menu, dialog and toast on the screens under test, the selector in this order:
   `data-testid` → role plus accessible name → label → exact visible text. Quote it from the code.
 - **Copy**: the exact visible text of headings, empty states, errors and toasts the cases assert.
 - **States**: loading, empty, error, disabled and permission-hidden variants, and what triggers each one.
@@ -25,7 +25,7 @@ Skip it. Keep **Related read APIs** from step 3: a write case still reads its da
 
 | Group | Cover |
 |---|---|
-| Happy path | The main flow, by clicks and typing, ending in what the user sees plus an API read-back |
+| Happy path | The main success path, by clicks and typing, ending in what the user sees plus an API read-back |
 | Navigation | Reaching the page from where users really start; deep link; back button keeps state |
 | States | Empty, loading, error with retry, disabled, permission-hidden |
 | Validation | Inline errors shown for each rejected input; the form keeps what was typed |
@@ -59,7 +59,7 @@ Each case:
 ````markdown
 ## TC-01 — {short title}
 
-**Use case**: `{use-case-id}` · **Flow**: 3.1 {flow title}
+**Scenario**: `{scenario-id}` · **Use case**: UC1 {use case title}
 **Depends on**: none
 **Page**: `{/route}`   **Role**: `{role}`   **Viewport**: default
 

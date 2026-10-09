@@ -13,7 +13,7 @@ mock built + verified
                              ▼
                   one fix agent applies all
                              ▼
-       regenerate Use cases section → re-run Verify
+     regenerate Scenarios views → re-run Verify
 ```
 
 - Spawn both reviewers in **one message**, so they run in parallel. Each is a **fresh** agent (not the one that built the mock) with a **review-only** prompt: it edits no file.
@@ -35,7 +35,7 @@ Question: **"Would a user think this IS the real app?"**
     - column names and order, badge styles;
     - which controls are hidden and which are shown unavailable;
     - every copy string: labels, titles, tooltips, empty and error text, toast text.
-- Ignore the mock-only pink panels and the use-case wrapper page (`index.html`).
+- Ignore the mock-only pink panels and the scenario wrapper page (`index.html`).
 - Report:
     - numbered findings, each with severity `HIGH` / `MEDIUM` / `LOW`, the mock `file:line`, the real `file:line`, and the exact class string or text to use;
     - a verdict: `MATCHES` / `MOSTLY MATCHES` / `DOES NOT MATCH`.
@@ -44,23 +44,23 @@ Question: **"Would a user think this IS the real app?"**
 
 Agent: general-purpose.
 
-Question: **"Does every use case behave as the spec says?"**
+Question: **"Does every scenario behave as the spec says?"**
 
-- Standalone mock: load the mock's JS into a Node `vm` (stub `location`, `sessionStorage`, `window`). `scripts/check-use-cases.js` shows how; reuse its `sandbox()`.
-    - Run every use case that has `op` / `req` under its scenario.
-    - For a screen use case, call the RPCs the screen calls with the params it sends, and check the data supports each step (the MR, version or row the step names exists, the filter returns what `expect` says).
-- In-project mock: read `_mock/use<Screen>.ts` and `rules.ts`, and trace each use case through them.
+- Standalone mock: load the mock's JS into a Node `vm` (stub `location`, `sessionStorage`, `window`). `scripts/check-scenarios.js` shows how; reuse its `sandbox()`.
+    - Run every scenario that has `op` / `req` under its mock state.
+    - For a screen scenario, call the RPCs the screen calls with the params it sends, and check the data supports each step (the MR, version or row the step names exists, the filter returns what `expect` says).
+- In-project mock: read `_mock/use<Screen>.ts` and `rules.ts`, and trace each scenario through them.
 - Compare every code and exact message with `spec.md` and `contracts/`.
 - Read the screen logic for dead buttons, wrong or ignored query params, and state leaking between frames (storage keys the index does not clear).
-- List every acceptance scenario, edge case and refusal row in the spec that has **no** use case in `<plan>/use-cases.js`, and every `skip` that could be played.
-- Report: numbered findings, each with severity, use-case id, `file:line`, spec line and the fix; then the gaps.
+- List every acceptance scenario, edge case and refusal row in the spec that has **no** scenario in `<plan>/use-cases.js`, and every `skip` that could be played.
+- Report: numbered findings, each with severity, scenario id, `file:line`, spec line and the fix; then the gaps.
 
 ## 3. Merge and fix
 
 - Merge the two reports into one numbered list.
-- When the UI review and a use case disagree (e.g. the mock has a control the real app lacks), settle it against the **spec first, then the real code**. Write down which won and why.
+- When the UI review and a scenario disagree (e.g. the mock has a control the real app lacks), settle it against the **spec first, then the real code**. Write down which won and why.
 - Apply every fix with **one fresh fix agent** — never one of the reviewers. Give it the merged list and the files; it reports each finding as fixed or not fixable, with why.
-    - A missing or wrong use case (title, `expect`, a gap) is fixed in `<plan>/use-cases.js` with the `generate-use-case` skill's rules, then `scripts/check.js` there. Everything else is fixed in the mock.
-- Then regenerate the overview's Use cases views (`use-cases-panels.js`, see `SKILL.md` step 7) and re-run Verify.
+    - A missing or wrong scenario (title, `expect`, a gap) is fixed in `<plan>/use-cases.js` with the `generate-use-case` skill's rules, then `scripts/check.js` there. Everything else is fixed in the mock.
+- Then regenerate the overview's Scenarios views (`scenarios-panels.js`, see `SKILL.md` step 7) and re-run Verify.
 - Don't run the reviewers a second time, unless the fix agent reports a finding it could not apply.
 - Confirm step: the two verdicts, the number of findings by severity, how many were fixed, and every conflict with the side that won.

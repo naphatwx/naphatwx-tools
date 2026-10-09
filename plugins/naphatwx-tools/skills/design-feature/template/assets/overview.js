@@ -70,9 +70,9 @@ railLinks.forEach(a => a.addEventListener("click", () => { pinnedLink = a; setAc
 addEventListener("scroll", spy, { passive: true });
 spy();
 
-// ===== Flow views: disclosure buttons (aria-expanded), all closed at first; one panel open per flow,
+// ===== Use case views: disclosure buttons (aria-expanded), all closed at first; one panel open per use case,
 // and clicking the open view's button closes it.
-const flows = [...document.querySelectorAll(".flow")];
+const useCases = [...document.querySelectorAll(".use-case")];
 const viewButtons = [...document.querySelectorAll(".views button[aria-controls]")];
 function selectView(btn, force) {
     const open = force ?? btn.getAttribute("aria-expanded") !== "true";
@@ -92,15 +92,15 @@ viewButtons.forEach(btn => {
     btn.addEventListener("click", () => selectView(btn));
 });
 document.querySelectorAll(".panel").forEach(p => p.addEventListener("animationend", () => p.classList.remove("entering")));
-// the flow a 1–4 key acts on: the current slide when presenting, else the flow nearest the top of the screen
-function flowInView() {
-    if (presenting()) return steps[current]?.slide.classList.contains("flow") ? steps[current].slide : null;
+// the use case a 1–4 key acts on: the current slide when presenting, else the one nearest the top of the screen
+function useCaseInView() {
+    if (presenting()) return steps[current]?.slide.classList.contains("use-case") ? steps[current].slide : null;
     let best = null;
-    for (const f of flows) { if (f.getBoundingClientRect().top < innerHeight * 0.5) best = f; }
+    for (const f of useCases) { if (f.getBoundingClientRect().top < innerHeight * 0.5) best = f; }
     return best && best.getBoundingClientRect().bottom > 0 ? best : null;
 }
 
-// ===== Open all: shows every flow view stacked (remembered) =====
+// ===== Open all: shows every use case view stacked (remembered) =====
 const openAll = document.getElementById("openAll");
 function setAll(on) {
     root.setAttribute("data-all", on ? "on" : "off");
@@ -111,7 +111,7 @@ function setAll(on) {
 setAll(store.get("plan-all") === "on");
 openAll.addEventListener("click", () => setAll(root.getAttribute("data-all") !== "on"));
 
-// ===== Present: one step per screen. A flow gives one step per view; an API section one per RPC.
+// ===== Present: one step per screen. A use case gives one step per view; an API section one per RPC.
 // Long steps scroll down; nothing scrolls sideways. ← → or Space step, Esc leaves.
 const slides = [...document.querySelectorAll(".slide")];
 const hud = document.getElementById("hud");
@@ -193,7 +193,7 @@ function show(i) {
 }
 function setPresent(on) {
     if (on) {
-        // the last section whose top has passed 30% of the window: a short flow at the top still counts
+        // the last section whose top has passed 30% of the window: a short use case at the top still counts
         const near = slides.filter(s => s.getBoundingClientRect().top <= innerHeight * 0.3).pop() || slides[0];
         root.setAttribute("data-present", "on");
         hud.hidden = false;
@@ -242,7 +242,7 @@ document.addEventListener("keydown", (e) => {
     if (k === "p" || k === "P") { setPresent(!presenting()); return; }
     if (k === "?") { openKeys(); return; }
     if (["1", "2", "3", "4"].includes(k)) {
-        const tab = flowInView()?.querySelectorAll(".views button[aria-controls]")[+k - 1];
+        const tab = useCaseInView()?.querySelectorAll(".views button[aria-controls]")[+k - 1];
         if (!tab || tab.disabled) return;
         selectView(tab);
         const panel = document.getElementById(tab.getAttribute("aria-controls"));
@@ -336,7 +336,7 @@ lightbox.innerHTML = '<button type="button" class="lightbox-close" title="Close 
 let lit = null;
 function caption(box) {
     const section = box.closest(".slide");
-    const title = section?.querySelector("h2, h3")?.textContent.replace(/^[\d.]+/, "").trim() || "";
+    const title = section?.querySelector("h2, h3")?.textContent.replace(/^(UC\d+|[\d.]+)/, "").trim() || "";
     const kind = box.closest(".panel")?.dataset.label || "";
     return [title, kind].filter(Boolean).join(" — ");
 }

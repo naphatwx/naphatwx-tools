@@ -10,14 +10,14 @@ web
 
 ## Users
 - Primary: engineers, leads and PMs in a feature design review meeting. One presenter shares the plan on a screen; others watch and ask questions.
-- The presenter walks flows in order: flow 1 → N, each as logic (flowchart), then service calls (sequence diagram), then rules.
+- The presenter walks use cases in order: UC1 → N, each as logic (flowchart), then service calls (sequence diagram), then rules, then scenarios.
 
 ## Product Purpose
 - Turn a spec, ticket or idea into a browsable plan folder that a team can review in one sitting.
-- Success: reviewers understand each flow, the database delta and the API delta, and leave with open questions written down.
+- Success: reviewers understand each use case, the database delta and the API delta, and leave with open questions written down.
 
 ## Positioning
-- One folder joins every flow's logic and service calls with the real permission keys, RPCs, fields and error codes, plus DB and API deltas marked add / change / drop.
+- One folder joins every use case's logic and service calls with the real permission keys, RPCs, fields and error codes, plus DB and API deltas marked add / change / drop.
 
 ## Operating Context
 - Opened from disk via `file://` (repo checkout or local folder). No server.
@@ -29,7 +29,7 @@ web
 - Diagrams come from two modes, and both must keep working: manual (SVG flowcharts + `render.js` sequence diagrams) and diagram-design (iframe embeds).
 - Detail stays hidden until opened: diagrams, rules, full schema and full contracts.
 - DB columns and API fields carry `+ add`, `~ change`, `− drop` marks.
-- Sections: overview + summary, scope, flows, database changes + ER page, API changes + shared types + full contracts, errors, mock UI, open questions.
+- Sections: overview + summary, scope, use cases (flowchart, sequence, rules, scenarios), database changes + ER page, API changes + shared types + full contracts, errors, open questions. The mock UI is its own page, linked from the use cases.
 
 ## Brand Commitments
 - Dark theme is the default.
@@ -39,7 +39,7 @@ web
 - Template: `plugins/naphatwx-tools/skills/design-feature/template/`. Content there is placeholder; no real feature data ships with the skill.
 
 ## Product Principles
-1. The meeting path comes first: walking flows in order must be effortless on a shared screen.
+1. The meeting path comes first: walking use cases in order must be effortless on a shared screen.
 2. Real identifiers over prose: permission keys, RPCs, fields and codes are the content.
 3. Show the delta, keep the whole one click away.
 4. Template-safe: every structure must be fillable by an agent without hand-tuned layout.

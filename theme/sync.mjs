@@ -92,7 +92,7 @@ const PREVIEWS = [
     [DF + 'database/er-diagram.html', 'generate-diagram/template/er/er-diagram.html'],
 ];
 // Preview files that differ on purpose: design-feature's own example data, or diagram-design stand-ins.
-const OWN = new Set([DF + 'mock/shared/use-case-play.js', DF + 'flowchart/02-example-flow.html', DF + 'sequence-diagram/02-example-flow.html']);
+const OWN = new Set([DF + 'mock/shared/scenario-play.js', DF + 'mock/shared/states.js', DF + 'flowchart/02-example-flow.html', DF + 'sequence-diagram/02-example-flow.html']);
 // Source files the preview doesn't need: the overview embeds the diagrams, not the standalone viewer.
 const SOURCE_ONLY = new Set(['generate-diagram/template/sequence-diagram/index.html']);
 const filesOf = (p) => (statSync(p).isDirectory()

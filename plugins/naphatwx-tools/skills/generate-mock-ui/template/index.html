@@ -121,7 +121,7 @@
         a.panel:hover { border-color: var(--accent); }
         /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
            the guide sits beside the frame, not above it, so steps and the whole screen show at once;
-           on mid widths it tops the side list: the open use case matters more than the others */
+           on mid widths it tops the side list: the open scenario matters more than the others */
         .uc-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: 17rem minmax(0, 1fr) 20rem; grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
         .uc-row > .tabs { grid-area: tabs; } .uc-row > .card { grid-area: card; } .uc-row > .guide { grid-area: guide; }
         .tabs, .guide { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
@@ -135,7 +135,7 @@
         .tab-s { text-transform: uppercase; }
         .tab-t { flex: 1; min-width: 0; }
         .tab:hover { color: var(--text); background: var(--surface); }
-        /* solid accent fill: the picked use case reads at a glance among 8+ rows */
+        /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
         .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
         .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
         .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
@@ -154,25 +154,25 @@
     </style>
     <script src="contract/rules.js"></script>
     <script src="contract/data.js"></script>
-    <script src="shared/scenarios.js"></script>
+    <script src="shared/states.js"></script>
     <script src="shared/components.js"></script>
     <script src="shared/fake-api.js"></script>
     <script src="../use-cases.js"></script>
-    <script src="shared/use-case-play.js"></script>
+    <script src="shared/scenario-play.js"></script>
 </head>
 
 <body>
     <div class="page py-6 space-y-8">
         <header>
-            <a href="../overview.html#flows" class="link">← Feature plan</a>
+            <a href="../overview.html#use-cases" class="link">← Feature plan</a>
             <h1 class="font-bold mt-2">Mock UI · Feature name</h1>
         </header>
 
-        <div id="flows" class="space-y-8"></div>
+        <div id="use-cases" class="space-y-8"></div>
 
         <section>
             <h2 class="font-bold mb-1">Audit log (this browser session)</h2>
-            <p class="meta mb-3 measure">What the real service writes: audit rows, events. Picking or restarting a use case clears it.</p>
+            <p class="meta mb-3 measure">What the real service writes: audit rows, events. Picking or restarting a scenario clears it.</p>
             <div id="log"></div>
         </section>
 
@@ -189,78 +189,78 @@
     <script>
         const SCREEN_W = 1600, SCREEN_H = 940;
         const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
-        const nn = flow => flow.split('.')[1].padStart(2, '0');
-        const ucsOf = flow => USE_CASES.filter(u => u.flow === flow);
-        const scenarioOf = uc => Scenarios.LIST.find(s => s.id === uc.scenario);
+        const nn = ucId => ucId.slice(2).padStart(2, '0');
+        const scsOf = ucId => SCENARIOS.filter(s => s.useCase === ucId);
+        const stateOf = sc => States.LIST.find(s => s.id === sc.state);
 
-        function screenSrc(uc) {
-            const q = new URLSearchParams({ scenario: uc.scenario, uc: uc.id, embed: '1', ...(uc.params || {}) });
-            return `page/${uc.page}.html?${q}`;
+        function screenSrc(sc) {
+            const q = new URLSearchParams({ state: sc.state, sc: sc.id, embed: '1', ...(sc.params || {}) });
+            return `page/${sc.page}.html?${q}`;
         }
-        // The URL the real app would show for this use case: edit the route to the app's own.
-        function screenUrl(uc) {
-            if (uc.page === 'console') return `MCP client · <ServiceName> · ${uc.op}`;
-            const q = new URLSearchParams(uc.params || {}); q.delete('modal');
-            return `localhost:3000/owners/${scenarioOf(uc).ownerId}${q.size ? '?' + q : ''}${uc.params?.modal ? ' · ' + uc.params.modal : ''}`;
+        // The URL the real app would show for this scenario: edit the route to the app's own.
+        function screenUrl(sc) {
+            if (sc.page === 'console') return `MCP client · <ServiceName> · ${sc.op}`;
+            const q = new URLSearchParams(sc.params || {}); q.delete('modal');
+            return `localhost:3000/owners/${stateOf(sc).ownerId}${q.size ? '?' + q : ''}${sc.params?.modal ? ' · ' + sc.params.modal : ''}`;
         }
-        /** Each use case starts from a clean mock: no rows written by another card, empty audit log. */
-        function clearState() {
+        /** Each scenario starts from a clean mock: no rows written by another card, empty audit log. */
+        function clearStore() {
             try { Object.keys(sessionStorage).filter(k => k.startsWith(FakeApi.STORE + ':')).forEach(k => sessionStorage.removeItem(k)); } catch { }
             renderLog();
         }
 
-        // ---------------------------------------------------------------- one block per flow
-        document.getElementById('flows').innerHTML = USE_CASE_FLOWS.map(f => {
-            const ucs = ucsOf(f.flow);
+        // ---------------------------------------------------------------- one block per use case
+        document.getElementById('use-cases').innerHTML = USE_CASES.map(uc => {
+            const scs = scsOf(uc.id);
             const head = `
               <div class="mb-2">
-                <h2 class="font-bold"><span class="meta mr-2">${f.flow}</span>${UI.esc(f.title)}</h2>
-                <div class="t-code font-mono meta mt-1">${UI.esc(f.refs)} · <a href="../overview.html#flow-${nn(f.flow)}" class="link">plan</a></div>
+                <h2 class="font-bold"><span class="meta mr-2">${uc.id}</span>${UI.esc(uc.title)}</h2>
+                <div class="t-code font-mono meta mt-1">${UI.esc(uc.refs)} · <a href="../overview.html#uc-${nn(uc.id)}" class="link">plan</a></div>
               </div>`;
-            const skipped = USE_CASES_SKIPPED.filter(u => u.flow === f.flow);
-            if (!ucs.length) return `<section id="flow-${nn(f.flow)}">${head}<p class="muted measure">${UI.esc(f.none || skipped[0]?.skip || 'No use case to play.')}</p></section>`;
+            const skipped = SCENARIOS_SKIPPED.filter(s => s.useCase === uc.id);
+            if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted measure">${UI.esc(uc.none || skipped[0]?.skip || 'No scenario to play.')}</p></section>`;
             return `
-              <section id="flow-${nn(f.flow)}" data-flow="${f.flow}">
+              <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
                 ${head}
                 <div class="uc-row">
-                <div class="tabs" role="tablist" aria-label="Use cases of flow ${f.flow}">
-                  ${ucs.map((u, i) => `<button type="button" role="tab" class="tab" data-uc="${u.id}" aria-selected="false" onclick="pick('${u.id}', true)"><span class="tab-n">${i + 1}</span><span class="tab-t">${UI.esc(u.title)}</span><span class="tab-s">${UI.esc(u.surface || '')}</span></button>`).join('')}
+                <div class="tabs" role="tablist" aria-label="Scenarios of ${uc.id}">
+                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"><span class="tab-n">${i + 1}</span><span class="tab-t">${UI.esc(s.title)}</span><span class="tab-s">${UI.esc(s.surface || '')}</span></button>`).join('')}
                 </div>
                 <div class="card"></div>
                 <aside class="guide" aria-label="How to play and what you should see"></aside>
                 </div>
-                ${skipped.map(u => `<p class="meta measure mt-2">Not in the mock: ${UI.esc(u.title)} — ${UI.esc(u.skip)}</p>`).join('')}
+                ${skipped.map(s => `<p class="meta measure mt-2">Not in the mock: ${UI.esc(s.title)} — ${UI.esc(s.skip)}</p>`).join('')}
               </section>`;
         }).join('');
 
         function pick(id, fromClick) {
-            const uc = USE_CASES.find(u => u.id === id);
-            const block = document.querySelector(`section[data-flow="${uc.flow}"]`);
-            block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.uc === id)));
-            if (fromClick) { clearState(); history.replaceState(null, '', '#uc-' + id); }
+            const sc = SCENARIOS.find(s => s.id === id);
+            const block = document.querySelector(`section[data-use-case="${sc.useCase}"]`);
+            block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sc === id)));
+            if (fromClick) { clearStore(); history.replaceState(null, '', '#sc-' + id); }
             block.querySelector('.card').innerHTML = `
-              <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="font-semibold">${UI.esc(uc.title)}</h3><span class="t-code font-mono meta">${UI.esc(uc.story)} · ${UI.esc(scenarioOf(uc).label)}</span></div>
+              <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap"><h3 class="font-semibold">${UI.esc(sc.title)}</h3><span class="t-code font-mono meta">${UI.esc(sc.story)} · ${UI.esc(stateOf(sc).label)}</span></div>
               <div class="frame mt-2">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
-                  <span class="url">${UI.esc(screenUrl(uc))}</span>
+                  <span class="url">${UI.esc(screenUrl(sc))}</span>
                   <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
-                  <button type="button" onclick="restart('${uc.id}')" class="btn-ghost">↻ Restart</button>
+                  <button type="button" onclick="restart('${sc.id}')" class="btn-ghost">↻ Restart</button>
                 </div>
-                <div class="fit"><iframe title="${UI.esc(uc.title)} — interactive mock" src="${screenSrc(uc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>
+                <div class="fit"><iframe title="${UI.esc(sc.title)} — interactive mock" src="${screenSrc(sc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>
               </div>`;
             block.querySelector('.guide').innerHTML = `
               <div class="label mb-1">How to play</div>
-              <ol class="list-decimal pl-5 space-y-1 muted">${list(uc.steps)}</ol>
+              <ol class="list-decimal pl-5 space-y-1 muted">${list(sc.steps)}</ol>
               <div class="label mt-4 mb-1">What you should see</div>
-              <ul class="list-disc pl-5 space-y-1 muted">${list(uc.expect)}</ul>`;
+              <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>`;
             fit(block);
         }
-        function restart(id) { clearState(); pick(id); }
+        function restart(id) { clearStore(); pick(id); }
 
         function fit(block) {
             const box = block.querySelector('.fit'); if (!box) return;
-            // fit the card's width and the window's height: the flow heading, title, toolbar and frame show without scrolling
+            // fit the card's width and the window's height: the use case heading, title, toolbar and frame show without scrolling
             const above = box.getBoundingClientRect().top - block.getBoundingClientRect().top;
             const s = Math.min(1, block.querySelector('.card').clientWidth / SCREEN_W, (innerHeight - above - 48) / SCREEN_H);
             box.querySelector('iframe').style.transform = `scale(${s})`;
@@ -268,8 +268,8 @@
             box.closest('.frame').style.width = Math.round(SCREEN_W * s) + 2 + 'px';
             block.querySelector('.scale-label').textContent = `${Math.round(s * 100)}% of ${SCREEN_W} px`;
         }
-        new ResizeObserver(() => document.querySelectorAll('section[data-flow]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #flows
-        addEventListener('resize', () => document.querySelectorAll('section[data-flow]').forEach(fit)); // height-only changes skip the observer
+        new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
+        addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer
 
         function renderLog() {
             const rows = FakeApi.log();
@@ -280,14 +280,14 @@
             if (el.innerHTML !== html) el.innerHTML = html;
         }
 
-        clearState(); // a reload starts clean too: rows written in an earlier visit would leak into every card
-        // first use case of every flow, or the one in the URL (#uc-<id>, from the plan's links)
-        const wanted = USE_CASES.find(u => location.hash === '#uc-' + u.id);
-        USE_CASE_FLOWS.forEach(f => { const first = ucsOf(f.flow)[0]; if (first) pick(wanted?.flow === f.flow ? wanted.id : first.id); });
-        if (wanted) document.querySelector(`section[data-flow="${wanted.flow}"]`).scrollIntoView();
+        clearStore(); // a reload starts clean too: rows written in an earlier visit would leak into every card
+        // first scenario of every use case, or the one in the URL (#sc-<id>, from the plan's links)
+        const wanted = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
+        USE_CASES.forEach(uc => { const first = scsOf(uc.id)[0]; if (first) pick(wanted?.useCase === uc.id ? wanted.id : first.id); });
+        if (wanted) document.querySelector(`section[data-use-case="${wanted.useCase}"]`).scrollIntoView();
         addEventListener('hashchange', () => {
-            const uc = USE_CASES.find(u => location.hash === '#uc-' + u.id);
-            if (uc) { clearState(); pick(uc.id); document.querySelector(`section[data-flow="${uc.flow}"]`).scrollIntoView(); }
+            const sc = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
+            if (sc) { clearStore(); pick(sc.id); document.querySelector(`section[data-use-case="${sc.useCase}"]`).scrollIntoView(); }
         });
         setInterval(renderLog, 1500); // the screens write the log from inside their frames
     </script>

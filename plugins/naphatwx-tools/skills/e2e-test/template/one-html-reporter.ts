@@ -23,9 +23,9 @@ type TestOut = {
   trace?: string
   annotations: Note[]
   attempts: Attempt[]
-  // From the test's `flow` and `use case` annotations (generate-use-case ids); the report groups by flow.
-  flow?: string
+  // From the test's `use case` and `scenario` annotations (generate-use-case ids); the report groups by use case.
   useCase?: string
+  scenario?: string
 }
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -92,8 +92,8 @@ export default class OneHtmlReporter implements Reporter {
       trace: trace ? relative(this.configDir, trace.path!).split('\\').join('/') : undefined,
       annotations,
       attempts,
-      flow: tag('flow'),
       useCase: tag('use case'),
+      scenario: tag('scenario'),
     })
   }
 

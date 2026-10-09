@@ -11,14 +11,14 @@
     </style>
     <script src="../contract/rules.js"></script>
     <script src="../contract/data.js"></script>
-    <script src="../shared/scenarios.js"></script>
+    <script src="../shared/states.js"></script>
     <script src="../shared/components.js"></script>
     <script src="../shared/fake-api.js"></script>
     <script src="../../use-cases.js"></script>
-    <script src="../shared/use-case-play.js"></script>
+    <script src="../shared/scenario-play.js"></script>
 </head>
 
-<!-- An MCP (or API) client calling the feature's operations. ?scenario= sets the caller and faults; ?uc= presets op + request. -->
+<!-- An MCP (or API) client calling the feature's operations. ?state= sets the caller and faults; ?sc= presets op + request. -->
 <body class="antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
     <div class="p-8 space-y-6">
         <div class="flex items-center justify-between gap-4">
@@ -45,12 +45,12 @@
         </div>
     </div>
     <script>
-        const uc = USE_CASES.find(u => u.id === Scenarios.params.get('uc'));
+        const sc = SCENARIOS.find(s => s.id === States.params.get('sc'));
         const op = document.getElementById('op'), reqBody = document.getElementById('reqBody'), resBody = document.getElementById('resBody');
-        document.getElementById('who').innerHTML = `scenario ${UI.esc(Scenarios.current.label)}<br>${Scenarios.current.perms.map(p => `<code>${p}</code>`).join(' ')}`;
-        const wantOp = uc?.op || Scenarios.params.get('op');
+        document.getElementById('who').innerHTML = `state ${UI.esc(States.current.label)}<br>${States.current.perms.map(p => `<code>${p}</code>`).join(' ')}`;
+        const wantOp = sc?.op || States.params.get('op');
         op.innerHTML = Object.keys(FakeApi.SAMPLES).map(k => `<option ${wantOp === k ? 'selected' : ''}>${k}</option>`).join('');
-        const fill = () => { reqBody.value = JSON.stringify(uc && op.value === uc.op ? uc.req : FakeApi.SAMPLES[op.value], null, 2); };
+        const fill = () => { reqBody.value = JSON.stringify(sc && op.value === sc.op ? sc.req : FakeApi.SAMPLES[op.value], null, 2); };
         op.onchange = fill; fill();
         document.getElementById('runBtn').onclick = async () => {
             resBody.textContent = '…';

@@ -162,7 +162,9 @@ td .aside { color: var(--text-2); font-size: var(--fs-body); font-weight: 400; }
     text-decoration: none;
 }
 .rail-list a:hover { color: var(--text); background: var(--surface-2); }
-.rail-list .n { flex: none; color: var(--text-3); width: 24px; font-variant-numeric: tabular-nums; }
+.rail-list .n { flex: none; color: var(--text-3); min-width: 24px; font-variant-numeric: tabular-nums; }
+/* nested numbers (UC1, 4.1, 5.1) share one column so their labels line up */
+.rail-list ol .n { min-width: 32px; }
 .rail-list ol a { padding-top: 7px; padding-bottom: 7px; padding-left: 40px; }
 .rail-list a.active { color: var(--accent); background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); font-weight: 600; }
 .rail-list a.active .n { color: var(--accent); }
@@ -193,7 +195,7 @@ html[data-rail="collapsed"] .rail-edge svg { transform: rotate(180deg); }
 html[data-rail="collapsed"] .sheet { margin-left: 0; }
 .slide { max-width: var(--measure); margin: 0 auto; }
 .slide + .slide { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
-.slide.flow + .slide.flow, #flows + .flow { border-top-color: transparent; margin-top: 36px; padding-top: 0; }
+.slide.use-case + .slide.use-case, #use-cases + .use-case { border-top-color: transparent; margin-top: 36px; padding-top: 0; }
 /* diagram panels: no max width, as wide as the window beside the rail */
 .wide { width: calc(100vw - var(--rail-w) - 80px); margin-left: 50%; transform: translateX(-50%); }
 
@@ -225,17 +227,17 @@ h2 + .facts { margin-top: 0; }
     color: var(--accent);
 }
 
-/* ============ FLOWS ============ */
-.flow-index { list-style: none; padding: 0; margin-top: 12px; border-top: 1px solid var(--line); }
-.flow-index li { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; border-bottom: 1px solid var(--line); margin: 0; }
-.flow-index a { color: var(--text); }
-.flow-index .aside { color: var(--text-3); font-size: var(--fs-body); }
-.flow-index .n { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
+/* ============ USE CASES ============ */
+.uc-index { list-style: none; padding: 0; margin-top: 12px; border-top: 1px solid var(--line); }
+.uc-index li { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; border-bottom: 1px solid var(--line); margin: 0; }
+.uc-index a { color: var(--text); }
+.uc-index .aside { color: var(--text-3); font-size: var(--fs-body); }
+.uc-index .n { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
 
-.flow-head { display: flex; flex-direction: column; gap: 4px; }
+.uc-head { display: flex; flex-direction: column; gap: 4px; }
 .refs { font: var(--fs-code)/1.6 var(--mono); color: var(--text-3); }
-.flow-line { margin-top: 2px; color: var(--text); }
-.flow-line .aside { margin-left: 4px; }
+.uc-line { margin-top: 2px; color: var(--text); }
+.uc-line .aside { margin-left: 4px; }
 
 .views { display: flex; gap: 4px; margin-top: 10px; padding: 3px; width: fit-content; border: 1px solid var(--line); border-radius: 10px; }
 .views button {
@@ -479,7 +481,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 .keys-close:hover { background: var(--surface-3); }
 
 /* ============ PRESENT MODE: one step per screen; long steps scroll down, never sideways ============ */
-/* a flow's h3 is its slide title here, so it takes the h2 size */
+/* a use case's h3 is its slide title here, so it takes the h2 size */
 html[data-present="on"] { --fs-h3: var(--fs-xl); }
 html[data-present="on"], html[data-present="on"] body { overflow-x: hidden; }
 html[data-present="on"] .rail, html[data-present="on"] .rail-edge, html[data-present="on"] .tools,
