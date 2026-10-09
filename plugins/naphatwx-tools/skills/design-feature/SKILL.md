@@ -137,7 +137,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     1. **Overview**: the `<h1>`, a one-sentence `.lead` + a `<dl class="facts">` of 3–4 key facts (key decision, data impact, API impact, UI impact or eligibility/scale), each `<dd>` one short line; a fact about data or API ends with a link to its section.
     2. **Scope**: the `.scope` block, full width: `<h3>In scope</h3>` with its bullet list, then `<h3>Out of scope</h3>` with its bullet list below it. Each out-of-scope item ends with its reason in `<span class="aside">— why</span>`.
     3. **Use cases**: one muted line naming the four views, then an `ol.uc-index` with one row per use case (`UC<n>` + name, link to `#uc-NN`, user story and priority on the right). Then one block per use case (copy the block between the `one block per use case` comments):
-        - `<header class="uc-head">`: `<h3>` with `<span class="sec-n">UC<n></span>` + the use case name, then `<p class="refs">` with its tags (user story, requirement ids joined by ` · `; no file names).
+        - `<header class="uc-head">`: `<h3>` with `<span class="sec-n">UC<n></span>` + the use case name, then `<p class="refs">` with its tags (user story, requirement ids joined by ` · `; no file names). The CSS puts them on the right of the title row.
         - `<p class="uc-line">`: the user's goal in one sentence, then `<span class="aside">Starts from <trigger>.</span>`.
         - The `.views` button row and four panels, ids `uc-NN-chart`, `uc-NN-seq`, `uc-NN-rules`, `uc-NN-sc` (buttons `…-tab`, linked by `aria-controls` / `aria-labelledby`):
             - Flowchart panel (`.panel.wide`): `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
@@ -145,6 +145,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
             - Scenarios button and panel (`.panel`, not wide, always last in the block): leave them out of the fragment. `node <this skill dir>/scripts/scenarios-panels.js <output>`, run once the use case blocks are in, writes them from `use-cases.js`:
                 - Button `Scenarios (K)`, K = the use case's scenario count.
+                - An `<h4>Scenarios</h4>` title at the top of the panel.
                 - A `.table-wrap` table: Scenario (title + first expect line in `.aside`) | Story | with a mock, `Play ↗` → `mock/index.html#sc-<id>` (new tab), or "not in the mock" for a skipped one. A use case with no scenario → one `.muted` line with its `none` sentence.
                 - With a mock, it also adds `.side-link` "Open the mock ↗" (new tab) to the Use cases `<h2>`.
     4. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
