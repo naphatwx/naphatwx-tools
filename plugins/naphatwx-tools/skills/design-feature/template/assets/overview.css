@@ -94,6 +94,8 @@ a { color: var(--accent); }
 code, kbd, pre, samp { font-family: var(--mono); }
 /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
 .label, th, dt { color: var(--text-2); font-weight: 600; }
+/* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
+th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -420,7 +422,7 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 .tbl.new .tbl-head { background: var(--ok-soft); }
 .tbl.drop .tbl-head { background: var(--bad-soft); }
 .tbl.drop .tbl-head > :first-child { text-decoration: line-through; text-decoration-thickness: 1px; }
-.tag { flex: none; white-space: nowrap; font: 500 var(--fs-body) var(--sans); color: var(--text-2); }
+.tag { flex: none; white-space: nowrap; font: 500 var(--fs-meta) var(--sans); color: var(--text-2); }
 .tbl.new .tag { color: var(--add); }
 .tbl.drop .tag { color: var(--drop); }
 .tbl.drop .row .col, .tbl.drop .row .type { color: var(--text-3); text-decoration: line-through; text-decoration-thickness: 1px; }
