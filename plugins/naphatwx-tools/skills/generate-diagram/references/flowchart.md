@@ -14,7 +14,7 @@ A flowchart shows one flow's logic: its steps, yes / no decisions, loops and end
 | Diamond | A yes / no question | accent `polygon`: fill `#1b2232`, stroke `#8ab0ff` |
 | Arrow | Next step, loop back (retry, reset) | grey `#6b6e78` path with arrowhead |
 
-- Shape carries the meaning; the diamond's blue is the only colour. Label text is `#e2e3e7`, detail lines `#c6c8cf` (mono), exit labels `#a3a6b0`, all 14px. These are the theme's `--text`, `--text-2`, `--text-3`.
+- Shape carries the meaning; the diamond's blue is the only colour. Label text is `#e2e3e7`, detail lines `#c6c8cf` (mono), exit labels `#a3a6b0`. Labels are 14px; detail lines and exit labels 12px. These are the theme's `--text`, `--text-2`, `--text-3`.
 - Labels are sentence case: `Yes`, `No`, `Retry`.
 
 - Every diamond has exactly two labelled exits (`Yes` / `No`, or two short outcomes). Every path ends at a pill or loops back to an earlier node.
@@ -66,9 +66,9 @@ Every label, detail line and condition a reader sees:
 ## Manual mode
 
 - Start from `template/flowchart/01-example-flow.svg`. Keep its `<title>` / `<desc>`, marker, colours and the mono `<g>` for detail lines. A standalone `.svg` can't read CSS variables, so it uses the theme's hex values directly.
-- Size shapes to the detail line at 14px mono (about 8.5px per character, plus 12px each side): boxes and pills ≥ 160 wide, diamonds ≥ 240 wide; a 28-char detail line needs a 260-wide box.
+- Size shapes to the detail line (about 8.5px per mono character, on the wide side, plus 12px each side): boxes and pills ≥ 160 wide, diamonds ≥ 240 wide; a 28-char detail line needs a 260-wide box.
 - Keep it compact so more of the flow fits on one screen: pills 44 tall, boxes 52, diamonds 96; about 30px of connector between shapes, 12–16px margin around the drawing.
-- Set the `viewBox` to fit, and `width` / `height` on the `<svg>` to the same numbers: a host page draws it at that 1:1 size, never scaled, so its 14px text renders at 14px (a wider drawing scrolls sideways). Lay nodes on a grid, main path top to bottom, branches to the sides; no line crosses a node.
+- Set the `viewBox` to fit, and `width` / `height` on the `<svg>` to the same numbers: a host page draws it at that 1:1 size, never scaled, so its text renders at its own size (a wider drawing scrolls sideways). Lay nodes on a grid, main path top to bottom, branches to the sides; no line crosses a node.
 - Save to `NN-<slug>.svg`. Don't copy the example itself to the output.
 
 ## Checks

@@ -39,7 +39,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - The HTML templates (sequence viewer, ER diagram) have an **Export PDF** button: it opens the print dialog and fits the diagram to the page width. Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
     - diagram-design mode: use the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) and skip its first-run style-guide question (the answer is always "proceed with the default"). Brief it so its output matches manual mode:
         - Colors: only the theme's values, the hexes in the `theme:tokens` block of `template/er/er-diagram.html`. Map its defaults: paper `#2d3142` → `#18191d`; `#393e53` → `#1f2025`; `#41465b` → `#363940`; ink `#f5f5f5` → `#e2e3e7`; muted `#bfc0c0` → `#c6c8cf`; tags `#8e98ac` → `#a3a6b0`; accent `#f08a59` → `#8ab0ff`; blue `#274a73` → `#1b2232`; amber → `#f0c26b`; red `#ab5258` → `#f28b8d`; connectors `#6b6e78`.
-        - Type: every label 14px (`font-size` 14 in viewBox units), sans and mono alike, with shapes sized to fit it. Hosts draw the SVG at 1:1, never scaled, so keep the viewBox at most about 1000 wide (wider scrolls sideways). Sentence case labels (`Yes`, `Retry`, `1 · Load`): no all-caps or letter-spaced tags. No dot-grid or patterned background.
+        - Type: main labels 14px (`font-size` 14 in viewBox units); secondary lines (detail, exit label, note, sub, type) 12px. Shapes keep the size that fits 14px. Hosts draw the SVG at 1:1, never scaled, so keep the viewBox at most about 1000 wide (wider scrolls sideways). Sentence case labels (`Yes`, `Retry`, `1 · Load`): no all-caps or letter-spaced tags. No dot-grid or patterned background.
         - Fonts: the OS font, never a web font. Delete the Google Fonts `<link>` (and any `preconnect`) and swap the font stacks: Geist and Instrument Serif → `-apple-system, "Segoe UI", system-ui, sans-serif`; Geist Mono → `ui-monospace, "SF Mono", Menlo, Consolas, monospace` (single quotes inside SVG `font-family="…"` attributes).
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
 6. A diagram file never holds a step details list. The caller's page shows it (see the sequence reference).
@@ -64,7 +64,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - diagram-design mode, `flowchart` and `sequence`: add this embed script just before `</body>` of every saved `.html`, unchanged. It is the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
     - Size: it posts `diagram-height` with `height` and `width` on every resize. The host sizes the iframe to the height (no fixed height); its lightbox uses the width to show the whole drawing, scaled.
     - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
-    - Width: each SVG draws at exactly its viewBox width (1:1, so 14px labels render at 14px) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host.
+    - Width: each SVG draws at exactly its viewBox width (1:1, so labels render at their own size) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host.
 
 ```html
 <script>
@@ -78,7 +78,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
   document.head.append(style);
   // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
   if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
-  // Draw each diagram at its viewBox width, never scaled, so 14px labels render at 14px; a narrow frame scrolls it sideways.
+  // Draw each diagram at its viewBox width, never scaled, so labels render at their own size; a narrow frame scrolls it sideways.
   const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
   svgs.forEach(svg => {
     Object.assign(svg.style, { width: svg.viewBox.baseVal.width + "px", maxWidth: "none", height: "auto" });

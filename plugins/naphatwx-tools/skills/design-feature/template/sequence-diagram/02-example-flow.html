@@ -49,8 +49,7 @@
         --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
         --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-        /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
-           --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+        /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
         --fs-xs: 0.75rem;
         --fs-sm: 0.875rem;
         --fs-md: 1rem;
@@ -62,6 +61,15 @@
         --fs-h3: var(--fs-lg);
         --fs-h2: var(--fs-xl);
         --fs-h1: var(--fs-2xl);
+        /* Roles: one step down per role, so the eye lands on body text first.
+           body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+        --fs-body: var(--fs-md);
+        --fs-meta: var(--fs-sm);
+        --fs-code: var(--fs-sm);
+        --fs-tag: var(--fs-xs);
+        /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+        --fs-dia: var(--fs-sm);
+        --fs-dia-sub: var(--fs-xs);
 
         /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
         --page-w: min(80%, 900px);
@@ -107,28 +115,28 @@
     .diagram { overflow-x: auto; }
     .diagram svg { display: block; width: 949px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
-    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: var(--fs-sm); color: var(--text-3); max-width: var(--page-w); margin: 8px auto 0; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: var(--fs-meta); color: var(--text-3); max-width: var(--page-w); margin: 8px auto 0; }
     .legend span::before { content: ""; display: inline-block; width: 26px; vertical-align: middle; margin-right: 6px; border-top: 2px solid var(--text-2); }
     .legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
     .legend .hot::before { border-color: var(--accent); }
     .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
-    .actor text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; }
-    .actor .sub { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 400; }
+    .actor text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; }
+    .actor .sub { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 400; }
     .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
     .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
     .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
     .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-    .lbl { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
+    .lbl { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
     .lbl.hot { fill: var(--accent); }
-    .num { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 600; }
+    .num { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
     .phase line { stroke: var(--line); }
     .phase rect { fill: var(--surface-2); }
-    .phase text { fill: var(--text-2); font-size: var(--fs-sm); font-weight: 600; }
+    .phase text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 600; }
     .note rect { fill: var(--bg); stroke: var(--line-strong); }
-    .note text { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
+    .note text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-family: var(--mono); }
     .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
     .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
-    .frame text { fill: var(--text); font-size: var(--fs-sm); font-weight: 700; }
+    .frame text { fill: var(--text); font-size: var(--fs-dia-sub); font-weight: 700; }
     .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
     .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
     .ah { fill: var(--text-2); }

@@ -45,8 +45,7 @@
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-    /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
-       --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+    /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
     --fs-xs: 0.75rem;
     --fs-sm: 0.875rem;
     --fs-md: 1rem;
@@ -58,6 +57,15 @@
     --fs-h3: var(--fs-lg);
     --fs-h2: var(--fs-xl);
     --fs-h1: var(--fs-2xl);
+    /* Roles: one step down per role, so the eye lands on body text first.
+       body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+    --fs-body: var(--fs-md);
+    --fs-meta: var(--fs-sm);
+    --fs-code: var(--fs-sm);
+    --fs-tag: var(--fs-xs);
+    /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+    --fs-dia: var(--fs-sm);
+    --fs-dia-sub: var(--fs-xs);
 
     /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
     --page-w: min(80%, 900px);
@@ -100,7 +108,7 @@ code, kbd, pre, samp { font-family: var(--mono); }
     z-index: 50;
     padding: 6px 12px;
     font: inherit;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-body);
     color: var(--text);
     background: var(--surface-2);
     border: 1px solid var(--line-strong);
@@ -117,12 +125,8 @@ code, kbd, pre, samp { font-family: var(--mono); }
 }
 /* theme:pdf:end */
 
-/* Page aliases onto the theme's type scale (projector page: body --fs-md), plus layout widths. */
+/* Layout widths. Font sizes use the theme's role tokens (--fs-body / meta / code / tag, --fs-dia / dia-sub). */
 :root {
-    --fs-body: var(--fs-md);
-    --fs-code: var(--fs-sm);
-    /* Headings and lead come from the theme (--fs-h1/h2/h3/lead). Everything else is one body size (--fs-md),
-       with code / kbd / pills at --fs-sm. Diagram labels inside SVGs are drawings and keep their own sizes. */
     --measure: var(--page-w);
     --rail-w: 320px;
 }
@@ -140,7 +144,7 @@ strong { color: var(--text); font-weight: 600; }
 .aside { color: inherit; }
 .muted { color: var(--text); }
 /* subordinate text under a title or in a table cell: lighter than the title it follows */
-td .aside { color: var(--text-2); font-size: var(--fs-body); font-weight: 400; }
+td .aside { color: var(--text-2); font-size: var(--fs-meta); font-weight: 400; }
 .nowrap { white-space: nowrap; }
 .skip {
     position: fixed; top: 12px; left: 12px; z-index: 60;
@@ -224,7 +228,7 @@ html[data-rail="collapsed"] .sheet { margin-left: 0; }
 /* diagram panels: no max width, as wide as the window beside the rail */
 .wide { width: calc(100vw - var(--rail-w) - 80px); margin-left: 50%; transform: translateX(-50%); }
 
-.kicker { font-size: var(--fs-body); color: var(--text-3); margin-bottom: 8px; }
+.kicker { font-size: var(--fs-meta); color: var(--text-3); margin-bottom: 8px; }
 h1 { font-size: var(--fs-h1); line-height: 1.08; letter-spacing: -0.025em; color: var(--text); font-weight: 650; text-wrap: balance; }
 h2 { font-size: var(--fs-h2); line-height: 1.2; letter-spacing: -0.015em; color: var(--text); font-weight: 600; margin-bottom: 12px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 14px; }
 h3 { font-size: var(--fs-h3); line-height: 1.3; color: var(--text); font-weight: 600; }
@@ -256,7 +260,7 @@ h2 + .facts { margin-top: 0; }
 .uc-index { list-style: none; padding: 0; margin-top: 12px; border-top: 1px solid var(--line); }
 .uc-index li { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; border-bottom: 1px solid var(--line); margin: 0; }
 .uc-index a { color: var(--text); }
-.uc-index .aside { color: var(--text-3); font-size: var(--fs-body); }
+.uc-index .aside { color: var(--text-3); font-size: var(--fs-meta); }
 .uc-index .n { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
 
 .uc-head { display: flex; flex-direction: column; gap: 2px; }
@@ -275,7 +279,7 @@ h2 + .facts { margin-top: 0; }
 .views button:hover:not(:disabled):not([aria-expanded="true"]) { color: var(--text); background: var(--surface-2); }
 .views button[aria-expanded="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
 .views button:disabled { color: var(--text-3); text-decoration: line-through; cursor: not-allowed; }
-.views kbd { font-size: var(--fs-code); color: inherit; opacity: 0.75; }
+.views kbd { font-size: var(--fs-tag); color: inherit; opacity: 0.75; }
 html[data-all="on"] .views { display: none; }
 
 .panel { margin-top: 10px; }
@@ -286,7 +290,7 @@ html[data-all="on"] .views { display: none; }
 .panel:not(.wide).entering { animation-name: panel-in-narrow; }
 @keyframes panel-in-narrow { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 html[data-all="on"] .panel[hidden] { display: block; }
-html[data-all="on"] .panel::before { content: attr(data-label); display: block; font-size: var(--fs-body); color: var(--text-3); margin-bottom: 8px; }
+html[data-all="on"] .panel::before { content: attr(data-label); display: block; font-size: var(--fs-meta); color: var(--text-3); margin-bottom: 8px; }
 .panel ul { color: var(--text); }
 
 /* ============ DIAGRAMS ============ */
@@ -305,7 +309,7 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .diagram-frame { display: block; width: 100%; height: 560px; border: 0; background: var(--surface); }
 
 /* inside the diagram box, under the drawing, at the text width */
-.seq-legend { display: flex; flex-wrap: wrap; gap: 20px; font-size: var(--fs-body); color: var(--text-3); max-width: var(--measure); margin: 10px auto 0; }
+.seq-legend { display: flex; flex-wrap: wrap; gap: 20px; font-size: var(--fs-meta); color: var(--text-3); max-width: var(--measure); margin: 10px auto 0; }
 .seq-legend span::before { content: ""; display: inline-block; width: 22px; vertical-align: middle; margin-right: 8px; border-top: 1.5px solid var(--text-2); }
 .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
 .seq-legend .hot::before { border-top: 2px solid var(--accent); }
@@ -313,23 +317,23 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .seq svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
 /* every label is --fs-sm (14px): the SVG draws at its own width and height, never scaled */
 .seq .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
-.seq .actor text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; }
-.seq .actor .sub { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 400; }
+.seq .actor text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; }
+.seq .actor .sub { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 400; }
 .seq .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
 .seq .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
 .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
 .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-.seq .lbl { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
+.seq .lbl { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
 .seq .lbl.hot { fill: var(--accent); }
-.seq .num { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 600; }
+.seq .num { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
 .seq .phase line { stroke: var(--line); }
 .seq .phase rect { fill: var(--surface-2); }
-.seq .phase text { fill: var(--text-2); font-size: var(--fs-sm); font-weight: 600; }
+.seq .phase text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 600; }
 .seq .note rect { fill: var(--bg); stroke: var(--line-strong); }
-.seq .note text { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
+.seq .note text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-family: var(--mono); }
 .seq .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
 .seq .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
-.seq .frame text { fill: var(--text); font-size: var(--fs-sm); font-weight: 700; }
+.seq .frame text { fill: var(--text); font-size: var(--fs-dia-sub); font-weight: 700; }
 .seq .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
 .seq .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
 .seq .ah { fill: var(--text-2); }
@@ -337,12 +341,12 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .seq .ah.hot { fill: var(--accent); }
 
 /* sits in the wide panel but keeps the text column's measure, centred under the diagram */
-.seq-steps { max-width: var(--measure); margin: 10px auto 0; font-size: var(--fs-body); }
+.seq-steps { max-width: var(--measure); margin: 10px auto 0; font-size: var(--fs-meta); }
 .seq-steps-title { font-size: var(--fs-body); margin-bottom: 6px; }
 .seq-steps ol { list-style: none; padding: 0; }
 /* inline flow: wrapped lines return to one left edge under the label, not a ragged gutter */
 .seq-steps li { padding: 2px 0 2px 28px; text-indent: -28px; margin: 0; }
-.seq-steps .n { display: inline-block; width: 28px; text-indent: 0; color: var(--text-3); font-size: var(--fs-code); font-family: var(--mono); }
+.seq-steps .n { display: inline-block; width: 28px; text-indent: 0; color: var(--text-3); font-size: var(--fs-tag); font-family: var(--mono); }
 .seq-steps code { margin-right: 4px; }
 
 /* zoom + lightbox */
@@ -360,7 +364,7 @@ html[data-zoom="on"] .zoom-shield, .in-lightbox .zoom-shield { display: block; }
     min-width: 40px; height: 40px; padding: 0 12px; border-radius: 9px;
     display: grid; place-items: center;
     background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--text);
-    font: 600 var(--fs-sm)/1 var(--sans); cursor: pointer;
+    font: 600 var(--fs-body)/1 var(--sans); cursor: pointer;
 }
 .zoom-tools .zoom-full { font-size: var(--fs-lg); }
 .zoom-tools button:hover { color: var(--text); background: var(--line-strong); }
@@ -384,7 +388,7 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 .lightbox-caption {
     position: absolute; left: 0; right: 0; bottom: 0; height: 5vh; margin: 0;
     display: flex; align-items: center; justify-content: center;
-    color: var(--text); font-size: var(--fs-body);
+    color: var(--text); font-size: var(--fs-meta);
 }
 .lightbox-caption:empty { display: none; }
 .lightbox-close {
@@ -457,8 +461,8 @@ details.more > summary {
 details.more > summary::-webkit-details-marker { display: none; }
 details.more > summary::before { content: "+"; font-family: var(--mono); color: var(--text-2); width: 12px; }
 details.more[open] > summary::before { content: "−"; }
-details.more > summary .aside { font-size: var(--fs-body); font-weight: 400; }
-h4 .aside { font-size: var(--fs-body); font-weight: 400; margin-left: 6px; }
+details.more > summary .aside { font-size: var(--fs-meta); font-weight: 400; }
+h4 .aside { font-size: var(--fs-meta); font-weight: 400; margin-left: 6px; }
 details.more > summary:hover { color: var(--accent); }
 details.more > :not(summary) { margin-bottom: 12px; }
 .api details.more { margin-top: 0; }
@@ -475,7 +479,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 .questions li { counter-increment: q; display: grid; grid-template-columns: 2rem 1fr; gap: 2px 8px; padding: 8px 0; border-bottom: 1px solid var(--line); margin: 0; }
 .questions li::before { content: counter(q); grid-row: span 2; font: 500 var(--fs-code)/1.65 var(--mono); color: var(--text-3); }
 .questions p { color: var(--text); }
-.questions .who { font-size: var(--fs-body); color: var(--text-3); }
+.questions .who { font-size: var(--fs-meta); color: var(--text-3); }
 
 /* ============ FLOATING TOOLS + HUD ============ */
 .tools, .hud {
@@ -490,7 +494,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 }
 .tools button:hover, .hud button:hover { background: var(--surface-2); color: var(--text); }
 .tools button[aria-pressed="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
-.tools kbd { font-size: var(--fs-code); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
+.tools kbd { font-size: var(--fs-tag); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
 .hud { left: 50%; right: auto; transform: translateX(-50%); align-items: center; }
 .hud[hidden] { display: none; }
 #hudLabel { padding: 0 10px; font: var(--fs-code) var(--mono); color: var(--text); font-variant-numeric: tabular-nums; min-width: 14ch; text-align: center; }
@@ -503,7 +507,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 .keys h2 { font-size: var(--fs-h3); margin-bottom: 12px; }
 .keys dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; align-items: baseline; }
 .keys dt { white-space: nowrap; }
-.keys kbd { display: inline-block; min-width: 24px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; text-align: center; font-size: var(--fs-sm); color: var(--text); }
+.keys kbd { display: inline-block; min-width: 24px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; text-align: center; font-size: var(--fs-tag); color: var(--text); }
 .keys-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: var(--radius); background: none; color: var(--text); font-size: var(--fs-lg); cursor: pointer; }
 .keys-close:hover { background: var(--surface-3); }
 

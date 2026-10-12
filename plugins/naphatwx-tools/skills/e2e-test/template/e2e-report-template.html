@@ -49,8 +49,7 @@
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-      /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
-         --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+      /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
       --fs-xs: 0.75rem;
       --fs-sm: 0.875rem;
       --fs-md: 1rem;
@@ -62,6 +61,15 @@
       --fs-h3: var(--fs-lg);
       --fs-h2: var(--fs-xl);
       --fs-h1: var(--fs-2xl);
+      /* Roles: one step down per role, so the eye lands on body text first.
+         body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+      --fs-body: var(--fs-md);
+      --fs-meta: var(--fs-sm);
+      --fs-code: var(--fs-sm);
+      --fs-tag: var(--fs-xs);
+      /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+      --fs-dia: var(--fs-sm);
+      --fs-dia-sub: var(--fs-xs);
 
       /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
       --page-w: min(80%, 900px);
@@ -104,7 +112,7 @@
       z-index: 50;
       padding: 6px 12px;
       font: inherit;
-      font-size: var(--fs-sm);
+      font-size: var(--fs-body);
       color: var(--text);
       background: var(--surface-2);
       border: 1px solid var(--line-strong);
@@ -121,7 +129,7 @@
   }
   /* theme:pdf:end */
 
-  body { font-size: var(--fs-md); line-height: 1.5; }
+  body { font-size: var(--fs-body); line-height: 1.5; }
   [hidden] { display: none !important; }
   /* no sidebar here, so the report gets a wider column than the theme text width */
   main { max-width: min(80%, 1200px); margin: 0 auto; padding: 16px var(--gutter) 48px; }
@@ -131,15 +139,15 @@
   h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
   h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
   h3 { font-size: var(--fs-h3); margin: 0; overflow-wrap: anywhere; }
-  .meta { color: var(--text-3); font-size: var(--fs-md); }
+  .meta { color: var(--text-3); font-size: var(--fs-meta); }
   .summary-line { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-md); }
   .summary-line .lead { font-weight: 600; }
-  .summary-line .meta { font-size: inherit; }
+  .summary-line .meta { font-size: var(--fs-meta); }
   .summary-line .c-bad { color: var(--bad); }
   .summary-line .c-warn { color: var(--warn); }
-  code { font-size: var(--fs-sm); overflow-wrap: anywhere; }
+  code { font-size: var(--fs-code); overflow-wrap: anywhere; }
 
-  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
+  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-tag); white-space: nowrap; }
   .tone-ok { color: var(--ok); background: var(--ok-soft); }
   .tone-warn { color: var(--warn); background: var(--warn-soft); }
   .tone-bad { color: var(--bad); background: var(--bad-soft); }
@@ -150,7 +158,7 @@
   button:disabled { opacity: .45; cursor: default; }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-  .empty-filter { margin-top: 16px; font-size: var(--fs-md); }
+  .empty-filter { margin-top: 16px; font-size: var(--fs-meta); }
   .uc-title { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
   .uc-title .meta { font-weight: 400; }
 
@@ -201,7 +209,7 @@
   /* Full-page shots: scroll the frame at full width instead of shrinking the page to an unreadable strip. */
   .stage.tall .frame { max-height: 78vh; overflow-y: auto; overscroll-behavior: contain; }
   .stage.tall img { max-height: none; height: auto; object-fit: initial; object-position: top; }
-  .hint { position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-md); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; }
+  .hint { position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-meta); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; }
   /* The whole shot is the click target: left half goes back, right half forward. The arrows only show the side;
      they ignore the pointer, so a tall shot still scrolls under them. */
   .stage[data-side="prev"] .frame { cursor: w-resize; }
@@ -222,14 +230,14 @@
   .list .g.bad { color: var(--bad); }
   .list .g.neutral { color: var(--neutral); }
   .list .t { overflow-wrap: anywhere; }
-  .list .ms { color: var(--text-3); font-size: var(--fs-md); font-variant-numeric: tabular-nums; }
+  .list .ms { color: var(--text-3); font-size: var(--fs-meta); font-variant-numeric: tabular-nums; }
 
-  pre { font-size: var(--fs-sm); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
+  pre { font-size: var(--fs-code); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
   .err { display: grid; gap: 4px; }
   .err pre { margin: 0; }
   .err-label { color: var(--bad); font-weight: 600; }
   .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-  .cmd > .meta { min-width: 4em; font-size: var(--fs-md); }
+  .cmd > .meta { min-width: 4em; font-size: var(--fs-meta); }
   .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
   .cmds { display: grid; gap: 8px; }
 

@@ -3,7 +3,7 @@
     <desc id="d">Open the form, check the thing.edit permission, validate the name, save it with CreateThing or show INVALID_ARGUMENT and retry.</desc>
     <!-- Shapes: terminal = outlined pill · process = filled box · decision = accent diamond. Grey connectors, sentence-case Yes/No labels; a loop back enters its target at its own point.
          Each node: a plain-words line, then a mono line with the real value from the source (permission, RPC, field rule, code, status).
-         All text is 14px and hosts draw the file at 1:1, so size each shape to about 8.5px per mono character. -->
+         Labels are 14px, detail lines and exit labels 12px. Hosts draw the file at 1:1; size each shape to about 8.5px per mono character. -->
     <defs>
         <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill="#6b6e78" />
@@ -18,7 +18,7 @@
         <path d="M660,290 V316" />
         <path d="M120,236 V200 H325 V234" />
     </g>
-    <g fill="#a3a6b0" text-anchor="middle">
+    <g fill="#a3a6b0" text-anchor="middle" font-size="12">
         <text x="539" y="126">No</text>
         <text x="398" y="203">Yes</text>
         <text x="539" y="256">Yes</text>
@@ -41,7 +41,7 @@
         <rect x="580" y="318" width="160" height="44" rx="22" fill="#121316" stroke="#4a4d55" stroke-width="1.4" />
         <text x="660" y="336">Saved</text>
     </g>
-    <g fill="#c6c8cf" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">
+    <g fill="#c6c8cf" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" font-size="12">
         <text x="380" y="48">/things/:id</text>
         <text x="380" y="149">thing.edit</text>
         <text x="660" y="148">read-only view</text>

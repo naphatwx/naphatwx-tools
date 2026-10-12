@@ -49,8 +49,7 @@
         --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
         --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-        /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
-           --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+        /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
         --fs-xs: 0.75rem;
         --fs-sm: 0.875rem;
         --fs-md: 1rem;
@@ -62,6 +61,15 @@
         --fs-h3: var(--fs-lg);
         --fs-h2: var(--fs-xl);
         --fs-h1: var(--fs-2xl);
+        /* Roles: one step down per role, so the eye lands on body text first.
+           body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+        --fs-body: var(--fs-md);
+        --fs-meta: var(--fs-sm);
+        --fs-code: var(--fs-sm);
+        --fs-tag: var(--fs-xs);
+        /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+        --fs-dia: var(--fs-sm);
+        --fs-dia-sub: var(--fs-xs);
 
         /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
         --page-w: min(80%, 900px);
@@ -109,9 +117,9 @@
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
     .conn { fill: none; stroke: var(--connector); stroke-width: 1.6; }
     .ah { fill: var(--connector); }
-    .exit { fill: var(--text-3); font-size: var(--fs-sm); text-anchor: middle; }
-    .node text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; text-anchor: middle; }
-    .node .detail { fill: var(--text-2); font-family: var(--mono); font-size: var(--fs-sm); font-weight: 400; }
+    .exit { fill: var(--text-3); font-size: var(--fs-dia-sub); text-anchor: middle; }
+    .node text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; text-anchor: middle; }
+    .node .detail { fill: var(--text-2); font-family: var(--mono); font-size: var(--fs-dia-sub); font-weight: 400; }
     .pill { fill: var(--bg); stroke: var(--line-3); stroke-width: 1.4; }
     .box { fill: var(--surface-3); stroke: var(--line-strong); stroke-width: 1.2; }
     .decision { fill: var(--accent-fill); stroke: var(--accent); stroke-width: 1.4; }

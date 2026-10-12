@@ -7,7 +7,7 @@ var SeqDiagrams = (function () {
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const define = (id, spec) => { flows[id] = spec; };
     const MAX = 40;
-    // Text is 14px; widths are estimated per character (mono, sans, bold sans), on the wide side.
+    // Widths are estimated per character for 14px text (mono, sans, bold sans), on the wide side; 12px lines fit inside.
     const MONO = 8.6, SANS = 7.9, BOLD = 8.8, NUM = 24;
 
     function svg(id, { title = id, actors, steps, gap = 160 }) {

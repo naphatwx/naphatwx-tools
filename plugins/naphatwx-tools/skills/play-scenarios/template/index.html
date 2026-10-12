@@ -52,8 +52,7 @@
             --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
             --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-            /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
-               --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+            /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
             --fs-xs: 0.75rem;
             --fs-sm: 0.875rem;
             --fs-md: 1rem;
@@ -65,6 +64,15 @@
             --fs-h3: var(--fs-lg);
             --fs-h2: var(--fs-xl);
             --fs-h1: var(--fs-2xl);
+            /* Roles: one step down per role, so the eye lands on body text first.
+               body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+            --fs-body: var(--fs-md);
+            --fs-meta: var(--fs-sm);
+            --fs-code: var(--fs-sm);
+            --fs-tag: var(--fs-xs);
+            /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+            --fs-dia: var(--fs-sm);
+            --fs-dia-sub: var(--fs-xs);
 
             /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
             --page-w: min(80%, 900px);
@@ -107,7 +115,7 @@
             z-index: 50;
             padding: 6px 12px;
             font: inherit;
-            font-size: var(--fs-sm);
+            font-size: var(--fs-body);
             color: var(--text);
             background: var(--surface-2);
             border: 1px solid var(--line-strong);
@@ -135,11 +143,11 @@
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
         /* Headings use the shared theme steps; other text --fs-md, code and the frame's toolbar --fs-sm. */
-        body { font-size: var(--fs-md); }
+        body { font-size: var(--fs-body); }
         h1 { font-size: var(--fs-h1); line-height: 1.15; }
         h2 { font-size: var(--fs-h2); line-height: 1.25; }
         h3 { font-size: var(--fs-h3); line-height: 1.3; }
-        .t-code { font-size: var(--fs-sm); }
+        .t-code { font-size: var(--fs-code); }
         .link { color: var(--accent); text-decoration: none; }
         .link:hover { text-decoration: underline; }
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
@@ -166,7 +174,7 @@
         @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs, .guide, .guide-body { overflow-y: visible; } }
         @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
-        .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
+        .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
         .tab-s { text-transform: uppercase; }
         .tab-t { flex: 1; min-width: 0; }
         .tab:hover { color: var(--text); background: var(--surface); }
@@ -180,11 +188,11 @@
         .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
         .tab[aria-selected="true"] .tab-n { border-color: var(--bg); }
         .tabs-title { display: flex; flex-direction: column; gap: 2px; }
-        .tabs-count { font-size: var(--fs-sm); font-weight: 400; white-space: nowrap; }
+        .tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
         .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
         .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
         .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
-        .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-sm); background: var(--surface-2); border-bottom: 1px solid var(--line); }
+        .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-meta); background: var(--surface-2); border-bottom: 1px solid var(--line); }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
         .url { font-family: var(--mono); padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
         .btn-ghost { padding: 4px 8px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }

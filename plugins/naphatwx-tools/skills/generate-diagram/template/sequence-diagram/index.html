@@ -51,8 +51,7 @@
             --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
             --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
 
-            /* Type scale. Body text is --fs-md on every page; code and pills --fs-sm. Reports use only
-               --fs-lg (title), --fs-md and --fs-sm. Nothing renders below --fs-xs. */
+            /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
             --fs-xs: 0.75rem;
             --fs-sm: 0.875rem;
             --fs-md: 1rem;
@@ -64,6 +63,15 @@
             --fs-h3: var(--fs-lg);
             --fs-h2: var(--fs-xl);
             --fs-h1: var(--fs-2xl);
+            /* Roles: one step down per role, so the eye lands on body text first.
+               body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+            --fs-body: var(--fs-md);
+            --fs-meta: var(--fs-sm);
+            --fs-code: var(--fs-sm);
+            --fs-tag: var(--fs-xs);
+            /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+            --fs-dia: var(--fs-sm);
+            --fs-dia-sub: var(--fs-xs);
 
             /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
             --page-w: min(80%, 900px);
@@ -106,7 +114,7 @@
             z-index: 50;
             padding: 6px 12px;
             font: inherit;
-            font-size: var(--fs-sm);
+            font-size: var(--fs-body);
             color: var(--text);
             background: var(--surface-2);
             border: 1px solid var(--line-strong);
@@ -150,30 +158,30 @@
         /* render.js sets the SVG's width and height: it draws at 1:1, so every label renders at 14px; a wider one scrolls. */
         .seq svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
         .seq .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
-        .seq .actor text { fill: var(--text); font-size: var(--fs-sm); font-weight: 600; }
-        .seq .actor .sub { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 400; }
+        .seq .actor text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; }
+        .seq .actor .sub { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 400; }
         .seq .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
         .seq .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
         .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
         .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-        .seq .lbl { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
+        .seq .lbl { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
         .seq .lbl.hot { fill: var(--accent); }
-        .seq .num { fill: var(--text-3); font-size: var(--fs-sm); font-weight: 600; }
+        .seq .num { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
         .seq .phase line { stroke: var(--line); }
         .seq .phase rect { fill: var(--surface-2); }
-        .seq .phase text { fill: var(--text-2); font-size: var(--fs-sm); font-weight: 600; }
+        .seq .phase text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 600; }
         .seq .note rect { fill: var(--bg); stroke: var(--line-strong); }
-        .seq .note text { fill: var(--text-2); font-size: var(--fs-sm); font-family: var(--mono); }
+        .seq .note text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-family: var(--mono); }
         .seq .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
         .seq .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
-        .seq .frame text { fill: var(--text); font-size: var(--fs-sm); font-weight: 700; }
+        .seq .frame text { fill: var(--text); font-size: var(--fs-dia-sub); font-weight: 700; }
         .seq .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
         .seq .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
         .seq .ah { fill: var(--text-2); }
         .seq .ah.ret { fill: var(--text-3); }
         .seq .ah.hot { fill: var(--accent); }
         .seq .step { cursor: default; }
-        .seq-steps { margin-top: 8px; font-size: var(--fs-md); color: var(--text-2); }
+        .seq-steps { margin-top: 8px; font-size: var(--fs-meta); color: var(--text-2); }
         .seq-steps-title { margin: 0; }
         .seq-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
         .seq-steps li { padding: 2px 0 2px 30px; text-indent: -30px; }
@@ -183,7 +191,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
-            font-size: var(--fs-sm);
+            font-size: var(--fs-meta);
             color: var(--text-3);
             /* inside the diagram box, at the text width */
             max-width: var(--page-w);
