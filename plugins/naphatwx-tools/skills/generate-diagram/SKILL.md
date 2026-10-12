@@ -62,14 +62,14 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Read the reference for the type and follow it: [flowchart](references/flowchart.md), [sequence](references/sequence.md), [er](references/er.md).
 - diagram-design mode, `flowchart` and `sequence`: add this embed script just before `</body>` of every saved `.html`, unchanged. It is the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
-    - Height: it posts `diagram-height` on every resize, so the host sizes the iframe to the content (no fixed height).
+    - Size: it posts `diagram-height` with `height` and `width` on every resize. The host sizes the iframe to the height (no fixed height); its lightbox uses the width to show the whole drawing, scaled.
     - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
     - Width: each SVG draws at exactly its viewBox width (1:1, so 14px labels render at 14px) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host.
 
 ```html
 <script>
   // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
-  // Out: {type: "diagram-height", height} on every resize, so the host sizes the iframe.
+  // Out: {type: "diagram-height", height, width} on every resize, so the host sizes the iframe.
   const embedded = parent !== window;
   const style = document.createElement("style");
   style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
@@ -88,10 +88,15 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     svg.before(box);
     box.append(svg);
   });
-  // body, not documentElement: its scrollHeight never drops below the iframe's height
-  const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
-  addEventListener("load", postHeight);
-  new ResizeObserver(postHeight).observe(document.body);
+  // height: body, not documentElement, whose scrollHeight never drops below the iframe's height;
+  // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
+  const postSize = () => {
+    const cs = getComputedStyle(document.body);
+    const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, width }, "*");
+  };
+  addEventListener("load", postSize);
+  new ResizeObserver(postSize).observe(document.body);
 </script>
 ```
 

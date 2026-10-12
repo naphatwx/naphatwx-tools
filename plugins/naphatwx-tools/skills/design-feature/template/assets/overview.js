@@ -287,6 +287,8 @@ addEventListener("message", (e) => {
     const frame = [...document.querySelectorAll(".diagram-frame")].find(f => f.contentWindow === e.source);
     if (!frame) return;
     frame.style.height = Math.ceil(e.data.height) + "px";
+    if (e.data.width) frame.dataset.w = Math.ceil(e.data.width);
+    if (lit?.stage.contains(frame)) fitLitFrame();
     const box = frame.closest(".flowchart, .seq");
     if (box) updateCue(box);
 });
@@ -381,17 +383,37 @@ function openLightbox(box, stage, reset) {
     lightbox.setAttribute("aria-label", caption(box) || "Diagram");
     lightbox.showModal();
     lightbox.querySelector(".lightbox-close").focus();
-    const cs = getComputedStyle(box);
-    const roomW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    const roomH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    if (litFrame()) return fitLitFrame();
+    const { roomW, roomH } = room(box);
     stage.style.width = Math.min(roomW, roomH / ratio) + "px";
+}
+function room(box) {
+    const cs = getComputedStyle(box);
+    return {
+        roomW: box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),
+        roomH: box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom),
+    };
+}
+// a diagram-design iframe can't be measured from here (file://), so it posts its drawing's width:
+// the frame lays out at that width (nothing scrolls inside) and is scaled whole to fit the room
+const litFrame = () => lit?.stage.querySelector(":scope > iframe.diagram-frame[data-w]");
+function fitLitFrame() {
+    const frame = litFrame();
+    if (!frame) return;
+    const w = +frame.dataset.w, h = parseFloat(frame.style.height) || frame.offsetHeight;
+    const { roomW, roomH } = room(lit.box);
+    const k = Math.min(roomW / w, roomH / h);
+    Object.assign(frame.style, { width: w + "px", transform: `scale(${k})`, transformOrigin: "0 0" });
+    Object.assign(lit.stage.style, { width: w * k + "px", height: h * k + "px" });
 }
 lightbox.addEventListener("close", () => {
     if (!lit) return;
     const { box, stage, spot, reset, opener } = lit;
     lit = null;
     box.classList.remove("in-lightbox");
-    stage.style.width = "";
+    stage.style.width = stage.style.height = "";
+    const frame = stage.querySelector(":scope > iframe.diagram-frame");
+    if (frame) Object.assign(frame.style, { width: "", transform: "", transformOrigin: "" });
     spot.replaceWith(box);
     reset();
     if (opener?.isConnected) opener.focus({ preventScroll: true });

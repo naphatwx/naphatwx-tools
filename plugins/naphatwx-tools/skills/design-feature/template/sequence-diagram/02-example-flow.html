@@ -191,7 +191,7 @@
   </div>
   <script>
     // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
-    // Out: {type: "diagram-height", height} on every resize, so the host sizes the iframe.
+    // Out: {type: "diagram-height", height, width} on every resize, so the host sizes the iframe.
     const embedded = parent !== window;
     const style = document.createElement("style");
     style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
@@ -210,10 +210,15 @@
       svg.before(box);
       box.append(svg);
     });
-    // body, not documentElement: its scrollHeight never drops below the iframe's height
-    const postHeight = () => parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height }, "*");
-    addEventListener("load", postHeight);
-    new ResizeObserver(postHeight).observe(document.body);
+    // height: body, not documentElement, whose scrollHeight never drops below the iframe's height;
+    // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
+    const postSize = () => {
+      const cs = getComputedStyle(document.body);
+      const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, width }, "*");
+    };
+    addEventListener("load", postSize);
+    new ResizeObserver(postSize).observe(document.body);
   </script>
 </body>
 </html>

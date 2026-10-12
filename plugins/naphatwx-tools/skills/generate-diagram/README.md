@@ -66,8 +66,8 @@ sequenceDiagram
     H->>F: load in iframe.diagram-frame, or img, or script src
     F->>F: embedded? add class embedded, hide its own title
     F->>F: draw each SVG at its viewBox width, 1:1, scroll sideways when narrow
-    F-->>H: postMessage diagram-height on every resize
-    H->>H: size the iframe to that height
+    F-->>H: postMessage diagram-height (height, width) on every resize
+    H->>H: size the iframe to that height; the lightbox scales the full width to fit
 ```
 
 Rules the diagrams don't show:
