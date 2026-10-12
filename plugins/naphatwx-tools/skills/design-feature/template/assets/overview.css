@@ -67,13 +67,14 @@
     --fs-dia: var(--fs-sm);
     --fs-dia-sub: var(--fs-xs);
 
-    /* Max widths: Tailwind max-w steps (md 448px, 4xl 896px, 5xl 1024px). Use these, not raw px */
+    /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px). Use these, not raw px */
     --max-w-md: 28rem;
+    --max-w-3xl: 48rem;
     --max-w-4xl: 56rem;
     --max-w-5xl: 64rem;
 
-    /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-4xl */
-    --page-w: min(80%, var(--max-w-4xl));
+    /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-3xl */
+    --page-w: min(80%, var(--max-w-3xl));
     --gutter: clamp(16px, 3vw, 24px);
 
     --radius: 6px;
