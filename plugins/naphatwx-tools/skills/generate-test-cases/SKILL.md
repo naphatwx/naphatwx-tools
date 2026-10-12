@@ -110,8 +110,10 @@ Read enough to pin down:
 - **Permissions**: the role or scope required
 - **Related read APIs**: what to call to verify a write actually landed
 
-If the code and the spec disagree, follow the spec and add a
-`⚠️ spec/code mismatch` note on that case.
+If the code and the spec disagree on behaviour, follow the spec and add a
+`⚠️ spec/code mismatch` note on that case. User-facing messages are the
+exception: expect the code's exact text (the one the scenario quotes), and
+note the spec's differing text in the same `⚠️ spec/code mismatch` note.
 
 ### 4. Resolve the MCP Surface
 
@@ -132,6 +134,22 @@ target, in use case order, titled with the scenario's title. Its `given` is the
 precondition, its `when` the steps, its `expect` the expected result (made
 exact in steps 3 and 4). Then add the extra cases below that no scenario
 covers; mark each one `extra`.
+
+Reuse the scenario's concrete example as the case's input and expected output,
+so the test checks the same thing a reviewer played:
+
+- **Input**: the same request, ids, versions and names. A scenario's
+  `GetRepositoryVersions {repositoryId 1204, page 1, limit 20}` is the step's
+  request, with field names from `GetInputSchema` (step 4).
+- **Expected**: the same values and the message quoted verbatim, e.g.
+  `total = 32`, `entities[0].bumpedVersion = "2.3.2-1"`, or
+  `PERMISSION_DENIED`, message `"…"` copied from the scenario.
+- **Role**: a scenario that names a role and its permissions
+  ("DEV: has repositories.versions.read, not repositories.versions.create")
+  runs as that role; list it with its permissions under Preconditions.
+- An example the target can't reproduce (other seed data, a fault you can't
+  cause) → keep its shape, put the value you will really use, and say so in a
+  note on the case.
 
 Include a case for each row that applies. Skip what the feature does not have
 — do not pad the file.
@@ -184,7 +202,7 @@ Leave this second table out when no use cases were found.
 | ---- | ----- | ------------- |
 | {resource} | `{value}` | {which call resolves it} |
 
-**Role required**: `{permission}`
+**Roles**: `{ROLE}`: has `{permission}` · `{ROLE}` (permission cases): has `{permission}`, not `{permission}`
 
 ## Test Data
 
@@ -248,8 +266,8 @@ All test records use the prefix `TEST_AI_` so cleanup can find them.
 
 - **Every step names a real operation.** `AppEnvVarService → Create`, not
   "create the env var".
-- **Every expectation is checkable.** Exact field value or exact error code.
-  Never "should succeed" or "should fail".
+- **Every expectation is checkable.** Exact field value, exact error code and
+  the exact message text. Never "should succeed" or "should fail".
 - **Every write case has a read-back step.** A response alone does not prove
   the data landed.
 - **Negative cases assert no side effect** — the record must not exist after a

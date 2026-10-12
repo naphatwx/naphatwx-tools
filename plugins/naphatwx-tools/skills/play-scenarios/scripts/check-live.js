@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Checks live/live.js and live/.env.example against the plan's scenarios. With --run-seeds (app and server.mjs running),
-// plays every seeded scenario twice through the server: both picks must succeed, and writing ones must get a new URL.
+// Checks live/live.js and live/.env.example against the plan's scenarios; WARN lines (tooltip steps, roles with no permissions) keep exit 0.
+// With --run-seeds (app and server.mjs running), picks every seeded scenario twice: both must succeed, writing ones get a new URL.
 // Usage: node check-live.js <live-dir> [--use-cases <file>] [--run-seeds [--server http://localhost:4000]]. Exit 1 on any error.
 
 const fs = require('fs');
@@ -14,6 +14,7 @@ if (!dir) { process.stderr.write('usage: node check-live.js <live-dir> [--use-ca
 const ucArg = process.argv.indexOf('--use-cases');
 const ucFile = ucArg > 0 ? process.argv[ucArg + 1] : path.join(dir, '..', 'use-cases.js');
 const errors = [];
+const warnings = [];
 
 /** Parse `<NAME> = [ ... ]` or `{ ... }` as strict JSON, the way other tools read it. */
 function parseVar(src, name) {
@@ -96,6 +97,10 @@ PLAY.forEach((p, i) => {
     if (p.seed && !/^node seeds\/[\w.-]+\.mjs\b/.test(p.seed)) out(`note: ${where}: seed is not a seeds/*.mjs script; fine if it calls the API and prints {"url"}`);
     if (!Array.isArray(p.steps) || !p.steps.length) errors.push(`${where}: steps missing`);
     if (p.role && !['link', 'post'].includes(LOGIN.type)) errors.push(`${where}: role needs login type link or post`);
+    const steps = (p.steps || []).join(' ');
+    const hover = steps.match(/\b(tooltip|hover|point at)\b/i);
+    if (hover) warnings.push(`${where}: a step says "${hover[1]}"; confirm in the component that the control still has one (not inline text)`);
+    if (p.role && !/\b[a-z][\w-]*(?:[.:][a-z][\w-]*)+\b/.test(steps)) warnings.push(`${where}: signs in as ${p.role} but no step names its permissions (e.g. "You are signed in as ${p.role}: has things.read, not things.create")`);
 });
 
 // ---------------------------------------------------------------- picks, twice each, through server.mjs (same auth and .env as playing)
@@ -121,6 +126,7 @@ async function runSeeds() {
     if (process.argv.includes('--run-seeds')) await runSeeds();
     const playable = PLAY.filter(p => !p.skip).length;
     out(`scenarios: ${CORE.length} · playable live: ${playable} · skipped: ${PLAY.length - playable} · seed commands: ${seeds.length} · secret keys: ${exampleKeys.length}${process.argv.includes('--run-seeds') ? ' (each seeded scenario picked twice)' : ''}`);
+    warnings.forEach(w => out('WARN ' + w));
     if (errors.length) { errors.forEach(e => out('ERROR ' + e)); process.exit(1); }
     out('OK');
 })();

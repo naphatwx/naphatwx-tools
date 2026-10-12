@@ -62,7 +62,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 2. **Real design system**: every class string in `components.js` and `shell.js` is copied from the app's components, with the source files listed in each file's header. Load only what the app itself loads (its CSS framework, icon set, font) — from a CDN when the app does.
 3. **Real contract**: `types.ts` mirrors the real proto / OpenAPI / DTOs. Mock-only fields are marked in a comment. Never invent a field the source doesn't have.
 4. **One set of rules**: the fake API calls `rules.js` for every mapping, validation and computed value. The mock never enforces a rule looser or stricter than the spec.
-5. **Real names**: fake-API functions are named exactly like the real operations and take the real request shapes.
+5. **Real names and messages**: fake-API functions are named exactly like the real operations and take the real request shapes. Every user-facing text the fake API and pages show (errors, refusals, toasts, empty states) is copied verbatim from the code: the same text `use-cases.js` quotes. Keep the texts as constants in `rules.js`. No code yet → the spec's text, as `use-cases.js` has it. Never write your own wording: a mock that says something else teaches reviewers the wrong screen.
 6. **Every state has a link**: each edge state from the spec is a state in `states.js`, reachable as `page/<screen>.html?state=<id>`. Never an empty list where the real app would show an error.
 7. **Mock-only UI is obvious**: the state / scenario panel stays pink and dashed. Nothing mock-only uses product styling.
 8. Wrap every `sessionStorage` / `localStorage` call in `try/catch`; the mock must still work when storage is blocked.
@@ -122,18 +122,21 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 | `state` | a `States.LIST` id |
 | `page` | screen file name without `.html`, or `"console"` |
 | `params` | optional query params the screen needs (`{ "status": "FAILED" }`, `{ "modal": "NEW_VERSION" }`) |
-| `steps` | "How to play": imperative, with real values from the mock data (`Pick merge request !161`, `v2.3.3-1`) |
+| `steps` | "How to play": imperative, with real values from the mock data (`Pick merge request !161`, `v2.3.3-1`); a role scenario starts with the role and its permissions |
 | `op`, `req` | API / MCP scenarios: the preset operation and request |
 | `skip` | instead of the fields above, for a scenario with nothing to play (a `job`, a migration): one sentence saying why |
 
 - `title`, `story` and `expect` come from `use-cases.js`; the file's last lines merge both lists into `SCENARIOS` for the pages. Keep those lines as the template has them.
 - Steps name what is on screen, not how the code works. A reviewer who never read the spec should be able to follow them.
+- Pick mock data that gives the scenario's example values (versions, counts, names), so "What you should see" matches the frame.
+- A state with other permissions → the first step names them: "You are signed in as DEV: has repositories.versions.read, not repositories.versions.create."
+- Write "tooltip" or "hover" only when the page really has one; an inline reason is read, not hovered.
 - A scenario you can't play as written (its `expect` doesn't match the spec or the screen) → report it; don't change `use-cases.js`.
 
 ### 5. Write `shared/`
 
 - `states.js`: `PAGES` and `LIST` (`id`, entity, `perms`, `faults`, `label`, `useCase` = the plan use cases it shows (`UC1 · UC2`), `hint` telling the viewer what to try). `perms` includes every permission the operations in its scenarios need.
-- `fake-api.js`: one async function per operation **any scenario references** (refusal-only ones too, e.g. Update / Retry that the feature refuses). Latency, permission checks, state faults, validation via `rules.js`, the spec's error codes and user-facing messages. Writes and side effects (audit rows, events) persist in `sessionStorage` under `STORE`; `log()` reads storage, since screens write it from inside their frames. Provide `SAMPLES` for the console.
+- `fake-api.js`: one async function per operation **any scenario references** (refusal-only ones too, e.g. Update / Retry that the feature refuses). Latency, permission checks, state faults, validation via `rules.js`, the real error codes and the code's exact messages (Hard Rule 5). Writes and side effects (audit rows, events) persist in `sessionStorage` under `STORE`; `log()` reads storage, since screens write it from inside their frames. Provide `SAMPLES` for the console.
 - `components.js`: the helpers the pages need, with the app's real class strings.
 - `shell.js`: the app's real chrome around `#page`, plus the mock-only panel as-is:
     - `?embed=1` (inside a scenario card) → no panel; the card already shows the steps.
@@ -174,8 +177,10 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 - `node <this skill dir>/scripts/check-scenarios.js <output>/mock`. It:
     - runs `node --check` on every `.js` file and the inline `<script>` of every page;
     - reads `<plan>/use-cases.js` (`--use-cases <file>` for another path) and `shared/scenario-play.js`: both strict JSON, every scenario has exactly one play entry and every play entry matches a scenario, every `state` is in `states.js`, every `page` exists;
-    - runs every console scenario against the fake API in a Node `vm` sandbox (location and `sessionStorage` stubbed) and prints the result next to its `expect`.
-    - Read each console result against its `expect`. Any mismatch → fix the data, the fake API or the expect text, then re-run. Exit code 0 and no mismatch before you go on.
+    - runs every console scenario against the fake API in a Node `vm` sandbox (location and `sessionStorage` stubbed) and prints the result next to its `expect`;
+    - compares each run's message with the text the `expect` quotes (quotes of 8+ characters; a quote ending in `…` is a prefix) and fails on a mismatch.
+    - A message mismatch → read the code for the real text. The mock is wrong → fix `rules.js` / `fake-api.js`. `use-cases.js` is wrong → report it for the `generate-use-case` skill; don't edit it here.
+    - Read each console result against the rest of its `expect` too (values, counts). Any mismatch → fix the data or the fake API, then re-run. Exit code 0 and no mismatch before you go on.
 - Type-check the contract when Node is available (a temporary install is fine):
   `npx -y -p typescript@5 tsc --noEmit --allowJs --checkJs --strict --lib es2022,dom contract/types.ts contract/rules.js contract/data.js`
 - Open `index.html` and every page × state in a headless browser when one is available (`--allow-file-access-from-files`). Check the console for errors and look at the screenshots: each card's iframe shows its screen scaled to fit, `#sc-<id>` picks the right chip.

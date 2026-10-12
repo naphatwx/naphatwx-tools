@@ -150,7 +150,7 @@ Output:
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
-| [scripts/check-live.js](scripts/check-live.js) | Checks `live/` against `use-cases.js`; `--run-seeds` picks every seeded scenario twice |
+| [scripts/check-live.js](scripts/check-live.js) | Checks `live/` against `use-cases.js`; warns on tooltip / hover steps and on roles whose permissions no step names; `--run-seeds` picks every seeded scenario twice |
 | [template/](template/) | The `live/` folder, working against a stand-in app; copied and filled in per feature |
 | [template/README.md](template/README.md) | Ships as `live/README.md` |
 | [template/preview/](template/preview/) | Stand-in app and fake API for the template; not copied |

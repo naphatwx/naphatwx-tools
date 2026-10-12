@@ -70,7 +70,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - From the plan folder: `overview.html` (scope, screens, errors) and `use-cases.js`.
 - When `<plan>/mock/shared/scenario-play.js` exists, it has each scenario's screen, params and steps. Start from it; names and values change to the seeded ones.
-- List per scenario: the screen and route, the data it needs, whether it **writes** (creates or changes data) or only reads, and the role it runs as.
+- List per scenario: the screen and route, the data it needs, whether it **writes** (creates or changes data) or only reads, and the role it runs as with the permissions that matter (the scenario's `given` names them).
 
 ### 2. Scan the app
 
@@ -80,6 +80,7 @@ Delegate to a read-only sub-agent when the agent can. Ask for concrete answers w
 - **API**: the create / read / update calls for every entity the scenarios need, their request shapes, validation (name length and characters, for `unique()`), and which states only a background job reaches (`PENDING → READY`).
 - **API auth**: how a script authenticates (API key header, service token, dev login). The env var that holds it.
 - **UI login**: a dev login route? Its method and shape (GET link or POST body), and the roles it accepts.
+- **Roles**: the permissions each of those roles holds, from the seed or permission map, as exact strings (`DEV: repositories.versions.read`, no `repositories.versions.create`).
 - **Routes**: the URL of each screen, and the params that set a filter, tab or open a form.
 - **Framing**: `X-Frame-Options` or CSP `frame-ancestors` in dev.
 - **Existing seed tools**: when the repo has one that works over the API, reading it shows the right calls; reuse its patterns, but the play seeds stay in `live/seeds/`.
@@ -137,10 +138,14 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 | `seed` | `node seeds/<name>.mjs [args]`; prints `{"url"}`. Several scenarios share one seed with args |
 | `url` | only for a scenario with no seed: a fixed path starting with `/` |
 | `role` | optional role for this scenario (read-only user, another team) |
-| `steps` | "How to play": imperative; name what the seed created (`the new pluto repo`, `merge request !159`) |
+| `steps` | "How to play": imperative; name what the seed created (`the new pluto repo`, `merge request !159`) and the values the reviewer should see |
 | `skip` | instead of the fields above, for a scenario you can't play live: one sentence saying why and where to play it instead |
 
 - `title`, `story` and `expect` come from `use-cases.js`; the file's last lines merge both lists. Keep those lines as the template has them.
+- The reviewer compares the screen with "What you should see", so the steps must lead to those exact values:
+    - A scenario that signs in as a role other than the default starts with that role and its relevant permissions: "You are signed in as DEV: has repositories.versions.read, not repositories.versions.create." Add any upstream rule the scenario depends on ("Your linked Groot user is in the BA group, whose page 7 is not writable").
+    - Use the values the seed really creates (project names, tags, versions, merge request titles). When they differ from the scenario's `e.g.` values, the seed wins in the steps; tell the user so the scenario can be updated with the `generate-use-case` skill.
+    - Before writing "tooltip", "hover" or "point at", read the control's component: a tooltip replaced by inline text is read, not hovered (`Read the amber reason under the card's title`).
 - Skip, with a reason: `api` and `job` scenarios with no screen (point to the `e2e-test` skill or an MCP client), and faults you can't cause safely on a dev machine (an upstream outage; point to the mock).
 - A scenario whose `expect` doesn't match what the app should do → report it; don't change `use-cases.js`.
 
@@ -164,6 +169,7 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 ### 7. Verify
 
 - `node <this skill dir>/scripts/check-live.js <plan>/live`: syntax of `live.js`, `server.mjs` and every seed; `live.js` as strict JSON; one entry per scenario in order; every playable entry has a seed or a url, and steps; login and roles consistent.
+- It warns (`WARN`, exit 0) when a step says "tooltip", "hover" or "point at" (confirm the control still has one, then keep it), and when an entry with a `role` has no step naming its permissions.
 - Pre-test: `node <plan>/live/server.mjs --up`. It runs `pretest.up`, waits for `health`, warns about framing headers, and prints the page URL.
 - `check-live.js` also checks the secrets: `.env.example` exists with no values, every `apiAuth.env` is listed in it, `.env` is git-ignored, and `live.js` holds nothing that looks like a secret. It names keys still empty, never values.
 - With the app up, `.env` filled in and `server.mjs` running, `check-live.js <plan>/live --run-seeds [--server http://localhost:4000]`: picks every seeded scenario twice through the server, with the same `.env` and auth as playing. Both picks must succeed; a writing scenario must get a **new** URL each time (it prints which ones get the same).

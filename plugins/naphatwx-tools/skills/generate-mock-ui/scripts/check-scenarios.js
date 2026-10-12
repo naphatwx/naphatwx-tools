@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Checks a standalone mock's play data against the plan's scenarios, and runs every console (API / MCP) scenario
-// against the fake API. Usage: node check-scenarios.js <mock-dir> [--use-cases <file>] [--json]
-// Scenarios come from <mock-dir>/../use-cases.js by default. Exit 1 on any structural error.
+// against the fake API: its message must match the expect's quoted text. Scenarios come from <mock-dir>/../use-cases.js.
+// Usage: node check-scenarios.js <mock-dir> [--use-cases <file>] [--json]. Exit 1 on any structural error or message mismatch.
 
 const fs = require('fs');
 const os = require('os');
@@ -81,6 +81,17 @@ function sandbox(state, sc) {
     return ctx;
 }
 
+// ---------------------------------------------------------------- messages: the fake API's text must be the text use-cases.js quotes
+const messageOf = v => v && typeof v === 'object' ? String(v.message || v.error || '') : '';
+// quoted runs of 8+ characters with a letter: messages, not values like "2.3.3"
+const quotedIn = lines => (lines || []).flatMap(l => [...String(l).matchAll(/"([^"]{8,})"/g)].map(m => m[1])).filter(q => /[a-z]{3}/i.test(q));
+const norm = t => t.replace(/\s+/g, ' ').trim();
+/** A quote ending in … or ... is a prefix of the full message. */
+function sameText(quote, message) {
+    const q = norm(quote), m = norm(message), cut = q.match(/^(.*?)\s*(?:…|\.\.\.)$/);
+    return cut ? m.startsWith(cut[1]) : m === q || m.includes(q) || q.includes(m);
+}
+
 let stateIds = [];
 try { stateIds = vm.runInContext('States.LIST.map(s => s.id)', sandbox('')); }
 catch (e) { errors.push(`could not load the mock in a sandbox: ${e.message}`); }
@@ -118,7 +129,11 @@ USE_CASES.forEach(c => { if (!CORE.some(s => s.useCase === c.id) && !c.none) err
             ctx.__req = JSON.parse(JSON.stringify(s.req));
             result = { ok: true, value: await vm.runInContext(`FakeApi[${JSON.stringify(s.op)}](__req)`, ctx) };
         } catch (e) { result = { ok: false, value: e instanceof Error ? { error: e.message } : e }; }
-        runs.push({ id: s.id, op: s.op, state: s.state, result, expect: s.expect, moreSteps: s.steps.length > 1 });
+        const message = messageOf(result.value);
+        const quotes = quotedIn(s.expect);
+        const matched = !message || !quotes.length || quotes.some(q => sameText(q, message));
+        if (!matched) errors.push(`${s.id}: the fake API answered "${message}", but expect quotes ${quotes.map(q => `"${q}"`).join(', ')}; use the code's exact text in both`);
+        runs.push({ id: s.id, op: s.op, state: s.state, result, message, matched, expect: s.expect, moreSteps: s.steps.length > 1 });
     }
 
     const inUseCase = c => SCS.filter(s => s.useCase === c.id);
@@ -132,9 +147,10 @@ USE_CASES.forEach(c => { if (!CORE.some(s => s.useCase === c.id) && !c.none) err
         for (const r of runs) {
             out(`\n# ${r.id} · ${r.op} · state ${r.state}${r.moreSteps ? ' (later steps not run)' : ''}`);
             out(`  ${r.result.ok ? 'OK' : 'ERROR'} ${JSON.stringify(r.result.value).slice(0, 400)}`);
+            if (r.message) out(`  message ${r.matched ? 'matches' : 'DOES NOT MATCH'} the quoted expect text`);
             r.expect.forEach(e => out(`  expect: ${e}`));
         }
-        out(errors.length ? `\n${errors.length} error(s):\n- ${errors.join('\n- ')}` : '\nNo structural errors.');
+        out(errors.length ? `\n${errors.length} error(s):\n- ${errors.join('\n- ')}` : '\nNo errors.');
     }
     process.exit(errors.length ? 1 : 0);
 })();

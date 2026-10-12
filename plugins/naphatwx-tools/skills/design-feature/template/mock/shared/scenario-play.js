@@ -4,9 +4,9 @@
 
 var SCENARIO_PLAY = [
   { "id": "create-read-only", "state": "read-only", "page": "example",
-    "steps": ["Look at the toolbar."] },
+    "steps": ["You are signed in as VIEWER: has things.read, not things.create.", "Look at the toolbar for Create, then read the list."] },
   { "id": "create-archived", "state": "archived", "page": "example",
-    "steps": ["Hover or tab to Create."] },
+    "steps": ["Hover or tab to Create and read its tooltip."] },
   { "id": "create-api", "state": "normal", "page": "console",
     "op": "CreateThing", "req": { "ownerId": 1204, "name": "Third thing" },
     "steps": ["Press Run."] },

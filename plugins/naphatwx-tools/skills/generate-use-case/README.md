@@ -82,7 +82,10 @@ Rules the diagrams don't show:
 
 - Both arrays are strict JSON after `var NAME = `, so a page on `file://` loads the file with `<script src>` and a script parses it.
 - Every scenario comes from the source. Unknown copy → `TBD`. Never invented behaviour.
-- No mock or test details: no state ids, pages, selectors or mock data.
+- Every scenario carries a concrete, true example: real versions, counts, ids, a request → answer, or a script's output line.
+- Messages are copied verbatim from the code, not the spec (the spec drifts). The reply lists every place the two differ.
+- A role scenario names the role and its exact permission strings ("DEV: has repositories.versions.read, not repositories.versions.create").
+- No mock or test details: no state ids, pages, query params or selectors. Example values are fine.
 - Ids are stable. Other files link to `#sc-<scenario id>`.
 - Every count in the reply comes from `check.js`.
 
@@ -110,7 +113,7 @@ Output: one file.
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
 | [template/use-cases.js](template/use-cases.js) | Example file: 3 use cases, 11 scenarios across `ui`, `api` and `job` |
-| [scripts/check.js](scripts/check.js) | Checks the file and prints the scenario count per use case; `--json` for machine output; exit 1 on any error |
+| [scripts/check.js](scripts/check.js) | Checks the file and prints the scenario count per use case; warns on a scenario with no example or a role with no permission string; `--json` for machine output; exit 1 on any error |
 
 ## Related skills
 

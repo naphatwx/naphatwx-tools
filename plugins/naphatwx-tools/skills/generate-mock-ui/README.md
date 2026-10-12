@@ -153,7 +153,7 @@ Output, in-project:
 | [SKILL.md](SKILL.md) | The agent's instructions; standalone mode |
 | [references/in-project.md](references/in-project.md) | In-project mode: mock routes inside the real app |
 | [references/mock-review.md](references/mock-review.md) | The review: two fresh reviewers, then one fix agent |
-| [scripts/check-scenarios.js](scripts/check-scenarios.js) | Syntax-checks every script, matches play entries to scenarios, runs console scenarios against the fake API |
+| [scripts/check-scenarios.js](scripts/check-scenarios.js) | Syntax-checks every script, matches play entries to scenarios, runs console scenarios against the fake API and fails when a message differs from the text the scenario quotes |
 | [template/](template/) | The standalone `mock/` folder on a placeholder domain; copied whole and filled in per feature |
 | [template/README.md](template/README.md) | Ships as `mock/README.md` |
 | [use-cases.js](use-cases.js) | Example use cases for the template preview; never copied |

@@ -53,7 +53,7 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 ### 3. Write `_mock/`
 
 - `types.ts`: only the types not generated yet (Hard Rule 4). Empty → leave the file out.
-- `rules.ts`: every spec rule as a pure function — status and field mapping, eligibility, validation, error classification, the user-facing messages.
+- `rules.ts`: every spec rule as a pure function — status and field mapping, eligibility, validation, error classification, the user-facing messages copied verbatim from the code (the same text `use-cases.js` quotes; SKILL.md Hard Rule 5).
 - `data.ts`: realistic names, ids, dates and volumes (enough rows to page), typed with the real types. One entity per state that needs different data. Keep ids consistent with the plan's diagrams.
 - `use-cases.ts`: `<plan>/use-cases.js` (from the `generate-use-case` skill) copied as-is, with `var` turned into `export const`. The app can't load a file outside itself, so this is a copy: re-copy it whenever `use-cases.js` changes, never edit it here.
 - `scenario-play.ts`: `export const SCENARIO_PLAY = [...]`, a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment), one entry per scenario id.

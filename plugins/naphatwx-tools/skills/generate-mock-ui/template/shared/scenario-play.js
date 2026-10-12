@@ -4,7 +4,7 @@
 
 var SCENARIO_PLAY = [
   { "id": "read-list", "state": "normal", "page": "example",
-    "steps": ["Look at the list: newest first.", "Press Refresh."] },
+    "steps": ["Read the pluto list: Second thing, then First thing.", "Press Refresh."] },
   { "id": "read-failed", "state": "normal", "page": "example", "params": { "status": "FAILED" },
     "steps": ["The Status filter is set to Failed."] },
   { "id": "read-empty", "state": "empty", "page": "example",
@@ -14,9 +14,9 @@ var SCENARIO_PLAY = [
   { "id": "read-retry", "state": "unreachable", "page": "example",
     "steps": ["Wait for the first read to fail.", "Press Retry."] },
   { "id": "create-read-only", "state": "read-only", "page": "example",
-    "steps": ["Look at the toolbar."] },
+    "steps": ["You are signed in as VIEWER: has things.read, not things.create.", "Look at the toolbar for Create, then read the list."] },
   { "id": "create-archived", "state": "archived", "page": "example",
-    "steps": ["Hover or tab to Create."] },
+    "steps": ["Hover or tab to Create and read its tooltip."] },
   { "id": "create-api", "state": "normal", "page": "console",
     "op": "CreateThing", "req": { "ownerId": 1204, "name": "Third thing" },
     "steps": ["Press Run."] },

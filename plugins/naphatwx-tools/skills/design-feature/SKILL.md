@@ -96,7 +96,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Tables read and written, relations, and any external (read-through) tables.
     - Error mapping: cause → code → what the user sees.
     - Acceptance scenarios, edge cases and refusal rows, each with its story / AC id (or FR / decision id) and the exact user-facing message. They become the scenarios (step 3).
-    - Control rules: which control is hidden and which is shown unavailable with a reason, as the spec says. No permission → whatever the real app does today (usually hidden).
+    - **Roles and permissions**: each role the feature touches and the exact permission strings it holds or lacks, read from the seed or permission map (`DEV: repositories.versions.read, not repositories.versions.create`), plus any upstream rule (`legacy group BA, page 7 not writable`). Scenarios name them.
+    - **Examples**: real values a scenario can show — versions, counts, ids, names the dev seed creates, a request and its answer. Each scenario carries one.
+    - **Messages from the code**: when the code exists, copy each user-facing message verbatim from it (`file:line`), because the spec drifts. List every place the spec's text and the code's differ.
+    - Control rules: which control is hidden and which is shown unavailable with a reason, as the spec says. No permission → whatever the real app does today (usually hidden). How the reason shows (tooltip or inline text), read from the component when it exists.
     - Blockers and open questions.
 - No source → ask once where the content is (use AskUserQuestion when the agent has it).
 - Write the extract to `<output>/.parts/brief.md`: one heading per item above, use cases numbered `UC<n>` with a file slug `NN-<slug>`, names exactly as the source spells them, and the source file for each fact. Every sub-agent reads it instead of re-reading the spec.
@@ -146,6 +149,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Scenarios button and panel (`.panel`, not wide, always last in the block): leave them out of the fragment. `node <this skill dir>/scripts/scenarios-panels.js <output>`, run once the use case blocks are in, writes them from `use-cases.js`:
                 - Button `Scenarios (K)`, K = the use case's scenario count.
                 - A `.table-wrap` table: Scenario (title + first expect line in `.aside`) | Story | with a mock, `Play ↗` → `mock/index.html#sc-<id>` (new tab), or "not in the mock" for a skipped one. A use case with no scenario → one `.muted` line with its `none` sentence.
+                - The first expect line carries the scenario's example (generate-use-case writes it so), so the panel shows real values with no extra work. Re-run the script after `use-cases.js` changes.
                 - With a mock, it also adds `.side-link` "Open the mock ↗" (new tab) to the Use cases `<h2>`.
     4. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
         - **ER diagram ↗** link, inside the `<h2 id="database">` right after its text: `<a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one link per page (`ER diagram · catalog ↗`). No related table → no page and no link.

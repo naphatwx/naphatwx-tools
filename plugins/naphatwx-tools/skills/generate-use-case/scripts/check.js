@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Checks a use-cases.js file (USE_CASES + SCENARIOS) and prints the scenario count per use case.
 // Usage: node check.js <use-cases.js> [--json]
-// Exit 1 on any error.
+// Exit 1 on any error; warnings (a scenario with no concrete example) keep exit 0.
 
 const fs = require('fs');
 
@@ -10,6 +10,7 @@ if (!file) { process.stderr.write('usage: node check.js <use-cases.js> [--json]\
 const asJson = process.argv.includes('--json');
 const out = s => process.stdout.write(s + '\n');
 const errors = [];
+const warnings = [];
 
 /** `<NAME> = [ ... ]` parsed as strict JSON (works for `var X =` and `export const X =`). */
 function parseVar(src, name) {
@@ -60,12 +61,28 @@ for (const s of SCS) {
 }
 UCS.forEach(c => { if (!SCS.some(s => s.useCase === c.id) && !c.none) errors.push(`use case ${c.id} has no scenario and no "none" sentence`); });
 
+// Examples: a quoted message, a number or an identifier lets a reviewer tell pass from fail.
+const EXAMPLE = /"[^"]+"|\d|\b[a-z]+[A-Z]\w*\b|\b\w+_\w+\b|\b[A-Z]{2,}\b|![0-9]/;
+const ROLE_TALK = /\b(role|permission|not allowed|lacks?|read-only|forbidden|permissiondenied|unauthori[sz]ed|denied)\b/i;
+// permission strings look like a.b(.c) or a:b; e.g. / i.e. and file names are not
+const PERM = /\b[a-z][a-z0-9_-]*(?:[.:][a-z][a-z0-9_-]*)+\b/g;
+const notPerm = p => /^(e\.g|i\.e)$/.test(p) || /\.(md|js|mjs|ts|json|html|sql|go|ya?ml)$/.test(p);
+for (const s of SCS) {
+    const name = s.id || '(no id)';
+    const expect = Array.isArray(s.expect) ? s.expect.join(' ') : '';
+    if (expect && !EXAMPLE.test(expect)) warnings.push(`${name}: expect has no quoted message, number or identifier; add the real example (SKILL.md step 2, Examples)`);
+    const text = [s.title, s.given, s.when, expect].filter(Boolean).join(' ');
+    if (ROLE_TALK.test(text) && !(text.match(PERM) || []).some(p => !notPerm(p)))
+        warnings.push(`${name}: talks about a role or permission but names no permission string (e.g. "DEV: has things.read, not things.create")`);
+}
+
 const perUseCase = UCS.map(c => ({ useCase: c.id, title: c.title, count: SCS.filter(s => s.useCase === c.id).length }));
 const perSurface = Object.fromEntries(SURFACES.map(k => [k, SCS.filter(s => s.surface === k).length]));
-if (asJson) out(JSON.stringify({ useCases: UCS.length, scenarios: SCS.length, perUseCase, perSurface, errors }, null, 2));
+if (asJson) out(JSON.stringify({ useCases: UCS.length, scenarios: SCS.length, perUseCase, perSurface, errors, warnings }, null, 2));
 else {
     out(`${count(UCS.length, 'use case')}, ${count(SCS.length, 'scenario')} (${SURFACES.map(k => `${perSurface[k]} ${k}`).join(', ')})`);
     perUseCase.forEach(c => out(`  ${c.useCase} ${c.title}: ${c.count}`));
+    if (warnings.length) out(`\n${warnings.length} warning(s):\n- ${warnings.join('\n- ')}`);
     out(errors.length ? `\n${errors.length} error(s):\n- ${errors.join('\n- ')}` : '\nNo errors.');
 }
 process.exit(errors.length ? 1 : 0);
