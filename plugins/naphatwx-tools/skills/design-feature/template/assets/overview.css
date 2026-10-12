@@ -67,8 +67,13 @@
     --fs-dia: var(--fs-sm);
     --fs-dia-sub: var(--fs-xs);
 
-    /* Page frame: every page centers its content at the same width, 80% of the window up to 900px */
-    --page-w: min(80%, 900px);
+    /* Max widths: Tailwind max-w steps (md 448px, 4xl 896px, 5xl 1024px). Use these, not raw px */
+    --max-w-md: 28rem;
+    --max-w-4xl: 56rem;
+    --max-w-5xl: 64rem;
+
+    /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-4xl */
+    --page-w: min(80%, var(--max-w-4xl));
     --gutter: clamp(16px, 3vw, 24px);
 
     --radius: 6px;
@@ -504,7 +509,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 .hud-keys { padding: 0 8px 0 4px; color: var(--text-3); font: var(--fs-code) var(--mono); white-space: nowrap; }
 
 /* ============ SHORTCUT SHEET ( ? ) ============ */
-.keys { margin: auto; padding: 24px 28px; width: min(440px, calc(100vw - 32px)); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); }
+.keys { margin: auto; padding: 24px 28px; width: min(var(--max-w-md), calc(100vw - 32px)); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); }
 .keys::backdrop { background: rgba(0, 0, 0, 0.6); }
 .keys h2 { font-size: var(--fs-h3); margin-bottom: 12px; }
 .keys dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; align-items: baseline; }
@@ -524,7 +529,7 @@ html[data-present="on"] .refs { white-space: nowrap; overflow: hidden; text-over
 /* bottom padding = the bar's footprint (set by show()) + 24px, so the last line clears it */
 html[data-present="on"] .sheet { margin-left: 0; padding: 28px 48px calc(var(--hud-space, 62px) + 24px); min-height: 100vh; display: flex; flex-direction: column; }
 html[data-present="on"] .slide { display: none; margin: 0 auto !important; padding: 0 !important; border: 0 !important; }
-html[data-present="on"] .slide.current { display: block; margin: auto !important; width: min(1080px, 100%); max-width: none; animation: slide-in 0.32s var(--ease); }
+html[data-present="on"] .slide.current { display: block; margin: auto !important; width: min(var(--max-w-5xl), 100%); max-width: none; animation: slide-in 0.32s var(--ease); }
 html[data-present="on"] .wide { width: 100%; margin-left: 0; transform: none; }
 html[data-present="on"] .panel { animation: none !important; }
 /* fitRoom() ends the box at the room above the bar; the diagram stays 1:1 (labels 14px), and
