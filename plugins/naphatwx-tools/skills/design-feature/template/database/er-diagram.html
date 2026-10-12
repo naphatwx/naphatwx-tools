@@ -64,9 +64,9 @@
             --fs-h1: var(--fs-2xl);
             /* Roles: one step down per role, so the eye lands on body text first.
                body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
-            --fs-body: var(--fs-md);
-            --fs-meta: var(--fs-sm);
-            --fs-code: var(--fs-sm);
+            --fs-body: var(--fs-sm);
+            --fs-meta: var(--fs-xs);
+            --fs-code: 0.8125rem;
             --fs-tag: var(--fs-xs);
             /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
             --fs-dia: var(--fs-sm);
@@ -156,7 +156,7 @@
 
         .btn {
             font: inherit;
-            font-size: var(--fs-md);
+            font-size: var(--fs-body);
             color: var(--text-2);
             background: var(--surface-2);
             border: 1px solid var(--line-strong);

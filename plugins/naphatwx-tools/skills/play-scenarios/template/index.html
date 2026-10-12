@@ -66,9 +66,9 @@
             --fs-h1: var(--fs-2xl);
             /* Roles: one step down per role, so the eye lands on body text first.
                body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
-            --fs-body: var(--fs-md);
-            --fs-meta: var(--fs-sm);
-            --fs-code: var(--fs-sm);
+            --fs-body: var(--fs-sm);
+            --fs-meta: var(--fs-xs);
+            --fs-code: 0.8125rem;
             --fs-tag: var(--fs-xs);
             /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
             --fs-dia: var(--fs-sm);
@@ -144,7 +144,7 @@
         .page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
-        /* Headings use the shared theme steps; other text --fs-md, code and the frame's toolbar --fs-sm. */
+        /* Headings use the shared theme steps; other text uses the theme's role tokens (--fs-body / meta / code / tag). */
         body { font-size: var(--fs-body); }
         h1 { font-size: var(--fs-h1); line-height: 1.15; }
         h2 { font-size: var(--fs-h2); line-height: 1.25; }
