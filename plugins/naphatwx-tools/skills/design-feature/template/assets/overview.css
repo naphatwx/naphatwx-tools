@@ -349,6 +349,8 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .zoomable { touch-action: none; }
 html[data-zoom="on"] .zoomable, .zoomable.in-lightbox { overflow: hidden; }
 html[data-zoom="on"] .zoomable { cursor: grab; }
+/* a pan drag would otherwise select the page, which tints a diagram-design iframe blue */
+html[data-zoom="on"] .zoomable, .zoomable.in-lightbox { -webkit-user-select: none; user-select: none; }
 .zoomable.panning { cursor: grabbing; }
 .zoom-stage { transform-origin: 0 0; }
 .zoom-shield { position: absolute; inset: 0; display: none; }
