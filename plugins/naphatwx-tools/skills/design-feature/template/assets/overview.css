@@ -425,8 +425,6 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
 .tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; align-items: start; }
 .tables + p { margin-top: 10px; }
 .tbl { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; scroll-margin-top: 32px; }
-.tbl.new { border-color: var(--add); }
-.tbl.drop { border-color: var(--drop); }
 .tbl.ext { border-style: dashed; }
 .tbl-head {
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px;
