@@ -524,7 +524,7 @@ function render() {
         el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt))),
       DATA.command ? el('div', { class: 'summary-line' }, el('span', { class: 'meta' }, 'Command: ', el('code', {}, DATA.command)), copyBtn(DATA.command, 'run command')) : null),
     el('div', { class: 'head-row' }, tools)));
-  addExportPdf(app.querySelector('.head-row'));
+  addExportPdf();
   app.append(...boxes, none);
 }
 render();

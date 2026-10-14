@@ -571,7 +571,7 @@ function render() {
         el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
         DATA.baseURL ? el('span', { class: 'meta' }, DATA.baseURL) : null)),
     el('div', { class: 'head-row' }, tools)));
-  addExportPdf(app.querySelector('.head-row'));
+  addExportPdf();
   // Failed tests first (inside each use case), so the report opens on what needs attention.
   const order = { failed: 0, flaky: 1, passed: 2, skipped: 3 };
   const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => order[a[0].dataset.kind] - order[b[0].dataset.kind] || a[1] - b[1]);

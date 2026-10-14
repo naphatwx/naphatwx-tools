@@ -332,9 +332,8 @@ function render() {
     DATA.notes && DATA.notes.length ? el('ul', { class: 'notes' }, DATA.notes.map((t) => el('li', {}, t))) : null,
     el('div', { class: 'progress' }, totalCount, el('div', { class: 'bar', 'aria-hidden': 'true' }, totalBar)),
     el('div', { class: 'tools' }, hideBtn, mdBtn)));
-  const tools = app.querySelector('.tools');
-  addExportPdf(tools);
-  tools.append(resetBtn);
+  app.querySelector('.tools').append(resetBtn);
+  addExportPdf();
 
   for (const p of DATA.phases) {
     const count = el('span', { class: 'count meta' });
