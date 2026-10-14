@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.204
+
+**Wider open test in the e2e report**
+
+- e2e-test: an open test grows to `min(96vw, --max-w-7xl)`, centered. The header, filters and closed rows stay at the text width.
+- theme: new tokens `--max-w-6xl` (72rem, 1152px, not used yet) and `--max-w-7xl` (80rem, 1280px).
+
 ## 1.9.203
 
 **One use-cases.js for every skill that plays or tests a feature**
