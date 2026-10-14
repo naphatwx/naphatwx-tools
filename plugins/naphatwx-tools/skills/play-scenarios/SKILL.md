@@ -114,7 +114,7 @@ Delegate to a read-only sub-agent when the agent can. Ask for concrete answers w
 
 ### 4. Copy the template
 
-- Copy `template/` → `<plan>/live/`, without `preview/`. In `seeds/lib.mjs`, delete the `API === 'preview'` line. Empty `results.js` to `var PLAYED_RESULTS = {};` (keep its comment lines).
+- Copy `template/` → `<plan>/live/`, without `preview/`. In `seeds/lib.mjs`, delete the `API_BASE === 'preview'` line. Empty `results.js` to `var PLAYED_RESULTS = {};` (keep its comment lines).
 - Replace the example seeds in `seeds/` with the feature's own.
 - Set the page title and `<h1>` to the feature name.
 - `LIVE_CONFIG`:

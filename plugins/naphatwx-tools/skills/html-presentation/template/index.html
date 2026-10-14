@@ -390,7 +390,7 @@
             <p>Click left to revisit. Click right to wrap up.</p>
         </section>
 
-        <div class="nav-zone left" onclick="prev()"></div>
+        <div class="nav-zone left" onclick="previous()"></div>
         <div class="nav-zone right" onclick="next()"></div>
 
         <div class="hint left">◀ prev</div>
@@ -402,27 +402,27 @@
         /* theme:pdf-js:start */
         /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
         function addExportPdf(target, prepare) {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'export-pdf no-print';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'export-pdf no-print';
             if (!target) {
                 target = document.querySelector('.float-bar');
                 if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
             }
-            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-            b.textContent = 'Export PDF';
-            b.addEventListener('click', async () => {
+            button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            button.textContent = 'Export PDF';
+            button.addEventListener('click', async () => {
                 if (prepare) await prepare();
                 window.print();
             });
-            target.append(b);
-            return b;
+            target.append(button);
+            return button;
         }
         /* theme:pdf-js:end */
         addExportPdf();
 
         const slides = document.querySelectorAll(".slide");
-        const curEl = document.getElementById("cur");
+        const currentNumber = document.getElementById("cur");
         const leftHint = document.querySelector(".hint.left");
         const rightHint = document.querySelector(".hint.right");
         let i = 0;
@@ -436,7 +436,7 @@
             slides[i].classList.remove("active");
             i = n;
             slides[i].classList.add("active");
-            curEl.textContent = i + 1;
+            currentNumber.textContent = i + 1;
             updateHints();
         }
 
@@ -446,12 +446,12 @@
         }
 
         function next() { show(i + 1); }
-        function prev() { show(i - 1); }
+        function previous() { show(i - 1); }
 
         // keyboard support
         document.addEventListener("keydown", (e) => {
             if (e.key === "ArrowRight") next();
-            if (e.key === "ArrowLeft") prev();
+            if (e.key === "ArrowLeft") previous();
         });
 
         updateHints();

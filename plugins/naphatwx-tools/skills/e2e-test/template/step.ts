@@ -7,8 +7,8 @@ export async function step(page: Page, title: string, body: () => Promise<void>)
     let failure: unknown
     try {
       await body()
-    } catch (e) {
-      failure = e
+    } catch (error) {
+      failure = error
     }
     const shot = await page.screenshot({ type: 'jpeg', quality: 60, animations: 'disabled' }).catch(() => null)
     if (shot) await test.info().attach(`step: ${title}`, { body: shot, contentType: 'image/jpeg' })
@@ -22,10 +22,10 @@ const SECRET = /token|secret|password|passwd|cookie|authorization|api[-_]?key|se
 const MAX = 20000
 
 // Hides secret-looking keys anywhere in a JSON value; the report is shared, so no tokens or cookies.
-export function mask(v: unknown): unknown {
-  if (Array.isArray(v)) return v.map(mask)
-  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, SECRET.test(k) ? '***' : mask(x)]))
-  return v
+export function mask(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(mask)
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, x]) => [k, SECRET.test(k) ? '***' : mask(x)]))
+  return value
 }
 
 const parse = (text: string): unknown => {
@@ -36,26 +36,26 @@ const parse = (text: string): unknown => {
   }
 }
 
-// Sends one request, records it, then runs check(res, body). Returns the parsed body for the next step.
+// Sends one request, records it, then runs check(response, body). Returns the parsed body for the next step.
 export async function apiStep(
   request: APIRequestContext,
   title: string,
   call: Call,
-  check: (res: APIResponse, body: unknown) => Promise<void> | void,
+  check: (response: APIResponse, body: unknown) => Promise<void> | void,
 ): Promise<unknown> {
   return test.step(title, async () => {
-    const req = { method: call.method.toUpperCase(), url: call.url, body: mask(call.data) }
-    let res: APIResponse | undefined
+    const recordedRequest = { method: call.method.toUpperCase(), url: call.url, body: mask(call.data) }
+    let response: APIResponse | undefined
     let body: unknown
     try {
-      res = await request.fetch(call.url, { method: req.method, data: call.data, headers: call.headers })
-      body = parse(await res.text())
-    } catch (e) {
-      await attachCall(title, req, { error: String((e as Error).message ?? e) })
-      throw e
+      response = await request.fetch(call.url, { method: recordedRequest.method, data: call.data, headers: call.headers })
+      body = parse(await response.text())
+    } catch (error) {
+      await attachCall(title, recordedRequest, { error: String((error as Error).message ?? error) })
+      throw error
     }
-    await attachCall(title, req, { status: res.status(), body: mask(body) })
-    await check(res, body)
+    await attachCall(title, recordedRequest, { status: response.status(), body: mask(body) })
+    await check(response, body)
     return body
   })
 }

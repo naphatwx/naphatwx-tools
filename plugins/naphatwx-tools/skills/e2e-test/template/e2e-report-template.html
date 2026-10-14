@@ -322,39 +322,39 @@
 /* theme:pdf-js:start */
 /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
 function addExportPdf(target, prepare) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'export-pdf no-print';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'export-pdf no-print';
     if (!target) {
         target = document.querySelector('.float-bar');
         if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
     }
-    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-    b.textContent = 'Export PDF';
-    b.addEventListener('click', async () => {
+    button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    button.textContent = 'Export PDF';
+    button.addEventListener('click', async () => {
         if (prepare) await prepare();
         window.print();
     });
-    target.append(b);
-    return b;
+    target.append(button);
+    return button;
 }
 /* theme:pdf-js:end */
 const DATA = /*__E2E_DATA__*/null;
 
-const el = (tag, attrs = {}, ...kids) => {
-  const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
-  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(String(k)));
-  return n;
+const createElement = (tag, attributes = {}, ...children) => {
+  const node = document.createElement(tag);
+  for (const [name, value] of Object.entries(attributes)) name === 'class' ? (node.className = value) : node.setAttribute(name, value);
+  for (const child of children.flat()) if (child != null) node.append(child.nodeType ? child : document.createTextNode(String(child)));
+  return node;
 };
-const ms = (v) => (v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + ' s' : v + ' ms');
-const pad = (n) => String(n).padStart(2, '0');
-function isoLocal(v) {
-  const d = new Date(v);
-  if (isNaN(d)) return String(v ?? '');
-  const off = -d.getTimezoneOffset();
-  const z = (off >= 0 ? '+' : '-') + pad(Math.floor(Math.abs(off) / 60)) + ':' + pad(Math.abs(off) % 60);
-  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + z;
+const formatDuration = (milliseconds) => (milliseconds == null ? '' : milliseconds >= 1000 ? (milliseconds / 1000).toFixed(1) + ' s' : milliseconds + ' ms');
+const pad = (number) => String(number).padStart(2, '0');
+function isoLocal(value) {
+  const date = new Date(value);
+  if (isNaN(date)) return String(value ?? '');
+  const offsetMinutes = -date.getTimezoneOffset();
+  const timezone = (offsetMinutes >= 0 ? '+' : '-') + pad(Math.floor(Math.abs(offsetMinutes) / 60)) + ':' + pad(Math.abs(offsetMinutes) % 60);
+  return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds()) + timezone;
 }
 
 // Playwright status -> word, glyph, tone. Color always comes with a glyph and the word.
@@ -371,159 +371,159 @@ const STATUS = {
   notrun: { word: 'not run', glyph: '○', tone: 'neutral' },
   incomplete: { word: 'incomplete', glyph: '–', tone: 'warn' },
 };
-const st = (s) => STATUS[s] || { word: String(s), glyph: '–', tone: 'neutral' };
-const pill = (s) => el('span', { class: 'pill tone-' + st(s).tone }, el('span', { 'aria-hidden': 'true' }, st(s).glyph), st(s).word);
+const statusOf = (status) => STATUS[status] || { word: String(status), glyph: '–', tone: 'neutral' };
+const pill = (status) => createElement('span', { class: 'pill tone-' + statusOf(status).tone }, createElement('span', { 'aria-hidden': 'true' }, statusOf(status).glyph), statusOf(status).word);
 // Buckets follow Playwright's own outcome, so header and filters match its summary.
 const OUTCOME = { expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped', notrun: 'notrun' };
-const kind = (t) => OUTCOME[t.outcome] || (t.status === 'passed' ? (t.retry ? 'flaky' : 'passed') : t.status === 'skipped' ? 'skipped' : 'failed');
+const kind = (test) => OUTCOME[test.outcome] || (test.status === 'passed' ? (test.retry ? 'flaky' : 'passed') : test.status === 'skipped' ? 'skipped' : 'failed');
 
 const announcer = document.getElementById('announce');
-async function copy(text, btn, what) {
+async function copy(text, button, what) {
   try { await navigator.clipboard.writeText(text); }
   catch {
-    const t = el('textarea', {}, text);
-    document.body.append(t); t.select();
+    const textarea = createElement('textarea', {}, text);
+    document.body.append(textarea); textarea.select();
     try { document.execCommand('copy'); } catch {}
-    t.remove();
+    textarea.remove();
   }
-  btn.textContent = 'Copied';
+  button.textContent = 'Copied';
   announcer.textContent = '';
   setTimeout(() => { announcer.textContent = 'Copied ' + what; }, 50);
-  setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+  setTimeout(() => { button.textContent = 'Copy'; }, 1200);
 }
-const cmdRow = (label, cmd, what) => {
-  const btn = el('button', { type: 'button', 'aria-label': 'Copy ' + what }, 'Copy');
-  btn.onclick = () => copy(cmd, btn, what);
-  return el('div', { class: 'command' }, el('span', { class: 'meta' }, label), el('code', {}, cmd), btn);
+const commandRow = (label, command, what) => {
+  const button = createElement('button', { type: 'button', 'aria-label': 'Copy ' + what }, 'Copy');
+  button.onclick = () => copy(command, button, what);
+  return createElement('div', { class: 'command' }, createElement('span', { class: 'meta' }, label), createElement('code', {}, command), button);
 };
 
 const zoom = document.getElementById('zoom');
-const zoomImg = zoom.querySelector('img');
+const zoomImage = zoom.querySelector('img');
 document.getElementById('zoom-close').onclick = () => zoom.close();
-zoom.onclick = (e) => { if (e.target === zoom || e.target === zoomImg) zoom.close(); };
+zoom.onclick = (e) => { if (e.target === zoom || e.target === zoomImage) zoom.close(); };
 // Stand-in for a step without a screenshot, so every step shows a frame you can click through.
 const NO_SHOT = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">'
   + '<rect width="1280" height="720" fill="#18191d"/><rect x="560" y="250" width="160" height="120" rx="12" fill="none" stroke="#4a4d55" stroke-width="6"/>'
   + '<circle cx="640" cy="310" r="26" fill="none" stroke="#4a4d55" stroke-width="6"/><path d="M548 238 L732 382" stroke="#4a4d55" stroke-width="6"/>'
   + '<text x="640" y="440" fill="#a3a6b0" font-family="-apple-system, Segoe UI, system-ui, sans-serif" font-size="32" text-anchor="middle">No screenshot for this step</text></svg>');
-const isTall = (img) => img.naturalWidth > 0 && img.naturalHeight / img.naturalWidth > 1.5;
+const isTall = (image) => image.naturalWidth > 0 && image.naturalHeight / image.naturalWidth > 1.5;
 
 // Reviewer flags: 'ok' shows nothing; the rest show the reviewer's note on the step.
 const FLAG = { test: 'Test problem', product: 'Product problem', unsure: 'Check by hand' };
-const flagged = (s) => s.review && s.review.flag !== 'ok';
-const show = (v) => (v == null ? '' : typeof v === 'string' ? v : JSON.stringify(v, null, 2));
+const flagged = (step) => step.review && step.review.flag !== 'ok';
+const show = (value) => (value == null ? '' : typeof value === 'string' ? value : JSON.stringify(value, null, 2));
 
 // One step at a time, like slides. Built once per test, so collapse and re-expand keeps the last step seen.
 // ui steps show their screenshot; mcp / api / job steps show the call's request and response.
 function viewer(slides, surface) {
   let i = 0;
-  const box = el('div', { class: 'viewer', tabindex: '0', 'aria-label': 'Step viewer, use left and right arrow keys' });
-  const title = el('h3', {});
-  const status = el('span', {});
-  const time = el('span', { class: 'meta' });
-  const count = el('span', { class: 'meta', 'aria-live': 'polite' });
-  const prev = el('button', { type: 'button' }, '‹ Prev');
-  const next = el('button', { type: 'button' }, 'Next ›');
-  const full = el('button', { type: 'button' }, 'Zoom');
-  const err = el('div', { class: 'error' }, el('div', { class: 'error-label' }, 'Error in this step'), el('pre', {}));
-  const revLabel = el('div', { class: 'review-label' });
-  const revNote = el('div', {});
-  const rev = el('div', { class: 'review' }, revLabel, revNote);
-  const msgs = el('div', { class: 'messages' }, err, rev);
-  const img = el('img', { alt: '' });
+  const box = createElement('div', { class: 'viewer', tabindex: '0', 'aria-label': 'Step viewer, use left and right arrow keys' });
+  const title = createElement('h3', {});
+  const status = createElement('span', {});
+  const time = createElement('span', { class: 'meta' });
+  const count = createElement('span', { class: 'meta', 'aria-live': 'polite' });
+  const previousButton = createElement('button', { type: 'button' }, '‹ Prev');
+  const nextButton = createElement('button', { type: 'button' }, 'Next ›');
+  const zoomButton = createElement('button', { type: 'button' }, 'Zoom');
+  const errorBox = createElement('div', { class: 'error' }, createElement('div', { class: 'error-label' }, 'Error in this step'), createElement('pre', {}));
+  const reviewLabel = createElement('div', { class: 'review-label' });
+  const reviewNote = createElement('div', {});
+  const review = createElement('div', { class: 'review' }, reviewLabel, reviewNote);
+  const messages = createElement('div', { class: 'messages' }, errorBox, review);
+  const image = createElement('img', { alt: '' });
   // Clicking the shot is a mouse shortcut only; keyboard users have Prev/Next and the step list.
-  const left = el('span', { class: 'edge previous', 'aria-hidden': 'true' }, '‹');
-  const right = el('span', { class: 'edge next', 'aria-hidden': 'true' }, '›');
-  const hint = el('span', { class: 'hint', 'aria-hidden': 'true', hidden: '' }, 'scroll ↓');
-  const frame = el('div', { class: 'frame' }, img);
-  const stage = el('div', { class: 'stage' }, frame, left, right, hint);
-  const target = el('div', { class: 'target' });
-  const reqPre = el('pre', {});
-  const resPre = el('pre', {});
-  const reqBox = el('div', {}, el('div', { class: 'label' }, 'Request'), reqPre);
-  const resBox = el('div', {}, el('div', { class: 'label' }, 'Response'), resPre);
-  const none = el('div', { class: 'meta' }, 'No call recorded for this step.');
-  const callview = el('div', { class: 'callview' }, target, reqBox, resBox, none);
+  const left = createElement('span', { class: 'edge previous', 'aria-hidden': 'true' }, '‹');
+  const right = createElement('span', { class: 'edge next', 'aria-hidden': 'true' }, '›');
+  const hint = createElement('span', { class: 'hint', 'aria-hidden': 'true', hidden: '' }, 'scroll ↓');
+  const frame = createElement('div', { class: 'frame' }, image);
+  const stage = createElement('div', { class: 'stage' }, frame, left, right, hint);
+  const target = createElement('div', { class: 'target' });
+  const requestPre = createElement('pre', {});
+  const responsePre = createElement('pre', {});
+  const requestBox = createElement('div', {}, createElement('div', { class: 'label' }, 'Request'), requestPre);
+  const responseBox = createElement('div', {}, createElement('div', { class: 'label' }, 'Response'), responsePre);
+  const none = createElement('div', { class: 'meta' }, 'No call recorded for this step.');
+  const callView = createElement('div', { class: 'callview' }, target, requestBox, responseBox, none);
   const side = (e) => {
-    const r = frame.getBoundingClientRect();
-    if (e.clientX - r.left > frame.clientWidth) return '';  // on the scrollbar
-    const d = e.clientX - r.left < r.width / 2 ? 'prev' : 'next';
-    return (d === 'prev' ? i > 0 : i < slides.length - 1) ? d : '';
+    const frameRect = frame.getBoundingClientRect();
+    if (e.clientX - frameRect.left > frame.clientWidth) return '';  // on the scrollbar
+    const direction = e.clientX - frameRect.left < frameRect.width / 2 ? 'prev' : 'next';
+    return (direction === 'prev' ? i > 0 : i < slides.length - 1) ? direction : '';
   };
   frame.onmousemove = (e) => { stage.dataset.side = side(e); };
   frame.onmouseleave = () => { stage.dataset.side = ''; };
-  frame.onclick = (e) => { const d = side(e); if (d) { go(d === 'prev' ? -1 : 1); stage.dataset.side = side(e); } };
+  frame.onclick = (e) => { const direction = side(e); if (direction) { go(direction === 'prev' ? -1 : 1); stage.dataset.side = side(e); } };
   // Tall shots make the frame a scroll region, which keyboard users must be able to focus.
   const fit = () => {
-    const tall = isTall(img);
+    const tall = isTall(image);
     stage.classList.toggle('tall', tall);
     if (tall) { frame.setAttribute('tabindex', '0'); frame.setAttribute('aria-label', 'Full-page screenshot, scrolls vertically'); }
     else { frame.removeAttribute('tabindex'); frame.removeAttribute('aria-label'); }
     hint.hidden = !tall || frame.scrollTop + frame.clientHeight >= frame.scrollHeight - 4;
   };
-  img.onload = fit;
+  image.onload = fit;
   frame.onscroll = fit;
-  const items = slides.map((s, n) => {
-    const t = st(s.status);
-    const b = el('button', { type: 'button' }, el('span', { class: 'number' }, n + 1 + '.'),
-      el('span', { class: 'glyph ' + t.tone, 'aria-hidden': 'true' }, t.glyph), el('span', { class: 'title' }, s.title,
-      el('span', { class: 'sr-only' }, ', ' + t.word), flagged(s) ? el('span', { class: 'flag' }, '⚑ ' + (FLAG[s.review.flag] || 'Review')) : null),
-      el('span', { class: 'duration' }, ms(s.ms)));
-    b.onclick = () => { i = n; update(); };
-    return el('li', {}, b);
+  const items = slides.map((step, n) => {
+    const stepStatus = statusOf(step.status);
+    const button = createElement('button', { type: 'button' }, createElement('span', { class: 'number' }, n + 1 + '.'),
+      createElement('span', { class: 'glyph ' + stepStatus.tone, 'aria-hidden': 'true' }, stepStatus.glyph), createElement('span', { class: 'title' }, step.title,
+      createElement('span', { class: 'sr-only' }, ', ' + stepStatus.word), flagged(step) ? createElement('span', { class: 'flag' }, '⚑ ' + (FLAG[step.review.flag] || 'Review')) : null),
+      createElement('span', { class: 'duration' }, formatDuration(step.ms)));
+    button.onclick = () => { i = n; update(); };
+    return createElement('li', {}, button);
   });
-  const list = el('ol', { class: 'list', 'aria-label': 'Steps' }, items);
+  const list = createElement('ol', { class: 'list', 'aria-label': 'Steps' }, items);
 
   const update = () => {
-    const s = slides[i];
-    title.textContent = (i + 1) + '. ' + s.title;
-    status.replaceChildren(pill(s.status));
-    time.textContent = ms(s.ms);
+    const step = slides[i];
+    title.textContent = (i + 1) + '. ' + step.title;
+    status.replaceChildren(pill(step.status));
+    time.textContent = formatDuration(step.ms);
     count.textContent = 'Step ' + (i + 1) + ' / ' + slides.length;
-    prev.disabled = i === 0;
-    next.disabled = i === slides.length - 1;
-    full.disabled = !s.shot;
-    err.hidden = !s.error;
-    err.querySelector('pre').textContent = s.error || '';
-    rev.hidden = !flagged(s);
-    if (flagged(s)) {
-      revLabel.replaceChildren('⚑ Review: ' + (FLAG[s.review.flag] || s.review.flag), s.review.check ? el('span', { class: 'meta' }, s.review.check) : null);
-      revNote.textContent = s.review.note || '';
+    previousButton.disabled = i === 0;
+    nextButton.disabled = i === slides.length - 1;
+    zoomButton.disabled = !step.shot;
+    errorBox.hidden = !step.error;
+    errorBox.querySelector('pre').textContent = step.error || '';
+    review.hidden = !flagged(step);
+    if (flagged(step)) {
+      reviewLabel.replaceChildren('⚑ Review: ' + (FLAG[step.review.flag] || step.review.flag), step.review.check ? createElement('span', { class: 'meta' }, step.review.check) : null);
+      reviewNote.textContent = step.review.note || '';
     }
-    msgs.hidden = err.hidden && rev.hidden;
+    messages.hidden = errorBox.hidden && review.hidden;
     // A step with a screenshot shows it; a call step, or any non-ui step, shows the request and response.
-    const asCall = !s.shot && (s.call || surface !== 'ui');
+    const asCall = !step.shot && (step.call || surface !== 'ui');
     stage.hidden = asCall;
-    callview.hidden = !asCall;
+    callView.hidden = !asCall;
     if (asCall) {
-      const c = s.call;
-      target.textContent = c ? c.target || '' : '';
-      target.hidden = !c || !c.target;
-      reqBox.hidden = resBox.hidden = !c;
-      none.hidden = !!c;
-      reqPre.textContent = c ? show(c.request) : '';
-      resPre.textContent = c ? show(c.response) : '';
+      const call = step.call;
+      target.textContent = call ? call.target || '' : '';
+      target.hidden = !call || !call.target;
+      requestBox.hidden = responseBox.hidden = !call;
+      none.hidden = !!call;
+      requestPre.textContent = call ? show(call.request) : '';
+      responsePre.textContent = call ? show(call.response) : '';
     } else {
       frame.scrollTop = 0;
-      img.src = s.shot || NO_SHOT;
-      img.alt = s.shot ? s.title : 'No screenshot for this step';
+      image.src = step.shot || NO_SHOT;
+      image.alt = step.shot ? step.title : 'No screenshot for this step';
       fit();
     }
     items.forEach((li, n) => {
-      const b = li.firstChild;
-      if (n === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      const button = li.firstChild;
+      if (n === i) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current');
     });
     // A control that just became disabled drops focus; keep it inside the viewer.
     if (document.activeElement?.disabled) box.focus({ preventScroll: true });
   };
-  const go = (d) => { const n = i + d; if (n >= 0 && n < slides.length) { i = n; update(); } };
-  prev.onclick = () => go(-1);
-  next.onclick = () => go(1);
-  full.onclick = () => {
-    const s = slides[i];
-    zoomImg.src = s.shot; zoomImg.alt = s.title;
-    zoom.classList.toggle('tall', isTall(img));
-    document.getElementById('zoom-title').textContent = (i + 1) + '. ' + s.title;
+  const go = (delta) => { const nextIndex = i + delta; if (nextIndex >= 0 && nextIndex < slides.length) { i = nextIndex; update(); } };
+  previousButton.onclick = () => go(-1);
+  nextButton.onclick = () => go(1);
+  zoomButton.onclick = () => {
+    const step = slides[i];
+    zoomImage.src = step.shot; zoomImage.alt = step.title;
+    zoom.classList.toggle('tall', isTall(image));
+    document.getElementById('zoom-title').textContent = (i + 1) + '. ' + step.title;
     zoom.showModal();
   };
   box.onkeydown = (e) => {
@@ -531,87 +531,87 @@ function viewer(slides, surface) {
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   };
-  box.append(el('div', { class: 'bar' }, title, status, time, count, el('div', { class: 'buttons' }, prev, next, full)),
-    el('div', { class: 'viewer-body' }, msgs, stage, callview, list));
+  box.append(createElement('div', { class: 'bar' }, title, status, time, count, createElement('div', { class: 'buttons' }, previousButton, nextButton, zoomButton)),
+    createElement('div', { class: 'viewer-body' }, messages, stage, callView, list));
   update();
   return box;
 }
 
 const NOTE = { skip: 'Skipped', fixme: 'Fixme', fail: 'Expected to fail' };
-let uid = 0;
+let uniqueId = 0;
 // Slides a row's panel open or shut; a click mid-slide reverses from the current height.
 const EASE = getComputedStyle(document.documentElement).getPropertyValue('--ease').trim() || 'ease';
-const calm = matchMedia('(prefers-reduced-motion: reduce)');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 function slide(panel, open, instant) {
   const from = panel.hidden ? 0 : panel.getBoundingClientRect().height;
   panel.getAnimations().forEach((a) => a.cancel());
   panel.style.overflow = '';
   panel.hidden = false;
   const to = open ? panel.getBoundingClientRect().height : 0;
-  if (instant || calm.matches || from === to) { panel.hidden = !open; return; }
-  const cs = getComputedStyle(panel);
-  const at = (h) => h ? { height: h + 'px', paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, opacity: 1 }
+  if (instant || reducedMotion.matches || from === to) { panel.hidden = !open; return; }
+  const computedStyle = getComputedStyle(panel);
+  const keyframe = (height) => height ? { height: height + 'px', paddingTop: computedStyle.paddingTop, paddingBottom: computedStyle.paddingBottom, opacity: 1 }
     : { height: '0px', paddingTop: '0px', paddingBottom: '0px', opacity: 0 };
   panel.style.overflow = 'hidden';
-  const a = panel.animate([at(from), at(to)], { duration: 220, easing: EASE, fill: 'forwards' });
-  a.onfinish = () => { panel.hidden = !open; panel.style.overflow = ''; a.cancel(); };
+  const animation = panel.animate([keyframe(from), keyframe(to)], { duration: 220, easing: EASE, fill: 'forwards' });
+  animation.onfinish = () => { panel.hidden = !open; panel.style.overflow = ''; animation.cancel(); };
 }
 
 let closeOpen = null;
 
-function testBox(t) {
-  const k = kind(t);
-  const id = 'test-' + (++uid);
-  const box = el('section', { class: 'test disclosure', 'aria-labelledby': id + '-h' });
-  box.dataset.kind = k;
-  const flags = t.steps.filter(flagged).length;
+function testBox(test) {
+  const testKind = kind(test);
+  const id = 'test-' + (++uniqueId);
+  const box = createElement('section', { class: 'test disclosure', 'aria-labelledby': id + '-h' });
+  box.dataset.kind = testKind;
+  const flags = test.steps.filter(flagged).length;
   box.dataset.flags = String(flags);
-  const toggle = el('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
-    el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' && st(t.status).tone === 'bad' ? t.status : k),
-    t.surface ? el('span', { class: 'surface', title: 'Surface: ' + t.surface }, t.surface) : null, el('span', { class: 'title' }, t.title),
-    t.scKind ? el('span', { class: 'scenario-kind ' + t.scKind, title: 'Scenario kind' }, t.scKind) : null);
-  const attempts = t.attempts || [];
-  const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : t.retry ? ' · retry ' + t.retry : '';
-  const where = t.runner === 'ai' ? 'AI tester' + (t.role ? ' as ' + t.role : '') : t.file;
-  const head = el('div', { class: 'test-head disclosure-head' }, el('h2', { id: id + '-h' }, toggle),
-    el('div', { class: 'info' }, t.scenario ? el('span', { class: 'meta' }, t.scenario) : null, where ? el('span', { class: 'meta' }, where) : null,
-      k === 'notrun' ? null : el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : '')),
-      flags ? el('span', { class: 'meta color-warn' }, '⚑ ' + flags + ' review flag' + (flags > 1 ? 's' : '')) : null));
+  const toggle = createElement('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
+    createElement('span', { class: 'mark', 'aria-hidden': 'true' }), pill(testKind === 'failed' && statusOf(test.status).tone === 'bad' ? test.status : testKind),
+    test.surface ? createElement('span', { class: 'surface', title: 'Surface: ' + test.surface }, test.surface) : null, createElement('span', { class: 'title' }, test.title),
+    test.scKind ? createElement('span', { class: 'scenario-kind ' + test.scKind, title: 'Scenario kind' }, test.scKind) : null);
+  const attempts = test.attempts || [];
+  const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : test.retry ? ' · retry ' + test.retry : '';
+  const where = test.runner === 'ai' ? 'AI tester' + (test.role ? ' as ' + test.role : '') : test.file;
+  const head = createElement('div', { class: 'test-head disclosure-head' }, createElement('h2', { id: id + '-h' }, toggle),
+    createElement('div', { class: 'info' }, test.scenario ? createElement('span', { class: 'meta' }, test.scenario) : null, where ? createElement('span', { class: 'meta' }, where) : null,
+      testKind === 'notrun' ? null : createElement('span', { class: 'meta' }, formatDuration(test.ms) + runs + (test.project ? ' · ' + test.project : '')),
+      flags ? createElement('span', { class: 'meta color-warn' }, '⚑ ' + flags + ' review flag' + (flags > 1 ? 's' : '')) : null));
   // The whole row is a mouse target; keyboard and screen readers use the heading's button.
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
-  const body = el('div', { class: 'test-body', id: id + '-b' });
-  const setOpen = (o, instant) => { box.classList.toggle('open', o); toggle.setAttribute('aria-expanded', String(o)); slide(body, o, instant); };
+  const body = createElement('div', { class: 'test-body', id: id + '-b' });
+  const setOpen = (open, instant) => { box.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open)); slide(body, open, instant); };
   toggle.onclick = () => {
-    const o = !box.classList.contains('open');
+    const open = !box.classList.contains('open');
     // Only one test open at a time; the other shuts at once so this row can be scrolled back into view.
-    const other = o && closeOpen && closeOpen !== close;
+    const other = open && closeOpen && closeOpen !== close;
     if (other) closeOpen(true);
-    closeOpen = o ? close : null;
-    setOpen(o);
+    closeOpen = open ? close : null;
+    setOpen(open);
     if (other) head.scrollIntoView({ block: 'nearest' });
   };
   const close = (instant) => setOpen(false, instant);
 
-  const notes = t.annotations || [];
-  if (notes.length) body.append(el('ul', { class: 'notes', 'aria-label': 'Annotations' },
-    notes.map((a) => el('li', {}, el('b', {}, NOTE[a.type] || a.type), a.description || 'no reason given'))));
-  const slides = t.steps.slice();
-  if (t.finalShot) slides.push({ title: 'Page at failure', status: 'failed', shot: t.finalShot });
-  if (slides.length) body.append(viewer(slides, t.surface || 'ui'));
-  else if (!notes.length) body.append(el('div', { class: 'meta' }, k === 'skipped' ? 'Skipped, with no reason given.'
-    : k === 'notrun' ? 'This scenario is in use-cases.js but has no result in this run.' : 'This test has no named steps.'));
+  const notes = test.annotations || [];
+  if (notes.length) body.append(createElement('ul', { class: 'notes', 'aria-label': 'Annotations' },
+    notes.map((a) => createElement('li', {}, createElement('b', {}, NOTE[a.type] || a.type), a.description || 'no reason given'))));
+  const slides = test.steps.slice();
+  if (test.finalShot) slides.push({ title: 'Page at failure', status: 'failed', shot: test.finalShot });
+  if (slides.length) body.append(viewer(slides, test.surface || 'ui'));
+  else if (!notes.length) body.append(createElement('div', { class: 'meta' }, testKind === 'skipped' ? 'Skipped, with no reason given.'
+    : testKind === 'notrun' ? 'This scenario is in use-cases.js but has no result in this run.' : 'This test has no named steps.'));
   // Playwright usually repeats the failed step's error as the test error; show it once.
-  const stepErrors = t.steps.map((s) => (s.error || '').trim()).filter(Boolean);
-  if (t.error && !stepErrors.some((e) => e === t.error.trim())) body.append(el('div', {}, el('h3', {}, 'Test error'), el('pre', {}, t.error)));
-  if (attempts.length) body.append(el('details', { class: 'attempts' },
-    el('summary', {}, 'Earlier attempts (' + attempts.length + ')'),
-    el('ol', {}, attempts.map((a) => el('li', {},
-      el('div', { class: 'attempt-head' }, el('span', {}, a.retry ? 'Retry ' + a.retry : 'First run'), pill(a.status), el('span', { class: 'meta' }, ms(a.duration))),
-      a.error ? el('pre', {}, a.error) : null)))));
-  if (k !== 'passed' && k !== 'notrun' && t.runner !== 'ai' && t.file) {
-    const cmd = 'npx playwright test ' + t.file + (t.project ? ' --project=' + JSON.stringify(t.project).replace(/^"([\w.-]+)"$/, '$1') : '');
-    body.append(el('div', { class: 'commands' }, cmdRow('Rerun', cmd, 'rerun command for ' + t.title),
-      t.trace ? cmdRow('Trace', 'npx playwright show-trace ' + t.trace, 'trace command for ' + t.title) : null));
+  const stepErrors = test.steps.map((s) => (s.error || '').trim()).filter(Boolean);
+  if (test.error && !stepErrors.some((e) => e === test.error.trim())) body.append(createElement('div', {}, createElement('h3', {}, 'Test error'), createElement('pre', {}, test.error)));
+  if (attempts.length) body.append(createElement('details', { class: 'attempts' },
+    createElement('summary', {}, 'Earlier attempts (' + attempts.length + ')'),
+    createElement('ol', {}, attempts.map((attempt) => createElement('li', {},
+      createElement('div', { class: 'attempt-head' }, createElement('span', {}, attempt.retry ? 'Retry ' + attempt.retry : 'First run'), pill(attempt.status), createElement('span', { class: 'meta' }, formatDuration(attempt.duration))),
+      attempt.error ? createElement('pre', {}, attempt.error) : null)))));
+  if (testKind !== 'passed' && testKind !== 'notrun' && test.runner !== 'ai' && test.file) {
+    const command = 'npx playwright test ' + test.file + (test.project ? ' --project=' + JSON.stringify(test.project).replace(/^"([\w.-]+)"$/, '$1') : '');
+    body.append(createElement('div', { class: 'commands' }, commandRow('Rerun', command, 'rerun command for ' + test.title),
+      test.trace ? commandRow('Trace', 'npx playwright show-trace ' + test.trace, 'trace command for ' + test.title) : null));
   }
   box.append(head, body);
   setOpen(false, true);
@@ -620,64 +620,64 @@ function testBox(t) {
 
 function render() {
   const app = document.getElementById('app');
-  if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
-  const n = { failed: 0, flaky: 0, passed: 0, skipped: 0, notrun: 0 };
-  for (const t of DATA.tests) n[kind(t)]++;
-  const tools = el('div', { class: 'tools', role: 'group', 'aria-label': 'Show tests' });
+  if (!DATA) { app.append(createElement('p', {}, 'No data in this report.')); return; }
+  const counts = { failed: 0, flaky: 0, passed: 0, skipped: 0, notrun: 0 };
+  for (const test of DATA.tests) counts[kind(test)]++;
+  const tools = createElement('div', { class: 'tools', role: 'group', 'aria-label': 'Show tests' });
   const boxes = DATA.tests.map(testBox);
   const flaggedTests = boxes.filter((b) => +b.dataset.flags > 0).length;
   const flagCount = boxes.reduce((c, b) => c + +b.dataset.flags, 0);
   // The tree from use-cases.js: UC1 → its scenarios in file order, UC2 → …, then tests with no known use case.
   const known = new Set((DATA.useCases || []).map((u) => u.id));
-  const ucOf = (t) => (known.has(t.useCase) ? t.useCase : '');
-  const useCases = [...(DATA.useCases || []), { id: '', title: 'Other tests' }].filter((u) => DATA.tests.some((t) => ucOf(t) === u.id));
-  const heads = new Map(useCases.map((u) => {
-    const tests = DATA.tests.filter((t) => ucOf(t) === u.id);
+  const useCaseOf = (test) => (known.has(test.useCase) ? test.useCase : '');
+  const useCases = [...(DATA.useCases || []), { id: '', title: 'Other tests' }].filter((u) => DATA.tests.some((t) => useCaseOf(t) === u.id));
+  const heads = new Map(useCases.map((useCase) => {
+    const tests = DATA.tests.filter((t) => useCaseOf(t) === useCase.id);
     const passed = tests.filter((t) => kind(t) === 'passed').length;
-    return [u.id, el('h2', { class: 'use-case-title' }, (u.id ? u.id + ' ' : '') + u.title, el('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
+    return [useCase.id, createElement('h2', { class: 'use-case-title' }, (useCase.id ? useCase.id + ' ' : '') + useCase.title, createElement('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
   }));
-  const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
-  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['flaky', 'Flaky', n.flaky], ['passed', 'Passed', n.passed],
-    ['skipped', 'Skipped', n.skipped], ['notrun', 'Not run', n.notrun], ['review', 'Review flags', flaggedTests]].filter(([key, , c]) => c || ['all', 'failed', 'passed'].includes(key));
+  const none = createElement('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
+  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', counts.failed], ['flaky', 'Flaky', counts.flaky], ['passed', 'Passed', counts.passed],
+    ['skipped', 'Skipped', counts.skipped], ['notrun', 'Not run', counts.notrun], ['review', 'Review flags', flaggedTests]].filter(([key, , total]) => total || ['all', 'failed', 'passed'].includes(key));
   let failedFirst = false;
   const order = { failed: 0, flaky: 1, passed: 2, skipped: 3, notrun: 4 };
   const place = () => {
     const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => (failedFirst ? order[a[0].dataset.kind] - order[b[0].dataset.kind] : 0) || a[1] - b[1]);
-    for (const u of useCases) {
-      app.append(heads.get(u.id));
-      sorted.filter(([, i]) => ucOf(DATA.tests[i]) === u.id).forEach(([b]) => app.append(b));
+    for (const useCase of useCases) {
+      app.append(heads.get(useCase.id));
+      sorted.filter(([, i]) => useCaseOf(DATA.tests[i]) === useCase.id).forEach(([b]) => app.append(b));
     }
     app.append(none);
   };
-  const buttons = FILTERS.map(([key, label, c]) => {
-    const b = el('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + c);
-    b.onclick = () => {
-      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  const buttons = FILTERS.map(([key, label, total]) => {
+    const button = createElement('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + total);
+    button.onclick = () => {
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === button)));
       let shown = 0;
       for (const box of boxes) {
         box.hidden = key !== 'all' && (key === 'review' ? box.dataset.flags === '0' : box.dataset.kind !== key);
         if (!box.hidden) shown++;
       }
-      for (const [u, h] of heads) h.hidden = !boxes.some((box, i) => !box.hidden && ucOf(DATA.tests[i]) === u);
+      for (const [useCaseId, heading] of heads) heading.hidden = !boxes.some((box, i) => !box.hidden && useCaseOf(DATA.tests[i]) === useCaseId);
       none.hidden = shown > 0;
     };
-    return b;
+    return button;
   });
   // Default order is use-cases.js order, the same tree every skill shows; this toggle lifts failures to the top of each use case.
-  const sortBtn = el('button', { type: 'button', 'aria-pressed': 'false' }, 'Failed first');
-  sortBtn.onclick = () => { failedFirst = !failedFirst; sortBtn.setAttribute('aria-pressed', String(failedFirst)); place(); };
-  tools.append(...buttons, el('span', { class: 'separator', 'aria-hidden': 'true' }), sortBtn);
+  const sortButton = createElement('button', { type: 'button', 'aria-pressed': 'false' }, 'Failed first');
+  sortButton.onclick = () => { failedFirst = !failedFirst; sortButton.setAttribute('aria-pressed', String(failedFirst)); place(); };
+  tools.append(...buttons, createElement('span', { class: 'separator', 'aria-hidden': 'true' }), sortButton);
   // Same buckets and order as the filters; a count is colored only when it is not zero.
-  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' color-' + tone : '') }, c + ' ' + word);
-  app.append(el('header', {},
-    el('div', {}, el('h1', {}, 'E2E report · ' + DATA.name, pill(DATA.status)),
-      el('div', { class: 'summary-line' },
-        count(n.failed, 'failed', 'bad'), count(n.flaky, 'flaky', 'warn'), count(n.passed, 'passed'), count(n.skipped, 'skipped'),
-        n.notrun ? count(n.notrun, 'not run') : null, count(flagCount, 'review flag' + (flagCount === 1 ? '' : 's'), 'warn'),
-        el('span', { class: 'meta' }, DATA.tests.length + ' scenarios · ' + ms(DATA.ms)),
-        el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
-        DATA.baseURL ? el('span', { class: 'meta' }, DATA.baseURL) : null)),
-    el('div', { class: 'head-row' }, tools)));
+  const count = (total, word, tone) => createElement('span', { class: 'lead' + (total && tone ? ' color-' + tone : '') }, total + ' ' + word);
+  app.append(createElement('header', {},
+    createElement('div', {}, createElement('h1', {}, 'E2E report · ' + DATA.name, pill(DATA.status)),
+      createElement('div', { class: 'summary-line' },
+        count(counts.failed, 'failed', 'bad'), count(counts.flaky, 'flaky', 'warn'), count(counts.passed, 'passed'), count(counts.skipped, 'skipped'),
+        counts.notrun ? count(counts.notrun, 'not run') : null, count(flagCount, 'review flag' + (flagCount === 1 ? '' : 's'), 'warn'),
+        createElement('span', { class: 'meta' }, DATA.tests.length + ' scenarios · ' + formatDuration(DATA.ms)),
+        createElement('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
+        DATA.baseURL ? createElement('span', { class: 'meta' }, DATA.baseURL) : null)),
+    createElement('div', { class: 'head-row' }, tools)));
   addExportPdf();
   place();
 }

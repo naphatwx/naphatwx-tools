@@ -7,90 +7,90 @@ const fs = require('fs');
 const path = require('path');
 
 const args = process.argv.slice(2);
-const opt = (name, d) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : d; };
+const option = (name, fallback) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : fallback; };
 const plan = args[0];
 if (!plan) { process.stderr.write('usage: node scenarios-panels.js <plan-dir> [--use-cases <file>] [--play-file <file>] [--play <url>] [--mock <url>]\n'); process.exit(2); }
-const ucFile = opt('--use-cases', path.join(plan, 'use-cases.js'));
-const playFile = opt('--play-file', path.join(plan, 'mock/shared/scenario-play.js'));
-const play = opt('--play', 'mock/index.html#sc-{id}');
-const mockIndex = opt('--mock', 'mock/index.html');
+const useCasesFile = option('--use-cases', path.join(plan, 'use-cases.js'));
+const playFile = option('--play-file', path.join(plan, 'mock/shared/scenario-play.js'));
+const play = option('--play', 'mock/index.html#sc-{id}');
+const mockIndex = option('--mock', 'mock/index.html');
 const overviewPath = path.join(plan, 'overview.html');
 let html = fs.readFileSync(overviewPath, 'utf8');
-const fail = msg => { process.stderr.write(msg + '\n'); process.exit(1); };
+const fail = message => { process.stderr.write(message + '\n'); process.exit(1); };
 
 /** `<NAME> = [ ... ]` parsed as strict JSON (works for `var X =` and `export const X =`). */
-function parseVar(src, name, file) {
-    const m = src.match(new RegExp(`\\b${name}\\s*=\\s*\\[`));
-    if (!m) throw new Error(`${name} not found in ${file}`);
-    const start = m.index + m[0].length - 1;
-    let depth = 0, inStr = false;
-    for (let j = start; j < src.length; j++) {
-        const c = src[j];
-        if (inStr) { if (c === '\\') j++; else if (c === '"') inStr = false; continue; }
-        if (c === '"') inStr = true;
-        else if (c === '[') depth++;
-        else if (c === ']' && --depth === 0) return JSON.parse(src.slice(start, j + 1));
+function parseVariable(source, name, file) {
+    const match = source.match(new RegExp(`\\b${name}\\s*=\\s*\\[`));
+    if (!match) throw new Error(`${name} not found in ${file}`);
+    const start = match.index + match[0].length - 1;
+    let depth = 0, inString = false;
+    for (let j = start; j < source.length; j++) {
+        const character = source[j];
+        if (inString) { if (character === '\\') j++; else if (character === '"') inString = false; continue; }
+        if (character === '"') inString = true;
+        else if (character === '[') depth++;
+        else if (character === ']' && --depth === 0) return JSON.parse(source.slice(start, j + 1));
     }
     throw new Error(`${name}: unclosed array`);
 }
-const src = fs.readFileSync(ucFile, 'utf8');
+const source = fs.readFileSync(useCasesFile, 'utf8');
 // Plans made before the use case / scenario split group "use cases" under flows (3.N); they need a rebuild, not a patch.
-if (/\bUSE_CASE_FLOWS\s*=/.test(src) || /id="flows"/.test(html))
+if (/\bUSE_CASE_FLOWS\s*=/.test(source) || /id="flows"/.test(html))
     fail('Old plan layout (flows 3.N). Re-run the generate-use-case skill, then rebuild overview.html from the template.');
-const USE_CASES = parseVar(src, 'USE_CASES', ucFile);
-const CORE = parseVar(src, 'SCENARIOS', ucFile);
+const USE_CASES = parseVariable(source, 'USE_CASES', useCasesFile);
+const CORE = parseVariable(source, 'SCENARIOS', useCasesFile);
 const hasMock = fs.existsSync(playFile);
-const PLAY = hasMock ? parseVar(fs.readFileSync(playFile, 'utf8'), 'SCENARIO_PLAY', playFile) : [];
-const SCS = CORE.map(s => ({ ...s, ...(PLAY.find(p => p.id === s.id) || { skip: 'no mock' }) }));
+const PLAY = hasMock ? parseVariable(fs.readFileSync(playFile, 'utf8'), 'SCENARIO_PLAY', playFile) : [];
+const SCENARIOS = CORE.map(s => ({ ...s, ...(PLAY.find(p => p.id === s.id) || { skip: 'no mock' }) }));
 // same rule as the mock's isPlayable: only a ui scenario with a play entry opens a screen
-const playable = s => hasMock && !s.skip && (s.surface || 'ui') === 'ui';
+const playable = scenario => hasMock && !scenario.skip && (scenario.surface || 'ui') === 'ui';
 
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[c]));
-const nn = ucId => ucId.slice(2).padStart(2, '0');
-const href = s => play.replace(/\{(id|page|state)\}/g, (_, k) => encodeURIComponent(s[k]));
-const ext = 'target="_blank" rel="noopener"';
-const scsOf = ucId => SCS.filter(s => s.useCase === ucId);
-const playCell = s => playable(s) ? `<a href="${esc(href(s))}" ${ext}>Play ↗</a>`
-    : !hasMock ? '' : `<span class="aside">${(s.surface || 'ui') === 'ui' ? 'not in the mock' : 'No mock'}</span>`;
-const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[c]));
+const twoDigitNumber = useCaseId => useCaseId.slice(2).padStart(2, '0');
+const href = scenario => play.replace(/\{(id|page|state)\}/g, (_, key) => encodeURIComponent(scenario[key]));
+const newTabAttributes = 'target="_blank" rel="noopener"';
+const scenariosOf = useCaseId => SCENARIOS.filter(s => s.useCase === useCaseId);
+const playCell = scenario => playable(scenario) ? `<a href="${escapeHtml(href(scenario))}" ${newTabAttributes}>Play ↗</a>`
+    : !hasMock ? '' : `<span class="aside">${(scenario.surface || 'ui') === 'ui' ? 'not in the mock' : 'No mock'}</span>`;
+const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
 // channel tag (ui / mcp / api / job), title + kind + story chip, first expect line, then one muted line per "na" reason
-const naLines = s => s.na && typeof s.na === 'object' ? Object.entries(s.na).map(([k, why]) => `<br><span class="aside not-applicable">${esc(k)} n/a: ${esc(why)}</span>`).join('') : '';
-const kindTag = s => s.kind ? ` <span class="scenario-kind ${esc(s.kind)}">${esc(s.kind)}</span>` : '';
-const scenarioCell = s => `${s.surface ? `<span class="channel-tag">${esc(s.surface)}</span> ` : ''}${esc(s.title)}${kindTag(s)} <span class="references">${esc(s.story)}</span>`
-    + `<br><span class="aside">${esc((s.expect || [])[0] || '')}</span>${naLines(s)}`;
+const notApplicableLines = scenario => scenario.na && typeof scenario.na === 'object' ? Object.entries(scenario.na).map(([channel, why]) => `<br><span class="aside not-applicable">${escapeHtml(channel)} n/a: ${escapeHtml(why)}</span>`).join('') : '';
+const kindTag = scenario => scenario.kind ? ` <span class="scenario-kind ${escapeHtml(scenario.kind)}">${escapeHtml(scenario.kind)}</span>` : '';
+const scenarioCell = scenario => `${scenario.surface ? `<span class="channel-tag">${escapeHtml(scenario.surface)}</span> ` : ''}${escapeHtml(scenario.title)}${kindTag(scenario)} <span class="references">${escapeHtml(scenario.story)}</span>`
+    + `<br><span class="aside">${escapeHtml((scenario.expect || [])[0] || '')}</span>${notApplicableLines(scenario)}`;
 
 // ---------------------------------------------------------------- "Open the mock" link on the Use cases heading
 html = html.replace(/(<section class="slide" id="use-cases"[^>]*>\s*<h2>[\s\S]*?)(?: <a class="side-link"[^>]*>[^<]*<\/a>)?<\/h2>/,
-    (_, h2) => `${h2}${hasMock ? ` <a class="side-link" href="${esc(mockIndex)}" ${ext}>Open the mock ↗</a>` : ''}</h2>`);
+    (_, h2) => `${h2}${hasMock ? ` <a class="side-link" href="${escapeHtml(mockIndex)}" ${newTabAttributes}>Open the mock ↗</a>` : ''}</h2>`);
 
 // ---------------------------------------------------------------- "Scenarios" view per use case
-const I = '            ';
-const panelOf = (uc, id) => {
-    const scs = scsOf(uc.id);
+const INDENT = '            ';
+const panelOf = (useCase, id) => {
+    const scenarios = scenariosOf(useCase.id);
     const open = `<div class="panel" role="region" tabindex="-1" id="${id}" aria-labelledby="${id}-tab" hidden>`;
-    const note = `${I}    <!-- Generated by scripts/scenarios-panels.js from use-cases.js${hasMock ? ' and the mock\'s play file' : ''}. Don't hand-edit. -->`;
-    if (!scs.length) return `${open}\n${note}\n${I}    <p class="muted">${esc(uc.none || 'No scenario for this use case.')}</p>\n${I}</div>`;
-    const rows = scs.map(s => `${I}            <tr id="sc-${esc(s.id)}"><td>${scenarioCell(s)}</td>${hasMock ? `<td class="nowrap">${playCell(s)}</td>` : ''}</tr>`);
-    return `${open}\n${note}\n${I}    <div class="table-wrap"><table>\n${I}        <thead><tr><th>Scenario</th>${hasMock ? '<th></th>' : ''}</tr></thead><tbody>\n${rows.join('\n')}\n${I}        </tbody></table></div>\n${I}</div>`;
+    const note = `${INDENT}    <!-- Generated by scripts/scenarios-panels.js from use-cases.js${hasMock ? ' and the mock\'s play file' : ''}. Don't hand-edit. -->`;
+    if (!scenarios.length) return `${open}\n${note}\n${INDENT}    <p class="muted">${escapeHtml(useCase.none || 'No scenario for this use case.')}</p>\n${INDENT}</div>`;
+    const rows = scenarios.map(s => `${INDENT}            <tr id="sc-${escapeHtml(s.id)}"><td>${scenarioCell(s)}</td>${hasMock ? `<td class="nowrap">${playCell(s)}</td>` : ''}</tr>`);
+    return `${open}\n${note}\n${INDENT}    <div class="table-wrap"><table>\n${INDENT}        <thead><tr><th>Scenario</th>${hasMock ? '<th></th>' : ''}</tr></thead><tbody>\n${rows.join('\n')}\n${INDENT}        </tbody></table></div>\n${INDENT}</div>`;
 };
 const missing = [];
-for (const uc of USE_CASES) {
-    const id = `uc-${nn(uc.id)}-sc`;
-    const start = html.indexOf(`id="uc-${nn(uc.id)}"`);
-    if (start < 0) { missing.push(uc.id); continue; }
-    const end = (() => { const e = html.indexOf('</section>', start); return e < 0 ? html.length : e; })();
+for (const useCase of USE_CASES) {
+    const id = `uc-${twoDigitNumber(useCase.id)}-sc`;
+    const start = html.indexOf(`id="uc-${twoDigitNumber(useCase.id)}"`);
+    if (start < 0) { missing.push(useCase.id); continue; }
+    const end = (() => { const index = html.indexOf('</section>', start); return index < 0 ? html.length : index; })();
     let block = html.slice(start, end).replace(/\s*$/, '');
     // the panel is always the block's last child, so cut from it to the end
-    const old = block.search(new RegExp(`\\s*<div class="panel"[^>]*id="${id}"`));
-    if (old >= 0) block = block.slice(0, old);
+    const oldPanel = block.search(new RegExp(`\\s*<div class="panel"[^>]*id="${id}"`));
+    if (oldPanel >= 0) block = block.slice(0, oldPanel);
     block = block.replace(new RegExp(`\\n[ \\t]*<button[^>]*id="${id}-tab"[^>]*>[^<]*</button>`), '');
-    const button = `<button type="button" aria-expanded="false" aria-controls="${id}" id="${id}-tab">Scenarios (${scsOf(uc.id).length})</button>`;
-    block = block.replace(/(<div class="views"[\s\S]*?)(\n[ \t]*<\/div>)/, `$1\n${I}    ${button}$2`);
-    block += `\n${I}${panelOf(uc, id)}\n        `;
+    const button = `<button type="button" aria-expanded="false" aria-controls="${id}" id="${id}-tab">Scenarios (${scenariosOf(useCase.id).length})</button>`;
+    block = block.replace(/(<div class="views"[\s\S]*?)(\n[ \t]*<\/div>)/, `$1\n${INDENT}    ${button}$2`);
+    block += `\n${INDENT}${panelOf(useCase, id)}\n        `;
     html = html.slice(0, start) + block + html.slice(end);
 }
 
 fs.writeFileSync(overviewPath, html);
-process.stdout.write(`Scenarios written into the use cases: ${plural(SCS.length, 'scenario')} in ${plural(USE_CASES.length, 'use case')}, ${hasMock ? `${SCS.filter(playable).length} playable in the mock` : 'no mock'}\n`);
-USE_CASES.forEach(uc => process.stdout.write(`  ${uc.id} ${uc.title}: ${scsOf(uc.id).length}${hasMock ? ` (${scsOf(uc.id).filter(playable).length} playable)` : ''}\n`));
+process.stdout.write(`Scenarios written into the use cases: ${plural(SCENARIOS.length, 'scenario')} in ${plural(USE_CASES.length, 'use case')}, ${hasMock ? `${SCENARIOS.filter(playable).length} playable in the mock` : 'no mock'}\n`);
+USE_CASES.forEach(useCase => process.stdout.write(`  ${useCase.id} ${useCase.title}: ${scenariosOf(useCase.id).length}${hasMock ? ` (${scenariosOf(useCase.id).filter(playable).length} playable)` : ''}\n`));
 if (missing.length) fail(`No #uc-NN block in overview.html for use case(s): ${missing.join(', ')}`);

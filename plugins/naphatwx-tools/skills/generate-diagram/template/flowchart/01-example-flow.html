@@ -212,50 +212,50 @@
     /* theme:pdf-js:start */
     /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
     function addExportPdf(target, prepare) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'export-pdf no-print';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'export-pdf no-print';
         if (!target) {
             target = document.querySelector('.float-bar');
             if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
         }
-        b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-        b.textContent = 'Export PDF';
-        b.addEventListener('click', async () => {
+        button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+        button.textContent = 'Export PDF';
+        button.addEventListener('click', async () => {
             if (prepare) await prepare();
             window.print();
         });
-        target.append(b);
-        return b;
+        target.append(button);
+        return button;
     }
     /* theme:pdf-js:end */
     /* theme:diagram-labels-js:start */
     /* Synced from theme/diagram-labels.js by theme/sync.mjs. Do not edit here. */
     function fitDiagramLabels(root = document) {
-        const PAD = 6, GAP = 4, r1 = n => Math.round(n * 10) / 10;
+        const PAD = 6, GAP = 4, roundTo1 = value => Math.round(value * 10) / 10;
         let done = true;
-        root.querySelectorAll('g.edge-label').forEach(g => {
-            const text = g.querySelector(':scope > text');
+        root.querySelectorAll('g.edge-label').forEach(group => {
+            const text = group.querySelector(':scope > text');
             if (!text) return;
-            const w = text.getComputedTextLength();
+            const width = text.getComputedTextLength();
             // 0: not laid out yet (a hidden panel or frame), so the next call fits it
-            if (!w) { done = false; return; }
-            let cx = parseFloat(g.dataset.cx);
-            if (Number.isNaN(cx)) {
+            if (!width) { done = false; return; }
+            let centerX = parseFloat(group.dataset.cx);
+            if (Number.isNaN(centerX)) {
                 const x = text.x.baseVal[0]?.value || 0, anchor = getComputedStyle(text).textAnchor;
-                cx = anchor === 'start' ? x + w / 2 : anchor === 'end' ? x - w / 2 : x;
+                centerX = anchor === 'start' ? x + width / 2 : anchor === 'end' ? x - width / 2 : x;
             }
-            text.setAttribute('x', r1(cx));
+            text.setAttribute('x', roundTo1(centerX));
             text.setAttribute('text-anchor', 'middle');
-            const left = cx - w / 2 - PAD;
-            const bg = g.querySelector(':scope > .edge-label-background');
-            if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
-            const num = g.querySelector(':scope > .edge-label-number');
-            if (num) {
-                num.removeAttribute('transform');
+            const left = centerX - width / 2 - PAD;
+            const background = group.querySelector(':scope > .edge-label-background');
+            if (background) { background.setAttribute('x', roundTo1(left)); background.setAttribute('width', roundTo1(width + 2 * PAD)); }
+            const badge = group.querySelector(':scope > .edge-label-number');
+            if (badge) {
+                badge.removeAttribute('transform');
                 try {
-                    const b = num.getBBox();
-                    num.setAttribute('transform', `translate(${r1(left - GAP - (b.x + b.width))} 0)`);
+                    const box = badge.getBBox();
+                    badge.setAttribute('transform', `translate(${roundTo1(left - GAP - (box.x + box.width))} 0)`);
                 } catch { done = false; }
             }
         });
@@ -290,8 +290,8 @@
         // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
         const postSize = () => {
             if (!embedded) return;
-            const cs = getComputedStyle(document.body);
-            const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+            const bodyStyle = getComputedStyle(document.body);
+            const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(bodyStyle.paddingLeft) + parseFloat(bodyStyle.paddingRight);
             parent.postMessage({ type: 'diagram-height', height: document.body.getBoundingClientRect().height, width }, '*');
         };
         const refresh = () => { fitDiagramLabels(); postSize(); };

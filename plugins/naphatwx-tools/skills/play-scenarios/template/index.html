@@ -310,35 +310,35 @@
         /* theme:pdf-js:start */
         /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
         function addExportPdf(target, prepare) {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'export-pdf no-print';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'export-pdf no-print';
             if (!target) {
                 target = document.querySelector('.float-bar');
                 if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
             }
-            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-            b.textContent = 'Export PDF';
-            b.addEventListener('click', async () => {
+            button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            button.textContent = 'Export PDF';
+            button.addEventListener('click', async () => {
                 if (prepare) await prepare();
                 window.print();
             });
-            target.append(b);
-            return b;
+            target.append(button);
+            return button;
         }
         /* theme:pdf-js:end */
         addExportPdf();
-        const SCREEN_W = 1920, SCREEN_H = 1080; // 16:9; the frame scales to the column width and keeps this ratio
-        const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-        const list = items => (items || []).map(s => `<li>${esc(s)}</li>`).join('');
-        const nn = ucId => ucId.slice(2).padStart(2, '0');
+        const SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080; // 16:9; the frame scales to the column width and keeps this ratio
+        const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+        const list = items => (items || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
+        const twoDigitNumber = useCaseId => useCaseId.slice(2).padStart(2, '0');
         // trace IDs ("US4 · AC4") as a "2 refs" chip + the hidden IDs; one click handler toggles every chip
-        const refsChip = refs => {
-            const n = String(refs || '').split(' · ').filter(s => s.trim()).length;
-            return n ? `<button type="button" class="references-chip" aria-expanded="false" title="Show trace IDs">${n} ref${n > 1 ? 's' : ''}</button><span class="references-ids code-text font-mono meta">${esc(refs)}</span>` : '';
+        const referencesChip = refs => {
+            const count = String(refs || '').split(' · ').filter(s => s.trim()).length;
+            return count ? `<button type="button" class="references-chip" aria-expanded="false" title="Show trace IDs">${count} ref${count > 1 ? 's' : ''}</button><span class="references-ids code-text font-mono meta">${escapeHtml(refs)}</span>` : '';
         };
-        document.addEventListener('click', e => { const c = e.target.closest('.references-chip'); if (c) c.setAttribute('aria-expanded', String(c.getAttribute('aria-expanded') !== 'true')); });
-        const scsOf = ucId => SCENARIOS.filter(s => s.useCase === ucId);
+        document.addEventListener('click', e => { const chip = e.target.closest('.references-chip'); if (chip) chip.setAttribute('aria-expanded', String(chip.getAttribute('aria-expanded') !== 'true')); });
+        const scenariosOf = useCaseId => SCENARIOS.filter(s => s.useCase === useCaseId);
         const playable = s => !s.skip;
         const SURFACE = { ui: 'Played by hand on the screen', mcp: 'Played by your AI agent over MCP', api: 'Played by your AI agent over the API', job: 'Played by your AI agent: runs the job' };
         const byId = id => SCENARIOS.find(s => s.id === id);
@@ -349,35 +349,35 @@
         // ---------------------------------------------------------------- where each scenario opens
         const opened = {}; // scenario id → the URL its last seed returned
         const values = {}; // scenario id → { key: value } its last seed created (names, ids, merge request numbers), or typed by the viewer
-        const labelOf = k => k.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase().replace(/\b(mr|id|url)\b/g, m => m.toUpperCase());
+        const labelOf = key => key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase().replace(/\b(mr|id|url)\b/g, match => match.toUpperCase());
         /** {key} in a step or prompt → the value the seed created; before the seed, a marker saying the seed fills it. */
-        const fill = (sc, text) => String(text).replace(/\{(\w+)\}/g, (m, k) => values[sc.id]?.[k] ?? (sc.seed ? `[${labelOf(k)}: filled in after the seed]` : `[${labelOf(k)}: type it above]`));
+        const fill = (scenario, text) => String(text).replace(/\{(\w+)\}/g, (match, key) => values[scenario.id]?.[key] ?? (scenario.seed ? `[${labelOf(key)}: filled in after the seed]` : `[${labelOf(key)}: type it above]`));
         /** After a seed: keep its URL and values, and fill them into the steps. */
-        function seeded(sc, block, r) {
-            if (r.url) opened[sc.id] = r.url;
-            values[sc.id] = { ...(values[sc.id] || {}), ...Object.fromEntries(Object.entries(r.values || {}).map(([k, v]) => [k, String(v)])) };
-            block.querySelector('.url').textContent = screenUrl(sc);
-            block.querySelector('.open-link').href = screenSrc(sc);
-            block.querySelector('.guide .steps').innerHTML = list((sc.steps || []).map(t => fill(sc, t)));
+        function seeded(scenario, block, result) {
+            if (result.url) opened[scenario.id] = result.url;
+            values[scenario.id] = { ...(values[scenario.id] || {}), ...Object.fromEntries(Object.entries(result.values || {}).map(([key, value]) => [key, String(value)])) };
+            block.querySelector('.url').textContent = screenUrl(scenario);
+            block.querySelector('.open-link').href = screenSource(scenario);
+            block.querySelector('.guide .steps').innerHTML = list((scenario.steps || []).map(step => fill(scenario, step)));
         }
-        const pathOf = sc => opened[sc.id] || sc.url || '';
-        const roleOf = sc => sc.role || LIVE_CONFIG.role || '';
+        const pathOf = scenario => opened[scenario.id] || scenario.url || '';
+        const roleOf = scenario => scenario.role || LIVE_CONFIG.role || '';
         /** A link login wraps the URL, so every scenario signs in as its role; a post login is done by server.mjs. */
-        function screenSrc(sc) {
-            if (LOGIN.type !== 'link') return LIVE_CONFIG.base + pathOf(sc);
-            return LIVE_CONFIG.base + LOGIN.path.replace('{role}', encodeURIComponent(roleOf(sc))).replace('{next}', encodeURIComponent(pathOf(sc)));
+        function screenSource(scenario) {
+            if (LOGIN.type !== 'link') return LIVE_CONFIG.base + pathOf(scenario);
+            return LIVE_CONFIG.base + LOGIN.path.replace('{role}', encodeURIComponent(roleOf(scenario))).replace('{next}', encodeURIComponent(pathOf(scenario)));
         }
-        const screenUrl = sc => sc.skip ? 'Skipped: not played live' : pathOf(sc) ? (LIVE_CONFIG.base + pathOf(sc)).replace(/^https?:\/\//, '') : sc.prompt ? 'No screen: a prompt for your AI agent' : 'The seed sets the URL';
+        const screenUrl = scenario => scenario.skip ? 'Skipped: not played live' : pathOf(scenario) ? (LIVE_CONFIG.base + pathOf(scenario)).replace(/^https?:\/\//, '') : scenario.prompt ? 'No screen: a prompt for your AI agent' : 'The seed sets the URL';
         /** server.mjs is needed for a seed to run or a sign-in to post. */
-        const needsServer = sc => !!sc.seed || LOGIN.type === 'post';
+        const needsServer = scenario => !!scenario.seed || LOGIN.type === 'post';
 
         // ---------------------------------------------------------------- one pick: new data, sign-in, URL (server.mjs runs one at a time)
-        function play(sc) {
-            if (!needsServer(sc)) return Promise.resolve({ ok: true });
+        function play(scenario) {
+            if (!needsServer(scenario)) return Promise.resolve({ ok: true });
             if (!served) return Promise.resolve({ ok: false, output: 'Seeds and sign-in run through the play server. Start it with node live/server.mjs --up, then open the URL it prints.' });
-            return fetch('/__play/' + encodeURIComponent(sc.id), { method: 'POST', headers: { 'X-Play': '1' } })
-                .then(r => r.json())
-                .catch(e => ({ ok: false, output: 'The play server did not answer: ' + e.message }));
+            return fetch('/__play/' + encodeURIComponent(scenario.id), { method: 'POST', headers: { 'X-Play': '1' } })
+                .then(response => response.json())
+                .catch(error => ({ ok: false, output: 'The play server did not answer: ' + error.message }));
         }
 
         // ---------------------------------------------------------------- results, per viewer
@@ -385,7 +385,7 @@
         let results = {};
         try { results = JSON.parse(localStorage.getItem(RESULTS_KEY)) || {}; } catch { }
         // results recorded by the AI (results.js); what this viewer clicked wins, and a cleared scenario stays empty
-        if (typeof PLAYED_RESULTS === 'object') for (const [id, r] of Object.entries(PLAYED_RESULTS)) if (!results[id]?.status && !results[id]?.cleared) results[id] = { ...(results[id] || {}), status: r.status || '', note: results[id]?.note || r.note || '' };
+        if (typeof PLAYED_RESULTS === 'object') for (const [id, recorded] of Object.entries(PLAYED_RESULTS)) if (!results[id]?.status && !results[id]?.cleared) results[id] = { ...(results[id] || {}), status: recorded.status || '', note: results[id]?.note || recorded.note || '' };
         function setResult(id, patch) {
             results[id] = { ...(results[id] || {}), ...patch, at: new Date().toISOString() };
             try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { /* storage blocked: kept for this visit only */ }
@@ -394,27 +394,27 @@
         function mark(id, status) {
             setResult(id, { status: results[id]?.status === status ? '' : status });
             const block = document.querySelector(`section[data-use-case="${byId(id).useCase}"]`);
-            block.querySelectorAll('.result-button').forEach(b => b.setAttribute('aria-pressed', String(results[id].status === b.dataset.status)));
+            block.querySelectorAll('.result-button').forEach(button => button.setAttribute('aria-pressed', String(results[id].status === button.dataset.status)));
         }
 
         // ---------------------------------------------------------------- one block per use case
-        const heads = {}; // use case heading, drawn above the frame by pick() so it is exactly as wide
-        document.getElementById('use-cases').innerHTML = USE_CASES.map(uc => {
-            const scs = scsOf(uc.id);
-            const head = `
+        const headings = {}; // use case heading, drawn above the frame by pick() so it is exactly as wide
+        document.getElementById('use-cases').innerHTML = USE_CASES.map(useCase => {
+            const scenarios = scenariosOf(useCase.id);
+            const heading = `
               <div class="use-case-head mb-2">
-                <h2 class="font-bold"><span class="meta mr-2">${uc.id}</span>${esc(uc.title)}</h2>
-                ${refsChip(uc.refs)}<a href="../overview.html#uc-${nn(uc.id)}" class="link code-text">plan</a>
+                <h2 class="font-bold"><span class="meta mr-2">${useCase.id}</span>${escapeHtml(useCase.title)}</h2>
+                ${referencesChip(useCase.refs)}<a href="../overview.html#uc-${twoDigitNumber(useCase.id)}" class="link code-text">plan</a>
               </div>`;
-            heads[uc.id] = head;
-            if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted">${esc(uc.none || 'No scenario to play.')}</p></section>`;
+            headings[useCase.id] = heading;
+            if (!scenarios.length) return `<section id="uc-${twoDigitNumber(useCase.id)}">${heading}<p class="muted">${escapeHtml(useCase.none || 'No scenario to play.')}</p></section>`;
             return `
-              <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
+              <section id="uc-${twoDigitNumber(useCase.id)}" data-use-case="${useCase.id}">
                 <div class="use-case-row">
                 <div class="tabs">
-                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${uc.id}"></span></div>
-                  <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
-                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab${s.skip ? ' skipped' : ''}" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"${s.skip ? ` title="Skipped: ${esc(s.skip)}"` : ''}>${s.skip ? `<span class="tab-number skip" aria-hidden="true">–</span>` : `<span class="tab-number" data-r="${s.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="tab-title">${esc(s.title)}${s.skip ? '<span class="sr-only"> (skipped)</span>' : ''}</span><span class="tab-surface" title="${esc(SURFACE[s.surface] || '')}">${esc(s.surface || '')}</span></button>`).join('')}
+                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${twoDigitNumber(useCase.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${useCase.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${useCase.id}"></span></div>
+                  <div class="tab-list" role="tablist" aria-labelledby="sc-title-${twoDigitNumber(useCase.id)}">
+                  ${scenarios.map((scenario, i) => `<button type="button" role="tab" class="tab${scenario.skip ? ' skipped' : ''}" data-sc="${scenario.id}" aria-selected="false" onclick="pick('${scenario.id}', true)"${scenario.skip ? ` title="Skipped: ${escapeHtml(scenario.skip)}"` : ''}>${scenario.skip ? `<span class="tab-number skip" aria-hidden="true">–</span>` : `<span class="tab-number" data-r="${scenario.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="tab-title">${escapeHtml(scenario.title)}${scenario.skip ? '<span class="sr-only"> (skipped)</span>' : ''}</span><span class="tab-surface" title="${escapeHtml(SURFACE[scenario.surface] || '')}">${escapeHtml(scenario.surface || '')}</span></button>`).join('')}
                   </div>
                 </div>
                 <div class="card"></div>
@@ -425,114 +425,114 @@
 
         /** run = seed and load now; otherwise a seeded scenario waits behind a Play button, so a page load seeds nothing. */
         function pick(id, run) {
-            const sc = byId(id);
-            const block = document.querySelector(`section[data-use-case="${sc.useCase}"]`);
-            block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sc === id)));
+            const scenario = byId(id);
+            const block = document.querySelector(`section[data-use-case="${scenario.useCase}"]`);
+            block.querySelectorAll('[role=tab]').forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.sc === id)));
             if (run) history.replaceState(null, '', '#sc-' + id);
-            const r = results[id] || {};
-            block.querySelector('.card').innerHTML = `${heads[sc.useCase]}
-              <div class="title-row"><h3 class="font-semibold">${esc(sc.title)}</h3>${sc.kind ? `<span class="scenario-kind ${esc(sc.kind)}">${esc(sc.kind)}</span>` : ''}${!sc.skip && LOGIN.type !== 'none' && roleOf(sc) ? `<span class="role-pill" title="Signs in as this role">${esc(roleOf(sc))}</span>` : ''}${refsChip(sc.story)}</div>
+            const result = results[id] || {};
+            block.querySelector('.card').innerHTML = `${headings[scenario.useCase]}
+              <div class="title-row"><h3 class="font-semibold">${escapeHtml(scenario.title)}</h3>${scenario.kind ? `<span class="scenario-kind ${escapeHtml(scenario.kind)}">${escapeHtml(scenario.kind)}</span>` : ''}${!scenario.skip && LOGIN.type !== 'none' && roleOf(scenario) ? `<span class="role-pill" title="Signs in as this role">${escapeHtml(roleOf(scenario))}</span>` : ''}${referencesChip(scenario.story)}</div>
               <div class="frame mt-2">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
-                  <span class="url">${esc(screenUrl(sc))}</span>
-                  <a href="${esc(screenSrc(sc))}" target="_blank" rel="noopener" class="link whitespace-nowrap open-link"${sc.skip || (sc.prompt && !sc.seed) ? ' hidden' : ''}>Open ↗</a>
+                  <span class="url">${escapeHtml(screenUrl(scenario))}</span>
+                  <a href="${escapeHtml(screenSource(scenario))}" target="_blank" rel="noopener" class="link whitespace-nowrap open-link"${scenario.skip || (scenario.prompt && !scenario.seed) ? ' hidden' : ''}>Open ↗</a>
                   <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
-                  <button type="button" onclick="pick('${sc.id}', true)" class="button-ghost"${sc.skip || (sc.prompt && !sc.seed) ? ' hidden' : ''} title="${sc.seed ? 'Create new data and reload' : 'Reload'}">↻ Restart</button>
+                  <button type="button" onclick="pick('${scenario.id}', true)" class="button-ghost"${scenario.skip || (scenario.prompt && !scenario.seed) ? ' hidden' : ''} title="${scenario.seed ? 'Create new data and reload' : 'Reload'}">↻ Restart</button>
                 </div>
-                <div class="screen-fit"><div class="overlay" hidden></div>${sc.skip ? '' : sc.prompt ? `<div class="api">${apiBody(sc)}</div>` : `<iframe title="${esc(sc.title)} — running app" width="${SCREEN_W}" height="${SCREEN_H}"></iframe>`}</div>
+                <div class="screen-fit"><div class="overlay" hidden></div>${scenario.skip ? '' : scenario.prompt ? `<div class="api">${apiBody(scenario)}</div>` : `<iframe title="${escapeHtml(scenario.title)} — running app" width="${SCREEN_WIDTH}" height="${SCREEN_HEIGHT}"></iframe>`}</div>
               </div>`;
             block.querySelector('.guide').innerHTML = `
               <div class="guide-result">
               <div class="label mb-1">Result</div>
-              ${sc.skip ? `<p class="meta">Skipped: not played live. ${esc(sc.skip)}</p>` : `
+              ${scenario.skip ? `<p class="meta">Skipped: not played live. ${escapeHtml(scenario.skip)}</p>` : `
               <div class="result-control flex gap-2 mb-2">
-                <button type="button" class="result-button pass" data-status="pass" aria-pressed="${r.status === 'pass'}" onclick="mark('${sc.id}', 'pass')">✓ Pass</button>
-                <button type="button" class="result-button fail" data-status="fail" aria-pressed="${r.status === 'fail'}" onclick="mark('${sc.id}', 'fail')">✗ Fail</button>
+                <button type="button" class="result-button pass" data-status="pass" aria-pressed="${result.status === 'pass'}" onclick="mark('${scenario.id}', 'pass')">✓ Pass</button>
+                <button type="button" class="result-button fail" data-status="fail" aria-pressed="${result.status === 'fail'}" onclick="mark('${scenario.id}', 'fail')">✗ Fail</button>
               </div>
-              <textarea class="note result-control" aria-label="Note for ${esc(sc.title)}" placeholder="What you saw, if it differs" oninput="setResult('${sc.id}', { note: this.value })">${esc(r.note)}</textarea>`}
+              <textarea class="note result-control" aria-label="Note for ${escapeHtml(scenario.title)}" placeholder="What you saw, if it differs" oninput="setResult('${scenario.id}', { note: this.value })">${escapeHtml(result.note)}</textarea>`}
               </div>
               <div class="guide-body">
-              ${sc.skip ? '' : `<div class="label mt-4 mb-1">How to play</div>
-              <ol class="list-decimal pl-5 space-y-1 muted steps">${list((sc.steps || []).map(t => fill(sc, t)))}</ol>`}
+              ${scenario.skip ? '' : `<div class="label mt-4 mb-1">How to play</div>
+              <ol class="list-decimal pl-5 space-y-1 muted steps">${list((scenario.steps || []).map(step => fill(scenario, step)))}</ol>`}
               <div class="label mt-4 mb-1">What you should see</div>
-              <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>
-              ${sc.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="code-text meta break-words">${esc(sc.seed)}</code>` : ''}
+              <ul class="list-disc pl-5 space-y-1 muted">${list(scenario.expect)}</ul>
+              ${scenario.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="code-text meta break-words">${escapeHtml(scenario.seed)}</code>` : ''}
               </div>`;
             fit(block);
-            if (sc.skip) return overlay(block, `<p class="muted">Not played live</p><p>${esc(sc.skip)}</p>`);
-            if (sc.prompt) { if (run) load(sc, block); return; }
-            if (run || !needsServer(sc)) load(sc, block);
-            else overlay(block, `<p class="muted">${sc.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${esc(roleOf(sc))} first.`}</p><button type="button" class="button-ghost" onclick="pick('${sc.id}', true)">▶ Open</button>`);
+            if (scenario.skip) return overlay(block, `<p class="muted">Not played live</p><p>${escapeHtml(scenario.skip)}</p>`);
+            if (scenario.prompt) { if (run) load(scenario, block); return; }
+            if (run || !needsServer(scenario)) load(scenario, block);
+            else overlay(block, `<p class="muted">${scenario.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${escapeHtml(roleOf(scenario))} first.`}</p><button type="button" class="button-ghost" onclick="pick('${scenario.id}', true)">▶ Open</button>`);
         }
 
         function overlay(block, html) {
-            const o = block.querySelector('.overlay');
-            o.hidden = !html; o.innerHTML = html || '';
+            const cover = block.querySelector('.overlay');
+            cover.hidden = !html; cover.innerHTML = html || '';
         }
         const loads = {}; // latest load per use case wins, when a chip is picked while a seed still runs
-        async function load(sc, block) {
-            const token = loads[sc.useCase] = {};
-            if (sc.prompt) return loadApi(sc, block, token);
+        async function load(scenario, block) {
+            const token = loads[scenario.useCase] = {};
+            if (scenario.prompt) return loadApi(scenario, block, token);
             const frame = block.querySelector('iframe');
             frame.src = 'about:blank';
-            if (needsServer(sc)) overlay(block, sc.seed ? `<p class="muted">Creating data…</p><code class="code-text meta">${esc(sc.seed)}</code>` : `<p class="muted">Signing in as ${esc(roleOf(sc))}…</p>`);
-            const r = await play(sc);
-            if (loads[sc.useCase] !== token) return;
-            if (!r.ok) {
-                overlay(block, `<p class="bad">${sc.seed ? 'Seed' : 'Sign-in'} failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</p><pre>${esc(r.output)}</pre><button type="button" class="button-ghost" onclick="pick('${sc.id}', true)">↻ Try again</button>`);
+            if (needsServer(scenario)) overlay(block, scenario.seed ? `<p class="muted">Creating data…</p><code class="code-text meta">${escapeHtml(scenario.seed)}</code>` : `<p class="muted">Signing in as ${escapeHtml(roleOf(scenario))}…</p>`);
+            const result = await play(scenario);
+            if (loads[scenario.useCase] !== token) return;
+            if (!result.ok) {
+                overlay(block, `<p class="bad">${scenario.seed ? 'Seed' : 'Sign-in'} failed${result.code != null ? ` (exit ${escapeHtml(result.code)})` : ''}</p><pre>${escapeHtml(result.output)}</pre><button type="button" class="button-ghost" onclick="pick('${scenario.id}', true)">↻ Try again</button>`);
                 return;
             }
-            seeded(sc, block, r);
+            seeded(scenario, block, result);
             overlay(block, '');
-            frame.src = screenSrc(sc);
+            frame.src = screenSource(scenario);
         }
 
         // ---------------------------------------------------------------- no-screen scenarios: AI prompt + recorded calls
         // a scenario with no seed has no values: the viewer types its prompt's {keys}
-        const slotsOf = sc => sc.seed ? [] : [...new Set([...sc.prompt.matchAll(/\{(\w+)\}/g)].map(m => m[1]))];
-        const promptText = sc => fill(sc, sc.prompt);
-        function setValue(id, k, val) {
-            (values[id] ||= {})[k] = val;
-            const sc = byId(id), block = document.querySelector(`section[data-use-case="${sc.useCase}"]`);
-            block.querySelector('.prompt').textContent = promptText(sc);
-            block.querySelector('.guide .steps').innerHTML = list((sc.steps || []).map(t => fill(sc, t)));
+        const slotsOf = scenario => scenario.seed ? [] : [...new Set([...scenario.prompt.matchAll(/\{(\w+)\}/g)].map(match => match[1]))];
+        const promptText = scenario => fill(scenario, scenario.prompt);
+        function setValue(id, key, value) {
+            (values[id] ||= {})[key] = value;
+            const scenario = byId(id), block = document.querySelector(`section[data-use-case="${scenario.useCase}"]`);
+            block.querySelector('.prompt').textContent = promptText(scenario);
+            block.querySelector('.guide .steps').innerHTML = list((scenario.steps || []).map(step => fill(scenario, step)));
         }
-        const pretty = v => typeof v === 'string' ? v : JSON.stringify(v, null, 2);
+        const pretty = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
         /** One recorded call: an MCP tools/call, a command (a job), or a lookup note. */
-        function callHtml(c, i) {
-            if (c.lookup) return `<div class="api-lookup code-text">${esc(c.lookup)}</div>`;
-            c = c.arguments || c.command ? c : { ...c, arguments: { operation: c.operation, params: c.params } }; // older shape
-            const what = c.command ? '$ ' + c.command : [c.tool, c.arguments?.operation].filter(Boolean).join(' · ');
-            const req = c.command ? '' : `<div><div class="label">Request · tools/call</div><pre>${esc(pretty({ name: c.tool, arguments: c.arguments }))}</pre></div>`;
-            return `<details class="call"><summary><span class="meta">${i + 1}</span><span>${esc(what)}</span>${c.role ? `<span class="meta">as ${esc(c.role)}</span>` : ''}<span class="${c.isError ? 'error' : 'ok'}">${c.isError ? '✗ error' : '✓ answer'}</span></summary>
-              <div>${req}<div><div class="label">${c.command ? 'Output' : 'Response'}${c.isError ? ' · isError true' : ''}</div><pre>${esc(pretty(c.response))}</pre></div></div></details>`;
+        function callHtml(call, i) {
+            if (call.lookup) return `<div class="api-lookup code-text">${escapeHtml(call.lookup)}</div>`;
+            call = call.arguments || call.command ? call : { ...call, arguments: { operation: call.operation, params: call.params } }; // older shape
+            const what = call.command ? '$ ' + call.command : [call.tool, call.arguments?.operation].filter(Boolean).join(' · ');
+            const request = call.command ? '' : `<div><div class="label">Request · tools/call</div><pre>${escapeHtml(pretty({ name: call.tool, arguments: call.arguments }))}</pre></div>`;
+            return `<details class="call"><summary><span class="meta">${i + 1}</span><span>${escapeHtml(what)}</span>${call.role ? `<span class="meta">as ${escapeHtml(call.role)}</span>` : ''}<span class="${call.isError ? 'error' : 'ok'}">${call.isError ? '✗ error' : '✓ answer'}</span></summary>
+              <div>${request}<div><div class="label">${call.command ? 'Output' : 'Response'}${call.isError ? ' · isError true' : ''}</div><pre>${escapeHtml(pretty(call.response))}</pre></div></div></details>`;
         }
-        function apiBody(sc) {
-            const run = (typeof PLAYED_RESULTS === 'object' && PLAYED_RESULTS[sc.id]) || {};
-            const calls = run.calls || [];
-            let n = 0;
+        function apiBody(scenario) {
+            const recordedRun = (typeof PLAYED_RESULTS === 'object' && PLAYED_RESULTS[scenario.id]) || {};
+            const calls = recordedRun.calls || [];
+            let callIndex = 0;
             return `<section class="space-y-2">
                 <div class="flex items-center gap-2 flex-wrap"><span class="label">Prompt for your AI agent</span>
-                  ${sc.seed ? `<button type="button" class="button-ghost result-control" onclick="pick('${sc.id}', true)">▶ Seed</button>` : ''}
-                  ${slotsOf(sc).map(k => `<label class="meta">${esc(k)} <input class="slot" data-slot="${esc(k)}" value="${esc(values[sc.id]?.[k] || '')}" oninput="setValue('${sc.id}', this.dataset.slot, this.value)"></label>`).join('')}
-                  <button type="button" class="button-ghost result-control ml-auto" onclick="navigator.clipboard.writeText(promptText(byId('${sc.id}'))).then(() => { this.textContent = 'Copied'; setTimeout(() => { this.textContent = 'Copy prompt'; }, 1500); })">Copy prompt</button>
+                  ${scenario.seed ? `<button type="button" class="button-ghost result-control" onclick="pick('${scenario.id}', true)">▶ Seed</button>` : ''}
+                  ${slotsOf(scenario).map(key => `<label class="meta">${escapeHtml(key)} <input class="slot" data-slot="${escapeHtml(key)}" value="${escapeHtml(values[scenario.id]?.[key] || '')}" oninput="setValue('${scenario.id}', this.dataset.slot, this.value)"></label>`).join('')}
+                  <button type="button" class="button-ghost result-control ml-auto" onclick="navigator.clipboard.writeText(promptText(byId('${scenario.id}'))).then(() => { this.textContent = 'Copied'; setTimeout(() => { this.textContent = 'Copy prompt'; }, 1500); })">Copy prompt</button>
                   <span class="api-status meta w-full"></span></div>
-                <div class="prompt">${esc(promptText(sc))}</div></section>
-              <section class="space-y-2"><div class="label">Recorded calls${calls.length ? `<span class="label-note"> · ${calls.filter(c => !c.lookup).length} calls${run.by ? ', ' + esc(run.by) : ''}${run.at ? ', ' + esc(run.at) : ''}</span>` : ''}</div>
-                ${calls.length ? calls.map(c => callHtml(c, c.lookup ? n : n++)).join('') : '<p class="muted">No recorded run yet. Ask your agent to play the AI scenarios of this plan.</p>'}</section>`;
+                <div class="prompt">${escapeHtml(promptText(scenario))}</div></section>
+              <section class="space-y-2"><div class="label">Recorded calls${calls.length ? `<span class="label-note"> · ${calls.filter(call => !call.lookup).length} calls${recordedRun.by ? ', ' + escapeHtml(recordedRun.by) : ''}${recordedRun.at ? ', ' + escapeHtml(recordedRun.at) : ''}</span>` : ''}</div>
+                ${calls.length ? calls.map(call => callHtml(call, call.lookup ? callIndex : callIndex++)).join('') : '<p class="muted">No recorded run yet. Ask your agent to play the AI scenarios of this plan.</p>'}</section>`;
         }
-        async function loadApi(sc, block, token) {
-            const status = t => { const el = block.querySelector('.api-status'); if (el) el.innerHTML = t; };
-            if (!needsServer(sc)) return;
-            status(`Creating data… <code class="code-text">${esc(sc.seed)}</code>`);
-            const r = await play(sc);
-            if (loads[sc.useCase] !== token) return;
-            if (!r.ok) { status(`<span class="status-fail">Seed failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</span><pre>${esc(r.output)}</pre>`); return; }
-            seeded(sc, block, r);
-            block.querySelector('.prompt').textContent = promptText(sc);
-            const got = Object.entries(r.values || {}).map(([k, v]) => `${labelOf(k)} ${v}`).join(', ');
-            status(got ? `Seeded: ${esc(got)}. The prompt and steps have them.` : 'Seeded. The seed returned no values.');
+        async function loadApi(scenario, block, token) {
+            const status = html => { const element = block.querySelector('.api-status'); if (element) element.innerHTML = html; };
+            if (!needsServer(scenario)) return;
+            status(`Creating data… <code class="code-text">${escapeHtml(scenario.seed)}</code>`);
+            const result = await play(scenario);
+            if (loads[scenario.useCase] !== token) return;
+            if (!result.ok) { status(`<span class="status-fail">Seed failed${result.code != null ? ` (exit ${escapeHtml(result.code)})` : ''}</span><pre>${escapeHtml(result.output)}</pre>`); return; }
+            seeded(scenario, block, result);
+            block.querySelector('.prompt').textContent = promptText(scenario);
+            const seededValues = Object.entries(result.values || {}).map(([key, value]) => `${labelOf(key)} ${value}`).join(', ');
+            status(seededValues ? `Seeded: ${escapeHtml(seededValues)}. The prompt and steps have them.` : 'Seeded. The seed returned no values.');
         }
 
         function fit(block) {
@@ -540,18 +540,18 @@
             // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
             const row = block.querySelector('.use-case-row');
             row.style.removeProperty('--frame-w'); // the full column, not the last fit's frame
-            const s = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_W);
-            const ifr = box.querySelector('iframe'); if (ifr) ifr.style.transform = `scale(${s})`;
-            box.style.height = Math.round(SCREEN_H * s) + 'px';
+            const scale = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_WIDTH);
+            const iframe = box.querySelector('iframe'); if (iframe) iframe.style.transform = `scale(${scale})`;
+            box.style.height = Math.round(SCREEN_HEIGHT * scale) + 'px';
             const frame = box.closest('.frame');
-            frame.style.width = Math.round(SCREEN_W * s) + 2 + 'px';
+            frame.style.width = Math.round(SCREEN_WIDTH * scale) + 2 + 'px';
             row.style.setProperty('--frame-w', frame.style.width);
             row.style.setProperty('--frame-h', frame.offsetHeight + 'px');
             row.style.setProperty('--frame-top', frame.getBoundingClientRect().top - row.getBoundingClientRect().top + 'px');
             // the text column (page title, results) takes the frame's real width, so all of it lines up
-            const ws = [...document.querySelectorAll('.use-case-row')].map(r => parseFloat(r.style.getPropertyValue('--frame-w'))).filter(Boolean);
-            document.documentElement.style.setProperty('--text-w', Math.max(...ws) + 'px');
-            block.querySelector('.scale-label').textContent = ifr ? `${Math.round(s * 100)}% of ${SCREEN_W} px` : '';
+            const frameWidths = [...document.querySelectorAll('.use-case-row')].map(useCaseRow => parseFloat(useCaseRow.style.getPropertyValue('--frame-w'))).filter(Boolean);
+            document.documentElement.style.setProperty('--text-w', Math.max(...frameWidths) + 'px');
+            block.querySelector('.scale-label').textContent = iframe ? `${Math.round(scale * 100)}% of ${SCREEN_WIDTH} px` : '';
         }
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
         addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer
@@ -563,67 +563,67 @@
             fail: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
         };
         function renderResults() {
-            document.querySelectorAll('.tab-number[data-r]').forEach(el => {
-                const st = results[el.dataset.r]?.status || '';
-                el.className = 'tab-number ' + st;
-                el.innerHTML = st ? `${ICON[st]}<span class="sr-only">${el.dataset.n}, ${STATUS[st]}</span>` : el.dataset.n;
+            document.querySelectorAll('.tab-number[data-r]').forEach(element => {
+                const status = results[element.dataset.r]?.status || '';
+                element.className = 'tab-number ' + status;
+                element.innerHTML = status ? `${ICON[status]}<span class="sr-only">${element.dataset.n}, ${STATUS[status]}</span>` : element.dataset.n;
             });
-            document.querySelectorAll('[data-count]').forEach(el => {
-                const sts = scsOf(el.dataset.count).filter(playable).map(s => results[s.id]?.status || '');
-                const n = st => sts.filter(x => x === st).length;
-                el.innerHTML = n('') === sts.length ? '' : `<span class="pass">${n('pass')} pass</span> · <span class="fail">${n('fail')} fail</span> · ${n('')} left`;
+            document.querySelectorAll('[data-count]').forEach(element => {
+                const statuses = scenariosOf(element.dataset.count).filter(playable).map(s => results[s.id]?.status || '');
+                const countOf = status => statuses.filter(x => x === status).length;
+                element.innerHTML = countOf('') === statuses.length ? '' : `<span class="pass">${countOf('pass')} pass</span> · <span class="fail">${countOf('fail')} fail</span> · ${countOf('')} left`;
             });
-            const rows = SCENARIOS.map(s => ({ s, st: s.skip ? 'skip' : results[s.id]?.status || '', note: s.skip || results[s.id]?.note || '' }));
-            const n = st => rows.filter(r => r.st === st).length;
+            const rows = SCENARIOS.map(s => ({ scenario: s, status: s.skip ? 'skip' : results[s.id]?.status || '', note: s.skip || results[s.id]?.note || '' }));
+            const countOf = status => rows.filter(row => row.status === status).length;
             document.getElementById('results').innerHTML = `
-              <p class="mb-2"><span class="status-pass">${n('pass')} pass</span> · <span class="status-fail">${n('fail')} fail</span> · <span class="status-none">${n('')} not played</span> · ${n('skip')} skipped
+              <p class="mb-2"><span class="status-pass">${countOf('pass')} pass</span> · <span class="status-fail">${countOf('fail')} fail</span> · <span class="status-none">${countOf('')} not played</span> · ${countOf('skip')} skipped
                 <button type="button" class="button-ghost ml-2 result-control" onclick="copyResults(this)">Copy as Markdown</button></p>
               <div class="panel overflow-x-auto"><table class="result-table">
                 <tr><th>Use case</th><th>Scenario</th><th>Surface</th><th>Result</th><th>Note</th></tr>
-                ${rows.map(r => `<tr><td class="font-mono code-text meta">${r.s.useCase}</td><td><a class="link" href="#sc-${r.s.id}">${esc(r.s.title)}</a></td><td class="font-mono code-text meta">${esc(r.s.surface || '')}</td><td class="status-${r.st === 'skip' ? 'none' : r.st || 'none'} whitespace-nowrap">${STATUS[r.st]}</td><td class="muted">${esc(r.note)}</td></tr>`).join('')}
+                ${rows.map(row => `<tr><td class="font-mono code-text meta">${row.scenario.useCase}</td><td><a class="link" href="#sc-${row.scenario.id}">${escapeHtml(row.scenario.title)}</a></td><td class="font-mono code-text meta">${escapeHtml(row.scenario.surface || '')}</td><td class="status-${row.status === 'skip' ? 'none' : row.status || 'none'} whitespace-nowrap">${STATUS[row.status]}</td><td class="muted">${escapeHtml(row.note)}</td></tr>`).join('')}
               </table></div>`;
         }
         /** Clear: drop the Pass / Fail and notes of these scenarios, to test again. A cleared one does not take the AI's result back. */
-        function clearResults(ids, ask) {
-            if (!confirm(ask)) return;
+        function clearResults(ids, question) {
+            if (!confirm(question)) return;
             ids.forEach(id => { results[id] = { cleared: true }; });
             try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { }
             renderResults();
             // the open guides show the cleared marks; the screens and their data stay as they are
-            document.querySelectorAll('section[data-use-case]').forEach(b => {
-                const open = b.querySelector('[role=tab][aria-selected=true]');
+            document.querySelectorAll('section[data-use-case]').forEach(block => {
+                const open = block.querySelector('[role=tab][aria-selected=true]');
                 if (!open || !ids.includes(open.dataset.sc)) return;
-                b.querySelectorAll('.result-button').forEach(x => x.setAttribute('aria-pressed', 'false'));
-                const note = b.querySelector('.note'); if (note) note.value = '';
+                block.querySelectorAll('.result-button').forEach(button => button.setAttribute('aria-pressed', 'false'));
+                const note = block.querySelector('.note'); if (note) note.value = '';
             });
         }
-        const clearUseCase = ucId => clearResults(scsOf(ucId).filter(playable).map(s => s.id), `Clear the Pass / Fail and notes of ${ucId}?`);
+        const clearUseCase = useCaseId => clearResults(scenariosOf(useCaseId).filter(playable).map(s => s.id), `Clear the Pass / Fail and notes of ${useCaseId}?`);
         const clearAll = () => clearResults(SCENARIOS.filter(playable).map(s => s.id), 'Clear every Pass / Fail and note on this page?');
-        function copyResults(btn) {
-            const cell = v => String(v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
-            const md = ['| Use case | Scenario | Surface | Result | Note |', '|---|---|---|---|---|']
+        function copyResults(button) {
+            const cell = value => String(value).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+            const markdown = ['| Use case | Scenario | Surface | Result | Note |', '|---|---|---|---|---|']
                 .concat(SCENARIOS.map(s => `| ${s.useCase} | ${cell(s.title)} | ${s.surface || ''} | ${STATUS[s.skip ? 'skip' : results[s.id]?.status || '']} | ${cell(s.skip || results[s.id]?.note || '')} |`)).join('\n');
-            navigator.clipboard.writeText(md).then(() => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy as Markdown'; }, 1500); });
+            navigator.clipboard.writeText(markdown).then(() => { button.textContent = 'Copied'; setTimeout(() => { button.textContent = 'Copy as Markdown'; }, 1500); });
         }
 
         // what stops a play before it starts: no server, the app down, or a session to open by hand
         const notes = [];
         if (!served && SCENARIOS.filter(playable).some(needsServer)) notes.push('Opened from disk: seeds and sign-in do not run. Start <code>node live/server.mjs --up</code> and open the URL it prints.');
         if (LOGIN.type === 'manual') notes.push('Sign in once in the app with Open ↗. The frames share that session.');
-        const banner = () => { document.getElementById('banner').innerHTML = notes.map(n => `<div class="banner mb-2">${n}</div>`).join(''); };
+        const banner = () => { document.getElementById('banner').innerHTML = notes.map(note => `<div class="banner mb-2">${note}</div>`).join(''); };
         banner();
-        if (served) fetch('/__status', { headers: { 'X-Play': '1' } }).then(r => r.json()).then(st => {
-            if (st.missing?.length) { notes.push(`Missing in <code>live/.env</code>: ${st.missing.map(esc).join(', ')}. Copy <code>.env.example</code> to <code>.env</code> and fill them in; the next pick reads it.`); banner(); }
-            if (!st.up) { notes.push(`The app does not answer at <code>${esc(st.health)}</code>. ${st.start ? `Start it with <code>${esc(st.start)}</code>, or r` : 'R'}estart the play server with <code>--up</code>.`); banner(); }
+        if (served) fetch('/__status', { headers: { 'X-Play': '1' } }).then(response => response.json()).then(serverStatus => {
+            if (serverStatus.missing?.length) { notes.push(`Missing in <code>live/.env</code>: ${serverStatus.missing.map(escapeHtml).join(', ')}. Copy <code>.env.example</code> to <code>.env</code> and fill them in; the next pick reads it.`); banner(); }
+            if (!serverStatus.up) { notes.push(`The app does not answer at <code>${escapeHtml(serverStatus.health)}</code>. ${serverStatus.start ? `Start it with <code>${escapeHtml(serverStatus.start)}</code>, or r` : 'R'}estart the play server with <code>--up</code>.`); banner(); }
         }).catch(() => { });
         renderResults();
         // first scenario of every use case, or the one in the URL (#sc-<id>, from the plan's links); only that one runs
         const wanted = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
-        USE_CASES.forEach(uc => { const first = scsOf(uc.id).find(playable) || scsOf(uc.id)[0]; if (first) pick(wanted?.useCase === uc.id ? wanted.id : first.id, wanted?.useCase === uc.id); });
+        USE_CASES.forEach(useCase => { const first = scenariosOf(useCase.id).find(playable) || scenariosOf(useCase.id)[0]; if (first) pick(wanted?.useCase === useCase.id ? wanted.id : first.id, wanted?.useCase === useCase.id); });
         if (wanted) document.querySelector(`section[data-use-case="${wanted.useCase}"]`).scrollIntoView();
         addEventListener('hashchange', () => {
-            const sc = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
-            if (sc) { pick(sc.id, true); document.querySelector(`section[data-use-case="${sc.useCase}"]`).scrollIntoView(); }
+            const scenario = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
+            if (scenario) { pick(scenario.id, true); document.querySelector(`section[data-use-case="${scenario.useCase}"]`).scrollIntoView(); }
         });
     </script>
 </body>

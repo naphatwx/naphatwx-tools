@@ -23,20 +23,20 @@ ${Array.from({ length: 8 }, (_, i) => `<rect x="96" y="${172 + i * 56}" width="1
 <text x="640" y="690" fill="#a3a6b0" font-family="system-ui" font-size="22" text-anchor="middle">${title.replace(/[<&]/g, '')}</text></svg>`);
 
 function fill(value, title = '') {
-    if (Array.isArray(value)) return value.map((v) => fill(v, title));
+    if (Array.isArray(value)) return value.map((item) => fill(item, title));
     if (value && typeof value === 'object') {
-        const t = value.title ?? title;
-        return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, v === '@screen' ? screen(k === 'finalShot' ? 'Page at failure' : t) : fill(v, t)]));
+        const ownTitle = value.title ?? title;
+        return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, item === '@screen' ? screen(key === 'finalShot' ? 'Page at failure' : ownTitle) : fill(item, ownTitle)]));
     }
     return value;
 }
 
 mkdirSync(join(here, 'examples'), { recursive: true });
-for (const r of REPORTS) {
-    const template = readFileSync(join(skills, r.template), 'utf8');
-    if (!template.includes(r.marker)) throw new Error(`${r.template}: marker ${r.marker} not found`);
-    const data = fill(JSON.parse(readFileSync(join(here, 'data', r.data), 'utf8')));
+for (const report of REPORTS) {
+    const template = readFileSync(join(skills, report.template), 'utf8');
+    if (!template.includes(report.marker)) throw new Error(`${report.template}: marker ${report.marker} not found`);
+    const data = fill(JSON.parse(readFileSync(join(here, 'data', report.data), 'utf8')));
     const json = JSON.stringify(data).replace(/</g, '\\u003c');
-    writeFileSync(join(here, 'examples', r.out), template.replace(r.marker, () => json));
-    process.stdout.write(`wrote theme/gallery/examples/${r.out}\n`);
+    writeFileSync(join(here, 'examples', report.out), template.replace(report.marker, () => json));
+    process.stdout.write(`wrote theme/gallery/examples/${report.out}\n`);
 }

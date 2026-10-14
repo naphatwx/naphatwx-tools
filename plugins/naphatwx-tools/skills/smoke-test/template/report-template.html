@@ -290,30 +290,30 @@
 /* theme:pdf-js:start */
 /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
 function addExportPdf(target, prepare) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'export-pdf no-print';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'export-pdf no-print';
     if (!target) {
         target = document.querySelector('.float-bar');
         if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
     }
-    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-    b.textContent = 'Export PDF';
-    b.addEventListener('click', async () => {
+    button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    button.textContent = 'Export PDF';
+    button.addEventListener('click', async () => {
         if (prepare) await prepare();
         window.print();
     });
-    target.append(b);
-    return b;
+    target.append(button);
+    return button;
 }
 /* theme:pdf-js:end */
 const DATA = /*__SMOKE_DATA__*/null;
 
-const el = (tag, attrs = {}, ...kids) => {
-  const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
-  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(String(k)));
-  return n;
+const createElement = (tag, attributes = {}, ...children) => {
+  const node = document.createElement(tag);
+  for (const [name, value] of Object.entries(attributes)) name === 'class' ? (node.className = value) : node.setAttribute(name, value);
+  for (const child of children.flat()) if (child != null) node.append(child.nodeType ? child : document.createTextNode(String(child)));
+  return node;
 };
 // Same words as the e2e report. Color always comes with a glyph and the word.
 const STATUS = {
@@ -323,149 +323,149 @@ const STATUS = {
   'not-reached': { word: 'not reached', glyph: '–', tone: 'neutral' },
   skipped: { word: 'skipped', glyph: '–', tone: 'neutral' },
 };
-const st = (s) => STATUS[s] || { word: String(s), glyph: '–', tone: 'neutral' };
-const pill = (s) => el('span', { class: 'pill tone-' + st(s).tone }, el('span', { 'aria-hidden': 'true' }, st(s).glyph), st(s).word);
-const ms = (v) => (v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + ' s' : v + ' ms');
-const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const pad = (n) => String(n).padStart(2, '0');
-function isoLocal(v) {
-  const d = new Date(v);
-  if (isNaN(d)) return String(v ?? '');
-  const off = -d.getTimezoneOffset();
-  const z = (off >= 0 ? '+' : '-') + pad(Math.floor(Math.abs(off) / 60)) + ':' + pad(Math.abs(off) % 60);
-  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + z;
+const statusOf = (status) => STATUS[status] || { word: String(status), glyph: '–', tone: 'neutral' };
+const pill = (status) => createElement('span', { class: 'pill tone-' + statusOf(status).tone }, createElement('span', { 'aria-hidden': 'true' }, statusOf(status).glyph), statusOf(status).word);
+const formatDuration = (milliseconds) => (milliseconds == null ? '' : milliseconds >= 1000 ? (milliseconds / 1000).toFixed(1) + ' s' : milliseconds + ' ms');
+const slug = (text) => String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const pad = (number) => String(number).padStart(2, '0');
+function isoLocal(value) {
+  const date = new Date(value);
+  if (isNaN(date)) return String(value ?? '');
+  const offsetMinutes = -date.getTimezoneOffset();
+  const timezone = (offsetMinutes >= 0 ? '+' : '-') + pad(Math.floor(Math.abs(offsetMinutes) / 60)) + ':' + pad(Math.abs(offsetMinutes) % 60);
+  return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds()) + timezone;
 }
 
-async function copy(text, btn) {
+async function copy(text, button) {
   try { await navigator.clipboard.writeText(text); }
   catch {
-    const t = el('textarea', {}, text);
-    document.body.append(t); t.select();
+    const textarea = createElement('textarea', {}, text);
+    document.body.append(textarea); textarea.select();
     try { document.execCommand('copy'); } catch {}
-    t.remove();
+    textarea.remove();
   }
-  const was = btn.textContent;
-  btn.textContent = 'Copied';
+  const previousLabel = button.textContent;
+  button.textContent = 'Copied';
   // Clear first so a second copy of the same thing is announced again.
   const live = document.getElementById('announce');
   live.textContent = '';
-  setTimeout(() => { live.textContent = 'Copied ' + btn.dataset.what; }, 50);
-  setTimeout(() => { btn.textContent = was; }, 1200);
+  setTimeout(() => { live.textContent = 'Copied ' + button.dataset.what; }, 50);
+  setTimeout(() => { button.textContent = previousLabel; }, 1200);
 }
 // `what` names the thing copied, for the aria-label and the "Copied …" announcement.
-const copyBtn = (text, what, label = 'Copy') => {
-  const b = el('button', { type: 'button', 'aria-label': 'Copy ' + what, 'data-what': what }, label);
-  b.onclick = () => copy(text, b);
-  return b;
+const copyButton = (text, what, label = 'Copy') => {
+  const button = createElement('button', { type: 'button', 'aria-label': 'Copy ' + what, 'data-what': what }, label);
+  button.onclick = () => copy(text, button);
+  return button;
 };
 
-const firstBroken = (f) => f.hops.find((h) => h.status !== 'pass' && h.status !== 'not-reached');
-const flowId = (f) => 'flow-' + slug(f.flow);
-const entryOf = (f) => f.entry || 'entry';
+const firstBroken = (flow) => flow.hops.find((h) => h.status !== 'pass' && h.status !== 'not-reached');
+const flowId = (flow) => 'flow-' + slug(flow.flow);
+const entryOf = (flow) => flow.entry || 'entry';
 
-function verdict(f) {
-  if (f.error) return { bad: true, text: '✕ Trigger failed: ' + f.error };
-  const broken = firstBroken(f);
-  const ok = [entryOf(f), ...f.hops.filter((h) => h.status === 'pass').map((h) => h.service)].filter((s, i, a) => s !== a[i - 1]);
-  if (!broken) return { bad: false, text: '✓ Every hop answered: ' + ok.join(' → ') + '.' };
-  const what = broken.envMismatch?.length ? 'env var mismatch: ' + broken.detail : st(broken.status).word + (broken.detail ? ' (' + broken.detail + ')' : '');
+function verdict(flow) {
+  if (flow.error) return { bad: true, text: '✕ Trigger failed: ' + flow.error };
+  const broken = firstBroken(flow);
+  const answered = [entryOf(flow), ...flow.hops.filter((h) => h.status === 'pass').map((h) => h.service)].filter((s, i, a) => s !== a[i - 1]);
+  if (!broken) return { bad: false, text: '✓ Every hop answered: ' + answered.join(' → ') + '.' };
+  const what = broken.envMismatch?.length ? 'env var mismatch: ' + broken.detail : statusOf(broken.status).word + (broken.detail ? ' (' + broken.detail + ')' : '');
   // The failing link already names its source node, so leave it out of the "OK" prefix.
-  const before = broken.from && ok.at(-1) === broken.from ? ok.slice(0, -1) : ok;
+  const before = broken.from && answered.at(-1) === broken.from ? answered.slice(0, -1) : answered;
   return { bad: true, text: '✕ ' + (before.length ? before.join(' → ') + ' OK; ' : '') + (broken.from ? broken.from + ' → ' : '') + broken.service + ' ' + what + '.' };
 }
 
 const pretty = (text) => { try { return JSON.stringify(JSON.parse(text), null, 2); } catch { return text; } };
 
 // Shows only this hop's entry when the runner found one; the full body sits behind a toggle.
-function evidence(label, e, what) {
-  const box = el('div', {});
-  const body = pretty(e.body || '');
-  const entry = e.entry ? pretty(e.entry) : '';
+function evidence(label, record, what) {
+  const box = createElement('div', {});
+  const body = pretty(record.body || '');
+  const entry = record.entry ? pretty(record.entry) : '';
   const shown = entry || body;
-  box.append(el('div', { class: 'evidence-head' },
-    el('span', { class: 'meta' }, label + ': HTTP ' + e.status + ' · ' + ms(e.ms)), el('code', {}, e.url),
-    shown ? copyBtn(shown, (entry ? 'hop entry' : 'response body') + ' for ' + what) : null));
+  box.append(createElement('div', { class: 'evidence-head' },
+    createElement('span', { class: 'meta' }, label + ': HTTP ' + record.status + ' · ' + formatDuration(record.ms)), createElement('code', {}, record.url),
+    shown ? copyButton(shown, (entry ? 'hop entry' : 'response body') + ' for ' + what) : null));
   if (entry) {
-    box.append(el('div', { class: 'meta' }, 'This hop’s entry, ', el('code', {}, e.entryPath || 'hops[]'), ':'), el('pre', {}, entry));
+    box.append(createElement('div', { class: 'meta' }, 'This hop’s entry, ', createElement('code', {}, record.entryPath || 'hops[]'), ':'), createElement('pre', {}, entry));
     if (body) {
-      const full = el('details', { class: 'full' }, el('summary', {}, el('span', { class: 'mark', 'aria-hidden': 'true' }), 'Show full response'),
-        el('div', { class: 'full-head' }, copyBtn(body, 'full response for ' + what)), el('pre', {}, body));
-      if (e.truncated) full.append(el('div', { class: 'note' }, 'Truncated: only the first 2,000 characters were kept.'));
+      const full = createElement('details', { class: 'full' }, createElement('summary', {}, createElement('span', { class: 'mark', 'aria-hidden': 'true' }), 'Show full response'),
+        createElement('div', { class: 'full-head' }, copyButton(body, 'full response for ' + what)), createElement('pre', {}, body));
+      if (record.truncated) full.append(createElement('div', { class: 'note' }, 'Truncated: only the first 2,000 characters were kept.'));
       box.append(full);
     }
   } else {
-    if (body) box.append(el('pre', {}, body));
-    if (e.truncated) box.append(el('div', { class: 'note' }, 'Truncated: only the first 2,000 characters were kept.'));
+    if (body) box.append(createElement('pre', {}, body));
+    if (record.truncated) box.append(createElement('div', { class: 'note' }, 'Truncated: only the first 2,000 characters were kept.'));
   }
   return box;
 }
 
-function polled(p) {
-  const answer = p.sameStatus ? (p.polls > 1 ? p.lastStatus + ' each time' : p.lastStatus) : 'last answer ' + p.lastStatus;
-  return el('div', { class: 'polled' }, 'Polled ', el('code', {}, (p.method || 'GET') + ' ' + p.lastUrl), ' ' + p.polls + '× over ' + ms(p.waitedMs) + ' — HTTP ' + answer +
-    (p.lastReason ? ' (' + p.lastReason + ')' : '') + '.');
+function polled(polling) {
+  const answer = polling.sameStatus ? (polling.polls > 1 ? polling.lastStatus + ' each time' : polling.lastStatus) : 'last answer ' + polling.lastStatus;
+  return createElement('div', { class: 'polled' }, 'Polled ', createElement('code', {}, (polling.method || 'GET') + ' ' + polling.lastUrl), ' ' + polling.polls + '× over ' + formatDuration(polling.waitedMs) + ' — HTTP ' + answer +
+    (polling.lastReason ? ' (' + polling.lastReason + ')' : '') + '.');
 }
 
 // One numbered row per hop; a closed row is a single line, the cause and evidence open below it.
-function hopShell(tag, n, status, from, to, via, time) {
-  return el(tag, { class: 'hop-row' }, el('span', { class: 'mark', 'aria-hidden': 'true' }), el('span', { class: 'number' }, n), pill(status),
-    el('span', { class: 'route' }, (from ? from + ' → ' : '') + to, via ? el('span', { class: 'via' }, '  via ' + via) : null),
-    el('span', { class: 'meta' }, time));
+function hopShell(tag, number, status, from, to, via, time) {
+  return createElement(tag, { class: 'hop-row' }, createElement('span', { class: 'mark', 'aria-hidden': 'true' }), createElement('span', { class: 'number' }, number), pill(status),
+    createElement('span', { class: 'route' }, (from ? from + ' → ' : '') + to, via ? createElement('span', { class: 'via' }, '  via ' + via) : null),
+    createElement('span', { class: 'meta' }, time));
 }
 
-function hopRow(f, h, n) {
-  const id = flowId(f) + '-hop-' + slug(h.id || h.service);
-  if (h.status === 'not-reached') {
-    return el('li', { class: 'hop skipped', id }, hopShell('div', n, h.status, h.from, h.service, h.transport, 'not checked'));
+function hopRow(flow, hop, number) {
+  const id = flowId(flow) + '-hop-' + slug(hop.id || hop.service);
+  if (hop.status === 'not-reached') {
+    return createElement('li', { class: 'hop skipped', id }, hopShell('div', number, hop.status, hop.from, hop.service, hop.transport, 'not checked'));
   }
-  const d = el('details', { class: 'hop', id });
-  d.append(hopShell('summary', n, h.status, h.from, h.service, h.transport, ms(h.ms)));
-  const body = el('div', { class: 'hop-body' });
-  if (h.detail) body.append(el('div', { class: 'why' + (h.status === 'pass' ? '' : ' bad') }, h.detail));
-  if (h.polling) body.append(polled(h.polling));
-  if (h.instance) body.append(el('div', { class: 'meta' }, 'Instance: ', el('code', {}, h.instance)));
-  if (h.env?.length) {
-    body.append(el('div', { class: 'table-wrap' }, el('table', {},
-      el('thead', {}, el('tr', {}, el('th', { scope: 'col' }, 'Env var'), el('th', { scope: 'col' }, 'Used'), el('th', { scope: 'col' }, 'Check'))),
-      el('tbody', {}, h.env.map((e) => el('tr', {}, el('td', {}, el('code', {}, e.name)), el('td', {}, el('code', {}, e.value ?? '')),
-        el('td', {}, pill(e.ok ? 'pass' : 'fail'), e.note ? ' ' + e.note : '')))))));
+  const details = createElement('details', { class: 'hop', id });
+  details.append(hopShell('summary', number, hop.status, hop.from, hop.service, hop.transport, formatDuration(hop.ms)));
+  const body = createElement('div', { class: 'hop-body' });
+  if (hop.detail) body.append(createElement('div', { class: 'why' + (hop.status === 'pass' ? '' : ' bad') }, hop.detail));
+  if (hop.polling) body.append(polled(hop.polling));
+  if (hop.instance) body.append(createElement('div', { class: 'meta' }, 'Instance: ', createElement('code', {}, hop.instance)));
+  if (hop.env?.length) {
+    body.append(createElement('div', { class: 'table-wrap' }, createElement('table', {},
+      createElement('thead', {}, createElement('tr', {}, createElement('th', { scope: 'col' }, 'Env var'), createElement('th', { scope: 'col' }, 'Used'), createElement('th', { scope: 'col' }, 'Check'))),
+      createElement('tbody', {}, hop.env.map((envVar) => createElement('tr', {}, createElement('td', {}, createElement('code', {}, envVar.name)), createElement('td', {}, createElement('code', {}, envVar.value ?? '')),
+        createElement('td', {}, pill(envVar.ok ? 'pass' : 'fail'), envVar.note ? ' ' + envVar.note : '')))))));
   }
-  if (h.evidence) body.append(evidence(h.polling ? 'Last poll' : 'Evidence', h.evidence, h.service + ' in ' + f.flow));
-  if (!body.childNodes.length) body.append(el('div', { class: 'meta' }, 'The runner recorded no request for this hop.'));
-  d.append(body);
-  return el('li', {}, d);
+  if (hop.evidence) body.append(evidence(hop.polling ? 'Last poll' : 'Evidence', hop.evidence, hop.service + ' in ' + flow.flow));
+  if (!body.childNodes.length) body.append(createElement('div', { class: 'meta' }, 'The runner recorded no request for this hop.'));
+  details.append(body);
+  return createElement('li', {}, details);
 }
 
 // Slides a row's panel open or shut; a click mid-slide reverses from the current height.
 const EASE = getComputedStyle(document.documentElement).getPropertyValue('--ease').trim() || 'ease';
-const calm = matchMedia('(prefers-reduced-motion: reduce)');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 function slide(panel, open, instant) {
   const from = panel.hidden ? 0 : panel.getBoundingClientRect().height;
   panel.getAnimations().forEach((a) => a.cancel());
   panel.style.overflow = '';
   panel.hidden = false;
   const to = open ? panel.getBoundingClientRect().height : 0;
-  if (instant || calm.matches || from === to) { panel.hidden = !open; return; }
-  const cs = getComputedStyle(panel);
-  const at = (h) => h ? { height: h + 'px', paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, opacity: 1 }
+  if (instant || reducedMotion.matches || from === to) { panel.hidden = !open; return; }
+  const computedStyle = getComputedStyle(panel);
+  const keyframe = (height) => height ? { height: height + 'px', paddingTop: computedStyle.paddingTop, paddingBottom: computedStyle.paddingBottom, opacity: 1 }
     : { height: '0px', paddingTop: '0px', paddingBottom: '0px', opacity: 0 };
   panel.style.overflow = 'hidden';
-  const a = panel.animate([at(from), at(to)], { duration: 220, easing: EASE, fill: 'forwards' });
-  a.onfinish = () => { panel.hidden = !open; panel.style.overflow = ''; a.cancel(); };
+  const animation = panel.animate([keyframe(from), keyframe(to)], { duration: 220, easing: EASE, fill: 'forwards' });
+  animation.onfinish = () => { panel.hidden = !open; panel.style.overflow = ''; animation.cancel(); };
 }
 
 let closeOpen = null;
 
-function flowBox(f) {
-  const failed = f.status !== 'pass';
-  const id = flowId(f);
-  const box = el('section', { class: 'flow disclosure', id, 'aria-labelledby': id + '-name' });
-  const panel = el('div', { id: id + '-panel' });
+function flowBox(flow) {
+  const failed = flow.status !== 'pass';
+  const id = flowId(flow);
+  const box = createElement('section', { class: 'flow disclosure', id, 'aria-labelledby': id + '-name' });
+  const panel = createElement('div', { id: id + '-panel' });
   box.dataset.kind = failed ? 'failed' : 'passed';
-  const toggle = el('button', { type: 'button', 'aria-controls': id + '-panel' },
-    el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(f.status), el('span', { id: id + '-name' }, f.flow));
-  const head = el('div', { class: 'flow-head disclosure-head' }, el('h2', {}, toggle),
-    el('div', { class: 'info' }, f.description ? el('span', { class: 'meta' }, f.description) : null, el('span', { class: 'meta' }, ms(f.ms))));
+  const toggle = createElement('button', { type: 'button', 'aria-controls': id + '-panel' },
+    createElement('span', { class: 'mark', 'aria-hidden': 'true' }), pill(flow.status), createElement('span', { id: id + '-name' }, flow.flow));
+  const head = createElement('div', { class: 'flow-head disclosure-head' }, createElement('h2', {}, toggle),
+    createElement('div', { class: 'info' }, flow.description ? createElement('span', { class: 'meta' }, flow.description) : null, createElement('span', { class: 'meta' }, formatDuration(flow.ms))));
   // Same disclosure as the e2e report: the whole row is a mouse target, the heading's button serves keyboards.
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
   const set = (open, instant) => { box.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open)); slide(panel, open, instant); };
@@ -482,54 +482,54 @@ function flowBox(f) {
   set(false, true);
   box.append(head, panel);
 
-  const chain = el('div', { class: 'chain', role: 'list', 'aria-label': 'Hop chain' });
-  const node = (name, s) => el('span', { class: 'node tone-' + st(s).tone, role: 'listitem' },
-    el('span', { 'aria-hidden': 'true' }, st(s).glyph), name, el('span', { class: 'sr-only' }, ' ' + st(s).word));
-  const arrow = () => el('span', { class: 'arrow', 'aria-hidden': 'true' }, '→');
-  chain.append(el('span', { class: 'node plain', role: 'listitem' }, 'trigger'), arrow(), node(entryOf(f), f.error ? 'fail' : 'pass'));
-  let prev = entryOf(f);
-  for (const h of f.hops) {
+  const chain = createElement('div', { class: 'chain', role: 'list', 'aria-label': 'Hop chain' });
+  const node = (name, status) => createElement('span', { class: 'node tone-' + statusOf(status).tone, role: 'listitem' },
+    createElement('span', { 'aria-hidden': 'true' }, statusOf(status).glyph), name, createElement('span', { class: 'sr-only' }, ' ' + statusOf(status).word));
+  const arrow = () => createElement('span', { class: 'arrow', 'aria-hidden': 'true' }, '→');
+  chain.append(createElement('span', { class: 'node plain', role: 'listitem' }, 'trigger'), arrow(), node(entryOf(flow), flow.error ? 'fail' : 'pass'));
+  let previousService = entryOf(flow);
+  for (const hop of flow.hops) {
     // A hop that starts somewhere other than the previous node gets its own source node, so the chain stays truthful.
-    if (h.from && h.from !== prev && h.from !== 'runner') chain.append(arrow(), el('span', { class: 'node plain', role: 'listitem' }, h.from));
-    chain.append(arrow(), node(h.service, h.status));
-    prev = h.service;
+    if (hop.from && hop.from !== previousService && hop.from !== 'runner') chain.append(arrow(), createElement('span', { class: 'node plain', role: 'listitem' }, hop.from));
+    chain.append(arrow(), node(hop.service, hop.status));
+    previousService = hop.service;
   }
-  const v = verdict(f);
-  panel.append(chain, el('div', { class: 'verdict' + (v.bad ? ' bad' : '') }, v.text));
+  const flowVerdict = verdict(flow);
+  panel.append(chain, createElement('div', { class: 'verdict' + (flowVerdict.bad ? ' bad' : '') }, flowVerdict.text));
 
-  const facts = el('div', { class: 'facts' });
-  if (f.probeId) facts.append(el('span', { class: 'meta' }, 'Probe ID: ', el('code', {}, f.probeId)));
-  if (f.startedAt) facts.append(el('span', { class: 'meta' }, 'Started ' + isoLocal(f.startedAt)));
+  const facts = createElement('div', { class: 'facts' });
+  if (flow.probeId) facts.append(createElement('span', { class: 'meta' }, 'Probe ID: ', createElement('code', {}, flow.probeId)));
+  if (flow.startedAt) facts.append(createElement('span', { class: 'meta' }, 'Started ' + isoLocal(flow.startedAt)));
   if (facts.childNodes.length) panel.append(facts);
-  if (failed && f.rerun) panel.append(el('div', { class: 'command' }, el('span', { class: 'meta' }, 'Rerun this flow:'), el('code', {}, f.rerun), copyBtn(f.rerun, 'rerun command for ' + f.flow)));
+  if (failed && flow.rerun) panel.append(createElement('div', { class: 'command' }, createElement('span', { class: 'meta' }, 'Rerun this flow:'), createElement('code', {}, flow.rerun), copyButton(flow.rerun, 'rerun command for ' + flow.flow)));
 
-  const list = el('ol', { class: 'hops', 'aria-label': 'Hops of ' + f.flow });
-  if (f.trigger) {
-    const t = el('details', { class: 'hop', id: id + '-trigger' });
-    t.append(hopShell('summary', '0', f.error ? 'fail' : 'pass', 'trigger', entryOf(f), '', ms(f.trigger.ms)),
-      el('div', { class: 'hop-body' }, f.error ? el('div', { class: 'why bad' }, f.error) : null, evidence('Trigger', f.trigger, 'trigger of ' + f.flow)));
-    list.append(el('li', {}, t));
+  const list = createElement('ol', { class: 'hops', 'aria-label': 'Hops of ' + flow.flow });
+  if (flow.trigger) {
+    const triggerRow = createElement('details', { class: 'hop', id: id + '-trigger' });
+    triggerRow.append(hopShell('summary', '0', flow.error ? 'fail' : 'pass', 'trigger', entryOf(flow), '', formatDuration(flow.trigger.ms)),
+      createElement('div', { class: 'hop-body' }, flow.error ? createElement('div', { class: 'why bad' }, flow.error) : null, evidence('Trigger', flow.trigger, 'trigger of ' + flow.flow)));
+    list.append(createElement('li', {}, triggerRow));
   }
-  f.hops.forEach((h, i) => list.append(hopRow(f, h, String(i + 1))));
-  panel.append(el('div', { class: 'label hops-label' }, 'Hops'), list);
+  flow.hops.forEach((hop, i) => list.append(hopRow(flow, hop, String(i + 1))));
+  panel.append(createElement('div', { class: 'label hops-label' }, 'Hops'), list);
   return box;
 }
 
 function render() {
   const app = document.getElementById('app');
-  if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
-  const n = { failed: 0, passed: 0 };
-  for (const f of DATA.flows) n[f.status === 'pass' ? 'passed' : 'failed']++;
+  if (!DATA) { app.append(createElement('p', {}, 'No data in this report.')); return; }
+  const counts = { failed: 0, passed: 0 };
+  for (const flow of DATA.flows) counts[flow.status === 'pass' ? 'passed' : 'failed']++;
   // Failed flows first; the rest keep the runner's order.
   const flows = DATA.flows.map((f, i) => [f, i]).sort((a, b) => (a[0].status === 'pass') - (b[0].status === 'pass') || a[1] - b[1]).map((x) => x[0]);
   const boxes = flows.map(flowBox);
-  const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No flows match this filter.');
-  const tools = el('div', { class: 'tools', role: 'group', 'aria-label': 'Show flows' });
-  const FILTERS = [['all', 'All', DATA.flows.length], ['failed', 'Failed', n.failed], ['passed', 'Passed', n.passed]];
-  const buttons = FILTERS.map(([key, label, c]) => {
-    const b = el('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + c);
-    b.onclick = () => {
-      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  const none = createElement('p', { class: 'meta empty-filter', hidden: '' }, 'No flows match this filter.');
+  const tools = createElement('div', { class: 'tools', role: 'group', 'aria-label': 'Show flows' });
+  const FILTERS = [['all', 'All', DATA.flows.length], ['failed', 'Failed', counts.failed], ['passed', 'Passed', counts.passed]];
+  const buttons = FILTERS.map(([key, label, total]) => {
+    const button = createElement('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + total);
+    button.onclick = () => {
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === button)));
       let shown = 0;
       for (const box of boxes) {
         box.hidden = key !== 'all' && box.dataset.kind !== key;
@@ -537,19 +537,19 @@ function render() {
       }
       none.hidden = shown > 0;
     };
-    return b;
+    return button;
   });
   tools.append(...buttons);
   // Same header as the e2e report: counts in filter order, colored only when not zero.
-  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' color-' + tone : '') }, c + ' ' + word);
-  app.append(el('header', {},
-    el('div', {}, el('h1', {}, 'Smoke report · ' + DATA.env, pill(DATA.status)),
-      el('div', { class: 'summary-line' },
-        count(n.failed, 'failed', 'bad'), count(n.passed, 'passed'),
-        el('span', { class: 'meta' }, DATA.flows.length + ' flows · ' + ms(DATA.ms)),
-        el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt))),
-      DATA.command ? el('div', { class: 'summary-line' }, el('span', { class: 'meta' }, 'Command: ', el('code', {}, DATA.command)), copyBtn(DATA.command, 'run command')) : null),
-    el('div', { class: 'head-row' }, tools)));
+  const count = (total, word, tone) => createElement('span', { class: 'lead' + (total && tone ? ' color-' + tone : '') }, total + ' ' + word);
+  app.append(createElement('header', {},
+    createElement('div', {}, createElement('h1', {}, 'Smoke report · ' + DATA.env, pill(DATA.status)),
+      createElement('div', { class: 'summary-line' },
+        count(counts.failed, 'failed', 'bad'), count(counts.passed, 'passed'),
+        createElement('span', { class: 'meta' }, DATA.flows.length + ' flows · ' + formatDuration(DATA.ms)),
+        createElement('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt))),
+      DATA.command ? createElement('div', { class: 'summary-line' }, createElement('span', { class: 'meta' }, 'Command: ', createElement('code', {}, DATA.command)), copyButton(DATA.command, 'run command')) : null),
+    createElement('div', { class: 'head-row' }, tools)));
   addExportPdf();
   app.append(...boxes, none);
 }

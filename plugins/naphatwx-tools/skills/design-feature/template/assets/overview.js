@@ -1,29 +1,29 @@
 /* theme:pdf-js:start */
 /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
 function addExportPdf(target, prepare) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'export-pdf no-print';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'export-pdf no-print';
     if (!target) {
         target = document.querySelector('.float-bar');
         if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
     }
-    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-    b.textContent = 'Export PDF';
-    b.addEventListener('click', async () => {
+    button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    button.textContent = 'Export PDF';
+    button.addEventListener('click', async () => {
         if (prepare) await prepare();
         window.print();
     });
-    target.append(b);
-    return b;
+    target.append(button);
+    return button;
 }
 /* theme:pdf-js:end */
 const root = document.documentElement;
 const typing = (e) => e.target.closest("input, textarea, select, [contenteditable]");
 const bare = (e) => !e.metaKey && !e.ctrlKey && !e.altKey;
 const store = {
-    get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
-    set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* private window */ } },
+    get: (key) => { try { return localStorage.getItem(key); } catch { return null; } },
+    set: (key, value) => { try { localStorage.setItem(key, value); } catch { /* private window */ } },
 };
 
 // ===== Rail: always open; the edge button or "[" hides it (remembered). On phones ☰ opens it as a drawer. =====
@@ -68,11 +68,11 @@ document.querySelectorAll(".use-case-head > .references, .use-case-index .aside,
 const search = document.getElementById("railSearch");
 const railLinks = [...rail.querySelectorAll(".rail-list a")];
 search.addEventListener("input", () => {
-    const q = search.value.toLowerCase().trim();
-    railLinks.forEach(a => a.classList.toggle("hidden", !!q && !a.textContent.toLowerCase().includes(q)));
-    rail.querySelectorAll(".rail-list > li").forEach(li => {
-        const kidHit = [...li.querySelectorAll("ol a")].some(a => !a.classList.contains("hidden"));
-        if (kidHit) li.querySelector(":scope > a").classList.remove("hidden");
+    const query = search.value.toLowerCase().trim();
+    railLinks.forEach(a => a.classList.toggle("hidden", !!query && !a.textContent.toLowerCase().includes(query)));
+    rail.querySelectorAll(".rail-list > li").forEach(item => {
+        const childMatches = [...item.querySelectorAll("ol a")].some(a => !a.classList.contains("hidden"));
+        if (childMatches) item.querySelector(":scope > a").classList.remove("hidden");
     });
 });
 search.addEventListener("keydown", (e) => {
@@ -84,12 +84,12 @@ search.addEventListener("keydown", (e) => {
 const byId = new Map(railLinks.map(a => [a.getAttribute("href").slice(1), a]));
 const targets = [...byId.keys()].map(id => document.getElementById(id)).filter(Boolean);
 let pinnedLink = null, activeLink;
-function setActive(a) {
-    if (a === activeLink) return;
-    activeLink = a;
-    railLinks.forEach(l => {
-        l.classList.toggle("active", l === a);
-        if (l === a) l.setAttribute("aria-current", "location"); else l.removeAttribute("aria-current");
+function setActive(link) {
+    if (link === activeLink) return;
+    activeLink = link;
+    railLinks.forEach(railLink => {
+        railLink.classList.toggle("active", railLink === link);
+        if (railLink === link) railLink.setAttribute("aria-current", "location"); else railLink.removeAttribute("aria-current");
     });
     railTitles(); // the active link is bold, so its label may now be cut short
 }
@@ -97,11 +97,11 @@ function spy() {
     if (pinnedLink) return;
     const atBottom = innerHeight + scrollY >= root.scrollHeight - 2;
     const passed = targets.filter(t => t.offsetParent && t.getBoundingClientRect().top <= 120);
-    const t = atBottom ? targets[targets.length - 1] : passed[passed.length - 1] || targets[0];
-    setActive(byId.get(t?.id));
+    const target = atBottom ? targets[targets.length - 1] : passed[passed.length - 1] || targets[0];
+    setActive(byId.get(target?.id));
 }
 railLinks.forEach(a => a.addEventListener("click", () => { pinnedLink = a; setActive(a); }));
-["wheel", "touchstart", "keydown"].forEach(ev => addEventListener(ev, () => { pinnedLink = null; }, { passive: true }));
+["wheel", "touchstart", "keydown"].forEach(eventName => addEventListener(eventName, () => { pinnedLink = null; }, { passive: true }));
 addEventListener("scroll", spy, { passive: true });
 spy();
 
@@ -109,37 +109,37 @@ spy();
 // and clicking the open view's button closes it.
 const useCases = [...document.querySelectorAll(".use-case")];
 const viewButtons = [...document.querySelectorAll(".views button[aria-controls]")];
-function selectView(btn, force) {
-    const open = force ?? btn.getAttribute("aria-expanded") !== "true";
-    btn.closest(".views").querySelectorAll("button[aria-controls]").forEach(b => {
-        const on = open && b === btn;
-        b.setAttribute("aria-expanded", String(on));
-        const panel = document.getElementById(b.getAttribute("aria-controls"));
+function selectView(button, force) {
+    const open = force ?? button.getAttribute("aria-expanded") !== "true";
+    button.closest(".views").querySelectorAll("button[aria-controls]").forEach(sibling => {
+        const on = open && sibling === button;
+        sibling.setAttribute("aria-expanded", String(on));
+        const panel = document.getElementById(sibling.getAttribute("aria-controls"));
         if (!panel) return;
-        const was = !panel.hidden;
+        const wasOpen = !panel.hidden;
         panel.hidden = !on;
-        if (on && !was) { panel.classList.remove("entering"); void panel.offsetWidth; panel.classList.add("entering"); }
+        if (on && !wasOpen) { panel.classList.remove("entering"); void panel.offsetWidth; panel.classList.add("entering"); }
     });
 }
-viewButtons.forEach(btn => {
-    const panel = document.getElementById(btn.getAttribute("aria-controls"));
-    if (panel) panel.dataset.label = btn.textContent.trim();
-    btn.addEventListener("click", () => selectView(btn));
+viewButtons.forEach(button => {
+    const panel = document.getElementById(button.getAttribute("aria-controls"));
+    if (panel) panel.dataset.label = button.textContent.trim();
+    button.addEventListener("click", () => selectView(button));
 });
 function closeViews() {
-    document.querySelectorAll(".views").forEach(v => {
-        const btn = v.querySelector("button[aria-controls]");
-        if (btn) selectView(btn, false);
+    document.querySelectorAll(".views").forEach(views => {
+        const button = views.querySelector("button[aria-controls]");
+        if (button) selectView(button, false);
     });
 }
 document.querySelectorAll(".panel").forEach(p => p.addEventListener("animationend", () => p.classList.remove("entering")));
 // a link into a closed view (Acceptance criteria → #sc-<id>) opens that view first, so the browser can scroll to it
 function reveal(id) {
-    const el = id && document.getElementById(decodeURIComponent(id));
-    const panel = el?.closest(".panel[hidden]");
+    const target = id && document.getElementById(decodeURIComponent(id));
+    const panel = target?.closest(".panel[hidden]");
     const tab = panel && document.getElementById(panel.getAttribute("aria-labelledby"));
     if (tab) selectView(tab, true);
-    return el;
+    return target;
 }
 document.addEventListener("click", (e) => {
     const a = e.target.closest('a[href^="#"]');
@@ -150,7 +150,7 @@ if (location.hash) reveal(location.hash.slice(1))?.scrollIntoView();
 function useCaseInView() {
     if (presenting()) return steps[current]?.slide.classList.contains("use-case") ? steps[current].slide : null;
     let best = null;
-    for (const f of useCases) { if (f.getBoundingClientRect().top < innerHeight * 0.5) best = f; }
+    for (const useCase of useCases) { if (useCase.getBoundingClientRect().top < innerHeight * 0.5) best = useCase; }
     return best && best.getBoundingClientRect().bottom > 0 ? best : null;
 }
 
@@ -172,10 +172,10 @@ openAll.addEventListener("click", () => {
 // Lazy diagram frames never load off screen, so the PDF would print them empty: load them all first.
 const frames = [...document.querySelectorAll("iframe.diagram-frame")];
 frames.forEach(f => f.addEventListener("load", () => { f.dataset.loaded = "1"; }, { once: true }));
-const loadFrames = () => Promise.all(frames.filter(f => !f.dataset.loaded).map(f => new Promise(done => {
-    f.addEventListener("load", () => setTimeout(done, 200), { once: true }); // 200 ms: the frame posts its height
+const loadFrames = () => Promise.all(frames.filter(f => !f.dataset.loaded).map(frame => new Promise(done => {
+    frame.addEventListener("load", () => setTimeout(done, 200), { once: true }); // 200 ms: the frame posts its height
     setTimeout(done, 2000);
-    f.loading = "eager";
+    frame.loading = "eager";
 })));
 document.getElementById("keysBtn").before(addExportPdf(document.querySelector(".tools"), loadFrames));
 
@@ -184,7 +184,7 @@ document.getElementById("keysBtn").before(addExportPdf(document.querySelector(".
 const slides = [...document.querySelectorAll(".slide")];
 const hud = document.getElementById("hud");
 const hudLabel = document.getElementById("hudLabel");
-const presentBtn = document.getElementById("presentBtn");
+const presentButton = document.getElementById("presentBtn");
 const steps = slides.flatMap(slide => {
     const title = slide.dataset.title;
     const views = [...slide.querySelectorAll(".views button[aria-controls]:not(:disabled)")];
@@ -208,9 +208,9 @@ function unfit() {
         box.style.maxHeight = "";
         box.classList.remove("fitted");
     });
-    const was = [...fitted];
+    const previouslyFitted = [...fitted];
     fitted.clear();
-    was.forEach(updateCue);
+    previouslyFitted.forEach(updateCue);
 }
 function fitRoom() {
     unfit();
@@ -221,12 +221,12 @@ function fitRoom() {
     if (!box) return;
     const sheetTop = parseFloat(getComputedStyle(document.getElementById("sheet")).paddingTop);
     const top = sheetTop + box.getBoundingClientRect().top - slide.getBoundingClientRect().top;
-    const cs = getComputedStyle(box);
-    const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + box.clientTop * 2;
-    const height = Math.max(200, Math.floor(room - top - padY));
+    const computedStyle = getComputedStyle(box);
+    const paddingY = parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom) + box.clientTop * 2;
+    const height = Math.max(200, Math.floor(room - top - paddingY));
     fitted.add(box);
     box.classList.add("fitted");
-    box.style.maxHeight = height + padY + "px";
+    box.style.maxHeight = height + paddingY + "px";
     if (!box.querySelector(":scope > .more-cue")) {
         box.insertAdjacentHTML("beforeend", '<div class="more-cue" aria-hidden="true" hidden>continues ↓</div>');
         box.addEventListener("scroll", () => updateCue(box), { passive: true });
@@ -246,12 +246,12 @@ function show(i) {
     current = Math.max(0, Math.min(steps.length - 1, i));
     const step = steps[current];
     slides.forEach(s => s.classList.toggle("current", s === step.slide));
-    step.slide.querySelectorAll(".step-off").forEach(el => el.classList.remove("step-off"));
+    step.slide.querySelectorAll(".step-off").forEach(element => element.classList.remove("step-off"));
     if (step.tab) selectView(step.tab, true);
     if ("part" in step) {
-        [...step.slide.children].forEach(el => {
-            const off = step.part ? !el.matches("h2") && el !== step.part : el.hasAttribute("data-part");
-            el.classList.toggle("step-off", off);
+        [...step.slide.children].forEach(child => {
+            const off = step.part ? !child.matches("h2") && child !== step.part : child.hasAttribute("data-part");
+            child.classList.toggle("step-off", off);
         });
     }
     hudLabel.textContent = `${current + 1} / ${steps.length} · ${step.label}`;
@@ -265,60 +265,60 @@ function setPresent(on) {
         const near = slides.filter(s => s.getBoundingClientRect().top <= innerHeight * 0.3).pop() || slides[0];
         root.setAttribute("data-present", "on");
         hud.hidden = false;
-        show(steps.findIndex(st => st.slide === near));
+        show(steps.findIndex(step => step.slide === near));
     } else {
         root.removeAttribute("data-present");
         hud.hidden = true;
         unfit();
-        document.querySelectorAll(".step-off").forEach(el => el.classList.remove("step-off"));
+        document.querySelectorAll(".step-off").forEach(element => element.classList.remove("step-off"));
         // back in docs, only the view of the last step stays open
         closeViews();
         if (steps[current].tab) selectView(steps[current].tab, true);
         steps[current].slide.scrollIntoView({ behavior: "instant" });
     }
-    presentBtn.setAttribute("aria-pressed", String(on));
+    presentButton.setAttribute("aria-pressed", String(on));
 }
-presentBtn.addEventListener("click", () => setPresent(true));
+presentButton.addEventListener("click", () => setPresent(true));
 document.getElementById("prevSlide").addEventListener("click", () => show(current - 1));
 document.getElementById("nextSlide").addEventListener("click", () => show(current + 1));
 document.getElementById("exitPresent").addEventListener("click", () => setPresent(false));
 // a view click while presenting jumps to that view's step
 viewButtons.forEach(tab => tab.addEventListener("click", () => {
     if (!presenting()) return;
-    const i = steps.findIndex(st => st.tab === tab);
+    const i = steps.findIndex(step => step.tab === tab);
     if (i >= 0) show(i);
 }));
 // a link while presenting jumps to the first step that holds the target
 addEventListener("hashchange", () => {
     if (!presenting()) return;
-    const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-    if (!el) return;
+    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (!target) return;
     // a row inside a use case view (#sc-<id>) goes to that view's step, not the use case's first one
-    const panel = el.closest(".panel");
-    let i = panel ? steps.findIndex(st => st.tab?.getAttribute("aria-controls") === panel.id) : -1;
-    if (i < 0) i = steps.findIndex(st => (st.part || st.slide).contains(el));
+    const panel = target.closest(".panel");
+    let i = panel ? steps.findIndex(step => step.tab?.getAttribute("aria-controls") === panel.id) : -1;
+    if (i < 0) i = steps.findIndex(step => (step.part || step.slide).contains(target));
     if (i >= 0 && i !== current) show(i);
-    if (panel) el.scrollIntoView({ block: "center" });
+    if (panel) target.scrollIntoView({ block: "center" });
 });
 
 // ===== Shortcut sheet ( ? ) =====
 const keys = document.getElementById("keys");
-const keysBtn = document.getElementById("keysBtn");
+const keysButton = document.getElementById("keysBtn");
 function openKeys() { if (!keys.open) keys.showModal(); keys.querySelector(".keys-close").focus(); }
-keysBtn.addEventListener("click", openKeys);
+keysButton.addEventListener("click", openKeys);
 keys.querySelector(".keys-close").addEventListener("click", () => keys.close());
 keys.addEventListener("click", (e) => { if (e.target === keys) keys.close(); });
 
 // ===== Keys =====
 document.addEventListener("keydown", (e) => {
     if (typing(e) || !bare(e) || document.querySelector("dialog[open]")) return;
-    const k = e.key;
-    if (k === "[") { toggleRail(); return; }
-    if (k === "/") { e.preventDefault(); small.matches ? setDrawer(true) : setCollapsed(false); search.focus(); return; }
-    if (k === "p" || k === "P") { setPresent(!presenting()); return; }
-    if (k === "?") { openKeys(); return; }
-    if (["1", "2", "3", "4"].includes(k)) {
-        const tab = useCaseInView()?.querySelectorAll(".views button[aria-controls]")[+k - 1];
+    const key = e.key;
+    if (key === "[") { toggleRail(); return; }
+    if (key === "/") { e.preventDefault(); small.matches ? setDrawer(true) : setCollapsed(false); search.focus(); return; }
+    if (key === "p" || key === "P") { setPresent(!presenting()); return; }
+    if (key === "?") { openKeys(); return; }
+    if (["1", "2", "3", "4"].includes(key)) {
+        const tab = useCaseInView()?.querySelectorAll(".views button[aria-controls]")[+key - 1];
         if (!tab || tab.disabled) return;
         selectView(tab);
         const panel = document.getElementById(tab.getAttribute("aria-controls"));
@@ -327,9 +327,9 @@ document.addEventListener("keydown", (e) => {
         return;
     }
     if (!presenting()) return;
-    if (k === "Escape") setPresent(false);
-    else if (k === "ArrowRight" || k === "PageDown" || (k === " " && !e.shiftKey)) { e.preventDefault(); show(current + 1); }
-    else if (k === "ArrowLeft" || k === "PageUp" || (k === " " && e.shiftKey)) { e.preventDefault(); show(current - 1); }
+    if (key === "Escape") setPresent(false);
+    else if (key === "ArrowRight" || key === "PageDown" || (key === " " && !e.shiftKey)) { e.preventDefault(); show(current + 1); }
+    else if (key === "ArrowLeft" || key === "PageUp" || (key === " " && e.shiftKey)) { e.preventDefault(); show(current - 1); }
 });
 
 // ===== Fit each diagram-design iframe to the height its file posts (works on file://) =====
@@ -354,7 +354,7 @@ function setZoom(on) {
     store.set("plan-zoom", on ? "on" : "off");
     if (!on) zooms.forEach(z => z.reset());
     // zoom pans with a drag instead of the box's sideways scroll
-    else document.querySelectorAll(".zoomable").forEach(b => { b.scrollLeft = 0; });
+    else document.querySelectorAll(".zoomable").forEach(box => { box.scrollLeft = 0; });
 }
 setZoom(store.get("plan-zoom") === "on");
 zoomToggle.addEventListener("click", () => setZoom(!zoomOn()));
@@ -367,43 +367,43 @@ function makeZoomable(box) {
     box.classList.add("zoomable");
     if (stage.querySelector("iframe")) box.insertAdjacentHTML("beforeend", '<div class="zoom-shield"></div>');
     box.insertAdjacentHTML("beforeend", '<div class="zoom-tools"><button type="button" class="zoom-reset" title="Reset zoom"></button><button type="button" class="zoom-full" title="Open in lightbox" aria-label="Open diagram in lightbox">⛶</button></div>');
-    const btn = box.querySelector(".zoom-reset");
+    const resetButton = box.querySelector(".zoom-reset");
     const active = () => box.classList.contains("in-lightbox") || (zoomOn() && !presenting());
-    let s = 1, x = 0, y = 0;
+    let scale = 1, x = 0, y = 0;
     const paint = () => {
-        stage.style.transform = s === 1 && !x && !y ? "" : `translate(${x}px, ${y}px) scale(${s})`;
-        btn.textContent = `↺ ${Math.round(s * 100)}%`;
+        stage.style.transform = scale === 1 && !x && !y ? "" : `translate(${x}px, ${y}px) scale(${scale})`;
+        resetButton.textContent = `↺ ${Math.round(scale * 100)}%`;
     };
-    const reset = () => { s = 1; x = 0; y = 0; paint(); };
+    const reset = () => { scale = 1; x = 0; y = 0; paint(); };
     paint();
     box.addEventListener("wheel", (e) => {
         if (!active()) return;
         e.preventDefault();
-        const r = box.getBoundingClientRect();
-        const px = e.clientX - r.left - box.clientLeft - stage.offsetLeft;
-        const py = e.clientY - r.top - box.clientTop - stage.offsetTop;
-        const next = Math.min(5, Math.max(0.5, s * Math.exp(-e.deltaY * 0.0015)));
-        x = px - (px - x) * next / s;
-        y = py - (py - y) * next / s;
-        s = next;
+        const rect = box.getBoundingClientRect();
+        const pointerX = e.clientX - rect.left - box.clientLeft - stage.offsetLeft;
+        const pointerY = e.clientY - rect.top - box.clientTop - stage.offsetTop;
+        const next = Math.min(5, Math.max(0.5, scale * Math.exp(-e.deltaY * 0.0015)));
+        x = pointerX - (pointerX - x) * next / scale;
+        y = pointerY - (pointerY - y) * next / scale;
+        scale = next;
         paint();
     }, { passive: false });
     stage.querySelectorAll("img").forEach(img => { img.draggable = false; });
     let drag = null;
     box.addEventListener("pointerdown", (e) => {
         if (!active() || e.button !== 0 || e.target.closest(".zoom-tools")) return;
-        drag = { id: e.pointerId, sx: e.clientX - x, sy: e.clientY - y };
+        drag = { id: e.pointerId, startX: e.clientX - x, startY: e.clientY - y };
         box.setPointerCapture(e.pointerId);
         box.classList.add("panning");
     });
     box.addEventListener("pointermove", (e) => {
         if (!drag || e.pointerId !== drag.id) return;
-        x = e.clientX - drag.sx; y = e.clientY - drag.sy; paint();
+        x = e.clientX - drag.startX; y = e.clientY - drag.startY; paint();
     });
-    const end = () => { drag = null; box.classList.remove("panning"); };
-    box.addEventListener("pointerup", end);
-    box.addEventListener("pointercancel", end);
-    btn.addEventListener("click", reset);
+    const endDrag = () => { drag = null; box.classList.remove("panning"); };
+    box.addEventListener("pointerup", endDrag);
+    box.addEventListener("pointercancel", endDrag);
+    resetButton.addEventListener("click", reset);
     box.querySelector(".zoom-full").addEventListener("click", () => openLightbox(box, stage, reset));
     zooms.push({ reset });
 }
@@ -435,14 +435,14 @@ function openLightbox(box, stage, reset) {
     lightbox.showModal();
     lightbox.querySelector(".lightbox-close").focus();
     if (litFrame()) return fitLitFrame();
-    const { roomW, roomH } = room(box);
-    stage.style.width = Math.min(roomW, roomH / ratio) + "px";
+    const { roomWidth, roomHeight } = room(box);
+    stage.style.width = Math.min(roomWidth, roomHeight / ratio) + "px";
 }
 function room(box) {
-    const cs = getComputedStyle(box);
+    const computedStyle = getComputedStyle(box);
     return {
-        roomW: box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),
-        roomH: box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom),
+        roomWidth: box.clientWidth - parseFloat(computedStyle.paddingLeft) - parseFloat(computedStyle.paddingRight),
+        roomHeight: box.clientHeight - parseFloat(computedStyle.paddingTop) - parseFloat(computedStyle.paddingBottom),
     };
 }
 // a diagram-design iframe can't be measured from here (file://), so it posts its drawing's width:
@@ -451,11 +451,11 @@ const litFrame = () => lit?.stage.querySelector(":scope > iframe.diagram-frame[d
 function fitLitFrame() {
     const frame = litFrame();
     if (!frame) return;
-    const w = +frame.dataset.w, h = parseFloat(frame.style.height) || frame.offsetHeight;
-    const { roomW, roomH } = room(lit.box);
-    const k = Math.min(roomW / w, roomH / h);
-    Object.assign(frame.style, { width: w + "px", transform: `scale(${k})`, transformOrigin: "0 0" });
-    Object.assign(lit.stage.style, { width: w * k + "px", height: h * k + "px" });
+    const width = +frame.dataset.w, height = parseFloat(frame.style.height) || frame.offsetHeight;
+    const { roomWidth, roomHeight } = room(lit.box);
+    const scale = Math.min(roomWidth / width, roomHeight / height);
+    Object.assign(frame.style, { width: width + "px", transform: `scale(${scale})`, transformOrigin: "0 0" });
+    Object.assign(lit.stage.style, { width: width * scale + "px", height: height * scale + "px" });
 }
 lightbox.addEventListener("close", () => {
     if (!lit) return;
@@ -474,9 +474,9 @@ lightbox.addEventListener("click", (e) => { if (e.target === lightbox) lightbox.
 
 // a rail label cut short by the ellipsis shows in full on hover
 function railTitles() {
-    rail.querySelectorAll(".rail-label").forEach(l => {
-        const a = l.closest("a") || l;
-        if (l.scrollWidth > l.clientWidth) a.title = l.textContent.trim(); else a.removeAttribute("title");
+    rail.querySelectorAll(".rail-label").forEach(label => {
+        const link = label.closest("a") || label;
+        if (label.scrollWidth > label.clientWidth) link.title = label.textContent.trim(); else link.removeAttribute("title");
     });
 }
 addEventListener("resize", railTitles);

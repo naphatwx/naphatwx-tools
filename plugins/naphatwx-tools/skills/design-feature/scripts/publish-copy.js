@@ -14,25 +14,25 @@ if (path.resolve(copy).startsWith(path.resolve(plan) + path.sep) || path.resolve
 }
 
 const SKIP = new Set(['.parts', '.DS_Store', 'node_modules']);
-const walk = d => fs.readdirSync(d, { withFileTypes: true }).filter(e => !SKIP.has(e.name))
-    .flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+const walk = directory => fs.readdirSync(directory, { withFileTypes: true }).filter(entry => !SKIP.has(entry.name))
+    .flatMap(entry => entry.isDirectory() ? walk(path.join(directory, entry.name)) : [path.join(directory, entry.name)]);
 
 fs.rmSync(copy, { recursive: true, force: true });
 const files = {};
 let stripped = 0, relinked = 0;
-for (const f of walk(plan)) {
-    const rel = path.relative(plan, f).split(path.sep).join('/');
-    const dest = rel === 'overview.html' ? 'index.html' : rel;
-    const target = path.join(copy, dest);
+for (const file of walk(plan)) {
+    const relativePath = path.relative(plan, file).split(path.sep).join('/');
+    const destination = relativePath === 'overview.html' ? 'index.html' : relativePath;
+    const target = path.join(copy, destination);
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    if (/\.(html|js)$/.test(f)) {
-        let s = fs.readFileSync(f, 'utf8');
-        s = s.replace(/\s+target="_blank"/g, () => (stripped++, '')).replace(/\s+rel="noopener(?: noreferrer)?"/g, '');
+    if (/\.(html|js)$/.test(file)) {
+        let content = fs.readFileSync(file, 'utf8');
+        content = content.replace(/\s+target="_blank"/g, () => (stripped++, '')).replace(/\s+rel="noopener(?: noreferrer)?"/g, '');
         // links back to the entry page: ../overview.html, ../../overview.html, overview.html#x
-        s = s.replace(/((?:\.\.\/)*)overview\.html/g, (_, up) => (relinked++, `${up}index.html`));
-        fs.writeFileSync(target, s);
-    } else fs.copyFileSync(f, target);
-    if (dest !== 'index.html') files[dest] = dest.endsWith('.ts') ? { from: dest, contentType: 'text/plain' } : dest;
+        content = content.replace(/((?:\.\.\/)*)overview\.html/g, (_, parentSteps) => (relinked++, `${parentSteps}index.html`));
+        fs.writeFileSync(target, content);
+    } else fs.copyFileSync(file, target);
+    if (destination !== 'index.html') files[destination] = destination.endsWith('.ts') ? { from: destination, contentType: 'text/plain' } : destination;
 }
 
 process.stdout.write(JSON.stringify({ file_path: path.join(copy, 'index.html'), root: copy, files, stripped, relinked, count: Object.keys(files).length + 1 }, null, 2) + '\n');

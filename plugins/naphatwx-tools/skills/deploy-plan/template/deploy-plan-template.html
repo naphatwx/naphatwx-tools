@@ -259,166 +259,166 @@
 /* theme:pdf-js:start */
 /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
 function addExportPdf(target, prepare) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'export-pdf no-print';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'export-pdf no-print';
     if (!target) {
         target = document.querySelector('.float-bar');
         if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
     }
-    b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-    b.textContent = 'Export PDF';
-    b.addEventListener('click', async () => {
+    button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+    button.textContent = 'Export PDF';
+    button.addEventListener('click', async () => {
         if (prepare) await prepare();
         window.print();
     });
-    target.append(b);
-    return b;
+    target.append(button);
+    return button;
 }
 /* theme:pdf-js:end */
 const DATA = /*__PLAN_DATA__*/null;
 
-const el = (tag, attrs = {}, ...kids) => {
-  const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
-  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(String(k)));
-  return n;
+const createElement = (tag, attributes = {}, ...children) => {
+  const node = document.createElement(tag);
+  for (const [name, value] of Object.entries(attributes)) name === 'class' ? (node.className = value) : node.setAttribute(name, value);
+  for (const child of children.flat()) if (child != null) node.append(child.nodeType ? child : document.createTextNode(String(child)));
+  return node;
 };
-const say = (msg) => { const a = document.getElementById('announce'); a.textContent = ''; setTimeout(() => { a.textContent = msg; }, 50); };
+const say = (message) => { const announcer = document.getElementById('announce'); announcer.textContent = ''; setTimeout(() => { announcer.textContent = message; }, 50); };
 
 // Ticks live in this browser only. Storage can throw (private mode), so the page works without it.
 const KEY = 'deploy-plan:' + (DATA && DATA.id || location.pathname);
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
-function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} }
+function save(ticks) { try { localStorage.setItem(KEY, JSON.stringify(ticks)); } catch {} }
 let state = load();
 let hideDone = false;
 
-async function copy(text, btn) {
+async function copy(text, button) {
   try { await navigator.clipboard.writeText(text); }
   catch {
-    const t = el('textarea', {}, text);
-    document.body.append(t); t.select();
+    const textarea = createElement('textarea', {}, text);
+    document.body.append(textarea); textarea.select();
     try { document.execCommand('copy'); } catch {}
-    t.remove();
+    textarea.remove();
   }
-  const was = btn.textContent;
-  btn.textContent = 'Copied';
-  say('Copied ' + btn.dataset.what);
-  setTimeout(() => { btn.textContent = was; }, 1200);
+  const previousLabel = button.textContent;
+  button.textContent = 'Copied';
+  say('Copied ' + button.dataset.what);
+  setTimeout(() => { button.textContent = previousLabel; }, 1200);
 }
-const copyBtn = (text, what, label = 'Copy') => {
-  const b = el('button', { type: 'button', class: 'small', 'aria-label': 'Copy ' + what, 'data-what': what }, label);
-  b.addEventListener('click', () => copy(text, b));
-  return b;
+const copyButton = (text, what, label = 'Copy') => {
+  const button = createElement('button', { type: 'button', class: 'small', 'aria-label': 'Copy ' + what, 'data-what': what }, label);
+  button.addEventListener('click', () => copy(text, button));
+  return button;
 };
 
 const TAGS = { db: 'DB', env: 'Env', infra: 'Infra', flag: 'Flag', api: 'API', data: 'Data', comms: 'Comms', check: 'Check' };
-const stepId = (p, i) => p.key + ':' + i;
+const stepId = (phase, index) => phase.key + ':' + index;
 
 function markdown() {
   const lines = ['# ' + (DATA.title || 'Deploy plan') + (DATA.env ? ' (' + DATA.env + ')' : ''), ''];
-  for (const p of DATA.phases) {
-    lines.push('## ' + p.title, '');
-    p.steps.forEach((s, i) => {
-      lines.push('- [' + (state[stepId(p, i)] ? 'x' : ' ') + '] ' + s.text + (s.risk === 'high' ? ' **(high risk)**' : ''));
-      if (s.cmd) lines.push('  `' + s.cmd + '`');
+  for (const phase of DATA.phases) {
+    lines.push('## ' + phase.title, '');
+    phase.steps.forEach((step, i) => {
+      lines.push('- [' + (state[stepId(phase, i)] ? 'x' : ' ') + '] ' + step.text + (step.risk === 'high' ? ' **(high risk)**' : ''));
+      if (step.cmd) lines.push('  `' + step.cmd + '`');
     });
     lines.push('');
   }
   return lines.join('\n');
 }
 
-const refs = [];
+const phaseViews = [];
 function update() {
   let done = 0, total = 0;
-  for (const r of refs) {
-    let d = 0;
-    r.rows.forEach(({ row, box, id }) => {
-      const on = !!state[id];
-      box.checked = on;
-      row.classList.toggle('is-done', on);
-      row.parentElement.hidden = hideDone && on;
-      if (on) d++;
+  for (const phaseView of phaseViews) {
+    let phaseDone = 0;
+    phaseView.rows.forEach(({ row, box, id }) => {
+      const ticked = !!state[id];
+      box.checked = ticked;
+      row.classList.toggle('is-done', ticked);
+      row.parentElement.hidden = hideDone && ticked;
+      if (ticked) phaseDone++;
     });
-    done += d; total += r.rows.length;
-    r.count.textContent = d + ' / ' + r.rows.length;
-    r.bar.style.width = (r.rows.length ? d / r.rows.length * 100 : 0) + '%';
-    const full = r.rows.length > 0 && d === r.rows.length;
-    r.bar.parentElement.classList.toggle('full', full);
-    r.section.classList.toggle('done', full);
-    r.pill.hidden = !full;
+    done += phaseDone; total += phaseView.rows.length;
+    phaseView.count.textContent = phaseDone + ' / ' + phaseView.rows.length;
+    phaseView.bar.style.width = (phaseView.rows.length ? phaseDone / phaseView.rows.length * 100 : 0) + '%';
+    const full = phaseView.rows.length > 0 && phaseDone === phaseView.rows.length;
+    phaseView.bar.parentElement.classList.toggle('full', full);
+    phaseView.section.classList.toggle('done', full);
+    phaseView.pill.hidden = !full;
   }
   totalCount.textContent = done + ' / ' + total + ' done';
   totalBar.style.width = (total ? done / total * 100 : 0) + '%';
   totalBar.parentElement.classList.toggle('full', total > 0 && done === total);
 }
 
-const totalCount = el('span', { class: 'count' });
-const totalBar = el('span');
+const totalCount = createElement('span', { class: 'count' });
+const totalBar = createElement('span');
 
 function render() {
   const app = document.getElementById('app');
-  if (!DATA) { app.append(el('p', {}, 'No data in this plan.')); return; }
+  if (!DATA) { app.append(createElement('p', {}, 'No data in this plan.')); return; }
   document.title = (DATA.title || 'Deploy plan') + (DATA.env ? ' · ' + DATA.env : '');
 
-  const hideBtn = el('button', { type: 'button', 'aria-pressed': 'false' }, 'Hide done');
-  hideBtn.addEventListener('click', () => { hideDone = !hideDone; hideBtn.setAttribute('aria-pressed', String(hideDone)); update(); });
-  const resetBtn = el('button', { type: 'button' }, 'Reset');
-  resetBtn.addEventListener('click', () => { if (confirm('Clear every tick on this plan?')) { state = {}; save(state); update(); say('All ticks cleared'); } });
-  const mdBtn = el('button', { type: 'button', 'data-what': 'plan as Markdown' }, 'Copy as Markdown');
-  mdBtn.addEventListener('click', () => copy(markdown(), mdBtn));
+  const hideButton = createElement('button', { type: 'button', 'aria-pressed': 'false' }, 'Hide done');
+  hideButton.addEventListener('click', () => { hideDone = !hideDone; hideButton.setAttribute('aria-pressed', String(hideDone)); update(); });
+  const resetButton = createElement('button', { type: 'button' }, 'Reset');
+  resetButton.addEventListener('click', () => { if (confirm('Clear every tick on this plan?')) { state = {}; save(state); update(); say('All ticks cleared'); } });
+  const markdownButton = createElement('button', { type: 'button', 'data-what': 'plan as Markdown' }, 'Copy as Markdown');
+  markdownButton.addEventListener('click', () => copy(markdown(), markdownButton));
 
-  app.append(el('header', {},
-    el('h1', {}, DATA.title || 'Deploy plan', DATA.env ? el('span', { class: 'pill tone-accent' }, DATA.env) : null),
-    el('div', { class: 'facts' },
-      DATA.services && DATA.services.length ? el('span', { class: 'meta' }, 'Services: ', DATA.services.flatMap((s, i) => [i ? ', ' : null, el('code', {}, s)])) : null,
-      DATA.order ? el('span', { class: 'meta' }, 'Order: ', el('span', {}, DATA.order)) : null,
-      DATA.source ? el('span', { class: 'meta' }, 'Source: ', /^https?:/.test(DATA.source) ? el('a', { href: DATA.source, target: '_blank', rel: 'noopener' }, DATA.source) : el('code', {}, DATA.source)) : null,
-      DATA.createdAt ? el('time', { class: 'meta', datetime: DATA.createdAt }, DATA.createdAt) : null),
-    DATA.notes && DATA.notes.length ? el('ul', { class: 'notes' }, DATA.notes.map((t) => el('li', {}, t))) : null,
-    el('div', { class: 'progress' }, totalCount, el('div', { class: 'bar', 'aria-hidden': 'true' }, totalBar)),
-    el('div', { class: 'tools' }, hideBtn, mdBtn)));
-  app.querySelector('.tools').append(resetBtn);
+  app.append(createElement('header', {},
+    createElement('h1', {}, DATA.title || 'Deploy plan', DATA.env ? createElement('span', { class: 'pill tone-accent' }, DATA.env) : null),
+    createElement('div', { class: 'facts' },
+      DATA.services && DATA.services.length ? createElement('span', { class: 'meta' }, 'Services: ', DATA.services.flatMap((s, i) => [i ? ', ' : null, createElement('code', {}, s)])) : null,
+      DATA.order ? createElement('span', { class: 'meta' }, 'Order: ', createElement('span', {}, DATA.order)) : null,
+      DATA.source ? createElement('span', { class: 'meta' }, 'Source: ', /^https?:/.test(DATA.source) ? createElement('a', { href: DATA.source, target: '_blank', rel: 'noopener' }, DATA.source) : createElement('code', {}, DATA.source)) : null,
+      DATA.createdAt ? createElement('time', { class: 'meta', datetime: DATA.createdAt }, DATA.createdAt) : null),
+    DATA.notes && DATA.notes.length ? createElement('ul', { class: 'notes' }, DATA.notes.map((t) => createElement('li', {}, t))) : null,
+    createElement('div', { class: 'progress' }, totalCount, createElement('div', { class: 'bar', 'aria-hidden': 'true' }, totalBar)),
+    createElement('div', { class: 'tools' }, hideButton, markdownButton)));
+  app.querySelector('.tools').append(resetButton);
   addExportPdf();
 
-  for (const p of DATA.phases) {
-    const count = el('span', { class: 'count meta' });
-    const bar = el('span');
-    const pill = el('span', { class: 'pill tone-ok' }, el('span', { 'aria-hidden': 'true' }, '✓'), 'done');
-    const list = el('ol', { class: 'steps' });
-    const section = el('section', { class: 'phase', 'aria-labelledby': 'h-' + p.key },
-      el('div', { class: 'phase-head' },
-        el('div', { class: 'phase-title' }, el('h2', { id: 'h-' + p.key }, p.title), count, pill),
-        el('div', { class: 'bar', 'aria-hidden': 'true' }, bar)),
+  for (const phase of DATA.phases) {
+    const count = createElement('span', { class: 'count meta' });
+    const bar = createElement('span');
+    const pill = createElement('span', { class: 'pill tone-ok' }, createElement('span', { 'aria-hidden': 'true' }, '✓'), 'done');
+    const list = createElement('ol', { class: 'steps' });
+    const section = createElement('section', { class: 'phase', 'aria-labelledby': 'h-' + phase.key },
+      createElement('div', { class: 'phase-head' },
+        createElement('div', { class: 'phase-title' }, createElement('h2', { id: 'h-' + phase.key }, phase.title), count, pill),
+        createElement('div', { class: 'bar', 'aria-hidden': 'true' }, bar)),
       list);
     const rows = [];
-    if (!p.steps.length) list.append(el('li', { class: 'empty' }, 'No steps.'));
-    p.steps.forEach((s, i) => {
-      const id = stepId(p, i);
+    if (!phase.steps.length) list.append(createElement('li', { class: 'empty' }, 'No steps.'));
+    phase.steps.forEach((step, i) => {
+      const id = stepId(phase, i);
       const boxId = 'c-' + id.replace(/[^a-z0-9]/gi, '-');
-      const box = el('input', { type: 'checkbox', id: boxId });
-      box.addEventListener('change', () => { state[id] = box.checked; save(state); update(); say((box.checked ? 'Done: ' : 'Not done: ') + s.text); });
-      const row = el('div', { class: 'step' },
+      const box = createElement('input', { type: 'checkbox', id: boxId });
+      box.addEventListener('change', () => { state[id] = box.checked; save(state); update(); say((box.checked ? 'Done: ' : 'Not done: ') + step.text); });
+      const row = createElement('div', { class: 'step' },
         box,
-        el('span', { class: 'number', 'aria-hidden': 'true' }, i + 1),
-        el('div', { class: 'body' },
-          el('div', { class: 'line' },
-            s.risk === 'high' ? el('span', { class: 'pill tone-bad' }, el('span', { 'aria-hidden': 'true' }, '!'), 'high risk') : null,
-            s.check ? el('span', { class: 'pill tone-warn' }, el('span', { 'aria-hidden': 'true' }, '?'), 'confirm') : null,
-            s.tag ? el('span', { class: 'pill tone-neutral' }, TAGS[s.tag] || s.tag) : null,
-            el('label', { for: boxId }, s.text)),
-          s.detail ? el('div', { class: 'detail' }, s.detail) : null,
-          s.cmd ? el('div', { class: 'command' }, el('code', {}, s.cmd), copyBtn(s.cmd, 'command')) : null,
-          s.source ? el('div', { class: 'meta' }, 'From ', el('code', {}, s.source)) : null));
+        createElement('span', { class: 'number', 'aria-hidden': 'true' }, i + 1),
+        createElement('div', { class: 'body' },
+          createElement('div', { class: 'line' },
+            step.risk === 'high' ? createElement('span', { class: 'pill tone-bad' }, createElement('span', { 'aria-hidden': 'true' }, '!'), 'high risk') : null,
+            step.check ? createElement('span', { class: 'pill tone-warn' }, createElement('span', { 'aria-hidden': 'true' }, '?'), 'confirm') : null,
+            step.tag ? createElement('span', { class: 'pill tone-neutral' }, TAGS[step.tag] || step.tag) : null,
+            createElement('label', { for: boxId }, step.text)),
+          step.detail ? createElement('div', { class: 'detail' }, step.detail) : null,
+          step.cmd ? createElement('div', { class: 'command' }, createElement('code', {}, step.cmd), copyButton(step.cmd, 'command')) : null,
+          step.source ? createElement('div', { class: 'meta' }, 'From ', createElement('code', {}, step.source)) : null));
       row.addEventListener('click', (e) => {
         if (e.target.closest('input, label, button, a, code')) return;
         box.checked = !box.checked;
         box.dispatchEvent(new Event('change'));
       });
-      list.append(el('li', {}, row));
+      list.append(createElement('li', {}, row));
       rows.push({ row, box, id });
     });
-    refs.push({ section, count, bar, pill, rows });
+    phaseViews.push({ section, count, bar, pill, rows });
     app.append(section);
   }
   update();

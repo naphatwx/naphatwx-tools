@@ -303,72 +303,72 @@
         /* theme:pdf-js:start */
         /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
         function addExportPdf(target, prepare) {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'export-pdf no-print';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'export-pdf no-print';
             if (!target) {
                 target = document.querySelector('.float-bar');
                 if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
             }
-            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-            b.textContent = 'Export PDF';
-            b.addEventListener('click', async () => {
+            button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            button.textContent = 'Export PDF';
+            button.addEventListener('click', async () => {
                 if (prepare) await prepare();
                 window.print();
             });
-            target.append(b);
-            return b;
+            target.append(button);
+            return button;
         }
         /* theme:pdf-js:end */
         addExportPdf();
-        const SCREEN_W = 1920, SCREEN_H = 1080; // 16:9; the frame scales to the column width and keeps this ratio
-        const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
-        const nn = ucId => ucId.slice(2).padStart(2, '0');
+        const SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080; // 16:9; the frame scales to the column width and keeps this ratio
+        const list = items => items.map(item => `<li>${UI.esc(item)}</li>`).join('');
+        const twoDigitNumber = useCaseId => useCaseId.slice(2).padStart(2, '0');
         // trace IDs ("US4 · AC4") as a "2 refs" chip + the hidden IDs; one click handler toggles every chip
-        const refsChip = refs => {
-            const n = String(refs || '').split(' · ').filter(s => s.trim()).length;
-            return n ? `<button type="button" class="references-chip" aria-expanded="false" title="Show trace IDs">${n} ref${n > 1 ? 's' : ''}</button><span class="references-ids code-text font-mono meta">${UI.esc(refs)}</span>` : '';
+        const referencesChip = refs => {
+            const count = String(refs || '').split(' · ').filter(s => s.trim()).length;
+            return count ? `<button type="button" class="references-chip" aria-expanded="false" title="Show trace IDs">${count} ref${count > 1 ? 's' : ''}</button><span class="references-ids code-text font-mono meta">${UI.esc(refs)}</span>` : '';
         };
-        document.addEventListener('click', e => { const c = e.target.closest('.references-chip'); if (c) c.setAttribute('aria-expanded', String(c.getAttribute('aria-expanded') !== 'true')); });
-        const scsOf = ucId => SCENARIOS.filter(s => s.useCase === ucId);
-        const playOf = ucId => scsOf(ucId).filter(isPlayable);
+        document.addEventListener('click', e => { const chip = e.target.closest('.references-chip'); if (chip) chip.setAttribute('aria-expanded', String(chip.getAttribute('aria-expanded') !== 'true')); });
+        const scenariosOf = useCaseId => SCENARIOS.filter(s => s.useCase === useCaseId);
+        const playableOf = useCaseId => scenariosOf(useCaseId).filter(isPlayable);
         const SURFACE = { mcp: 'MCP', api: 'API', job: 'Job' };
-        const stateOf = sc => States.LIST.find(s => s.id === sc.state);
+        const stateOf = scenario => States.LIST.find(s => s.id === scenario.state);
 
-        function screenSrc(sc) {
-            const q = new URLSearchParams({ state: sc.state, sc: sc.id, embed: '1', ...(sc.params || {}) });
-            return `page/${sc.page}.html?${q}`;
+        function screenSource(scenario) {
+            const query = new URLSearchParams({ state: scenario.state, sc: scenario.id, embed: '1', ...(scenario.params || {}) });
+            return `page/${scenario.page}.html?${query}`;
         }
         // The URL the real app would show for this scenario: edit the route to the app's own.
-        function screenUrl(sc) {
-            if (!isPlayable(sc)) return `${SURFACE[sc.surface] || sc.surface} · no screen`;
-            const q = new URLSearchParams(sc.params || {}); q.delete('modal');
-            return `localhost:3000/owners/${stateOf(sc).ownerId}${q.size ? '?' + q : ''}${sc.params?.modal ? ' · ' + sc.params.modal : ''}`;
+        function screenUrl(scenario) {
+            if (!isPlayable(scenario)) return `${SURFACE[scenario.surface] || scenario.surface} · no screen`;
+            const query = new URLSearchParams(scenario.params || {}); query.delete('modal');
+            return `localhost:3000/owners/${stateOf(scenario).ownerId}${query.size ? '?' + query : ''}${scenario.params?.modal ? ' · ' + scenario.params.modal : ''}`;
         }
         /** Each scenario starts from a clean mock: no rows written by another card, empty audit log. */
         function clearStore() {
-            try { Object.keys(sessionStorage).filter(k => k.startsWith(FakeApi.STORE + ':')).forEach(k => sessionStorage.removeItem(k)); } catch { }
+            try { Object.keys(sessionStorage).filter(key => key.startsWith(FakeApi.STORE + ':')).forEach(key => sessionStorage.removeItem(key)); } catch { }
             renderLog();
         }
 
         // ---------------------------------------------------------------- one block per use case
-        const heads = {}; // use case heading, drawn above the frame by pick() so it is exactly as wide
-        document.getElementById('use-cases').innerHTML = USE_CASES.map(uc => {
-            const scs = scsOf(uc.id);
-            const head = `
+        const headings = {}; // use case heading, drawn above the frame by pick() so it is exactly as wide
+        document.getElementById('use-cases').innerHTML = USE_CASES.map(useCase => {
+            const scenarios = scenariosOf(useCase.id);
+            const heading = `
               <div class="use-case-head mb-2">
-                <h2 class="font-bold"><span class="meta mr-2">${uc.id}</span>${UI.esc(uc.title)}</h2>
-                ${refsChip(uc.refs)}<a href="../overview.html#uc-${nn(uc.id)}" class="link code-text">plan</a>
+                <h2 class="font-bold"><span class="meta mr-2">${useCase.id}</span>${UI.esc(useCase.title)}</h2>
+                ${referencesChip(useCase.refs)}<a href="../overview.html#uc-${twoDigitNumber(useCase.id)}" class="link code-text">plan</a>
               </div>`;
-            heads[uc.id] = head;
-            if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted">${UI.esc(uc.none || 'No scenario.')}</p></section>`;
+            headings[useCase.id] = heading;
+            if (!scenarios.length) return `<section id="uc-${twoDigitNumber(useCase.id)}">${heading}<p class="muted">${UI.esc(useCase.none || 'No scenario.')}</p></section>`;
             return `
-              <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
+              <section id="uc-${twoDigitNumber(useCase.id)}" data-use-case="${useCase.id}">
                 <div class="use-case-row">
                 <div class="tabs">
-                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${uc.id}"></span></div>
-                  <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
-                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab${isPlayable(s) ? '' : ' off'}" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"><span class="tab-number"${isPlayable(s) ? ` data-r="${s.id}"` : ''} data-n="${i + 1}">${i + 1}</span><span class="tab-title">${UI.esc(s.title)}${isPlayable(s) ? '' : '<span class="sr-only"> (no mock)</span>'}</span><span class="tab-surface">${UI.esc(s.surface || '')}</span></button>`).join('')}
+                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${twoDigitNumber(useCase.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${useCase.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${useCase.id}"></span></div>
+                  <div class="tab-list" role="tablist" aria-labelledby="sc-title-${twoDigitNumber(useCase.id)}">
+                  ${scenarios.map((scenario, i) => `<button type="button" role="tab" class="tab${isPlayable(scenario) ? '' : ' off'}" data-sc="${scenario.id}" aria-selected="false" onclick="pick('${scenario.id}', true)"><span class="tab-number"${isPlayable(scenario) ? ` data-r="${scenario.id}"` : ''} data-n="${i + 1}">${i + 1}</span><span class="tab-title">${UI.esc(scenario.title)}${isPlayable(scenario) ? '' : '<span class="sr-only"> (no mock)</span>'}</span><span class="tab-surface">${UI.esc(scenario.surface || '')}</span></button>`).join('')}
                   </div>
                 </div>
                 <div class="card"></div>
@@ -378,44 +378,44 @@
         }).join('');
 
         function pick(id, fromClick) {
-            const sc = SCENARIOS.find(s => s.id === id);
-            const block = document.querySelector(`section[data-use-case="${sc.useCase}"]`);
-            block.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sc === id)));
+            const scenario = SCENARIOS.find(s => s.id === id);
+            const block = document.querySelector(`section[data-use-case="${scenario.useCase}"]`);
+            block.querySelectorAll('[role=tab]').forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.sc === id)));
             if (fromClick) { clearStore(); history.replaceState(null, '', '#sc-' + id); }
-            const play = isPlayable(sc);
-            const screen = play
-                ? `<iframe title="${UI.esc(sc.title)} — interactive mock" src="${screenSrc(sc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe>`
-                : `<div class="no-mock"><div class="font-semibold">No mock</div><p class="muted">${UI.esc(SURFACE[sc.surface] || sc.surface)} scenario — play it with play-scenarios or test it with e2e-test.</p></div>`;
-            block.querySelector('.card').innerHTML = `${heads[sc.useCase]}
-              <div class="title-row"><h3 class="font-semibold">${UI.esc(sc.title)}</h3>${sc.kind ? `<span class="scenario-kind ${UI.esc(sc.kind)}">${UI.esc(sc.kind)}</span>` : ''}${refsChip(sc.story)}<span class="code-text font-mono meta">${UI.esc(play ? stateOf(sc).label : 'no mock')}</span></div>
+            const hasScreen = isPlayable(scenario);
+            const screen = hasScreen
+                ? `<iframe title="${UI.esc(scenario.title)} — interactive mock" src="${screenSource(scenario)}" width="${SCREEN_WIDTH}" height="${SCREEN_HEIGHT}"></iframe>`
+                : `<div class="no-mock"><div class="font-semibold">No mock</div><p class="muted">${UI.esc(SURFACE[scenario.surface] || scenario.surface)} scenario — play it with play-scenarios or test it with e2e-test.</p></div>`;
+            block.querySelector('.card').innerHTML = `${headings[scenario.useCase]}
+              <div class="title-row"><h3 class="font-semibold">${UI.esc(scenario.title)}</h3>${scenario.kind ? `<span class="scenario-kind ${UI.esc(scenario.kind)}">${UI.esc(scenario.kind)}</span>` : ''}${referencesChip(scenario.story)}<span class="code-text font-mono meta">${UI.esc(hasScreen ? stateOf(scenario).label : 'no mock')}</span></div>
               <div class="frame mt-2">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
-                  <span class="url">${UI.esc(screenUrl(sc))}</span>
+                  <span class="url">${UI.esc(screenUrl(scenario))}</span>
                   <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
-                  ${play ? `<button type="button" onclick="restart('${sc.id}')" class="button-ghost">↻ Restart</button>` : ''}
+                  ${hasScreen ? `<button type="button" onclick="restart('${scenario.id}')" class="button-ghost">↻ Restart</button>` : ''}
                 </div>
                 <div class="screen-fit">${screen}</div>
               </div>`;
-            const r = results[id] || {};
-            block.querySelector('.guide').innerHTML = !play ? `
+            const result = results[id] || {};
+            block.querySelector('.guide').innerHTML = !hasScreen ? `
               <div class="guide-body">
               <div class="label mt-4 mb-1">What it should do</div>
-              <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>
+              <ul class="list-disc pl-5 space-y-1 muted">${list(scenario.expect)}</ul>
               </div>` : `
               <div class="guide-result">
               <div class="label mb-1">Result</div>
               <div class="result-control flex gap-2 mb-2">
-                <button type="button" class="result-button pass" data-status="pass" aria-pressed="${r.status === 'pass'}" onclick="mark('${sc.id}', 'pass')">✓ Pass</button>
-                <button type="button" class="result-button fail" data-status="fail" aria-pressed="${r.status === 'fail'}" onclick="mark('${sc.id}', 'fail')">✗ Fail</button>
+                <button type="button" class="result-button pass" data-status="pass" aria-pressed="${result.status === 'pass'}" onclick="mark('${scenario.id}', 'pass')">✓ Pass</button>
+                <button type="button" class="result-button fail" data-status="fail" aria-pressed="${result.status === 'fail'}" onclick="mark('${scenario.id}', 'fail')">✗ Fail</button>
               </div>
-              <textarea class="note result-control" aria-label="Note for ${UI.esc(sc.title)}" placeholder="What you saw, if it differs" oninput="setResult('${sc.id}', { note: this.value })">${UI.esc(r.note || '')}</textarea>
+              <textarea class="note result-control" aria-label="Note for ${UI.esc(scenario.title)}" placeholder="What you saw, if it differs" oninput="setResult('${scenario.id}', { note: this.value })">${UI.esc(result.note || '')}</textarea>
               </div>
               <div class="guide-body">
               <div class="label mt-4 mb-1">How to play</div>
-              <ol class="list-decimal pl-5 space-y-1 muted">${list(sc.steps)}</ol>
+              <ol class="list-decimal pl-5 space-y-1 muted">${list(scenario.steps)}</ol>
               <div class="label mt-4 mb-1">What you should see</div>
-              <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>
+              <ul class="list-disc pl-5 space-y-1 muted">${list(scenario.expect)}</ul>
               </div>`;
             fit(block);
         }
@@ -426,18 +426,18 @@
             // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
             const row = block.querySelector('.use-case-row');
             row.style.removeProperty('--frame-w'); // the full column, not the last fit's frame
-            const s = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_W);
-            const iframe = box.querySelector('iframe'); if (iframe) iframe.style.transform = `scale(${s})`;
-            box.style.height = Math.round(SCREEN_H * s) + 'px';
+            const scale = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_WIDTH);
+            const iframe = box.querySelector('iframe'); if (iframe) iframe.style.transform = `scale(${scale})`;
+            box.style.height = Math.round(SCREEN_HEIGHT * scale) + 'px';
             const frame = box.closest('.frame');
-            frame.style.width = Math.round(SCREEN_W * s) + 2 + 'px';
+            frame.style.width = Math.round(SCREEN_WIDTH * scale) + 2 + 'px';
             row.style.setProperty('--frame-w', frame.style.width);
             row.style.setProperty('--frame-h', frame.offsetHeight + 'px');
             row.style.setProperty('--frame-top', frame.getBoundingClientRect().top - row.getBoundingClientRect().top + 'px');
             // the text column (page title, audit log) takes the frame's real width, so all of it lines up
-            const ws = [...document.querySelectorAll('.use-case-row')].map(r => parseFloat(r.style.getPropertyValue('--frame-w'))).filter(Boolean);
-            document.documentElement.style.setProperty('--text-w', Math.max(...ws) + 'px');
-            block.querySelector('.scale-label').textContent = iframe ? `${Math.round(s * 100)}% of ${SCREEN_W} px` : '';
+            const frameWidths = [...document.querySelectorAll('.use-case-row')].map(useCaseRow => parseFloat(useCaseRow.style.getPropertyValue('--frame-w'))).filter(Boolean);
+            document.documentElement.style.setProperty('--text-w', Math.max(...frameWidths) + 'px');
+            block.querySelector('.scale-label').textContent = iframe ? `${Math.round(scale * 100)}% of ${SCREEN_WIDTH} px` : '';
         }
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
         addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer
@@ -459,70 +459,70 @@
         function mark(id, status) {
             setResult(id, { status: results[id]?.status === status ? '' : status });
             const block = document.querySelector(`section[data-use-case="${SCENARIOS.find(s => s.id === id).useCase}"]`);
-            block.querySelectorAll('.result-button').forEach(b => b.setAttribute('aria-pressed', String(results[id].status === b.dataset.status)));
+            block.querySelectorAll('.result-button').forEach(button => button.setAttribute('aria-pressed', String(results[id].status === button.dataset.status)));
         }
         function renderResults() {
-            document.querySelectorAll('.tab-number[data-r]').forEach(el => {
-                const st = results[el.dataset.r]?.status || '';
-                el.className = 'tab-number ' + st;
-                el.innerHTML = st ? `${ICON[st]}<span class="sr-only">${el.dataset.n}, ${STATUS[st]}</span>` : el.dataset.n;
+            document.querySelectorAll('.tab-number[data-r]').forEach(element => {
+                const status = results[element.dataset.r]?.status || '';
+                element.className = 'tab-number ' + status;
+                element.innerHTML = status ? `${ICON[status]}<span class="sr-only">${element.dataset.n}, ${STATUS[status]}</span>` : element.dataset.n;
             });
-            document.querySelectorAll('[data-count]').forEach(el => {
-                const sts = playOf(el.dataset.count).map(s => results[s.id]?.status || '');
-                const n = st => sts.filter(x => x === st).length;
-                el.innerHTML = n('') === sts.length ? '' : `<span class="pass">${n('pass')} pass</span> · <span class="fail">${n('fail')} fail</span> · ${n('')} left`;
+            document.querySelectorAll('[data-count]').forEach(element => {
+                const statuses = playableOf(element.dataset.count).map(s => results[s.id]?.status || '');
+                const countOf = status => statuses.filter(x => x === status).length;
+                element.innerHTML = countOf('') === statuses.length ? '' : `<span class="pass">${countOf('pass')} pass</span> · <span class="fail">${countOf('fail')} fail</span> · ${countOf('')} left`;
             });
-            const rows = SCENARIOS.filter(isPlayable).map(s => ({ s, st: results[s.id]?.status || '', note: results[s.id]?.note || '' }));
-            const n = st => rows.filter(r => r.st === st).length;
+            const rows = SCENARIOS.filter(isPlayable).map(s => ({ scenario: s, status: results[s.id]?.status || '', note: results[s.id]?.note || '' }));
+            const countOf = status => rows.filter(row => row.status === status).length;
             document.getElementById('results').innerHTML = `
-              <p class="mb-2"><span class="status-pass">${n('pass')} pass</span> · <span class="status-fail">${n('fail')} fail</span> · <span class="status-none">${n('')} not played</span>
+              <p class="mb-2"><span class="status-pass">${countOf('pass')} pass</span> · <span class="status-fail">${countOf('fail')} fail</span> · <span class="status-none">${countOf('')} not played</span>
                 <button type="button" class="button-ghost ml-2 result-control" onclick="copyResults(this)">Copy as Markdown</button></p>
               <div class="panel overflow-x-auto"><table class="result-table">
                 <tr><th>Use case</th><th>Scenario</th><th>Result</th><th>Note</th></tr>
-                ${rows.map(r => `<tr><td class="font-mono code-text meta">${r.s.useCase}</td><td><a class="link" href="#sc-${r.s.id}">${UI.esc(r.s.title)}</a></td><td class="status-${r.st || 'none'} whitespace-nowrap">${STATUS[r.st]}</td><td class="muted">${UI.esc(r.note)}</td></tr>`).join('')}
+                ${rows.map(row => `<tr><td class="font-mono code-text meta">${row.scenario.useCase}</td><td><a class="link" href="#sc-${row.scenario.id}">${UI.esc(row.scenario.title)}</a></td><td class="status-${row.status || 'none'} whitespace-nowrap">${STATUS[row.status]}</td><td class="muted">${UI.esc(row.note)}</td></tr>`).join('')}
               </table></div>`;
         }
         /** Clear: drop the Pass / Fail and notes of these scenarios, to test again. */
-        function clearResults(ids, ask) {
-            if (!confirm(ask)) return;
+        function clearResults(ids, question) {
+            if (!confirm(question)) return;
             ids.forEach(id => delete results[id]);
             try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { }
             renderResults();
             // the open guides show the cleared marks; the screens and their data stay as they are
-            document.querySelectorAll('section[data-use-case]').forEach(b => {
-                const open = b.querySelector('[role=tab][aria-selected=true]');
+            document.querySelectorAll('section[data-use-case]').forEach(block => {
+                const open = block.querySelector('[role=tab][aria-selected=true]');
                 if (!open || !ids.includes(open.dataset.sc)) return;
-                b.querySelectorAll('.result-button').forEach(x => x.setAttribute('aria-pressed', 'false'));
-                const note = b.querySelector('.note'); if (note) note.value = '';
+                block.querySelectorAll('.result-button').forEach(button => button.setAttribute('aria-pressed', 'false'));
+                const note = block.querySelector('.note'); if (note) note.value = '';
             });
         }
-        const clearUseCase = ucId => clearResults(playOf(ucId).map(s => s.id), `Clear the Pass / Fail and notes of ${ucId}?`);
+        const clearUseCase = useCaseId => clearResults(playableOf(useCaseId).map(s => s.id), `Clear the Pass / Fail and notes of ${useCaseId}?`);
         const clearAll = () => clearResults(SCENARIOS.filter(isPlayable).map(s => s.id), 'Clear every Pass / Fail and note on this page?');
-        function copyResults(btn) {
-            const cell = v => String(v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
-            const md = ['| Use case | Scenario | Result | Note |', '|---|---|---|---|']
+        function copyResults(button) {
+            const cell = value => String(value).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+            const markdown = ['| Use case | Scenario | Result | Note |', '|---|---|---|---|']
                 .concat(SCENARIOS.filter(isPlayable).map(s => `| ${s.useCase} | ${cell(s.title)} | ${STATUS[results[s.id]?.status || '']} | ${cell(results[s.id]?.note || '')} |`)).join('\n');
-            navigator.clipboard.writeText(md).then(() => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy as Markdown'; }, 1500); });
+            navigator.clipboard.writeText(markdown).then(() => { button.textContent = 'Copied'; setTimeout(() => { button.textContent = 'Copy as Markdown'; }, 1500); });
         }
 
         function renderLog() {
             const rows = FakeApi.log();
             const html = !rows.length
                 ? '<div class="panel meta p-6 text-center">Nothing yet.</div>'
-                : `<div class="panel rows">${rows.map(r => `<div class="px-4 py-2 flex gap-4"><span class="meta whitespace-nowrap">${UI.date(r.at)}</span><span>${UI.esc(r.message)}</span></div>`).join('')}</div>`;
-            const el = document.getElementById('log');
-            if (el.innerHTML !== html) el.innerHTML = html;
+                : `<div class="panel rows">${rows.map(row => `<div class="px-4 py-2 flex gap-4"><span class="meta whitespace-nowrap">${UI.date(row.at)}</span><span>${UI.esc(row.message)}</span></div>`).join('')}</div>`;
+            const element = document.getElementById('log');
+            if (element.innerHTML !== html) element.innerHTML = html;
         }
 
         renderResults();
         clearStore(); // a reload starts clean too: rows written in an earlier visit would leak into every card
         // first playable scenario of every use case (else its first), or the one in the URL (#sc-<id>, from the plan's links)
         const wanted = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
-        USE_CASES.forEach(uc => { const first = playOf(uc.id)[0] || scsOf(uc.id)[0]; if (first) pick(wanted?.useCase === uc.id ? wanted.id : first.id); });
+        USE_CASES.forEach(useCase => { const first = playableOf(useCase.id)[0] || scenariosOf(useCase.id)[0]; if (first) pick(wanted?.useCase === useCase.id ? wanted.id : first.id); });
         if (wanted) document.querySelector(`section[data-use-case="${wanted.useCase}"]`).scrollIntoView();
         addEventListener('hashchange', () => {
-            const sc = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
-            if (sc) { clearStore(); pick(sc.id); document.querySelector(`section[data-use-case="${sc.useCase}"]`).scrollIntoView(); }
+            const scenario = SCENARIOS.find(s => location.hash === '#sc-' + s.id);
+            if (scenario) { clearStore(); pick(scenario.id); document.querySelector(`section[data-use-case="${scenario.useCase}"]`).scrollIntoView(); }
         });
         setInterval(renderLog, 1500); // the screens write the log from inside their frames
     </script>

@@ -316,21 +316,21 @@
         /* theme:pdf-js:start */
         /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
         function addExportPdf(target, prepare) {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'export-pdf no-print';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'export-pdf no-print';
             if (!target) {
                 target = document.querySelector('.float-bar');
                 if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
             }
-            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
-            b.textContent = 'Export PDF';
-            b.addEventListener('click', async () => {
+            button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            button.textContent = 'Export PDF';
+            button.addEventListener('click', async () => {
                 if (prepare) await prepare();
                 window.print();
             });
-            target.append(b);
-            return b;
+            target.append(button);
+            return button;
         }
         /* theme:pdf-js:end */
         addExportPdf();
@@ -360,123 +360,123 @@
         };
 
         (function render({ tables, rels }) {
-            const HEAD = 34, ROW = 26, GX = 110, GY = 44, PAD = 16;
-            const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+            const HEAD_HEIGHT = 34, ROW_HEIGHT = 26, GAP_X = 110, GAP_Y = 44, PADDING = 16;
+            const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
             // Text is 14px; one width fits every table's longest name, key and type (estimated per character, on the wide side).
-            const MONO = 8.6, SANS = 7.9, BOLD = 8.8, PILL = 8.2;
+            const MONO_CHAR_WIDTH = 8.6, SANS_CHAR_WIDTH = 7.9, BOLD_CHAR_WIDTH = 8.8, PILL_CHAR_WIDTH = 8.2;
             // new / removed / altered tables get a signed pill; read and external keep a plain tag
-            const state = t => /^new/.test(t.tag) ? "add" : /^(removed|dropped)/.test(t.tag) ? "drop" : /altered/.test(t.tag) ? "change" : "";
-            const SIGN = { add: "+ ", drop: "− ", change: "~ " };
-            const tagText = t => (SIGN[state(t)] || "") + String(t.tag || "");
-            const tagW = t => state(t) ? tagText(t).length * PILL + 16 : String(t.tag || "").length * BOLD;
-            const widest = (list, per) => Math.max(0, ...list.map(v => String(v || "").length * per));
-            const cols = tables.flatMap(t => t.cols);
-            const KEY_X = Math.round(12 + widest(cols.map(c => c[0]), MONO) + 20);
-            const W = Math.round(Math.max(300, KEY_X + widest(cols.map(c => c[2]), BOLD) + 20 + widest(cols.map(c => c[1]), SANS) + 12,
-                ...tables.map(t => 16 + t.name.length * MONO + 20 + tagW(t) + 10)));
+            const tableState = t => /^new/.test(t.tag) ? "add" : /^(removed|dropped)/.test(t.tag) ? "drop" : /altered/.test(t.tag) ? "change" : "";
+            const STATE_SIGN = { add: "+ ", drop: "− ", change: "~ " };
+            const tagText = t => (STATE_SIGN[tableState(t)] || "") + String(t.tag || "");
+            const tagWidth = t => tableState(t) ? tagText(t).length * PILL_CHAR_WIDTH + 16 : String(t.tag || "").length * BOLD_CHAR_WIDTH;
+            const widest = (list, charWidth) => Math.max(0, ...list.map(v => String(v || "").length * charWidth));
+            const allColumns = tables.flatMap(t => t.cols);
+            const KEY_X = Math.round(12 + widest(allColumns.map(c => c[0]), MONO_CHAR_WIDTH) + 20);
+            const cardWidth = Math.round(Math.max(300, KEY_X + widest(allColumns.map(c => c[2]), BOLD_CHAR_WIDTH) + 20 + widest(allColumns.map(c => c[1]), SANS_CHAR_WIDTH) + 12,
+                ...tables.map(t => 16 + t.name.length * MONO_CHAR_WIDTH + 20 + tagWidth(t) + 10)));
             const byId = Object.fromEntries(tables.map(t => [t.id, t]));
-            const height = t => HEAD + t.cols.length * ROW;
+            const tableHeight = t => HEAD_HEIGHT + t.cols.length * ROW_HEIGHT;
 
             // Row tops: each grid row starts below the tallest table of the row above.
             const rowCount = Math.max(...tables.map(t => t.at[1])) + 1;
-            const rowTop = [PAD];
+            const rowTop = [PADDING];
             for (let r = 1; r < rowCount; r++) {
-                const tallest = Math.max(0, ...tables.filter(t => t.at[1] === r - 1).map(height));
-                rowTop[r] = rowTop[r - 1] + tallest + GY;
+                const tallest = Math.max(0, ...tables.filter(t => t.at[1] === r - 1).map(tableHeight));
+                rowTop[r] = rowTop[r - 1] + tallest + GAP_Y;
             }
-            tables.forEach(t => { t.x = PAD + t.at[0] * (W + GX); t.y = rowTop[t.at[1]]; });
-            const svgW = Math.max(...tables.map(t => t.x + W)) + PAD;
-            const svgH = Math.max(...tables.map(t => t.y + height(t))) + PAD;
+            tables.forEach(t => { t.x = PADDING + t.at[0] * (cardWidth + GAP_X); t.y = rowTop[t.at[1]]; });
+            const svgWidth = Math.max(...tables.map(t => t.x + cardWidth)) + PADDING;
+            const svgHeight = Math.max(...tables.map(t => t.y + tableHeight(t))) + PADDING;
 
             const anchor = ref => {
-                const [id, col] = ref.split(".");
-                const t = byId[id];
-                const i = t.cols.findIndex(c => c[0] === col);
-                if (i < 0) console.warn(`[er] unknown column ${ref}`);
-                return { t, y: t.y + HEAD + Math.max(i, 0) * ROW + ROW / 2 };
+                const [tableId, column] = ref.split(".");
+                const table = byId[tableId];
+                const columnIndex = table.cols.findIndex(c => c[0] === column);
+                if (columnIndex < 0) console.warn(`[er] unknown column ${ref}`);
+                return { table, y: table.y + HEAD_HEIGHT + Math.max(columnIndex, 0) * ROW_HEIGHT + ROW_HEIGHT / 2 };
             };
 
             // Lines first so tables paint over them. Each line gets its own lane so parallel elbows don't overlap.
             // Several FKs into one column fan out ±8px around the row centre instead of meeting at one point.
-            const into = {}, seen = {};
-            rels.forEach(r => { into[r[1]] = (into[r[1]] || 0) + 1; });
-            const lines = rels.map(([from, to, fc, tc, isNew], k) => {
-                const a = anchor(from), b = anchor(to);
-                const n = into[to], i = seen[to] = (seen[to] ?? -1) + 1;
-                b.y += n > 1 ? (i - (n - 1) / 2) * Math.min(8, 16 / (n - 1)) : 0;
+            const incomingCount = {}, incomingSeen = {};
+            rels.forEach(r => { incomingCount[r[1]] = (incomingCount[r[1]] || 0) + 1; });
+            const lines = rels.map(([from, to, fromCardinality, toCardinality, isNew], k) => {
+                const fromAnchor = anchor(from), toAnchor = anchor(to);
+                const n = incomingCount[to], fanIndex = incomingSeen[to] = (incomingSeen[to] ?? -1) + 1;
+                toAnchor.y += n > 1 ? (fanIndex - (n - 1) / 2) * Math.min(8, 16 / (n - 1)) : 0;
                 const lane = 18 + (k % 6) * 12;
-                let ax, bx, x;
-                if (a.t.x === b.t.x) {
-                    ax = bx = a.t.x + W;
-                    x = ax + lane;
+                let fromX, toX, laneX;
+                if (fromAnchor.table.x === toAnchor.table.x) {
+                    fromX = toX = fromAnchor.table.x + cardWidth;
+                    laneX = fromX + lane;
                 } else {
-                    const right = a.t.x < b.t.x;
-                    ax = right ? a.t.x + W : a.t.x; bx = right ? b.t.x : b.t.x + W;
-                    x = right ? ax + lane : ax - lane;
+                    const right = fromAnchor.table.x < toAnchor.table.x;
+                    fromX = right ? fromAnchor.table.x + cardWidth : fromAnchor.table.x; toX = right ? toAnchor.table.x : toAnchor.table.x + cardWidth;
+                    laneX = right ? fromX + lane : fromX - lane;
                 }
-                const d = `M${ax},${a.y} H${x} V${b.y} H${bx}`;
-                const cls = isNew ? "foreign-key new" : "foreign-key";
-                return `<g class="relation" data-a="${a.t.id}" data-b="${b.t.id}">`
-                    + `<path class="${cls}" d="${d}"/>`
-                    + `<circle class="foreign-key-dot${isNew ? " new" : ""}" cx="${bx}" cy="${b.y}" r="3"/>`
+                const path = `M${fromX},${fromAnchor.y} H${laneX} V${toAnchor.y} H${toX}`;
+                const lineClass = isNew ? "foreign-key new" : "foreign-key";
+                return `<g class="relation" data-a="${fromAnchor.table.id}" data-b="${toAnchor.table.id}">`
+                    + `<path class="${lineClass}" d="${path}"/>`
+                    + `<circle class="foreign-key-dot${isNew ? " new" : ""}" cx="${toX}" cy="${toAnchor.y}" r="3"/>`
                     // each cardinality centers on the level stub it labels: table edge to the lane
-                    + `<text class="foreign-key-cardinality" x="${(ax + x) / 2}" y="${a.y - 5}" text-anchor="middle">${esc(fc)}</text>`
-                    + (i ? "" : `<text class="foreign-key-cardinality" x="${(x + bx) / 2}" y="${b.y - 9}" text-anchor="middle">${esc(tc)}</text>`)
-                    + `<title>${esc(from)} → ${esc(to)}</title></g>`;
+                    + `<text class="foreign-key-cardinality" x="${(fromX + laneX) / 2}" y="${fromAnchor.y - 5}" text-anchor="middle">${escapeHtml(fromCardinality)}</text>`
+                    + (fanIndex ? "" : `<text class="foreign-key-cardinality" x="${(laneX + toX) / 2}" y="${toAnchor.y - 9}" text-anchor="middle">${escapeHtml(toCardinality)}</text>`)
+                    + `<title>${escapeHtml(from)} → ${escapeHtml(to)}</title></g>`;
             });
 
-            const boxes = tables.map(t => {
-                const st = state(t);
-                const kind = ["table-card", st, t.tag === "external" ? "external" : ""].filter(Boolean).join(" ");
-                const h = height(t), pad = st === "add" || st === "drop" ? 16 : 12;
-                const rows = t.cols.map(([col, type, key, mark], i) => {
-                    const y = t.y + HEAD + i * ROW;
+            const boxes = tables.map(table => {
+                const state = tableState(table);
+                const kind = ["table-card", state, table.tag === "external" ? "external" : ""].filter(Boolean).join(" ");
+                const height = tableHeight(table), textInset = state === "add" || state === "drop" ? 16 : 12;
+                const rows = table.cols.map(([column, type, key, mark], i) => {
+                    const y = table.y + HEAD_HEIGHT + i * ROW_HEIGHT;
                     return `<g class="row${mark ? " " + mark : ""}">`
-                        + (mark ? `<rect class="row-background" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>`
-                            : i % 2 ? `<rect class="row-zebra" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>` : "")
-                        + (i ? `<line class="row-line" x1="${t.x}" x2="${t.x + W}" y1="${y}" y2="${y}"/>` : "")
-                        + `<text class="column" x="${t.x + pad}" y="${y + 18}">${esc(col)}</text>`
-                        + `<text class="key" x="${t.x + KEY_X}" y="${y + 18}">${esc(key)}</text>`
-                        + `<text class="type" x="${t.x + W - 12}" y="${y + 18}" text-anchor="end">${esc(type)}</text></g>`;
+                        + (mark ? `<rect class="row-background" x="${table.x}" y="${y}" width="${cardWidth}" height="${ROW_HEIGHT}"/>`
+                            : i % 2 ? `<rect class="row-zebra" x="${table.x}" y="${y}" width="${cardWidth}" height="${ROW_HEIGHT}"/>` : "")
+                        + (i ? `<line class="row-line" x1="${table.x}" x2="${table.x + cardWidth}" y1="${y}" y2="${y}"/>` : "")
+                        + `<text class="column" x="${table.x + textInset}" y="${y + 18}">${escapeHtml(column)}</text>`
+                        + `<text class="key" x="${table.x + KEY_X}" y="${y + 18}">${escapeHtml(key)}</text>`
+                        + `<text class="type" x="${table.x + cardWidth - 12}" y="${y + 18}" text-anchor="end">${escapeHtml(type)}</text></g>`;
                 }).join("");
                 // row tints and the gutter bar are clipped to the box's rounded corners
-                const clip = `er-clip-${t.id}`;
-                const bar = pad === 16 ? `<rect class="table-card-bar" x="${t.x}" y="${t.y}" width="4" height="${h}" clip-path="url(#${clip})"/>` : "";
-                const pw = tagW(t), right = t.x + W - 10;
-                const tag = !t.tag ? "" : st
-                    ? `<g class="tag"><rect x="${right - pw + 0.5}" y="${t.y + 7.5}" width="${pw - 1}" height="19" rx="9.5"/>`
-                        + `<text x="${right - pw / 2}" y="${t.y + 21}" text-anchor="middle">${esc(tagText(t))}</text></g>`
-                    : `<text class="tag" x="${t.x + W - 12}" y="${t.y + 22}" text-anchor="end">${esc(t.tag)}</text>`;
-                return `<g class="${kind}" data-id="${t.id}" tabindex="0" role="group" aria-label="${esc(t.name)}${t.tag ? ", " + esc(t.tag) : ""}">`
-                    + `<rect class="table-card-box" x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/>`
-                    + `<path class="table-card-head" d="M${t.x + 1},${t.y + HEAD} V${t.y + 8} a7,7 0 0 1 7,-7 H${t.x + W - 8} a7,7 0 0 1 7,7 V${t.y + HEAD} Z"/>`
-                    + `<text class="table-card-name" x="${t.x + pad}" y="${t.y + 22}">${esc(t.name)}</text>`
-                    + tag + `<clipPath id="${clip}"><rect x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/></clipPath>`
-                    + `<g clip-path="url(#${clip})">${rows}</g>` + bar + `</g>`;
+                const clipId = `er-clip-${table.id}`;
+                const bar = textInset === 16 ? `<rect class="table-card-bar" x="${table.x}" y="${table.y}" width="4" height="${height}" clip-path="url(#${clipId})"/>` : "";
+                const pillWidth = tagWidth(table), right = table.x + cardWidth - 10;
+                const tag = !table.tag ? "" : state
+                    ? `<g class="tag"><rect x="${right - pillWidth + 0.5}" y="${table.y + 7.5}" width="${pillWidth - 1}" height="19" rx="9.5"/>`
+                        + `<text x="${right - pillWidth / 2}" y="${table.y + 21}" text-anchor="middle">${escapeHtml(tagText(table))}</text></g>`
+                    : `<text class="tag" x="${table.x + cardWidth - 12}" y="${table.y + 22}" text-anchor="end">${escapeHtml(table.tag)}</text>`;
+                return `<g class="${kind}" data-id="${table.id}" tabindex="0" role="group" aria-label="${escapeHtml(table.name)}${table.tag ? ", " + escapeHtml(table.tag) : ""}">`
+                    + `<rect class="table-card-box" x="${table.x}" y="${table.y}" width="${cardWidth}" height="${height}" rx="8"/>`
+                    + `<path class="table-card-head" d="M${table.x + 1},${table.y + HEAD_HEIGHT} V${table.y + 8} a7,7 0 0 1 7,-7 H${table.x + cardWidth - 8} a7,7 0 0 1 7,7 V${table.y + HEAD_HEIGHT} Z"/>`
+                    + `<text class="table-card-name" x="${table.x + textInset}" y="${table.y + 22}">${escapeHtml(table.name)}</text>`
+                    + tag + `<clipPath id="${clipId}"><rect x="${table.x}" y="${table.y}" width="${cardWidth}" height="${height}" rx="8"/></clipPath>`
+                    + `<g clip-path="url(#${clipId})">${rows}</g>` + bar + `</g>`;
             });
 
-            const el = document.getElementById("er");
+            const canvas = document.getElementById("er");
             // the legend inside the canvas stays, under the svg
-            el.querySelector(":scope > svg")?.remove();
-            el.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" role="img" aria-label="ER diagram, ${tables.length} tables, ${rels.length} foreign keys">${lines.join("")}${boxes.join("")}</svg>`);
+            canvas.querySelector(":scope > svg")?.remove();
+            canvas.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${svgWidth} ${svgHeight}" width="${svgWidth}" height="${svgHeight}" role="img" aria-label="ER diagram, ${tables.length} tables, ${rels.length} foreign keys">${lines.join("")}${boxes.join("")}</svg>`);
 
             // Hover or focus a table: dim everything not related to it.
-            const clear = () => el.querySelectorAll(".dimmed").forEach(n => n.classList.remove("dimmed"));
-            el.querySelectorAll(".table-card").forEach(g => {
-                const id = g.dataset.id;
+            const clearDimmed = () => canvas.querySelectorAll(".dimmed").forEach(n => n.classList.remove("dimmed"));
+            canvas.querySelectorAll(".table-card").forEach(card => {
+                const id = card.dataset.id;
                 const trace = () => {
-                    const near = new Set([id]);
-                    el.querySelectorAll(".relation").forEach(r => {
-                        const hit = r.dataset.a === id || r.dataset.b === id;
-                        r.classList.toggle("dimmed", !hit);
-                        if (hit) { near.add(r.dataset.a); near.add(r.dataset.b); }
+                    const related = new Set([id]);
+                    canvas.querySelectorAll(".relation").forEach(relation => {
+                        const isRelated = relation.dataset.a === id || relation.dataset.b === id;
+                        relation.classList.toggle("dimmed", !isRelated);
+                        if (isRelated) { related.add(relation.dataset.a); related.add(relation.dataset.b); }
                     });
-                    el.querySelectorAll(".table-card").forEach(t => t.classList.toggle("dimmed", !near.has(t.dataset.id)));
+                    canvas.querySelectorAll(".table-card").forEach(otherCard => otherCard.classList.toggle("dimmed", !related.has(otherCard.dataset.id)));
                 };
-                g.addEventListener("mouseenter", trace);
-                g.addEventListener("focus", trace);
-                g.addEventListener("mouseleave", () => { if (!g.contains(document.activeElement)) clear(); });
-                g.addEventListener("blur", clear);
+                card.addEventListener("mouseenter", trace);
+                card.addEventListener("focus", trace);
+                card.addEventListener("mouseleave", () => { if (!card.contains(document.activeElement)) clearDimmed(); });
+                card.addEventListener("blur", clearDimmed);
             });
         })(ER);
 

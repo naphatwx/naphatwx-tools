@@ -27,8 +27,8 @@
     // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
     const postSize = () => {
         if (!embedded) return;
-        const cs = getComputedStyle(document.body);
-        const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+        const bodyStyle = getComputedStyle(document.body);
+        const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(bodyStyle.paddingLeft) + parseFloat(bodyStyle.paddingRight);
         parent.postMessage({ type: 'diagram-height', height: document.body.getBoundingClientRect().height, width }, '*');
     };
     const refresh = () => { fitDiagramLabels(); postSize(); };

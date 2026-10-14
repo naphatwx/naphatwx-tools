@@ -32,42 +32,42 @@ type TestOut = {
 }
 type RunData = { name: string; stamp: string; startedAt: string; ms: number; baseURL: string; tests: TestOut[] }
 
-const pad = (n: number) => String(n).padStart(2, '0')
-const stripAnsi = (s = '') => s.replace(/\u001b\[[0-9;]*m/g, '')
-const safe = (s: string) => s.replace(/[^\w.-]+/g, '_').slice(0, 80)
+const pad = (number: number) => String(number).padStart(2, '0')
+const stripAnsi = (text = '') => text.replace(/\u001b\[[0-9;]*m/g, '')
+const safe = (text: string) => text.replace(/[^\w.-]+/g, '_').slice(0, 80)
 
 export default class RunDataReporter implements Reporter {
-  private opts: Options
+  private options: Options
   private rootDir = process.cwd()
   private configDir = process.cwd()
-  private dir = ''
+  private runDir = ''
   private name = 'e2e'
   private stamp = ''
   // One entry per test, keyed by test.id; a retry replaces the entry and moves the old one into attempts.
   private tests = new Map<string, TestOut>()
   private started = new Date()
 
-  constructor(opts: Options = {}) {
-    this.opts = opts
+  constructor(options: Options = {}) {
+    this.options = options
   }
 
   onBegin(config: FullConfig, _suite: Suite) {
     this.rootDir = config.rootDir
     this.configDir = config.configFile ? dirname(config.configFile) : config.rootDir
     this.started = new Date()
-    const d = this.started
-    this.stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`
-    this.name = process.env.E2E_REPORT_NAME ?? this.opts.name ?? 'e2e'
+    const date = this.started
+    this.stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+    this.name = process.env.E2E_REPORT_NAME ?? this.options.name ?? 'e2e'
     const fixed = process.env.E2E_RUN_DIR
-    this.dir = fixed
+    this.runDir = fixed
       ? (isAbsolute(fixed) ? fixed : join(this.configDir, fixed))
-      : join(this.configDir, this.opts.outputDir ?? 'e2e-results', `${this.name}-${this.stamp}`)
-    mkdirSync(join(this.dir, 'shots'), { recursive: true })
+      : join(this.configDir, this.options.outputDir ?? 'e2e-results', `${this.name}-${this.stamp}`)
+    mkdirSync(join(this.runDir, 'shots'), { recursive: true })
   }
 
   // Writes one image into shots/ and returns its path relative to the run dir.
   private save(file: string, body: Buffer) {
-    writeFileSync(join(this.dir, 'shots', file), body)
+    writeFileSync(join(this.runDir, 'shots', file), body)
     return `shots/${file}`
   }
 
@@ -77,34 +77,34 @@ export default class RunDataReporter implements Reporter {
     const calls = named('call: ')
     const used = new Set<object>()
     const take = (list: typeof shots, name: string) => {
-      const a = list.find((x) => !used.has(x) && x.name === name)
-      if (a) used.add(a)
-      return a
+      const attachment = list.find((x) => !used.has(x) && x.name === name)
+      if (attachment) used.add(attachment)
+      return attachment
     }
     const base = safe(`${test.id}-r${result.retry}`)
     const steps: StepOut[] = result.steps
       .filter((s: TestStep) => s.category === 'test.step')
-      .map((s, n) => {
-        const shot = take(shots, `step: ${s.title}`)
-        const call = take(calls, `call: ${s.title}`)
-        const rec = call ? JSON.parse(call.body!.toString('utf8')) : undefined
+      .map((step, n) => {
+        const shot = take(shots, `step: ${step.title}`)
+        const call = take(calls, `call: ${step.title}`)
+        const recorded = call ? JSON.parse(call.body!.toString('utf8')) : undefined
         return {
-          title: s.title,
-          status: s.error ? 'failed' : 'passed',
-          ms: s.duration,
-          error: s.error ? stripAnsi(s.error.message) : undefined,
+          title: step.title,
+          status: step.error ? 'failed' : 'passed',
+          ms: step.duration,
+          error: step.error ? stripAnsi(step.error.message) : undefined,
           shot: shot ? this.save(`${base}-${n + 1}.jpg`, shot.body!) : undefined,
-          call: rec ? { target: `${rec.request?.method ?? ''} ${rec.request?.url ?? ''}`.trim(), request: rec.request, response: rec.response } : undefined,
+          call: recorded ? { target: `${recorded.request?.method ?? ''} ${recorded.request?.url ?? ''}`.trim(), request: recorded.request, response: recorded.response } : undefined,
         }
       })
     // Playwright's own failure screenshot is a file on disk, not an in-memory body.
-    const failShot = result.attachments.find((a) => a.name === 'screenshot' && (a.body || a.path))
-    const failBody = failShot ? failShot.body ?? readFileSync(failShot.path!) : undefined
-    const ext = failShot?.contentType === 'image/jpeg' ? 'jpg' : 'png'
+    const failureShot = result.attachments.find((a) => a.name === 'screenshot' && (a.body || a.path))
+    const failureBody = failureShot ? failureShot.body ?? readFileSync(failureShot.path!) : undefined
+    const extension = failureShot?.contentType === 'image/jpeg' ? 'jpg' : 'png'
     // The trace zip stays on disk; the report shows it relative to the config folder, for `npx playwright show-trace`.
     const trace = result.attachments.find((a) => a.name === 'trace' && a.path)
-    const prev = this.tests.get(test.id)
-    const attempts = prev ? [...prev.attempts, { retry: prev.retry, status: prev.status, error: prev.error, duration: prev.ms }] : []
+    const previous = this.tests.get(test.id)
+    const attempts = previous ? [...previous.attempts, { retry: previous.retry, status: previous.status, error: previous.error, duration: previous.ms }] : []
     const tag = (type: string) => test.annotations.find((a) => a.type === type)?.description
     const seen = new Set<string>()
     const annotations = [...test.annotations, ...((result as { annotations?: Note[] }).annotations ?? [])]
@@ -124,7 +124,7 @@ export default class RunDataReporter implements Reporter {
       retry: result.retry,
       error: result.error ? stripAnsi(result.error.message) : undefined,
       steps,
-      finalShot: failBody ? this.save(`${base}-final.${ext}`, failBody) : undefined,
+      finalShot: failureBody ? this.save(`${base}-final.${extension}`, failureBody) : undefined,
       trace: trace ? relative(this.configDir, trace.path!).split('\\').join('/') : undefined,
       annotations,
       attempts,
@@ -134,7 +134,7 @@ export default class RunDataReporter implements Reporter {
   }
 
   onEnd(result: FullResult) {
-    const file = join(this.dir, 'run-data.json')
+    const file = join(this.runDir, 'run-data.json')
     // A re-run into the same E2E_RUN_DIR replaces only the tests it ran and keeps the rest.
     const old: RunData | undefined = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined
     const fresh = [...this.tests.values()]
@@ -148,7 +148,7 @@ export default class RunDataReporter implements Reporter {
       tests: [...(old?.tests ?? []).filter((t) => !keys.has(t.key)), ...fresh],
     }
     writeFileSync(file, JSON.stringify(data, null, 2))
-    process.stdout.write(`\nE2E run data: ${this.dir}\n`)
+    process.stdout.write(`\nE2E run data: ${this.runDir}\n`)
   }
 
   printsToStdio() {
