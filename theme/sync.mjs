@@ -43,7 +43,7 @@ const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
 
 const problems = [];
 for (const fg of ['text', 'text-2', 'text-3', 'accent', 'ok', 'warn', 'bad', 'neutral']) {
-    for (const bg of ['bg', 'surface', 'surface-2', 'surface-3', 'accent-fill']) {
+    for (const bg of ['bg', 'surface', 'surface-2', 'surface-3', 'hover', 'accent-fill']) {
         const r = ratio(tok[fg], tok[bg]);
         if (r < 4.5) problems.push(`contrast: --${fg} on --${bg} is ${r.toFixed(2)}:1 (needs 4.5)`);
     }

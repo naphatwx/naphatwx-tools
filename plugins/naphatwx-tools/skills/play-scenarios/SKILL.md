@@ -223,5 +223,5 @@ Do this after step 7 with the app up and `server.mjs` running, or when the user 
 - How to run it:
     1. Copy `live/.env.example` to `live/.env` and fill in the values. A value already set in the shell wins.
     2. `node <plan>/live/server.mjs --up` (starts the app, waits for it, serves the page). Without `--up` when the app is already running.
-    3. Open the URL it prints. Pick a scenario, play it, mark Pass or Fail, then "Copy as Markdown" under Results.
+    3. Open the URL it prints. Pick a scenario, play it, mark Pass or Fail, then "Copy as Markdown" under Results. To test again, **Clear** (per use case) or **Clear all** (bottom right) drops the Pass / Fail marks and notes.
     4. An AI scenario already shows the agent's result and its calls. To check it yourself: ▶ Seed, Copy prompt, paste it into your agent.

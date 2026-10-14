@@ -41,6 +41,7 @@ graph TD
 ```
 
 - Each pick and each Restart starts clean. The audit log shows what the real service would write.
+- To test again, **Clear** in a use case's scenario list drops its Pass / Fail and notes. **Clear all** (bottom right) drops them for the whole page.
 - Pass / Fail marks and notes stay in this browser only. Copy them before you switch browsers.
 - `#sc-<id>` at the end of the URL opens that scenario. The plan's Play links use it.
 

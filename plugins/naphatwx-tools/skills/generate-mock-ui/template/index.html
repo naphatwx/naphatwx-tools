@@ -21,6 +21,8 @@
             --line: #26282e;
             --line-strong: #363940;
             --line-3: #4a4d55;
+            /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+            --hover: #33353b;
 
             /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
             --text: #e2e3e7;
@@ -130,7 +132,7 @@
             border-radius: var(--radius);
             cursor: pointer;
         }
-        .export-pdf-float:hover { background: var(--surface-3); }
+        .export-pdf-float:hover { background: var(--hover); }
         @page { margin: 0; }
         @media print {
             html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -159,8 +161,8 @@
         .link { color: var(--accent); text-decoration: none; }
         .link:hover { text-decoration: underline; }
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
-        a.panel { color: inherit; text-decoration: none; transition: border-color .15s var(--ease); }
-        a.panel:hover { border-color: var(--accent); }
+        a.panel { color: inherit; text-decoration: none; transition: background .15s var(--ease); }
+        a.panel:hover { background: var(--hover); }
         /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
            the middle column shrinks to the frame's real width (--frame-w, set by fit()) and the side cards fill the rest;
            on mid widths the guide tops the side list: the open scenario matters more than the others */
@@ -176,7 +178,7 @@
         .uc-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
         /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
         .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-        .refs-chip:hover { border-color: var(--accent); }
+        .refs-chip:hover { background: var(--hover); }
         .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
         .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
         /* the result stays on top with its own fill; the guide text below it scrolls on its own */
@@ -189,7 +191,7 @@
         .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
         .tab-s { text-transform: uppercase; }
         .tab-t { flex: 1; min-width: 0; }
-        .tab:hover { color: var(--text); background: var(--surface); }
+        .tab:hover { color: var(--text); background: var(--hover); }
         /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
         .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
         .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
@@ -201,11 +203,19 @@
         .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
         .tab[aria-selected="true"] .tab-n { border-color: var(--bg); }
         .tabs-title { display: flex; flex-direction: column; gap: 2px; }
+        /* "Scenarios" and the use case's Clear share the title line */
+        .tabs-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .tabs-clear { padding: 0 8px; font: inherit; font-size: var(--fs-tag); font-weight: 400; color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+        .tabs-clear:hover { color: var(--text); background: var(--hover); }
+        /* bottom right: one long box with Clear all and Export PDF, like design-feature's tools bar */
+        .float-actions { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
+        .float-btn { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+        .float-btn:hover { background: var(--hover); color: var(--text); }
         .tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
         .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
         /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
         .result-btn { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
-        .result-btn:hover { border-color: var(--accent); }
+        .result-btn:hover { background: var(--hover); }
         .result-btn.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
         .result-btn.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
         .note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
@@ -218,7 +228,7 @@
         .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
         .url { font-family: var(--mono); padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
         .btn-ghost { padding: 4px 8px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
-        .btn-ghost:hover { border-color: var(--accent); }
+        .btn-ghost:hover { background: var(--hover); }
         .rows > * + * { border-top: 1px solid var(--line); }
         /* the screen renders at desktop width and is scaled down to the frame */
         .fit { position: relative; overflow: hidden; }
@@ -248,6 +258,7 @@
 </head>
 
 <body>
+    <div class="float-actions no-print"><button type="button" class="float-btn" onclick="clearAll()" title="Clear every Pass / Fail and note, to test again">Clear all</button></div>
     <div class="page py-6 space-y-8">
         <header>
             <a href="../overview.html#use-cases" class="link">← Feature plan</a>
@@ -295,7 +306,7 @@
             return b;
         }
         /* theme:pdf-js:end */
-        addExportPdf();
+        addExportPdf(document.querySelector('.float-actions')).classList.add('float-btn');
         const SCREEN_W = 1920, SCREEN_H = 1080; // 16:9; the frame scales to the column width and keeps this ratio
         const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
         const nn = ucId => ucId.slice(2).padStart(2, '0');
@@ -340,7 +351,7 @@
               <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
                 <div class="uc-row">
                 <div class="tabs">
-                  <div class="label tabs-title"><span id="sc-title-${nn(uc.id)}">Scenarios</span><span class="tabs-count" data-count="${uc.id}"></span></div>
+                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count" data-count="${uc.id}"></span></div>
                   <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
                   ${scs.map((s, i) => `<button type="button" role="tab" class="tab" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"><span class="tab-n" data-r="${s.id}" data-n="${i + 1}">${i + 1}</span><span class="tab-t">${UI.esc(s.title)}</span><span class="tab-s">${UI.esc(s.surface || '')}</span></button>`).join('')}
                   </div>
@@ -449,6 +460,22 @@
                 ${rows.map(r => `<tr><td class="font-mono t-code meta">${r.s.useCase}</td><td><a class="link" href="#sc-${r.s.id}">${UI.esc(r.s.title)}</a></td><td class="st-${r.st || 'none'} whitespace-nowrap">${STATUS[r.st]}</td><td class="muted">${UI.esc(r.note)}</td></tr>`).join('')}
               </table></div>`;
         }
+        /** Clear: drop the Pass / Fail and notes of these scenarios, to test again. */
+        function clearResults(ids, ask) {
+            if (!confirm(ask)) return;
+            ids.forEach(id => delete results[id]);
+            try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { }
+            renderResults();
+            // the open guides show the cleared marks; the screens and their data stay as they are
+            document.querySelectorAll('section[data-use-case]').forEach(b => {
+                const open = b.querySelector('[role=tab][aria-selected=true]');
+                if (!open || !ids.includes(open.dataset.sc)) return;
+                b.querySelectorAll('.result-btn').forEach(x => x.setAttribute('aria-pressed', 'false'));
+                const note = b.querySelector('.note'); if (note) note.value = '';
+            });
+        }
+        const clearUseCase = ucId => clearResults(scsOf(ucId).map(s => s.id), `Clear the Pass / Fail and notes of ${ucId}?`);
+        const clearAll = () => clearResults(SCENARIOS.map(s => s.id), 'Clear every Pass / Fail and note on this page?');
         function copyResults(btn) {
             const cell = v => String(v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
             const md = ['| Use case | Scenario | Result | Note |', '|---|---|---|---|']

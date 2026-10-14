@@ -19,6 +19,8 @@
             --line: #26282e;
             --line-strong: #363940;
             --line-3: #4a4d55;
+            /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+            --hover: #33353b;
 
             /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
             --text: #e2e3e7;
@@ -128,7 +130,7 @@
             border-radius: var(--radius);
             cursor: pointer;
         }
-        .export-pdf-float:hover { background: var(--surface-3); }
+        .export-pdf-float:hover { background: var(--hover); }
         @page { margin: 0; }
         @media print {
             html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }

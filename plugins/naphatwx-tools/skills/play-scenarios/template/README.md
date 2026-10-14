@@ -44,6 +44,7 @@ graph TD
 - Pass / Fail marks stay in this browser.
 - A scenario with no screen (API, MCP, job) shows a prompt for your AI agent instead of the app. Press ▶ Seed to put the new ids into it, then Copy prompt.
 - Its Result starts as the AI's own Pass / Fail from `results.js`, with every call it made below the prompt. Your mark wins.
+- To test again, **Clear** in a use case's scenario list drops its Pass / Fail and notes. **Clear all** (bottom right) does it for the whole page. A cleared scenario does not take the AI's result back. The screens and their data stay.
 
 ## Files
 

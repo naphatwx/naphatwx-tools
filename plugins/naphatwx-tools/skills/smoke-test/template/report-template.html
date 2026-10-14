@@ -18,6 +18,8 @@
       --line: #26282e;
       --line-strong: #363940;
       --line-3: #4a4d55;
+      /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+      --hover: #33353b;
 
       /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
       --text: #e2e3e7;
@@ -127,7 +129,7 @@
       border-radius: var(--radius);
       cursor: pointer;
   }
-  .export-pdf-float:hover { background: var(--surface-3); }
+  .export-pdf-float:hover { background: var(--hover); }
   @page { margin: 0; }
   @media print {
       html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -168,7 +170,7 @@
   /* Flow boxes use the heading-plus-button disclosure, so the flow name stays a real heading. */
   .flow { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; scroll-margin-top: 12px; }
   .flow-head { padding: 8px 14px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
-  .flow-head:hover { background: var(--surface-2); }
+  .flow-head:hover { background: var(--hover); }
   .flow.open { border-color: var(--accent); }
   /* the open row matches the pressed filter button, so it reads as selected */
   .flow.open > .flow-head, .flow.open > .flow-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
@@ -183,7 +185,7 @@
 
   summary { cursor: pointer; list-style: none; transition: background-color .15s var(--ease); }
   summary::-webkit-details-marker { display: none; }
-  summary:hover { background: var(--surface-2); }
+  summary:hover { background: var(--hover); }
   summary:focus-visible { outline-offset: -2px; }
   .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
   .mark::before { content: "+"; }
@@ -227,7 +229,7 @@
   .polled code { color: var(--text); }
 
   button { font: inherit; font-size: var(--fs-body); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 2px 10px; cursor: pointer; }
-  button:hover { background: var(--surface-3); }
+  button:hover { background: var(--hover); }
 
   .table-wrap { overflow-x: auto; margin: 8px 0; }
   table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: var(--fs-body); }

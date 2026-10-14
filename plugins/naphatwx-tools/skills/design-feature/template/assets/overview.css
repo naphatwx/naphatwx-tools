@@ -14,6 +14,8 @@
     --line: #26282e;
     --line-strong: #363940;
     --line-3: #4a4d55;
+    /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+    --hover: #33353b;
 
     /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
     --text: #e2e3e7;
@@ -123,7 +125,7 @@ th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04e
     border-radius: var(--radius);
     cursor: pointer;
 }
-.export-pdf-float:hover { background: var(--surface-3); }
+.export-pdf-float:hover { background: var(--hover); }
 @page { margin: 0; }
 @media print {
     html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -198,7 +200,7 @@ td .aside { color: var(--text-2); font-size: var(--fs-meta); font-weight: 400; }
     color: var(--text-2); font-size: var(--fs-body); line-height: 1.4;
     text-decoration: none;
 }
-.rail-list a:hover { color: var(--text); background: var(--surface-2); }
+.rail-list a:hover { color: var(--text); background: var(--hover); }
 .rail-list .n { flex: none; color: var(--text-3); min-width: 24px; font-variant-numeric: tabular-nums; }
 /* nested numbers (UC1, 4.1, 5.1) share one column so their labels line up */
 .rail-list ol .n { min-width: 32px; }
@@ -218,7 +220,7 @@ td .aside { color: var(--text-2); font-size: var(--fs-meta); font-weight: 400; }
     cursor: pointer;
     transition: left 0.2s var(--ease), color 0.12s, background 0.12s;
 }
-.rail-edge:hover { color: var(--text); background: var(--line-strong); }
+.rail-edge:hover { color: var(--text); background: var(--hover); }
 .rail-edge svg { width: 19px; height: 19px; transition: transform 0.2s var(--ease); }
 html[data-rail="collapsed"] .rail { visibility: hidden; }
 html[data-rail="collapsed"] .rail-edge { left: 8px; }
@@ -277,7 +279,7 @@ h2 + .facts { margin-top: 0; }
 .refs { font: var(--fs-code)/1.6 var(--mono); color: var(--text-3); }
 /* trace IDs hide behind a "N refs" chip (built by overview.js); a click shows them on the same line */
 .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-.refs-chip:hover { border-color: var(--accent); }
+.refs-chip:hover { background: var(--hover); }
 .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
 .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
 td > .refs-chip { margin-left: 8px; vertical-align: 1px; }
@@ -294,7 +296,7 @@ td > .refs-ids { margin-left: 6px; }
     color: var(--text-2); font: 500 var(--fs-body) var(--sans); cursor: pointer;
     transition: background 0.16s var(--ease), color 0.16s var(--ease);
 }
-.views button:hover:not(:disabled):not([aria-expanded="true"]) { color: var(--text); background: var(--surface-2); }
+.views button:hover:not(:disabled):not([aria-expanded="true"]) { color: var(--text); background: var(--hover); }
 .views button[aria-expanded="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
 .views button:disabled { color: var(--text-3); text-decoration: line-through; cursor: not-allowed; }
 .views kbd { font-size: var(--fs-tag); color: inherit; opacity: 0.75; }
@@ -385,7 +387,7 @@ html[data-zoom="on"] .zoom-shield, .in-lightbox .zoom-shield { display: block; }
     font: 600 var(--fs-body)/1 var(--sans); cursor: pointer;
 }
 .zoom-tools .zoom-full { font-size: var(--fs-lg); }
-.zoom-tools button:hover { color: var(--text); background: var(--line-strong); }
+.zoom-tools button:hover { color: var(--text); background: var(--hover); }
 .zoom-reset { display: none !important; }
 html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !important; }
 .in-lightbox .zoom-full { display: none; }
@@ -413,7 +415,7 @@ html[data-zoom="on"] .zoom-reset, .in-lightbox .zoom-reset { display: grid !impo
     position: absolute; top: 14px; right: 18px; width: 40px; height: 40px;
     border: 0; border-radius: 8px; background: none; color: var(--text); font-size: var(--fs-lg); cursor: pointer;
 }
-.lightbox-close:hover { background: var(--surface-3); }
+.lightbox-close:hover { background: var(--hover); }
 
 /* ============ TABLES (DB + API) ============ */
 .legend { display: flex; gap: 20px; margin: 16px 0 8px; font: var(--fs-code) var(--mono); }
@@ -508,7 +510,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
     height: 32px; padding: 0 12px; border: 0; border-radius: 8px;
     background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer;
 }
-.tools button:hover, .hud button:hover { background: var(--surface-2); color: var(--text); }
+.tools button:hover, .hud button:hover { background: var(--hover); color: var(--text); }
 .tools button[aria-pressed="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
 .tools kbd { font-size: var(--fs-tag); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
 .hud { left: 50%; right: auto; transform: translateX(-50%); align-items: center; }
@@ -525,7 +527,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 .keys dt { white-space: nowrap; }
 .keys kbd { display: inline-block; min-width: 24px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; text-align: center; font-size: var(--fs-tag); color: var(--text); }
 .keys-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: var(--radius); background: none; color: var(--text); font-size: var(--fs-lg); cursor: pointer; }
-.keys-close:hover { background: var(--surface-3); }
+.keys-close:hover { background: var(--hover); }
 
 /* ============ PRESENT MODE: one step per screen; long steps scroll down, never sideways ============ */
 /* a use case's h3 is its slide title here, so it takes the h2 size */

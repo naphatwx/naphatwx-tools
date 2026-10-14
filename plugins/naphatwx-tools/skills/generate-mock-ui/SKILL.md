@@ -165,7 +165,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
 - `#sc-<id>` picks that chip in its use case and scrolls to it; picking a chip updates the hash.
 - Store: clear every `FakeApi.STORE` key on page load, on every chip pick and on Restart, so each scenario starts clean. Without it, rows written in one card leak into every other card after a reload.
-- Results: each reviewer's Pass / Fail and note per scenario, in `localStorage` under `mock-results:<STORE>` (never cleared with the store, so marks survive Restart and reloads). A Results table above the audit log counts them and has "Copy as Markdown". Keep it as the template has it.
+- Results: each reviewer's Pass / Fail and note per scenario, in `localStorage` under `mock-results:<STORE>` (never cleared with the store, so marks survive Restart and reloads). A Results table above the audit log counts them and has "Copy as Markdown". **Clear** (in each use case's scenario list) and **Clear all** (bottom right, beside Export PDF) drop only those marks and notes, to test again. Keep it as the template has it.
 - Audit log at the bottom polls storage, since the screens write it from inside their frames. Contract cards (types.ts, rules.js, data.js) stay.
 
 ### 7. Link the plan (when a plan folder exists)

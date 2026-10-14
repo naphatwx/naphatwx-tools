@@ -13,7 +13,7 @@
     border-radius: var(--radius);
     cursor: pointer;
 }
-.export-pdf-float:hover { background: var(--surface-3); }
+.export-pdf-float:hover { background: var(--hover); }
 @page { margin: 0; }
 @media print {
     html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
