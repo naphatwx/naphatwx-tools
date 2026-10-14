@@ -145,7 +145,31 @@ document.addEventListener("click", (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (a) reveal(a.getAttribute("href").slice(1));
 });
-if (location.hash) reveal(location.hash.slice(1))?.scrollIntoView();
+// ===== Reload keeps what was open: views, "more" blocks, refs chips, the lightbox and the scroll spot.
+// Saved per page when it closes; a different #hash (a shared link) wins over the saved spot.
+const stateKey = "plan-open:" + location.pathname;
+const saved = (() => { try { return JSON.parse(store.get(stateKey)) || {}; } catch { return {}; } })();
+const detailsBlocks = [...document.querySelectorAll("details")];
+const refsChips = [...document.querySelectorAll(".references-chip")];
+const diagramBoxes = [];
+(saved.views || []).forEach(id => {
+    const tab = viewButtons.find(button => button.getAttribute("aria-controls") === id);
+    if (tab && !tab.disabled) selectView(tab, true);
+});
+document.querySelectorAll(".panel.entering").forEach(panel => panel.classList.remove("entering"));
+(saved.details || []).forEach(i => { if (detailsBlocks[i]) detailsBlocks[i].open = true; });
+(saved.refs || []).forEach(i => refsChips[i]?.setAttribute("aria-expanded", "true"));
+const restoreScroll = saved.scroll != null && location.hash === (saved.hash || "");
+if (restoreScroll) history.scrollRestoration = "manual";
+else if (location.hash) reveal(location.hash.slice(1))?.scrollIntoView();
+addEventListener("pagehide", () => store.set(stateKey, JSON.stringify({
+    views: viewButtons.filter(button => button.getAttribute("aria-expanded") === "true").map(button => button.getAttribute("aria-controls")),
+    details: detailsBlocks.flatMap((block, i) => block.open ? [i] : []),
+    refs: refsChips.flatMap((chip, i) => chip.getAttribute("aria-expanded") === "true" ? [i] : []),
+    lightbox: lit ? diagramBoxes.indexOf(lit.box) : -1,
+    hash: location.hash,
+    scroll: presenting() ? null : scrollY, // presenting: the step's #hash marks the spot
+})));
 // the use case a 1–4 key acts on: the current slide when presenting, else the one nearest the top of the screen
 function useCaseInView() {
     if (presenting()) return steps[current]?.slide.classList.contains("use-case") ? steps[current].slide : null;
@@ -484,7 +508,11 @@ addEventListener("resize", railTitles);
 document.addEventListener("DOMContentLoaded", () => {
     document.body.append(lightbox);
     railTitles();
-    document.querySelectorAll(".flowchart, .sequence").forEach(makeZoomable);
+    diagramBoxes.push(...document.querySelectorAll(".flowchart, .sequence"));
+    diagramBoxes.forEach(makeZoomable);
     // sequence diagrams have drawn by now, so section offsets are final
+    if (restoreScroll) scrollTo({ top: saved.scroll, behavior: "instant" });
+    const litBox = diagramBoxes[saved.lightbox];
+    if (litBox?.offsetParent) litBox.querySelector(".zoom-full").click();
     spy();
 });
