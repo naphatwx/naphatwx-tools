@@ -45,6 +45,21 @@ document.addEventListener("click", (e) => {
     if (root.hasAttribute("data-drawer") && !rail.contains(e.target) && !e.target.closest("#menuBtn")) setDrawer(false);
 });
 
+// ===== Trace IDs: each refs line hides behind a "N refs" chip; a click shows it on the same line =====
+document.querySelectorAll(".uc-head > .refs, .uc-index .aside, td > .refs").forEach((ids) => {
+    const n = ids.textContent.split(" · ").filter((s) => s.trim()).length;
+    if (!n) return;
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "refs-chip";
+    chip.title = "Show trace IDs";
+    chip.textContent = `${n} ref${n > 1 ? "s" : ""}`;
+    chip.setAttribute("aria-expanded", "false");
+    chip.addEventListener("click", () => chip.setAttribute("aria-expanded", String(chip.getAttribute("aria-expanded") !== "true")));
+    ids.classList.add("refs-ids");
+    ids.before(chip);
+});
+
 // ===== Search ("/" focuses it): filters rail links, keeps a parent visible while a child matches =====
 const search = document.getElementById("railSearch");
 const railLinks = [...rail.querySelectorAll(".rail-list a")];

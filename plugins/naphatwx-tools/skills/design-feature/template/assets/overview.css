@@ -271,8 +271,18 @@ h2 + .facts { margin-top: 0; }
 .uc-index .aside { color: var(--text-3); font-size: var(--fs-meta); }
 .uc-index .n { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
 
-.uc-head { display: flex; flex-direction: column; gap: 2px; }
+/* title and refs chip share one line; they wrap under the title on narrow screens */
+.uc-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.uc-head .refs { margin: 0; }
 .refs { font: var(--fs-code)/1.6 var(--mono); color: var(--text-3); }
+/* trace IDs hide behind a "N refs" chip (built by overview.js); a click shows them on the same line */
+.refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+.refs-chip:hover { border-color: var(--accent); }
+.refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+.refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+td > .refs-chip { margin-left: 8px; vertical-align: 1px; }
+td > .refs-ids { margin-left: 6px; }
+.uc-index .refs-chip { margin-left: auto; align-self: center; }
 .uc-line { margin-top: 2px; color: var(--text); }
 .uc-line .aside { margin-left: 4px; }
 
@@ -589,4 +599,6 @@ html[data-present="on"] .slide > .api { margin-top: 8px; }
     .wide { width: 100%; margin-left: 0; transform: none; }
     .zoom-stage { transform: none !important; }
     .flowchart img, .seq svg { max-width: 100% !important; height: auto; }
+    .refs-chip { display: none !important; }
+    .refs-ids { display: inline !important; }
 }
