@@ -186,8 +186,10 @@
   .step input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ok); cursor: pointer; }
   .step .n { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
   .step .body { display: grid; gap: 4px; min-width: 0; }
-  .step .line { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
-  .step label { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+  /* Title line: status pills, then the step title. Detail, command and source sit below. */
+  .step .line { display: flex; flex-direction: row; gap: 8px; align-items: center; }
+  .step .line .pill { flex: none; }
+  .step label { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; min-width: 0; }
   .step .detail { color: var(--text-2); overflow-wrap: anywhere; }
   .step .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
   .step .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
@@ -358,10 +360,10 @@ function render() {
         el('span', { class: 'n', 'aria-hidden': 'true' }, i + 1),
         el('div', { class: 'body' },
           el('div', { class: 'line' },
-            el('label', { for: boxId }, s.text),
             s.risk === 'high' ? el('span', { class: 'pill tone-bad' }, el('span', { 'aria-hidden': 'true' }, '!'), 'high risk') : null,
             s.check ? el('span', { class: 'pill tone-warn' }, el('span', { 'aria-hidden': 'true' }, '?'), 'confirm') : null,
-            s.tag ? el('span', { class: 'pill tone-neutral' }, TAGS[s.tag] || s.tag) : null),
+            s.tag ? el('span', { class: 'pill tone-neutral' }, TAGS[s.tag] || s.tag) : null,
+            el('label', { for: boxId }, s.text)),
           s.detail ? el('div', { class: 'detail' }, s.detail) : null,
           s.cmd ? el('div', { class: 'cmd' }, el('code', {}, s.cmd), copyBtn(s.cmd, 'command')) : null,
           s.source ? el('div', { class: 'meta' }, 'From ', el('code', {}, s.source)) : null));

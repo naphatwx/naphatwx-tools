@@ -169,18 +169,20 @@
 
   /* Flow boxes use the heading-plus-button disclosure, so the flow name stays a real heading. */
   .flow { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; scroll-margin-top: 12px; }
-  .flow-head { padding: 8px 14px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
+  .flow-head { padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background-color .15s var(--ease); }
   .flow-head:hover { background: var(--hover); }
   .flow.open { border-color: var(--accent); }
   /* the open row matches the pressed filter button, so it reads as selected */
   .flow.open > .flow-head, .flow.open > .flow-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
   .flow.open > .flow-head .mark { color: var(--accent); }
   .flow.open > .flow-head h2 { font-weight: 600; }
-  /* row titles at body size: a closed row is one compact line, so more flows fit on a screen */
-  .flow-head h2 { flex: 1 1 320px; min-width: 0; font-size: var(--fs-body); }
-  .flow-head h2 button { all: unset; display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; border-radius: var(--radius); }
+  /* Two lines: mark, status and flow name, then the facts below. */
+  .flow-head h2 { min-width: 0; font-size: var(--fs-body); }
+  .flow-head h2 button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
+  .flow-head h2 .pill { flex: none; }
+  .flow-head h2 button > span:last-child { overflow-wrap: anywhere; min-width: 0; }
   .flow-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-  .flow-head .info { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+  .flow-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
   .flow.open .flow-head .mark::before { content: "\2212"; }
 
   summary { cursor: pointer; list-style: none; transition: background-color .15s var(--ease); }

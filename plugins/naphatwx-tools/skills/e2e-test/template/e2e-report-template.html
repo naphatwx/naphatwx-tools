@@ -174,20 +174,21 @@
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
   .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
-  .test-head { padding: 8px 14px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; transition: background-color .15s var(--ease); }
+  .test-head { padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background-color .15s var(--ease); }
   .test-head:hover { background: var(--hover); }
   .test.open { border-color: var(--accent); }
   /* the open row matches the pressed filter button, so it reads as selected */
   .test.open > .test-head, .test.open > .test-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
   .test.open > .test-head .mark { color: var(--accent); }
   .test.open > .test-head h2 { font-weight: 600; }
-  /* row titles at body size: a closed row is one compact line, so more tests fit on a screen */
-  .test-head h2 { flex: 1 1 320px; min-width: 0; font-size: var(--fs-body); }
-  .test-head h2 button { all: unset; display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; border-radius: var(--radius); }
+  /* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
+  .test-head h2 { min-width: 0; font-size: var(--fs-body); }
+  .test-head h2 button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
+  .test-head h2 .pill { flex: none; }
   .test-head h2 button:hover { background: transparent; }
   .test-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   .test-head .t { overflow-wrap: anywhere; min-width: 0; }
-  .test-head .info { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+  .test-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
   .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
   .mark::before { content: "+"; }
   .test.open .mark::before { content: "\2212"; }
