@@ -317,7 +317,7 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .diagram-frame { display: block; width: 100%; height: 560px; border: 0; background: var(--surface); }
 
 /* inside the diagram box, under the drawing, at the text width */
-.seq-legend { display: flex; flex-wrap: wrap; gap: 20px; font-size: var(--fs-meta); color: var(--text-3); max-width: var(--measure); margin: 10px auto 0; }
+.seq-legend { display: flex; flex-wrap: wrap; gap: 20px; font-size: var(--fs-meta); color: var(--text-3); justify-content: center; margin: 10px 0 0; }
 .seq-legend span::before { content: ""; display: inline-block; width: 22px; vertical-align: middle; margin-right: 8px; border-top: 1.5px solid var(--text-2); }
 .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
 .seq-legend .hot::before { border-top: 2px solid var(--accent); }

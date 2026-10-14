@@ -186,10 +186,10 @@
         /* render() sets the SVG's width and height: it draws at 1:1, so every label renders at 14px; a wider one scrolls. */
         .canvas svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
 
-        /* inside the canvas, under the svg, at the text width */
+        /* inside the canvas, under the svg */
         .legend {
-            max-width: var(--page-w);
-            margin: 10px auto 0;
+            justify-content: center;
+            margin: 10px 0 0;
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
