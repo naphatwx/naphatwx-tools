@@ -125,7 +125,7 @@
     h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1rem; }
     /* Drawn at 1:1 (every label 14px), never scaled; a narrow window scrolls the diagram, not the page. */
     .diagram { overflow-x: auto; }
-    .diagram svg { display: block; width: 949px; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
+    .diagram svg { display: block; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
     .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: var(--fs-meta); color: var(--text-3); justify-content: center; margin: 8px 0 0; }
     .legend span::before { content: ""; display: inline-block; width: 26px; vertical-align: middle; margin-right: 6px; border-top: 2px solid var(--text-2); }
@@ -161,7 +161,7 @@
     <p class="eyebrow">Flow 02 · Sequence</p>
     <h1>Example flow</h1>
     <div class="diagram">
-      <svg viewBox="0 0 949 646" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
+      <svg viewBox="0 0 949 646" width="949" height="646" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-seq-title example-flow-seq-desc">
         <title id="example-flow-seq-title">Example flow: sequence diagram, 5 participants, 12 steps</title>
         <desc id="example-flow-seq-desc">web-app loads a thing through api-service and Postgres, then CreateThing calls the external system and writes an audit log on 200, or returns FAILED_PRECONDITION on 400.</desc>
         <line class="life" x1="80" x2="80" y1="68" y2="642"/>
@@ -179,66 +179,234 @@
         <g class="phase">
         <line x1="8" x2="941" y1="98" y2="98"/><rect x="8" y="86" width="90" height="24" rx="4"/><text x="18" y="103">1 · Load</text></g>
         <g class="step">
-        <line class="msg" x1="80" y1="132" x2="232" y2="132"/><path class="ah" d="M239,132 l-9,-4.5 v9 z"/><text class="lbl" x="171" y="125" text-anchor="middle">/things/:id</text><text class="num" x="86" y="125">1</text></g>
+        <line class="msg" x1="80" y1="132" x2="232" y2="132"/><path class="ah" d="M239,132 l-9,-4.5 v9 z"/><g class="edge-label" data-cx="160"><rect class="edge-label-bg" x="106.7" y="112" width="106.6" height="18" rx="3"/><text class="lbl" x="160" y="125" text-anchor="middle">/things/:id</text><text class="num edge-label-num" x="102.7" y="125" text-anchor="end">1</text></g></g>
         <g class="step"><title>id from the route</title>
-        <line class="msg" x1="240" y1="162" x2="447" y2="162"/><path class="ah" d="M454,162 l-9,-4.5 v9 z"/><text class="lbl" x="358.5" y="155" text-anchor="middle">GetThing</text><text class="num" x="246" y="155">2</text></g>
+        <line class="msg" x1="240" y1="162" x2="447" y2="162"/><path class="ah" d="M454,162 l-9,-4.5 v9 z"/><g class="edge-label" data-cx="347.5"><rect class="edge-label-bg" x="307.1" y="142" width="80.8" height="18" rx="3"/><text class="lbl" x="347.5" y="155" text-anchor="middle">GetThing</text><text class="num edge-label-num" x="303.1" y="155" text-anchor="end">2</text></g></g>
         <g class="step">
-        <line class="msg" x1="455" y1="192" x2="697" y2="192"/><path class="ah" d="M704,192 l-9,-4.5 v9 z"/><text class="lbl" x="591" y="185" text-anchor="middle">SELECT schema.thing</text><text class="num" x="461" y="185">3</text></g>
+        <line class="msg" x1="455" y1="192" x2="697" y2="192"/><path class="ah" d="M704,192 l-9,-4.5 v9 z"/><g class="edge-label" data-cx="580"><rect class="edge-label-bg" x="492.3" y="172" width="175.4" height="18" rx="3"/><text class="lbl" x="580" y="185" text-anchor="middle">SELECT schema.thing</text><text class="num edge-label-num" x="488.3" y="185" text-anchor="end">3</text></g></g>
         <g class="note"><title>needs permission thing.view; the id must exist, or NOT_FOUND</title><rect x="352.5" y="210" width="205" height="24" rx="4"/><text x="455" y="227" text-anchor="middle">permission thing.view</text></g>
         <g class="step">
-        <line class="msg ret" x1="455" y1="256" x2="248" y2="256"/><path class="ah ret" d="M241,256 l9,-4.5 v9 z"/><text class="lbl" x="358.5" y="249" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="249">4</text></g>
+        <line class="msg ret" x1="455" y1="256" x2="248" y2="256"/><path class="ah ret" d="M241,256 l9,-4.5 v9 z"/><g class="edge-label" data-cx="347.5"><rect class="edge-label-bg" x="285.6" y="236" width="123.8" height="18" rx="3"/><text class="lbl" x="347.5" y="249" text-anchor="middle">ThingResponse</text><text class="num edge-label-num" x="281.6" y="249" text-anchor="end">4</text></g></g>
         <g class="phase">
         <line x1="8" x2="941" y1="290" y2="290"/><rect x="8" y="278" width="82" height="24" rx="4"/><text x="18" y="295">2 · Act</text></g>
         <g class="step">
-        <line class="msg" x1="80" y1="324" x2="232" y2="324"/><path class="ah" d="M239,324 l-9,-4.5 v9 z"/><text class="lbl" x="171" y="317" text-anchor="middle">Confirm</text><text class="num" x="86" y="317">5</text></g>
+        <line class="msg" x1="80" y1="324" x2="232" y2="324"/><path class="ah" d="M239,324 l-9,-4.5 v9 z"/><g class="edge-label" data-cx="160"><rect class="edge-label-bg" x="123.9" y="304" width="72.2" height="18" rx="3"/><text class="lbl" x="160" y="317" text-anchor="middle">Confirm</text><text class="num edge-label-num" x="119.9" y="317" text-anchor="end">5</text></g></g>
         <g class="step"><title>name, ownerId</title>
-        <line class="msg" x1="240" y1="354" x2="447" y2="354"/><path class="ah" d="M454,354 l-9,-4.5 v9 z"/><text class="lbl" x="358.5" y="347" text-anchor="middle">CreateThing</text><text class="num" x="246" y="347">6</text></g>
+        <line class="msg" x1="240" y1="354" x2="447" y2="354"/><path class="ah" d="M454,354 l-9,-4.5 v9 z"/><g class="edge-label" data-cx="347.5"><rect class="edge-label-bg" x="294.2" y="334" width="106.6" height="18" rx="3"/><text class="lbl" x="347.5" y="347" text-anchor="middle">CreateThing</text><text class="num edge-label-num" x="290.2" y="347" text-anchor="end">6</text></g></g>
         <g class="step"><title>timeout 10 s</title>
-        <line class="msg hot" x1="455" y1="420" x2="857" y2="420"/><path class="ah hot" d="M864,420 l-9,-4.5 v9 z"/><text class="lbl hot" x="671" y="413" text-anchor="middle">POST /things</text><text class="num" x="461" y="413">7</text></g>
+        <line class="msg hot" x1="455" y1="420" x2="857" y2="420"/><path class="ah hot" d="M864,420 l-9,-4.5 v9 z"/><g class="edge-label" data-cx="660"><rect class="edge-label-bg" x="602.4" y="400" width="115.2" height="18" rx="3"/><text class="lbl hot" x="660" y="413" text-anchor="middle">POST /things</text><text class="num edge-label-num" x="598.4" y="413" text-anchor="end">7</text></g></g>
         <g class="step">
-        <line class="msg ret" x1="865" y1="450" x2="463" y2="450"/><path class="ah ret" d="M456,450 l9,-4.5 v9 z"/><text class="lbl" x="671" y="443" text-anchor="middle">200</text><text class="num" x="461" y="443">8</text></g>
+        <line class="msg ret" x1="865" y1="450" x2="463" y2="450"/><path class="ah ret" d="M456,450 l9,-4.5 v9 z"/><g class="edge-label" data-cx="660"><rect class="edge-label-bg" x="641.1" y="430" width="37.8" height="18" rx="3"/><text class="lbl" x="660" y="443" text-anchor="middle">200</text><text class="num edge-label-num" x="637.1" y="443" text-anchor="end">8</text></g></g>
         <g class="step">
-        <line class="msg hot" x1="455" y1="480" x2="697" y2="480"/><path class="ah hot" d="M704,480 l-9,-4.5 v9 z"/><text class="lbl hot" x="591" y="473" text-anchor="middle">INSERT schema.audit_log</text><text class="num" x="461" y="473">9</text></g>
+        <line class="msg hot" x1="455" y1="480" x2="697" y2="480"/><path class="ah hot" d="M704,480 l-9,-4.5 v9 z"/><g class="edge-label" data-cx="580"><rect class="edge-label-bg" x="475.1" y="460" width="209.8" height="18" rx="3"/><text class="lbl hot" x="580" y="473" text-anchor="middle">INSERT schema.audit_log</text><text class="num edge-label-num" x="471.1" y="473" text-anchor="end">9</text></g></g>
         <g class="step">
-        <line class="msg ret" x1="455" y1="510" x2="248" y2="510"/><path class="ah ret" d="M241,510 l9,-4.5 v9 z"/><text class="lbl" x="358.5" y="503" text-anchor="middle">ThingResponse</text><text class="num" x="246" y="503">10</text></g>
+        <line class="msg ret" x1="455" y1="510" x2="248" y2="510"/><path class="ah ret" d="M241,510 l9,-4.5 v9 z"/><g class="edge-label" data-cx="347.5"><rect class="edge-label-bg" x="285.6" y="490" width="123.8" height="18" rx="3"/><text class="lbl" x="347.5" y="503" text-anchor="middle">ThingResponse</text><text class="num edge-label-num" x="281.6" y="503" text-anchor="end">10</text></g></g>
         <g class="step">
-        <line class="msg ret" x1="865" y1="576" x2="463" y2="576"/><path class="ah ret" d="M456,576 l9,-4.5 v9 z"/><text class="lbl" x="671" y="569" text-anchor="middle">400</text><text class="num" x="461" y="569">11</text></g>
+        <line class="msg ret" x1="865" y1="576" x2="463" y2="576"/><path class="ah ret" d="M456,576 l9,-4.5 v9 z"/><g class="edge-label" data-cx="660"><rect class="edge-label-bg" x="641.1" y="556" width="37.8" height="18" rx="3"/><text class="lbl" x="660" y="569" text-anchor="middle">400</text><text class="num edge-label-num" x="637.1" y="569" text-anchor="end">11</text></g></g>
         <g class="step"><title>upstream reason passed through</title>
-        <line class="msg ret" x1="455" y1="606" x2="248" y2="606"/><path class="ah ret" d="M241,606 l9,-4.5 v9 z"/><text class="lbl" x="358.5" y="599" text-anchor="middle">FAILED_PRECONDITION</text><text class="num" x="246" y="599">12</text></g>
+        <line class="msg ret" x1="455" y1="606" x2="248" y2="606"/><path class="ah ret" d="M241,606 l9,-4.5 v9 z"/><g class="edge-label" data-cx="347.5"><rect class="edge-label-bg" x="259.8" y="586" width="175.4" height="18" rx="3"/><text class="lbl" x="347.5" y="599" text-anchor="middle">FAILED_PRECONDITION</text><text class="num edge-label-num" x="255.8" y="599" text-anchor="end">12</text></g></g>
       </svg>
       <p class="legend"><span>Call</span><span class="ret">Response</span><span class="hot">Side effect (external write or audit)</span></p>
     </div>
   </div>
+  <style>
+      /* theme:tokens:start */
+      /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+      :root {
+          color-scheme: dark;
+
+          /* Surfaces, darkest first */
+          --bg: #121316;
+          --surface: #18191d;
+          --surface-2: #1f2025;
+          --surface-3: #24262c;
+          --line: #26282e;
+          --line-strong: #363940;
+          --line-3: #4a4d55;
+          /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+          --hover: #33353b;
+
+          /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+          --text: #e2e3e7;
+          --text-2: #c6c8cf;
+          --text-3: #a3a6b0;
+
+          /* One accent */
+          --accent: #8ab0ff;
+          --accent-fill: #1b2232;
+          --accent-soft: rgba(138, 176, 255, 0.12);
+
+          /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+          --ok: #8fd694;
+          --warn: #f0c26b;
+          --bad: #f28b8d;
+          --neutral: #a3a6b0;
+          --ok-soft: rgba(143, 214, 148, 0.12);
+          --warn-soft: rgba(240, 194, 107, 0.12);
+          --bad-soft: rgba(242, 139, 141, 0.12);
+          --neutral-soft: rgba(163, 166, 176, 0.12);
+          --add: var(--ok);
+          --change: var(--warn);
+          --drop: var(--bad);
+
+          /* Diagrams: connectors and their labels */
+          --connector: #6b6e78;
+
+          /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+          --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+          --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+          /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
+          --fs-xs: 0.75rem;
+          --fs-sm: 0.875rem;
+          --fs-md: 1rem;
+          --fs-lg: 1.25rem;
+          --fs-xl: 1.5rem;
+          --fs-2xl: 2rem;
+          /* Headings and lead line: the same steps on every page */
+          --fs-lead: var(--fs-lg);
+          --fs-h3: var(--fs-lg);
+          --fs-h2: var(--fs-xl);
+          --fs-h1: var(--fs-2xl);
+          /* Roles: one step down per role, so the eye lands on body text first.
+             body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+          --fs-body: var(--fs-md);
+          --fs-meta: var(--fs-sm);
+          --fs-code: var(--fs-sm);
+          --fs-tag: var(--fs-xs);
+          /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+          --fs-dia: var(--fs-sm);
+          --fs-dia-sub: var(--fs-xs);
+
+          /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px, 6xl 1152px, 7xl 1280px). Use these, not raw px */
+          --max-w-md: 28rem;
+          --max-w-3xl: 48rem;
+          --max-w-4xl: 56rem;
+          --max-w-5xl: 64rem;
+          --max-w-6xl: 72rem;
+          --max-w-7xl: 80rem;
+
+          /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-3xl */
+          --page-w: min(80%, var(--max-w-3xl));
+          --gutter: clamp(16px, 3vw, 24px);
+
+          --radius: 6px;
+          --radius-lg: 10px;
+          --ease: cubic-bezier(0.2, 0, 0, 1);
+      }
+      /* theme:tokens:end */
+      /* theme:pdf:start */
+      /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+      /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
+      .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
+      .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+      .float-bar button:hover { background: var(--hover); color: var(--text); }
+      /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
+         An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
+      body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }
+      @page { margin: 0; }
+      @media print {
+          html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .no-print { display: none !important; }
+          body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
+          pre, figure, img, svg, tr { break-inside: avoid; }
+          h1, h2, h3 { break-after: avoid; }
+      }
+      /* theme:pdf:end */
+      .edge-label-bg { fill: var(--surface); }
+  </style>
   <script>
-    // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
-    // Out: {type: "diagram-height", height, width} on every resize, so the host sizes the iframe.
-    const embedded = parent !== window;
-    const style = document.createElement("style");
-    style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
-      .embedded body { padding: 1rem; }
-      .embedded .eyebrow, .embedded h1 { display: none; }`;
-    document.head.append(style);
-    // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
-    if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
-    // Draw each diagram at its viewBox width, never scaled, so 14px labels render at 14px; a narrow frame scrolls it sideways.
-    const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
-    svgs.forEach(svg => {
-      Object.assign(svg.style, { width: svg.viewBox.baseVal.width + "px", maxWidth: "none", height: "auto" });
-      if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
-      const box = document.createElement("div");
-      box.style.overflowX = "auto";
-      svg.before(box);
-      box.append(svg);
-    });
-    // height: body, not documentElement, whose scrollHeight never drops below the iframe's height;
-    // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
-    const postSize = () => {
-      const cs = getComputedStyle(document.body);
-      const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
-      parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, width }, "*");
-    };
-    addEventListener("load", postSize);
-    new ResizeObserver(postSize).observe(document.body);
+      /* theme:pdf-js:start */
+      /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+      function addExportPdf(target, prepare) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'export-pdf no-print';
+          if (!target) {
+              target = document.querySelector('.float-bar');
+              if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+          }
+          b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+          b.textContent = 'Export PDF';
+          b.addEventListener('click', async () => {
+              if (prepare) await prepare();
+              window.print();
+          });
+          target.append(b);
+          return b;
+      }
+      /* theme:pdf-js:end */
+      /* theme:diagram-labels-js:start */
+      /* Synced from theme/diagram-labels.js by theme/sync.mjs. Do not edit here. */
+      function fitDiagramLabels(root = document) {
+          const PAD = 6, GAP = 4, r1 = n => Math.round(n * 10) / 10;
+          let done = true;
+          root.querySelectorAll('g.edge-label').forEach(g => {
+              const text = g.querySelector(':scope > text');
+              if (!text) return;
+              const w = text.getComputedTextLength();
+              // 0: not laid out yet (a hidden panel or frame), so the next call fits it
+              if (!w) { done = false; return; }
+              let cx = parseFloat(g.dataset.cx);
+              if (Number.isNaN(cx)) {
+                  const x = text.x.baseVal[0]?.value || 0, anchor = getComputedStyle(text).textAnchor;
+                  cx = anchor === 'start' ? x + w / 2 : anchor === 'end' ? x - w / 2 : x;
+              }
+              text.setAttribute('x', r1(cx));
+              text.setAttribute('text-anchor', 'middle');
+              const left = cx - w / 2 - PAD;
+              const bg = g.querySelector(':scope > .edge-label-bg');
+              if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
+              const num = g.querySelector(':scope > .edge-label-num');
+              if (num) {
+                  num.removeAttribute('transform');
+                  try {
+                      const b = num.getBBox();
+                      num.setAttribute('transform', `translate(${r1(left - GAP - (b.x + b.width))} 0)`);
+                  } catch { done = false; }
+              }
+          });
+          return done;
+      }
+      /* theme:diagram-labels-js:end */
+      /* theme:diagram-embed-js:start */
+      /* Synced from theme/diagram-embed.js by theme/sync.mjs. Do not edit here. */
+      (function () {
+          const embedded = parent !== window;
+          const style = document.createElement('style');
+          // Embedded, the bottom padding stays: the fixed Export PDF bar sits in it, under the drawing.
+          // Print: each drawing shrinks to the page width instead of being cut off.
+          style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
+              .embedded body { padding: 1rem 1rem var(--float-space, 1rem); }
+              .embedded .eyebrow, .embedded h1 { display: none; }
+              @media print { svg[viewBox]:not(svg svg) { max-width: 100% !important; height: auto !important; } }`;
+          document.head.append(style);
+          if (embedded) { document.documentElement.classList.add('embedded'); document.documentElement.style.overflowY = 'hidden'; }
+          // Each diagram draws at its viewBox width, never scaled, so labels render at their own size; a narrow frame scrolls it sideways.
+          const svgs = [...document.querySelectorAll('svg[viewBox]:not(svg svg)')];
+          svgs.forEach(svg => {
+              Object.assign(svg.style, { width: svg.viewBox.baseVal.width + 'px', maxWidth: 'none', height: 'auto' });
+              if (getComputedStyle(svg.parentElement).overflowX === 'auto') return;
+              const box = document.createElement('div');
+              box.style.overflowX = 'auto';
+              svg.before(box);
+              box.append(svg);
+          });
+          addExportPdf();
+          // height: the body's box, padding included, not documentElement, whose scrollHeight never drops below the frame's height;
+          // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
+          const postSize = () => {
+              if (!embedded) return;
+              const cs = getComputedStyle(document.body);
+              const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+              parent.postMessage({ type: 'diagram-height', height: document.body.getBoundingClientRect().height, width }, '*');
+          };
+          const refresh = () => { fitDiagramLabels(); postSize(); };
+          addEventListener('load', refresh);
+          document.fonts?.ready.then(refresh);
+          new ResizeObserver(refresh).observe(document.body);
+      })();
+      /* theme:diagram-embed-js:end */
   </script>
 </body>
 </html>

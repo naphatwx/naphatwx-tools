@@ -9,12 +9,13 @@ A flowchart shows one flow's logic: its steps, yes / no decisions, loops and end
 
 | Shape | Use for | Manual SVG |
 |-------|---------|------------|
-| Pill | Start, end, exit | outlined `rect rx="25"`: fill `#121316`, stroke `#4a4d55` |
-| Box | A step the user or system does | filled `rect rx="8"`: fill `#24262c`, stroke `#363940` |
-| Diamond | A yes / no question | accent `polygon`: fill `#1b2232`, stroke `#8ab0ff` |
-| Arrow | Next step, loop back (retry, reset) | grey `#6b6e78` path with arrowhead |
+| Pill | Start, end, exit | `rect.pill rx="22"`: outlined, `--bg` fill, `--line-3` stroke |
+| Box | A step the user or system does | `rect.box rx="8"`: `--surface-3` fill, `--line-strong` stroke |
+| Diamond | A yes / no question | `polygon.decision`: `--accent-fill` fill, `--accent` stroke |
+| Arrow | Next step, loop back (retry, reset) | `.conn` path in `--connector` grey, with arrowhead |
 
-- Shape carries the meaning; the diamond's blue is the only colour. Label text is `#e2e3e7`, detail lines `#c6c8cf` (mono), exit labels `#a3a6b0`. Labels are 14px; detail lines and exit labels 12px. These are the theme's `--text`, `--text-2`, `--text-3`.
+- Shape carries the meaning; the diamond's blue is the only colour. Label text is `--text`, detail lines `--text-2` (mono), exit labels `--text-3`. Labels are 14px; detail lines and exit labels 12px.
+- Exit labels (`Yes`, `No`, `Retry`) are `.edge-label` groups (SKILL.md step 3), centered on the midpoint of the segment they label: just above a level segment, on a vertical one (the box hides the line behind the text).
 - Labels are sentence case: `Yes`, `No`, `Retry`.
 
 - Every diamond has exactly two labelled exits (`Yes` / `No`, or two short outcomes). Every path ends at a pill or loops back to an earlier node.
@@ -65,15 +66,16 @@ Every label, detail line and condition a reader sees:
 
 ## Manual mode
 
-- Start from `template/flowchart/01-example-flow.svg`. Keep its `<title>` / `<desc>`, marker, colours and the mono `<g>` for detail lines. A standalone `.svg` can't read CSS variables, so it uses the theme's hex values directly.
+- Start from `template/flowchart/01-example-flow.html`. Keep its `theme:` blocks, its classes, the `<title>` / `<desc>`, the marker and the scripts at the end (Export PDF, label fitting, the embed contract). Change the `<title>`, `.eyebrow`, `<h1>` and the `<svg>`. Several parts of one flow → one `<h2>` + `<div class="diagram">` per part.
 - Size shapes to the detail line (about 8.5px per mono character, on the wide side, plus 12px each side): boxes and pills ≥ 160 wide, diamonds ≥ 240 wide; a 28-char detail line needs a 260-wide box.
 - Keep it compact so more of the flow fits on one screen: pills 44 tall, boxes 52, diamonds 96; about 30px of connector between shapes, 12–16px margin around the drawing.
 - Set the `viewBox` to fit, and `width` / `height` on the `<svg>` to the same numbers: a host page draws it at that 1:1 size, never scaled, so its text renders at its own size (a wider drawing scrolls sideways). Lay nodes on a grid, main path top to bottom, branches to the sides; no line crosses a node.
-- Save to `NN-<slug>.svg`. Don't copy the example itself to the output.
+- Save to `NN-<slug>.html`. Don't copy the example itself to the output.
 
 ## Checks
 
 - Every diamond has two labelled exits; every path reaches an end pill or loops back.
+- Every exit label is centered on its segment (`data-cx` = the segment's midpoint).
 - No line crosses a node; no text overflows its shape.
 - Every permission, call, write, state check and error node has a detail line with a real value (or `TBD`).
 - No symbol from the "Words, not symbols" table is left in any label.

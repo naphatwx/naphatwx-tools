@@ -43,7 +43,7 @@ Every diagram is drawn by the `generate-diagram` skill (`naphatwx-tools:generate
 | Mode | When | Flowchart file | Sequence file | Embedded in `overview.html` as |
 |------|------|----------------|---------------|--------------------------------|
 | diagram-design | the `diagram-design` skill is available | `flowchart/NN-<slug>.html` | `sequence-diagram/NN-<slug>.html` | `<iframe class="diagram-frame">` |
-| manual | no `diagram-design` skill | `flowchart/NN-<slug>.svg` | `sequence-diagram/NN-<slug>.js` | `<img>` / `render.js` |
+| manual | no `diagram-design` skill | `flowchart/NN-<slug>.html` | `sequence-diagram/NN-<slug>.js` | `<iframe class="diagram-frame">` / `render.js` |
 
 The ER diagram is its own page in both modes (`database/er-diagram.html`), opened from the Database section. So is the API contracts board (`api/contracts.html`), opened from the API section. Sections are built by parallel sub-agents after the source is read (step 3).
 
@@ -75,8 +75,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 2. **Every use case has both diagrams** (they draw its flow): `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
 3. Each use case is one `<section class="slide use-case" id="uc-NN" data-title="UC<n> · <name>">` with four view buttons (disclosure buttons in a `role="group"` `.views` row: Flowchart, Sequence, Rules, Scenarios, each `aria-expanded` + `aria-controls`) and their four panels (`role="region"`), all closed by default (`aria-expanded="false"`, every `.panel` `hidden`). A click opens one panel at a time; a second click closes it.
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
-    - Manual mode: the flowchart is an `<img>`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
-    - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`. Its embed script (the `generate-diagram` skill adds it) hides the file's own eyebrow and title inside the frame and draws the diagram at 1:1.
+    - Manual mode: the flowchart is an `<iframe class="diagram-frame">`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="seq" data-flow="NN-<slug>">`.
+    - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`. Its page kit (the `generate-diagram` skill adds it) hides the file's own eyebrow and title inside the frame and draws the diagram at 1:1.
+    - Every iframed diagram keeps its own Export PDF button, at the bottom right of the frame, under the drawing: the frame's height includes the room for it, so it never covers the diagram.
     - Step details never sit inside a diagram: they go on the page right after the `.seq` box (manual: `render.js` adds them).
 4. Every rail link `href="#id"` (`.rail-list a`, nested ones included) matches a real `id` on the page, and every `.slide` has a `data-title` (presentation mode labels its steps with it).
 5. Every mock link (into `mock/`, or the app's `/mock/spec<NNN>` route) opens in a new tab: `target="_blank" rel="noopener"`. This is for the local folder; the published copy drops it (step 8).
@@ -116,7 +117,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Mode: the `diagram-design` skill is available (`diagram-design:diagram-design` in Claude Code; any agent: listed in its skills) → diagram-design; otherwise manual. Pass it to every `generate-diagram` run.
 - Copy `template/overview.html` → `<output>/overview.html` and `template/assets/` → `<output>/assets/`. The API agent copies `template/api/contracts.html` (step 3). The template's `flowchart/`, `sequence-diagram/`, `database/`, `mock/` and `use-cases.js` files exist only to preview it; don't copy them — `generate-diagram`, `generate-use-case` and `generate-mock-ui` write the real ones.
-- The template shows the same example use case twice: UC1 in manual mode (`<img>` + `render.js`), UC2 in diagram-design mode (`<iframe class="diagram-frame">`, files drawn by the diagram-design skill). Copy the block of the chosen mode as the use case block, then delete UC2 and its rail link from the output.
+- The template shows the same example use case twice: UC1 in manual mode (flowchart `<iframe>` + `render.js`), UC2 in diagram-design mode (`<iframe class="diagram-frame">`, files drawn by the diagram-design skill). Copy the block of the chosen mode as the use case block, then delete UC2 and its rail link from the output.
 - diagram-design mode: remove the `render.js` `<script>` lines and `SeqDiagrams.renderAll()` from the output `overview.html`.
 
 ### 3. Fan out section agents
@@ -157,7 +158,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
         - `<header class="uc-head">`: `<h3>` with `<span class="sec-n">UC<n></span>` + the use case name, then `<p class="refs">` with its tags (user story, requirement ids joined by ` · `; no file names). `overview.js` turns the line into a `N refs` chip on the title line; a click shows the IDs, and Export PDF prints them all.
         - `<p class="uc-line">`: the user's goal in one sentence, then `<span class="aside">Starts from <trigger>.</span>`.
         - The `.views` button row and four panels, ids `uc-NN-chart`, `uc-NN-seq`, `uc-NN-rules`, `uc-NN-sc` (buttons `…-tab`, linked by `aria-controls` / `aria-labelledby`):
-            - Flowchart panel (`.panel.wide`): `<div class="flowchart">` + the embed `generate-diagram` returned (`<img>` or `<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
+            - Flowchart panel (`.panel.wide`): `<div class="flowchart">` + the embed `generate-diagram` returned (`<iframe class="diagram-frame">`, no inline height: the iframe fits the height its file posts).
             - Sequence panel (`.panel.wide`): manual → `<div class="seq" data-flow="NN-<slug>">` with the `.seq-legend` line inside it; diagram-design → `<div class="seq">` + the returned `<iframe class="diagram-frame">`, then the returned `<div class="seq-steps">` right after the `.seq` box, not inside it.
             - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
             - Scenarios button and panel (`.panel`, not wide, always last in the block): leave them out of the fragment. `node <this skill dir>/scripts/scenarios-panels.js <output>`, run once the use case blocks are in, writes them from `use-cases.js`:

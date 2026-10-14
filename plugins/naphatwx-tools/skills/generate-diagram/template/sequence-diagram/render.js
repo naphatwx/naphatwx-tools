@@ -1,14 +1,15 @@
 // Draws sequence diagrams defined in sibling files (one flow per file) as inline SVG: <div class="seq" data-flow="NN-slug">.
-// Steps: phase | call | ret | hot | note | alt | else | opt | loop | end. Labels are the name only (≤ 40 chars, or one bare name);
-// an optional last `detail` string shows on hover and in the "Step details" list drawn after the .seq box.
+// Steps: phase | call | ret | hot | note | alt | else | opt | loop | end; a call to itself (from = to) draws a loop.
+// Labels are the name only (≤ 40 chars, or one bare name); an optional last `detail` shows on hover and in "Step details".
 
 var SeqDiagrams = (function () {
     const flows = {};
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const define = (id, spec) => { flows[id] = spec; };
     const MAX = 40;
-    // Widths are estimated per character for 14px text (mono, sans, bold sans), on the wide side; 12px lines fit inside.
-    const MONO = 8.6, SANS = 7.9, BOLD = 8.8, NUM = 24;
+    // Widths are estimated per character for 14px text (mono, sans, bold sans), on the wide side, for layout only;
+    // fitDiagramLabels then sizes each label box to its rendered text. NUM: room for the step number left of the box.
+    const MONO = 8.6, SANS = 7.9, BOLD = 8.8, NUM = 24, PAD = 6, GAP = 4, LOOP = 36;
 
     function svg(id, { title = id, actors, steps, gap = 160 }) {
         const TOP = 16, HEAD = 52;
@@ -16,12 +17,19 @@ var SeqDiagrams = (function () {
         const aw = actors.map(([, name, sub = '']) => Math.round(Math.max(118, sub.length * SANS + 24, name.length * BOLD + 24)));
         // gap is the minimum; a pair spreads apart until its actor boxes and the message labels between them fit
         const gaps = aw.slice(1).map((w, i) => Math.max(gap, (aw[i] + w) / 2 + 16));
+        // a label centers on its arrow with the step number left of its box, so it needs that room on both sides
+        const side = label => label.length * MONO / 2 + PAD + GAP + NUM;
         for (const [kind, a, b, label] of steps) {
             if (!['call', 'ret', 'hot'].includes(kind)) continue;
-            const lo = Math.min(idx[a], idx[b]), hi = Math.max(idx[a], idx[b]);
-            // NUM: the step number shares the label's row, at the arrow's left end
-            const span = gaps.slice(lo, hi).reduce((s, g) => s + g, 0), need = label.length * MONO + NUM + 28;
-            for (let i = lo; i < hi && span < need; i++) gaps[i] += (need - span) / (hi - lo);
+            const i = idx[a];
+            if (a === b) { // self-call: the label centers on the loop, LOOP wide, right of the lifeline
+                if (i < gaps.length) gaps[i] = Math.max(gaps[i], LOOP / 2 + side(label) + 8);
+                if (i > 0) gaps[i - 1] = Math.max(gaps[i - 1], side(label) - LOOP / 2 + 8);
+                continue;
+            }
+            const lo = Math.min(i, idx[b]), hi = Math.max(i, idx[b]);
+            const span = gaps.slice(lo, hi).reduce((s, g) => s + g, 0), need = 2 * side(label) + 16;
+            for (let k = lo; k < hi && span < need; k++) gaps[k] += (need - span) / (hi - lo);
         }
         const xs = [Math.round(Math.max(80, aw[0] / 2 + 12))];
         gaps.forEach(g => xs.push(Math.round(xs[xs.length - 1] + g)));
@@ -59,18 +67,21 @@ var SeqDiagrams = (function () {
             } else { // call | ret | hot
                 const [kind, a, b, label, detail] = s;
                 long(kind, label);
-                const x1 = X[a], x2 = X[b], d = x2 > x1 ? 1 : -1;
+                const self = a === b, x1 = X[a], x2 = self ? x1 + LOOP : X[b], d = x2 > x1 ? 1 : -1;
                 const cls = { call: 'msg', ret: 'msg ret', hot: 'msg hot' }[kind];
                 const ah = { call: 'ah', ret: 'ah ret', hot: 'ah hot' }[kind];
-                const lw = label.length * MONO, lo = Math.min(x1, x2) + NUM + 4, hi = Math.max(x1, x2) - 6;
-                const lx = Math.min(Math.max((lo + hi) / 2, lw / 2 + 6), W - lw / 2 - 6);
+                // centered on the arrow's midpoint (a self-call: on its loop), kept inside the drawing
+                const lw = label.length * MONO, sw = lw / 2 + PAD;
+                const lx = Math.round(Math.min(Math.max((x1 + x2) / 2, sw + GAP + NUM), W - sw - 6));
                 num++;
                 if (detail) details.push([num, label, detail]);
-                body.push(`<g class="step">${tip(detail)}<line class="${cls}" x1="${x1}" y1="${y}" x2="${x2 - d * 8}" y2="${y}"/>`,
-                    `<path class="${ah}" d="M${x2 - d},${y} l${-d * 9},-4.5 v9 z"/>`,
+                body.push(`<g class="step">${tip(detail)}`, self
+                    ? `<path class="${cls}" d="M${x1},${y} H${x2} V${y + 16} H${x1 + 8}"/><path class="${ah}" d="M${x1 + 1},${y + 16} l9,-4.5 v9 z"/>`
+                    : `<line class="${cls}" x1="${x1}" y1="${y}" x2="${x2 - d * 8}" y2="${y}"/><path class="${ah}" d="M${x2 - d},${y} l${-d * 9},-4.5 v9 z"/>`,
+                    `<g class="edge-label" data-cx="${lx}"><rect class="edge-label-bg" x="${lx - sw}" y="${y - 20}" width="${2 * sw}" height="18" rx="3"/>`,
                     `<text class="lbl${kind === 'hot' ? ' hot' : ''}" x="${lx}" y="${y - 7}" text-anchor="middle">${esc(label)}</text>`,
-                    `<text class="num" x="${Math.min(x1, x2) + 6}" y="${y - 7}">${num}</text></g>`);
-                y += 30;
+                    `<text class="num edge-label-num" x="${lx - sw - GAP}" y="${y - 7}" text-anchor="end">${num}</text></g></g>`);
+                y += self ? 46 : 30;
             }
         }
         const H = y;
@@ -94,6 +105,7 @@ var SeqDiagrams = (function () {
         return [out.concat(body, '</svg>').join(''), list];
     }
 
+    const watched = new WeakSet();
     function renderAll(root = document) {
         root.querySelectorAll('.seq[data-flow]').forEach(el => {
             const spec = flows[el.dataset.flow];
@@ -105,8 +117,46 @@ var SeqDiagrams = (function () {
             // the list sits on the page after the box, so zoom and the lightbox leave it out
             if (el.nextElementSibling?.classList.contains('seq-steps')) el.nextElementSibling.remove();
             el.insertAdjacentHTML('afterend', list);
+            // label boxes fit the rendered text; a hidden panel measures 0, so fit again once it gets a size
+            fitDiagramLabels(el);
+            if (!watched.has(el)) { watched.add(el); new ResizeObserver(() => fitDiagramLabels(el)).observe(el); }
         });
+        document.fonts?.ready.then(() => root.querySelectorAll('.seq[data-flow]').forEach(el => fitDiagramLabels(el)));
     }
+
+    /* theme:diagram-labels-js:start */
+    /* Synced from theme/diagram-labels.js by theme/sync.mjs. Do not edit here. */
+    function fitDiagramLabels(root = document) {
+        const PAD = 6, GAP = 4, r1 = n => Math.round(n * 10) / 10;
+        let done = true;
+        root.querySelectorAll('g.edge-label').forEach(g => {
+            const text = g.querySelector(':scope > text');
+            if (!text) return;
+            const w = text.getComputedTextLength();
+            // 0: not laid out yet (a hidden panel or frame), so the next call fits it
+            if (!w) { done = false; return; }
+            let cx = parseFloat(g.dataset.cx);
+            if (Number.isNaN(cx)) {
+                const x = text.x.baseVal[0]?.value || 0, anchor = getComputedStyle(text).textAnchor;
+                cx = anchor === 'start' ? x + w / 2 : anchor === 'end' ? x - w / 2 : x;
+            }
+            text.setAttribute('x', r1(cx));
+            text.setAttribute('text-anchor', 'middle');
+            const left = cx - w / 2 - PAD;
+            const bg = g.querySelector(':scope > .edge-label-bg');
+            if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
+            const num = g.querySelector(':scope > .edge-label-num');
+            if (num) {
+                num.removeAttribute('transform');
+                try {
+                    const b = num.getBBox();
+                    num.setAttribute('transform', `translate(${r1(left - GAP - (b.x + b.width))} 0)`);
+                } catch { done = false; }
+            }
+        });
+        return done;
+    }
+    /* theme:diagram-labels-js:end */
 
     return { define, renderAll };
 })();

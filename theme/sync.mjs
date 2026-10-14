@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Copies theme/tokens.css, base.css, pdf.css and pdf.js into every skill template between marker comments,
+// Copies theme/tokens.css, base.css, pdf.css, pdf.js and the diagram scripts into every skill template between marker comments,
 // so each skill folder stays self-contained (`npx skills add` installs one folder only).
 // Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS).
 // Usage: node theme/sync.mjs          write the blocks and preview copies
@@ -19,8 +19,11 @@ const IGNORE = [/\/mock\/(page|shared|contract)\//, /\/generate-mock-ui\/templat
 
 // CRLF to LF: a Windows checkout has CRLF sources, and a bare '\r' line would get indented.
 const stripHeader = (css) => css.replace(/\r\n/g, '\n').replace(/^\/\*[\s\S]*?\*\/\s*/, '').trimEnd();
-// Marker name -> source file. pdf-js goes inside a <script>; the rest inside a <style> or .css file.
-const SOURCES = { tokens: 'tokens.css', base: 'base.css', pdf: 'pdf.css', 'pdf-js': 'pdf.js' };
+// Marker name -> source file. The *-js blocks go inside a <script> or .js file; the rest inside a <style> or .css file.
+const SOURCES = {
+    tokens: 'tokens.css', base: 'base.css', pdf: 'pdf.css', 'pdf-js': 'pdf.js',
+    'diagram-labels-js': 'diagram-labels.js', 'diagram-embed-js': 'diagram-embed.js',
+};
 const BLOCKS = Object.fromEntries(Object.entries(SOURCES)
     .map(([name, file]) => [name, stripHeader(readFileSync(join(ROOT, 'theme', file), 'utf8'))]));
 

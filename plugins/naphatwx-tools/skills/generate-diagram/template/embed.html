@@ -1,0 +1,202 @@
+<!-- Diagram page kit: paste this whole file, unchanged, just before </body> of every diagram-design .html.
+     It adds the Export PDF button, fits each .edge-label box to its text, draws each SVG at 1:1, prints it fitted to the page width,
+     and keeps the embed contract with a host page (iframe height and width). -->
+<style>
+    /* theme:tokens:start */
+    /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+    :root {
+        color-scheme: dark;
+
+        /* Surfaces, darkest first */
+        --bg: #121316;
+        --surface: #18191d;
+        --surface-2: #1f2025;
+        --surface-3: #24262c;
+        --line: #26282e;
+        --line-strong: #363940;
+        --line-3: #4a4d55;
+        /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+        --hover: #33353b;
+
+        /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+        --text: #e2e3e7;
+        --text-2: #c6c8cf;
+        --text-3: #a3a6b0;
+
+        /* One accent */
+        --accent: #8ab0ff;
+        --accent-fill: #1b2232;
+        --accent-soft: rgba(138, 176, 255, 0.12);
+
+        /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+        --ok: #8fd694;
+        --warn: #f0c26b;
+        --bad: #f28b8d;
+        --neutral: #a3a6b0;
+        --ok-soft: rgba(143, 214, 148, 0.12);
+        --warn-soft: rgba(240, 194, 107, 0.12);
+        --bad-soft: rgba(242, 139, 141, 0.12);
+        --neutral-soft: rgba(163, 166, 176, 0.12);
+        --add: var(--ok);
+        --change: var(--warn);
+        --drop: var(--bad);
+
+        /* Diagrams: connectors and their labels */
+        --connector: #6b6e78;
+
+        /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+        /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
+        --fs-xs: 0.75rem;
+        --fs-sm: 0.875rem;
+        --fs-md: 1rem;
+        --fs-lg: 1.25rem;
+        --fs-xl: 1.5rem;
+        --fs-2xl: 2rem;
+        /* Headings and lead line: the same steps on every page */
+        --fs-lead: var(--fs-lg);
+        --fs-h3: var(--fs-lg);
+        --fs-h2: var(--fs-xl);
+        --fs-h1: var(--fs-2xl);
+        /* Roles: one step down per role, so the eye lands on body text first.
+           body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+        --fs-body: var(--fs-md);
+        --fs-meta: var(--fs-sm);
+        --fs-code: var(--fs-sm);
+        --fs-tag: var(--fs-xs);
+        /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+        --fs-dia: var(--fs-sm);
+        --fs-dia-sub: var(--fs-xs);
+
+        /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px, 6xl 1152px, 7xl 1280px). Use these, not raw px */
+        --max-w-md: 28rem;
+        --max-w-3xl: 48rem;
+        --max-w-4xl: 56rem;
+        --max-w-5xl: 64rem;
+        --max-w-6xl: 72rem;
+        --max-w-7xl: 80rem;
+
+        /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-3xl */
+        --page-w: min(80%, var(--max-w-3xl));
+        --gutter: clamp(16px, 3vw, 24px);
+
+        --radius: 6px;
+        --radius-lg: 10px;
+        --ease: cubic-bezier(0.2, 0, 0, 1);
+    }
+    /* theme:tokens:end */
+    /* theme:pdf:start */
+    /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+    /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
+    .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
+    .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+    .float-bar button:hover { background: var(--hover); color: var(--text); }
+    /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
+       An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
+    body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }
+    @page { margin: 0; }
+    @media print {
+        html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .no-print { display: none !important; }
+        body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
+        pre, figure, img, svg, tr { break-inside: avoid; }
+        h1, h2, h3 { break-after: avoid; }
+    }
+    /* theme:pdf:end */
+    .edge-label-bg { fill: var(--surface); }
+</style>
+<script>
+    /* theme:pdf-js:start */
+    /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+    function addExportPdf(target, prepare) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'export-pdf no-print';
+        if (!target) {
+            target = document.querySelector('.float-bar');
+            if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+        }
+        b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+        b.textContent = 'Export PDF';
+        b.addEventListener('click', async () => {
+            if (prepare) await prepare();
+            window.print();
+        });
+        target.append(b);
+        return b;
+    }
+    /* theme:pdf-js:end */
+    /* theme:diagram-labels-js:start */
+    /* Synced from theme/diagram-labels.js by theme/sync.mjs. Do not edit here. */
+    function fitDiagramLabels(root = document) {
+        const PAD = 6, GAP = 4, r1 = n => Math.round(n * 10) / 10;
+        let done = true;
+        root.querySelectorAll('g.edge-label').forEach(g => {
+            const text = g.querySelector(':scope > text');
+            if (!text) return;
+            const w = text.getComputedTextLength();
+            // 0: not laid out yet (a hidden panel or frame), so the next call fits it
+            if (!w) { done = false; return; }
+            let cx = parseFloat(g.dataset.cx);
+            if (Number.isNaN(cx)) {
+                const x = text.x.baseVal[0]?.value || 0, anchor = getComputedStyle(text).textAnchor;
+                cx = anchor === 'start' ? x + w / 2 : anchor === 'end' ? x - w / 2 : x;
+            }
+            text.setAttribute('x', r1(cx));
+            text.setAttribute('text-anchor', 'middle');
+            const left = cx - w / 2 - PAD;
+            const bg = g.querySelector(':scope > .edge-label-bg');
+            if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
+            const num = g.querySelector(':scope > .edge-label-num');
+            if (num) {
+                num.removeAttribute('transform');
+                try {
+                    const b = num.getBBox();
+                    num.setAttribute('transform', `translate(${r1(left - GAP - (b.x + b.width))} 0)`);
+                } catch { done = false; }
+            }
+        });
+        return done;
+    }
+    /* theme:diagram-labels-js:end */
+    /* theme:diagram-embed-js:start */
+    /* Synced from theme/diagram-embed.js by theme/sync.mjs. Do not edit here. */
+    (function () {
+        const embedded = parent !== window;
+        const style = document.createElement('style');
+        // Embedded, the bottom padding stays: the fixed Export PDF bar sits in it, under the drawing.
+        // Print: each drawing shrinks to the page width instead of being cut off.
+        style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
+            .embedded body { padding: 1rem 1rem var(--float-space, 1rem); }
+            .embedded .eyebrow, .embedded h1 { display: none; }
+            @media print { svg[viewBox]:not(svg svg) { max-width: 100% !important; height: auto !important; } }`;
+        document.head.append(style);
+        if (embedded) { document.documentElement.classList.add('embedded'); document.documentElement.style.overflowY = 'hidden'; }
+        // Each diagram draws at its viewBox width, never scaled, so labels render at their own size; a narrow frame scrolls it sideways.
+        const svgs = [...document.querySelectorAll('svg[viewBox]:not(svg svg)')];
+        svgs.forEach(svg => {
+            Object.assign(svg.style, { width: svg.viewBox.baseVal.width + 'px', maxWidth: 'none', height: 'auto' });
+            if (getComputedStyle(svg.parentElement).overflowX === 'auto') return;
+            const box = document.createElement('div');
+            box.style.overflowX = 'auto';
+            svg.before(box);
+            box.append(svg);
+        });
+        addExportPdf();
+        // height: the body's box, padding included, not documentElement, whose scrollHeight never drops below the frame's height;
+        // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
+        const postSize = () => {
+            if (!embedded) return;
+            const cs = getComputedStyle(document.body);
+            const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+            parent.postMessage({ type: 'diagram-height', height: document.body.getBoundingClientRect().height, width }, '*');
+        };
+        const refresh = () => { fitDiagramLabels(); postSize(); };
+        addEventListener('load', refresh);
+        document.fonts?.ready.then(refresh);
+        new ResizeObserver(refresh).observe(document.body);
+    })();
+    /* theme:diagram-embed-js:end */
+</script>

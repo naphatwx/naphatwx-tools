@@ -12,6 +12,8 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 - Notes and `alt` / `else` conditions are a short phrase that names the real value, not a generic word: `permission redeployment.redeploy`, not `guards`; `status not AVAILABLE`, not `env unavailable`. Use simple words, not symbols (`not in`, never `∉` or `!=`; see the table in the flowchart reference). The full rule goes in `detail` or in the caller's rules list.
 - Every `detail` holds real values from the source: field names, permission keys, enum values, config keys, timeouts. Never a vague summary like `permission check, validation`. Same words-not-symbols rule.
 - Mark only writes that leave the service or must be audited as side effects (`hot`), so readers can scan for them.
+- Each message label is an `.edge-label` group (SKILL.md step 3): the text centers on the arrow's midpoint, `(x1 + x2) / 2`, never on the label and step number together. The step number badge sits just left of the label's box, outside it.
+- A self-call (a call to the same participant) draws a loop to the right of the lifeline; its label sits just above the loop's top line, centered on the loop's horizontal span, never `text-anchor="start"`. Leave room for half the label and its step badge on each side, inside the drawing.
 
 ## diagram-design mode
 
@@ -45,6 +47,7 @@ SeqDiagrams.define("01-cut-new-version", {
 ```
 
 - `title` names the flow in the SVG's accessible name (`<title>: sequence diagram, N participants, M steps`); missing → the file id.
+- A step whose `from` and `to` are the same participant draws a self-call loop.
 - Actor names and message labels are 14px; actor subtitles, step numbers, notes, phase and frame labels are 12px. `render.js` spreads the participants until their boxes and message labels fit (`gap` is the minimum), and gives the SVG its own `width` / `height`: hosts draw it at 1:1, never scaled, and a box narrower than it scrolls sideways.
 
 | Step | Meaning |
@@ -63,4 +66,5 @@ SeqDiagrams.define("01-cut-new-version", {
 ## Checks
 
 - Every `alt` / `opt` / `loop` has its `end`; every actor used in a step is in `actors`.
+- Every message label is centered on its arrow, its box fits the text, and its step number sits left of the box.
 - The page draws with no "Missing diagram file" text and no `[seq]` length warnings in the console (a single long name such as an RPC is fine).

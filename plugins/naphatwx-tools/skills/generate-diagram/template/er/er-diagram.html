@@ -122,10 +122,14 @@
         .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
         .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
         .float-bar button:hover { background: var(--hover); color: var(--text); }
+        /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
+           An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
+        body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }
         @page { margin: 0; }
         @media print {
             html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .no-print { display: none !important; }
+            body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
         }
@@ -339,24 +343,23 @@
                 const n = into[to], i = seen[to] = (seen[to] ?? -1) + 1;
                 b.y += n > 1 ? (i - (n - 1) / 2) * Math.min(8, 16 / (n - 1)) : 0;
                 const lane = 18 + (k % 6) * 12;
-                let d, ax, bx, ad, bd;
+                let ax, bx, x;
                 if (a.t.x === b.t.x) {
-                    ax = bx = a.t.x + W; ad = bd = 1;
-                    const x = ax + lane;
-                    d = `M${ax},${a.y} H${x} V${b.y} H${bx}`;
+                    ax = bx = a.t.x + W;
+                    x = ax + lane;
                 } else {
                     const right = a.t.x < b.t.x;
                     ax = right ? a.t.x + W : a.t.x; bx = right ? b.t.x : b.t.x + W;
-                    ad = right ? 1 : -1; bd = -ad;
-                    const x = right ? ax + lane : ax - lane;
-                    d = `M${ax},${a.y} H${x} V${b.y} H${bx}`;
+                    x = right ? ax + lane : ax - lane;
                 }
+                const d = `M${ax},${a.y} H${x} V${b.y} H${bx}`;
                 const cls = isNew ? "fk new" : "fk";
                 return `<g class="rel" data-a="${a.t.id}" data-b="${b.t.id}">`
                     + `<path class="${cls}" d="${d}"/>`
                     + `<circle class="fk-dot${isNew ? " new" : ""}" cx="${bx}" cy="${b.y}" r="3"/>`
-                    + `<text class="fk-card" x="${ax + ad * 6}" y="${a.y - 5}" text-anchor="${ad > 0 ? "start" : "end"}">${esc(fc)}</text>`
-                    + (i ? "" : `<text class="fk-card" x="${bx + bd * 6}" y="${b.y - 9}" text-anchor="${bd > 0 ? "start" : "end"}">${esc(tc)}</text>`)
+                    // each cardinality centers on the level stub it labels: table edge to the lane
+                    + `<text class="fk-card" x="${(ax + x) / 2}" y="${a.y - 5}" text-anchor="middle">${esc(fc)}</text>`
+                    + (i ? "" : `<text class="fk-card" x="${(x + bx) / 2}" y="${b.y - 9}" text-anchor="middle">${esc(tc)}</text>`)
                     + `<title>${esc(from)} → ${esc(to)}</title></g>`;
             });
 

@@ -46,12 +46,12 @@ What each type and mode writes:
 ```mermaid
 graph LR
     subgraph DD["diagram-design mode"]
-        D1["flowchart: NN-slug.html + embed script"]
-        D2["sequence: NN-slug.html + embed script, step details fragment in the reply"]
-        D3["er: er-diagram.html, or er-area.html per area over 5 tables"]
+        D1["flowchart: NN-slug.html + page kit"]
+        D2["sequence: NN-slug.html + page kit, step details fragment in the reply"]
+        D3["er: er-diagram.html + page kit, or er-area.html per area over 5 tables"]
     end
     subgraph MAN["manual mode"]
-        M1["flowchart: NN-slug.svg from template/flowchart/"]
+        M1["flowchart: NN-slug.html from template/flowchart/"]
         M2["sequence: NN-slug.js + render.js, + index.html when no host page"]
         M3["er: er-diagram.html from template/er/"]
     end
@@ -63,10 +63,11 @@ How a host page shows a diagram (design-feature's `overview.html`):
 sequenceDiagram
     participant H as Host page
     participant F as Diagram file
-    H->>F: load in iframe.diagram-frame, or img, or script src
+    H->>F: load in iframe.diagram-frame, or script src
     F->>F: embedded? add class embedded, hide its own title
+    F->>F: fit each label box to its text, add the Export PDF button
     F->>F: draw each SVG at its viewBox width, 1:1, scroll sideways when narrow
-    F-->>H: postMessage diagram-height (height, width) on every resize
+    F-->>H: postMessage diagram-height (height with the room under the button, width) on every resize
     H->>H: size the iframe to that height; the lightbox scales the full width to fit
 ```
 
@@ -77,6 +78,8 @@ Rules the diagrams don't show:
 - Dark only, in the shared theme. Main labels are 14px, secondary lines 12px. Manual-mode files load nothing from the network.
 - It writes only the diagram files. It never edits the caller's page; it gives the embed snippet instead.
 - An ER diagram is its own page, opened by a link, not embedded.
+- Every diagram file has one Export PDF button, the same everywhere. It prints only that diagram, fitted to the page width. The page keeps room under its last line, so the button never covers the drawing.
+- Every message, edge and relation label is centered on its line. Its box is fitted to the rendered text in the browser; a step number sits left of the box.
 
 ## Input → output
 
@@ -85,11 +88,11 @@ Input: `<flowchart | sequence | er> <source> [output-path] [mode=diagram-design|
 - Type missing → inferred from the request, else asked once.
 - Output path missing → `diagrams/` at the project root.
 
-Output (manual mode shown; diagram-design mode writes `NN-<slug>.html` for flowchart and sequence):
+Output (manual mode shown; diagram-design mode writes `NN-<slug>.html` for sequence too):
 
 ```
 diagrams/
-├── 01-<slug>.svg        flowchart, one per flow
+├── 01-<slug>.html       flowchart, one per flow, Export PDF
 ├── 01-<slug>.js         sequence, one per flow: SeqDiagrams.define(...)
 ├── render.js            sequence: draws every .js flow as inline SVG
 ├── index.html           sequence: host page, only when no caller page loads the flows
@@ -106,7 +109,8 @@ Plus, in chat: the mode used, the embed snippet per file, and every `TBD` and op
 | [references/flowchart.md](references/flowchart.md) | Flowchart shapes, detail lines with real values, words-not-symbols table, checks |
 | [references/sequence.md](references/sequence.md) | Sequence labels, step format, step details fragment, checks |
 | [references/er.md](references/er.md) | What tables to include, change tags, layout, checks |
-| [template/flowchart/](template/flowchart/) | Example flowchart `.svg` with the theme's hex colors |
+| [template/flowchart/](template/flowchart/) | Example flowchart `.html`: inline SVG, Export PDF, the embed contract |
+| [template/embed.html](template/embed.html) | Page kit pasted into every diagram-design file: Export PDF, label fitting, the embed contract |
 | [template/sequence-diagram/](template/sequence-diagram/) | `render.js`, an example flow `.js` and the `index.html` host page |
 | [template/er/](template/er/) | `er-diagram.html`: the `ER` object, hover to trace relations, Export PDF |
 

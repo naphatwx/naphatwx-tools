@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Example flow</title>
+  <style>
+    /* theme:tokens:start */
+    /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+    :root {
+        color-scheme: dark;
+
+        /* Surfaces, darkest first */
+        --bg: #121316;
+        --surface: #18191d;
+        --surface-2: #1f2025;
+        --surface-3: #24262c;
+        --line: #26282e;
+        --line-strong: #363940;
+        --line-3: #4a4d55;
+        /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+        --hover: #33353b;
+
+        /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+        --text: #e2e3e7;
+        --text-2: #c6c8cf;
+        --text-3: #a3a6b0;
+
+        /* One accent */
+        --accent: #8ab0ff;
+        --accent-fill: #1b2232;
+        --accent-soft: rgba(138, 176, 255, 0.12);
+
+        /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+        --ok: #8fd694;
+        --warn: #f0c26b;
+        --bad: #f28b8d;
+        --neutral: #a3a6b0;
+        --ok-soft: rgba(143, 214, 148, 0.12);
+        --warn-soft: rgba(240, 194, 107, 0.12);
+        --bad-soft: rgba(242, 139, 141, 0.12);
+        --neutral-soft: rgba(163, 166, 176, 0.12);
+        --add: var(--ok);
+        --change: var(--warn);
+        --drop: var(--bad);
+
+        /* Diagrams: connectors and their labels */
+        --connector: #6b6e78;
+
+        /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+        /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
+        --fs-xs: 0.75rem;
+        --fs-sm: 0.875rem;
+        --fs-md: 1rem;
+        --fs-lg: 1.25rem;
+        --fs-xl: 1.5rem;
+        --fs-2xl: 2rem;
+        /* Headings and lead line: the same steps on every page */
+        --fs-lead: var(--fs-lg);
+        --fs-h3: var(--fs-lg);
+        --fs-h2: var(--fs-xl);
+        --fs-h1: var(--fs-2xl);
+        /* Roles: one step down per role, so the eye lands on body text first.
+           body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+        --fs-body: var(--fs-md);
+        --fs-meta: var(--fs-sm);
+        --fs-code: var(--fs-sm);
+        --fs-tag: var(--fs-xs);
+        /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+        --fs-dia: var(--fs-sm);
+        --fs-dia-sub: var(--fs-xs);
+
+        /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px, 6xl 1152px, 7xl 1280px). Use these, not raw px */
+        --max-w-md: 28rem;
+        --max-w-3xl: 48rem;
+        --max-w-4xl: 56rem;
+        --max-w-5xl: 64rem;
+        --max-w-6xl: 72rem;
+        --max-w-7xl: 80rem;
+
+        /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-3xl */
+        --page-w: min(80%, var(--max-w-3xl));
+        --gutter: clamp(16px, 3vw, 24px);
+
+        --radius: 6px;
+        --radius-lg: 10px;
+        --ease: cubic-bezier(0.2, 0, 0, 1);
+    }
+    /* theme:tokens:end */
+    /* theme:base:start */
+    /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+    * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    code, kbd, pre, samp { font-family: var(--mono); }
+    /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
+    .label, th, dt { color: var(--text-2); font-weight: 600; }
+    /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
+    th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
+    /* theme:base:end */
+    /* theme:pdf:start */
+    /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+    /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
+    .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
+    .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+    .float-bar button:hover { background: var(--hover); color: var(--text); }
+    /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
+       An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
+    body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }
+    @page { margin: 0; }
+    @media print {
+        html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .no-print { display: none !important; }
+        body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
+        pre, figure, img, svg, tr { break-inside: avoid; }
+        h1, h2, h3 { break-after: avoid; }
+    }
+    /* theme:pdf:end */
+
+    * { margin: 0; padding: 0; }
+    body { background: var(--surface); padding: 1.5rem var(--gutter); }
+    .frame { width: 100%; margin: 0 auto; }
+    /* text stays at the reading width; only the diagram is full width */
+    div.frame > :not(.diagram) { max-width: var(--page-w); margin-inline: auto; }
+    .eyebrow { font-size: var(--fs-body); color: var(--text-3); margin-bottom: 0.25rem; }
+    h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 1rem; }
+    /* Drawn at 1:1 (every label 14px), never scaled; a narrow window scrolls the diagram, not the page. */
+    .diagram { overflow-x: auto; }
+    .diagram svg { display: block; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
+    @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
+    .conn { fill: none; stroke: var(--connector); stroke-width: 1.6; }
+    .ah { fill: var(--connector); }
+    .exit { fill: var(--text-3); font-size: var(--fs-dia-sub); }
+    .edge-label-bg { fill: var(--surface); }
+    .node text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; text-anchor: middle; }
+    .node .detail { fill: var(--text-2); font-family: var(--mono); font-size: var(--fs-dia-sub); font-weight: 400; }
+    .pill { fill: var(--bg); stroke: var(--line-3); stroke-width: 1.4; }
+    .box { fill: var(--surface-3); stroke: var(--line-strong); stroke-width: 1.2; }
+    .decision { fill: var(--accent-fill); stroke: var(--accent); stroke-width: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Flow 01 · Flowchart</p>
+    <h1>Example flow</h1>
+    <div class="diagram">
+      <svg viewBox="0 0 760 376" width="760" height="376" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="example-flow-chart-title example-flow-chart-desc">
+        <title id="example-flow-chart-title">Example flow: flowchart, 7 nodes</title>
+        <desc id="example-flow-chart-desc">Open the form, check the thing.edit permission, validate the name, save it with CreateThing as ACTIVE, or show INVALID_ARGUMENT and retry.</desc>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+        <!-- Connectors first, behind nodes. The retry loop enters "Name valid?" on its own edge, not on the Yes connector. -->
+        <g class="conn" marker-end="url(#ah)">
+          <path d="M380,56 V84"/>
+          <path d="M500,134 H578"/>
+          <path d="M380,182 V214"/>
+          <path d="M500,264 H578"/>
+          <path d="M260,264 H202"/>
+          <path d="M660,290 V316"/>
+          <path d="M120,236 V200 H325 V234"/>
+        </g>
+        <!-- Exit labels center on their segment's midpoint (data-cx): above a level segment, on a vertical one.
+             The page script sizes each box to its text. -->
+        <g class="edge-label" data-cx="539"><rect class="edge-label-bg" x="525" y="114" width="28" height="16" rx="3"/><text class="exit" x="539" y="126" text-anchor="middle">No</text></g>
+        <g class="edge-label" data-cx="380"><rect class="edge-label-bg" x="364" y="190" width="32" height="16" rx="3"/><text class="exit" x="380" y="202" text-anchor="middle">Yes</text></g>
+        <g class="edge-label" data-cx="539"><rect class="edge-label-bg" x="523" y="244" width="32" height="16" rx="3"/><text class="exit" x="539" y="256" text-anchor="middle">Yes</text></g>
+        <g class="edge-label" data-cx="231"><rect class="edge-label-bg" x="217" y="244" width="28" height="16" rx="3"/><text class="exit" x="231" y="256" text-anchor="middle">No</text></g>
+        <g class="edge-label" data-cx="222.5"><rect class="edge-label-bg" x="202" y="180" width="41" height="16" rx="3"/><text class="exit" x="222.5" y="192" text-anchor="middle">Retry</text></g>
+        <g class="node"><rect class="pill" x="300" y="12" width="160" height="44" rx="22"/><text x="380" y="30">Open the form</text><text class="detail" x="380" y="48">/things/:id</text></g>
+        <g class="node"><polygon class="decision" points="380,86 500,134 380,182 260,134"/><text x="380" y="129">Can edit?</text><text class="detail" x="380" y="149">thing.edit</text></g>
+        <g class="node"><rect class="pill" x="580" y="112" width="160" height="44" rx="22"/><text x="660" y="130">No Edit button</text><text class="detail" x="660" y="148">read-only view</text></g>
+        <g class="node"><polygon class="decision" points="380,216 500,264 380,312 260,264"/><text x="380" y="259">Name valid?</text><text class="detail" x="380" y="279">name max 64 chars</text></g>
+        <g class="node"><rect class="box" x="40" y="238" width="160" height="52" rx="8"/><text x="120" y="259">Show error</text><text class="detail" x="120" y="279">INVALID_ARGUMENT</text></g>
+        <g class="node"><rect class="box" x="580" y="238" width="160" height="52" rx="8"/><text x="660" y="259">Save record</text><text class="detail" x="660" y="279">CreateThing</text></g>
+        <g class="node"><rect class="pill" x="580" y="318" width="160" height="44" rx="22"/><text x="660" y="336">Saved</text><text class="detail" x="660" y="354">status = ACTIVE</text></g>
+      </svg>
+    </div>
+  </div>
+  <script>
+    /* theme:pdf-js:start */
+    /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+    function addExportPdf(target, prepare) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'export-pdf no-print';
+        if (!target) {
+            target = document.querySelector('.float-bar');
+            if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+        }
+        b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+        b.textContent = 'Export PDF';
+        b.addEventListener('click', async () => {
+            if (prepare) await prepare();
+            window.print();
+        });
+        target.append(b);
+        return b;
+    }
+    /* theme:pdf-js:end */
+    /* theme:diagram-labels-js:start */
+    /* Synced from theme/diagram-labels.js by theme/sync.mjs. Do not edit here. */
+    function fitDiagramLabels(root = document) {
+        const PAD = 6, GAP = 4, r1 = n => Math.round(n * 10) / 10;
+        let done = true;
+        root.querySelectorAll('g.edge-label').forEach(g => {
+            const text = g.querySelector(':scope > text');
+            if (!text) return;
+            const w = text.getComputedTextLength();
+            // 0: not laid out yet (a hidden panel or frame), so the next call fits it
+            if (!w) { done = false; return; }
+            let cx = parseFloat(g.dataset.cx);
+            if (Number.isNaN(cx)) {
+                const x = text.x.baseVal[0]?.value || 0, anchor = getComputedStyle(text).textAnchor;
+                cx = anchor === 'start' ? x + w / 2 : anchor === 'end' ? x - w / 2 : x;
+            }
+            text.setAttribute('x', r1(cx));
+            text.setAttribute('text-anchor', 'middle');
+            const left = cx - w / 2 - PAD;
+            const bg = g.querySelector(':scope > .edge-label-bg');
+            if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
+            const num = g.querySelector(':scope > .edge-label-num');
+            if (num) {
+                num.removeAttribute('transform');
+                try {
+                    const b = num.getBBox();
+                    num.setAttribute('transform', `translate(${r1(left - GAP - (b.x + b.width))} 0)`);
+                } catch { done = false; }
+            }
+        });
+        return done;
+    }
+    /* theme:diagram-labels-js:end */
+    /* theme:diagram-embed-js:start */
+    /* Synced from theme/diagram-embed.js by theme/sync.mjs. Do not edit here. */
+    (function () {
+        const embedded = parent !== window;
+        const style = document.createElement('style');
+        // Embedded, the bottom padding stays: the fixed Export PDF bar sits in it, under the drawing.
+        // Print: each drawing shrinks to the page width instead of being cut off.
+        style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
+            .embedded body { padding: 1rem 1rem var(--float-space, 1rem); }
+            .embedded .eyebrow, .embedded h1 { display: none; }
+            @media print { svg[viewBox]:not(svg svg) { max-width: 100% !important; height: auto !important; } }`;
+        document.head.append(style);
+        if (embedded) { document.documentElement.classList.add('embedded'); document.documentElement.style.overflowY = 'hidden'; }
+        // Each diagram draws at its viewBox width, never scaled, so labels render at their own size; a narrow frame scrolls it sideways.
+        const svgs = [...document.querySelectorAll('svg[viewBox]:not(svg svg)')];
+        svgs.forEach(svg => {
+            Object.assign(svg.style, { width: svg.viewBox.baseVal.width + 'px', maxWidth: 'none', height: 'auto' });
+            if (getComputedStyle(svg.parentElement).overflowX === 'auto') return;
+            const box = document.createElement('div');
+            box.style.overflowX = 'auto';
+            svg.before(box);
+            box.append(svg);
+        });
+        addExportPdf();
+        // height: the body's box, padding included, not documentElement, whose scrollHeight never drops below the frame's height;
+        // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
+        const postSize = () => {
+            if (!embedded) return;
+            const cs = getComputedStyle(document.body);
+            const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+            parent.postMessage({ type: 'diagram-height', height: document.body.getBoundingClientRect().height, width }, '*');
+        };
+        const refresh = () => { fitDiagramLabels(); postSize(); };
+        addEventListener('load', refresh);
+        document.fonts?.ready.then(refresh);
+        new ResizeObserver(refresh).observe(document.body);
+    })();
+    /* theme:diagram-embed-js:end */
+  </script>
+</body>
+</html>

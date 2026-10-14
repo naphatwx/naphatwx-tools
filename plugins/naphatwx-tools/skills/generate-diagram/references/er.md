@@ -11,7 +11,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
 
 ## diagram-design mode
 
-- Ask for a **Database Schema** diagram (`type-db-schema`: FK lines column to column, `ON DELETE` label when the source gives one), dark theme, in the theme's colors and type (SKILL.md hard rule 4); save it as `er-diagram.html`. No embed script: it is a page, not an iframe.
+- Ask for a **Database Schema** diagram (`type-db-schema`: FK lines column to column, `ON DELETE` label when the source gives one), dark theme, in the theme's colors and type (SKILL.md hard rule 4); save it as `er-diagram.html`. Paste the page kit (SKILL.md step 3) before `</body>`: it adds the Export PDF button and fits each relationship label (`ON DELETE`) centered on its line. The page is opened by a link, not an iframe, so the embed part stays idle.
 - Over its budget (5 tables, 8 columns each) → split by area (for example catalog, ordering) into `er-<area>.html`, one link per page. Every table appears in at least one page; a table shared by two areas appears in both.
 
 ## Manual mode
@@ -22,6 +22,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
     - Layout: at most 4 grid columns; put a child next to its parent; keep FK lines short and avoid lines that cross a table.
 - The `← Overview` link points at `../overview.html#database` for design-feature. No such page → remove the link.
 - It draws any number of tables; split by area only when one page gets hard to read (more than about 12 tables).
+- Each cardinality label (`N`, `1`) centers on the level stub it labels, from the table edge to the line's lane.
 - Table names and columns are 14px, tags, types, keys and cardinality 12px; tables share one width that fits their longest name, key and type. The diagram draws at 1:1, never scaled, and scrolls sideways when wider than the window; hovering or tabbing to a table traces its relations.
 
 ## Checks

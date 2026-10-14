@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9.209
+
+**Every diagram: one Export PDF button, centered labels, room under the button**
+
+- Every diagram file has the same Export PDF button (`.float-bar` + `addExportPdf()`). It prints only that diagram, fitted to the page width, without the button.
+    - Flowcharts get it too. Manual flowcharts are now `NN-<slug>.html` pages, embedded by an iframe like diagram-design files, not an `.svg` in an `<img>`.
+    - diagram-design files (flowchart, sequence, ER) paste one page kit, generate-diagram's `template/embed.html`. It replaces the embed script that SKILL.md held inline.
+- Labels center on their line: message labels on the arrow's midpoint, self-call labels on the loop, flowchart exit labels on their segment, ER cardinality labels on their stub.
+    - The step number sits left of the label's box and never moves the label.
+    - The box behind a label is fitted to the rendered text in the browser, after fonts load, not guessed from a character count.
+    - `render.js` draws a call to the same participant as a self-call loop.
+- Room under the content: a page with a `.float-bar` gets 76px bottom padding (`--float-space`), so the button never covers the last line or the legend. An embedded diagram posts its height with that padding, so overview.html's iframe ends under the button. Print drops the padding and the button. html-presentation sets it back to 0.
+- theme: new `diagram-labels.js` (`fitDiagramLabels`) and `diagram-embed.js` (Export PDF, 1:1 SVGs, embed contract), synced by `theme/sync.mjs` into `theme:diagram-labels-js` and `theme:diagram-embed-js` blocks.
+
 ## 1.9.204
 
 **Wider open test in the e2e report**

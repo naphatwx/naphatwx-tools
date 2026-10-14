@@ -117,10 +117,14 @@ th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04e
 .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
 .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
 .float-bar button:hover { background: var(--hover); color: var(--text); }
+/* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
+   An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
+body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }
 @page { margin: 0; }
 @media print {
     html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .no-print { display: none !important; }
+    body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
     pre, figure, img, svg, tr { break-inside: avoid; }
     h1, h2, h3 { break-after: avoid; }
 }
@@ -336,6 +340,7 @@ html[data-all="on"] .panel::before { content: attr(data-label); display: block; 
 .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
 .seq .lbl { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
 .seq .lbl.hot { fill: var(--accent); }
+.seq .edge-label-bg { fill: var(--surface); }
 .seq .num { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
 .seq .phase line { stroke: var(--line); }
 .seq .phase rect { fill: var(--surface-2); }

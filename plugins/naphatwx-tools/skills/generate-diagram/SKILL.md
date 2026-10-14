@@ -10,7 +10,7 @@ Draw one diagram (or one set of the same type) into a file a browser can open or
 
 | Type | Shows | diagram-design mode | Manual mode |
 |------|-------|---------------------|-------------|
-| `flowchart` | A flow's logic: steps, yes / no decisions, loops, end states | `NN-<slug>.html` (its Flowchart type) | `NN-<slug>.svg` from `template/flowchart/` |
+| `flowchart` | A flow's logic: steps, yes / no decisions, loops, end states | `NN-<slug>.html` (its Flowchart type) | `NN-<slug>.html` from `template/flowchart/` |
 | `sequence` | Who calls whom, in what order, what comes back, which writes leave the service | `NN-<slug>.html` (its Sequence type) | `NN-<slug>.js` + `render.js` from `template/sequence-diagram/` |
 | `er` | Tables, columns, types, keys and foreign keys, with what changes | `er-diagram.html` (its Database Schema type) | `er-diagram.html` from `template/er/` |
 
@@ -26,7 +26,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - **Type**: missing → infer it from the request ("ER", "schema", "tables" → `er`; "who calls", "services" → `sequence`; "logic", "steps", "decisions" → `flowchart`). Still unclear → ask once (use AskUserQuestion when the agent has it).
 - **Source**: a brief (such as design-feature's `.parts/brief.md`), a spec folder or file, or a plain description. For `er` also: migration files, DDL, ORM models, or a live database read with read-only schema queries when the agent has a database tool.
-- **Output path**: a file or a folder. Missing → `diagrams/` at the project root. Name files `NN-<slug>` in reading order (`01-login.svg`); an ER page is `er-diagram.html`.
+- **Output path**: a file or a folder. Missing → `diagrams/` at the project root. Name files `NN-<slug>` in reading order (`01-login.html`); an ER page is `er-diagram.html`.
 - **Mode**: a caller that draws several diagrams passes it so they all match. Missing → pick it in step 2.
 
 ## Hard Rules
@@ -35,8 +35,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 2. Write only the output files. Never edit the caller's page (for example design-feature's `overview.html`); give it the embed snippet instead.
 3. Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split into several diagrams and say so. In diagram-design mode its own, tighter budgets win.
 4. Dark only, in the shared theme: no light palette, theme toggle or second palette, in either mode.
-    - Manual mode: every template's `<style>` holds the synced theme block (`theme:tokens` and `theme:base` markers). Keep it as-is and style only with its tokens (`var(--surface)`, `var(--accent)`, `var(--mono)`…); the standalone flowchart `.svg` uses the same hex values.
-    - The HTML templates (sequence viewer, ER diagram) have an **Export PDF** button: it opens the print dialog and fits the diagram to the page width. Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
+    - Manual mode: every template's `<style>` holds the synced theme block (`theme:tokens` and `theme:base` markers). Keep it as-is and style only with its tokens (`var(--surface)`, `var(--accent)`, `var(--mono)`…).
+    - **Every diagram file has one Export PDF button**, the same everywhere: the `.float-bar` at the bottom right, made by `addExportPdf()` from the synced `theme:pdf` / `theme:pdf-js` blocks. It opens the print dialog and prints only that diagram, fitted to the page width, without the button. The page keeps room under its last line (`theme:pdf` pads the body), so the button never covers the drawing, also inside a host's iframe.
+        - Manual templates (flowchart, sequence viewer, ER) already have it: keep the `theme:` blocks and the `addExportPdf(...)` call.
+        - diagram-design files get it from the page kit, `template/embed.html` (step 3). Never copy or restyle the button.
     - diagram-design mode: use the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) and skip its first-run style-guide question (the answer is always "proceed with the default"). Brief it so its output matches manual mode:
         - Colors: only the theme's values, the hexes in the `theme:tokens` block of `template/er/er-diagram.html`. Map its defaults: paper `#2d3142` → `#18191d`; `#393e53` → `#1f2025`; `#41465b` → `#363940`; ink `#f5f5f5` → `#e2e3e7`; muted `#bfc0c0` → `#c6c8cf`; tags `#8e98ac` → `#a3a6b0`; accent `#f08a59` → `#8ab0ff`; blue `#274a73` → `#1b2232`; amber → `#f0c26b`; red `#ab5258` → `#f28b8d`; connectors `#6b6e78`.
         - Type: main labels 14px (`font-size` 14 in viewBox units); secondary lines (detail, exit label, note, sub, type) 12px. Shapes keep the size that fits 14px. Hosts draw the SVG at 1:1, never scaled, so keep the viewBox at most about 1000 wide (wider scrolls sideways). Sentence case labels (`Yes`, `Retry`, `1 · Load`): no all-caps or letter-spaced tags. No dot-grid or patterned background.
@@ -61,49 +63,30 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 3. Draw
 
 - Read the reference for the type and follow it: [flowchart](references/flowchart.md), [sequence](references/sequence.md), [er](references/er.md).
-- diagram-design mode, `flowchart` and `sequence`: add this embed script just before `</body>` of every saved `.html`, unchanged. It is the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
-    - Size: it posts `diagram-height` with `height` and `width` on every resize. The host sizes the iframe to the height (no fixed height); its lightbox uses the width to show the whole drawing, scaled.
-    - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
-    - Width: each SVG draws at exactly its viewBox width (1:1, so labels render at their own size) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host.
+- **Labels center on their line** (every type, both modes). Each message, edge and relation label is one group; the page script fits it at render time (after fonts load), so never size a box from a character count:
 
 ```html
-<script>
-  // Embed contract with a host page such as design-feature's overview.html (postMessage works on file://).
-  // Out: {type: "diagram-height", height, width} on every resize, so the host sizes the iframe.
-  const embedded = parent !== window;
-  const style = document.createElement("style");
-  style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
-    .embedded body { padding: 1rem; }
-    .embedded .eyebrow, .embedded h1 { display: none; }`;
-  document.head.append(style);
-  // Embedded: the host shows the title and sizes the height, so the file drops its own heading.
-  if (embedded) { document.documentElement.classList.add("embedded"); document.documentElement.style.overflowY = "hidden"; }
-  // Draw each diagram at its viewBox width, never scaled, so labels render at their own size; a narrow frame scrolls it sideways.
-  const svgs = [...document.querySelectorAll("svg[viewBox]:not(svg svg)")];
-  svgs.forEach(svg => {
-    Object.assign(svg.style, { width: svg.viewBox.baseVal.width + "px", maxWidth: "none", height: "auto" });
-    if (getComputedStyle(svg.parentElement).overflowX === "auto") return;
-    const box = document.createElement("div");
-    box.style.overflowX = "auto";
-    svg.before(box);
-    box.append(svg);
-  });
-  // height: body, not documentElement, whose scrollHeight never drops below the iframe's height;
-  // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
-  const postSize = () => {
-    const cs = getComputedStyle(document.body);
-    const width = Math.max(0, ...svgs.map(s => s.viewBox.baseVal.width)) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
-    parent.postMessage({ type: "diagram-height", height: document.body.getBoundingClientRect().height, width }, "*");
-  };
-  addEventListener("load", postSize);
-  new ResizeObserver(postSize).observe(document.body);
-</script>
+<g class="edge-label" data-cx="616">            <!-- data-cx: the midpoint of the line it labels -->
+  <rect class="edge-label-bg" y="281" height="18" rx="3"/>   <!-- x and width: set by the script -->
+  <text x="616" y="295" text-anchor="middle">SELECT infra.user</text>
+  <g class="edge-label-num"><circle cx="0" cy="290" r="11"/><text x="0" y="295" text-anchor="middle">5</text></g>
+</g>
 ```
+
+- The text centers on `data-cx`; the box fits the rendered text plus 6px each side, centered on the same x; the step badge (`.edge-label-num`, optional) moves to just left of the box, outside it. The label itself never moves for the badge.
+- `data-cx` per type: a message arrow → `(x1 + x2) / 2`; a self-call loop → the middle of the loop's horizontal span; a flowchart edge → the middle of the segment it labels (above a level segment, on a vertical one, the box hiding the line behind it); an ER relationship → the middle of its line or level stub.
+- Lay out room for the widest label and its badge (about 8.6px per 14px mono character, on the wide side); the script only fits the box and moves the badge.
+- diagram-design mode, every type: paste `template/embed.html` (the page kit) just before `</body>` of every saved `.html`, unchanged. It adds the Export PDF button and label fitting, and keeps the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
+    - Size: it posts `diagram-height` with `height` and `width` on every resize. The height includes the body's bottom padding, so the host's iframe keeps the room under the drawing where the Export PDF button sits. The host sizes the iframe to the height (no fixed height); its lightbox uses the width to show the whole drawing, scaled.
+    - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
+    - Width: each SVG draws at exactly its viewBox width (1:1, so labels render at their own size) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host. In print it shrinks to the page width.
 
 ### 4. Verify
 
 - Run the checks at the end of the type's reference.
 - Open each file in a headless browser when one is available: it draws, labels are not clipped, and the console has no `[seq]` or `[er]` warnings.
+    - Each file has one Export PDF button, and scrolled to the end, the last line and the legend sit fully above it.
+    - Each label's text is centered on its line, its box fits the text, and its step badge sits left of the box.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 5. Reply
@@ -113,8 +96,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 | Type · mode | Embed |
 |-------------|-------|
-| `flowchart` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>` (no inline height) |
-| `flowchart` · manual | `<img src="<dir>/NN-<slug>.svg" alt="…">` |
+| `flowchart` · either | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>` (no inline height) |
 | `sequence` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>`, plus its `<div class="seq-steps">` fragment (see the sequence reference) |
 | `sequence` · manual | `<div class="seq" data-flow="NN-<slug>">` with the `.seq-legend` line inside it (it stays under the drawing), plus `<script src="<dir>/render.js">` once, `<script src="<dir>/NN-<slug>.js">` per flow, then `SeqDiagrams.renderAll()` |
 | `er` · either | `<a href="<dir>/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a>` (one link per page when split) |
