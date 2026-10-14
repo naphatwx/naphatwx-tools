@@ -126,6 +126,12 @@ viewButtons.forEach(btn => {
     if (panel) panel.dataset.label = btn.textContent.trim();
     btn.addEventListener("click", () => selectView(btn));
 });
+function closeViews() {
+    document.querySelectorAll(".views").forEach(v => {
+        const btn = v.querySelector("button[aria-controls]");
+        if (btn) selectView(btn, false);
+    });
+}
 document.querySelectorAll(".panel").forEach(p => p.addEventListener("animationend", () => p.classList.remove("entering")));
 // a link into a closed view (Acceptance criteria → #sc-<id>) opens that view first, so the browser can scroll to it
 function reveal(id) {
@@ -157,7 +163,12 @@ function setAll(on) {
     store.set("plan-all", on ? "on" : "off");
 }
 setAll(store.get("plan-all") === "on");
-openAll.addEventListener("click", () => setAll(root.getAttribute("data-all") !== "on"));
+// Close all also closes views opened one by one (by a click or by Present), not only the stacked ones
+openAll.addEventListener("click", () => {
+    const on = root.getAttribute("data-all") !== "on";
+    if (!on) closeViews();
+    setAll(on);
+});
 // Lazy diagram frames never load off screen, so the PDF would print them empty: load them all first.
 const frames = [...document.querySelectorAll("iframe.diagram-frame")];
 frames.forEach(f => f.addEventListener("load", () => { f.dataset.loaded = "1"; }, { once: true }));
@@ -260,6 +271,9 @@ function setPresent(on) {
         hud.hidden = true;
         unfit();
         document.querySelectorAll(".step-off").forEach(el => el.classList.remove("step-off"));
+        // back in docs, only the view of the last step stays open
+        closeViews();
+        if (steps[current].tab) selectView(steps[current].tab, true);
         steps[current].slide.scrollIntoView({ behavior: "instant" });
     }
     presentBtn.setAttribute("aria-pressed", String(on));
