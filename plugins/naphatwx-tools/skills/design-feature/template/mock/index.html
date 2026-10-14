@@ -167,6 +167,10 @@
         .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 4px; }
         /* title, refs chip and plan link share one line; they wrap under the title on narrow screens */
         .uc-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .sc-kind.basic { color: var(--accent); }
+        .sc-kind.exception { color: var(--warn); }
         /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
         .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
         .refs-chip:hover { background: var(--hover); }
@@ -368,7 +372,7 @@
                 ? `<iframe title="${UI.esc(sc.title)} — interactive mock" src="${screenSrc(sc)}" width="${SCREEN_W}" height="${SCREEN_H}"></iframe>`
                 : `<div class="no-mock"><div class="font-semibold">No mock</div><p class="muted">${UI.esc(SURFACE[sc.surface] || sc.surface)} scenario — play it with play-scenarios or test it with e2e-test.</p></div>`;
             block.querySelector('.card').innerHTML = `${heads[sc.useCase]}
-              <div class="title-row"><h3 class="font-semibold">${UI.esc(sc.title)}</h3>${refsChip(sc.story)}<span class="t-code font-mono meta">${UI.esc(play ? stateOf(sc).label : 'no mock')}</span></div>
+              <div class="title-row"><h3 class="font-semibold">${UI.esc(sc.title)}</h3>${sc.kind ? `<span class="sc-kind ${UI.esc(sc.kind)}">${UI.esc(sc.kind)}</span>` : ''}${refsChip(sc.story)}<span class="t-code font-mono meta">${UI.esc(play ? stateOf(sc).label : 'no mock')}</span></div>
               <div class="frame mt-2">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>

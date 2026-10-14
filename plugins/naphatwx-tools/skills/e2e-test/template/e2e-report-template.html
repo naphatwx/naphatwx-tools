@@ -262,6 +262,10 @@
   .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
 
   /* Surface tag (ui / mcp / api / job): the runner that played the scenario. */
+  /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+  .sc-kind { flex: none; font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+  .sc-kind.basic { color: var(--accent); }
+  .sc-kind.exception { color: var(--warn); }
   .surface { flex: none; font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 0 6px; }
   .tools .sep { width: 1px; align-self: stretch; background: var(--line-strong); margin: 0 4px; }
   .vbody > .msgs { grid-area: err; display: grid; gap: 10px; min-width: 0; }
@@ -541,7 +545,8 @@ function testBox(t) {
   box.dataset.flags = String(flags);
   const toggle = el('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
     el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' && st(t.status).tone === 'bad' ? t.status : k),
-    t.surface ? el('span', { class: 'surface', title: 'Surface: ' + t.surface }, t.surface) : null, el('span', { class: 't' }, t.title));
+    t.surface ? el('span', { class: 'surface', title: 'Surface: ' + t.surface }, t.surface) : null, el('span', { class: 't' }, t.title),
+    t.scKind ? el('span', { class: 'sc-kind ' + t.scKind, title: 'Scenario kind' }, t.scKind) : null);
   const attempts = t.attempts || [];
   const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : t.retry ? ' · retry ' + t.retry : '';
   const where = t.runner === 'ai' ? 'AI tester' + (t.role ? ' as ' + t.role : '') : t.file;

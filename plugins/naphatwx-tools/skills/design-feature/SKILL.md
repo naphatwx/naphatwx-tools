@@ -85,7 +85,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - `scripts/scenarios-panels.js`: each use case's Scenarios button and panel.
     - `scripts/acceptance-section.js`: the Acceptance criteria section, between its `acceptance:start` / `acceptance:end` markers.
     - Every count you report (scenarios per use case, total, acceptance coverage) comes from a script's output, never an estimate.
-10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. The generated views use its classes: `.ch-tag` (channel tag), `.aside.na` (n/a reason), `.ac-table` / `.ac-cover` / `.ac-gap` (Acceptance criteria) and `.nowrap` (Play cells).
+10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. The generated views use its classes: `.ch-tag` (channel tag), `.sc-kind` (scenario kind), `.aside.na` (n/a reason), `.ac-table` / `.ac-cover` / `.ac-gap` (Acceptance criteria) and `.nowrap` (Play cells).
 
 ## Workflow
 

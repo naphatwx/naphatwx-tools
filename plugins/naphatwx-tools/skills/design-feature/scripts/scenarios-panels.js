@@ -53,9 +53,10 @@ const scsOf = ucId => SCS.filter(s => s.useCase === ucId);
 const playCell = s => playable(s) ? `<a href="${esc(href(s))}" ${ext}>Play ↗</a>`
     : !hasMock ? '' : `<span class="aside">${(s.surface || 'ui') === 'ui' ? 'not in the mock' : 'No mock'}</span>`;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
-// channel tag (ui / mcp / api / job), title + story chip, first expect line, then one muted line per "na" reason
+// channel tag (ui / mcp / api / job), title + kind + story chip, first expect line, then one muted line per "na" reason
 const naLines = s => s.na && typeof s.na === 'object' ? Object.entries(s.na).map(([k, why]) => `<br><span class="aside na">${esc(k)} n/a: ${esc(why)}</span>`).join('') : '';
-const scenarioCell = s => `${s.surface ? `<span class="ch-tag">${esc(s.surface)}</span> ` : ''}${esc(s.title)} <span class="refs">${esc(s.story)}</span>`
+const kindTag = s => s.kind ? ` <span class="sc-kind ${esc(s.kind)}">${esc(s.kind)}</span>` : '';
+const scenarioCell = s => `${s.surface ? `<span class="ch-tag">${esc(s.surface)}</span> ` : ''}${esc(s.title)}${kindTag(s)} <span class="refs">${esc(s.story)}</span>`
     + `<br><span class="aside">${esc((s.expect || [])[0] || '')}</span>${naLines(s)}`;
 
 // ---------------------------------------------------------------- "Open the mock" link on the Use cases heading

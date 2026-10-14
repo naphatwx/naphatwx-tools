@@ -15,7 +15,7 @@ Build a clickable mock of a planned feature, in one of two modes:
 
 Standalone mode builds `mock/` — a clickable mock that opens straight from disk and doubles as the frontend contract. The mock is **only an interactive UI**: the app's real design system, with data shaped like the real API answers.
 
-- Its index shows the same tree as every skill that plays or tests the feature: each **use case**, then its **scenarios** in file order, each with a small surface tag (`ui` / `mcp` / `api` / `job`).
+- Its index shows the same tree as every skill that plays or tests the feature: each **use case**, then its **scenarios** in file order, each with a small surface tag (`ui` / `mcp` / `api` / `job`). The picked scenario's title shows its kind (`basic`, `alternate`, `exception`).
 - A `ui` scenario plays on the real screen in a frame.
 - An `mcp`, `api` or `job` scenario stays in the tree, greyed. Picking it shows an empty frame with "No mock". There is no fake API call, console or request / response play for it: the `play-scenarios` and `e2e-test` skills cover those.
 

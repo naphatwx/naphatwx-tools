@@ -486,6 +486,10 @@ tr:target > td { background: var(--accent-soft); }
 /* Channel tag (ui / mcp / api / job) in the Scenarios views and Acceptance criteria; .gap = no scenario on it */
 .ch-tag { display: inline-block; min-width: 3.4em; margin-right: 6px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 999px; font: 500 var(--fs-tag)/1.5 var(--mono); color: var(--text-2); text-align: center; text-transform: uppercase; vertical-align: 1px; }
 .ch-tag.gap { color: var(--warn); border-color: var(--warn); }
+/* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+.sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+.sc-kind.basic { color: var(--accent); }
+.sc-kind.exception { color: var(--warn); }
 td .aside.na { color: var(--text-3); }
 .ac-table { margin-top: 10px; }
 .ac-table td:first-child { width: 58%; }

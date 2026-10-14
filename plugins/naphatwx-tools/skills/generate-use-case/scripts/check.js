@@ -39,6 +39,8 @@ try {
 } catch (e) { errors.push(`${file} is missing or not strict JSON: ${e.message}`); }
 
 const SURFACES = ['ui', 'mcp', 'api', 'job'];
+// basic: the main path to the goal; alternate: another path that still reaches it; exception: the goal is not reached
+const KINDS = ['basic', 'alternate', 'exception'];
 
 /** Story refs as tokens: "US1 · AC2–4 · FR-003" → US1·AC2, US1·AC3, US1·AC4, FR-003. */
 function storyTokens(story) {
@@ -74,6 +76,8 @@ for (const s of SCS) {
     if (s.id && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(s.id)) errors.push(`${name}: id must be kebab-case`);
     for (const k of ['id', 'useCase', 'title', 'story', 'surface', 'when']) if (s[k] == null || s[k] === '') errors.push(`${name}: missing ${k}`);
     if (!Array.isArray(s.expect) || !s.expect.length) errors.push(`${name}: expect must be a non-empty array`);
+    if (s.kind == null) warnings.push(`${name}: no kind; set "kind" to ${KINDS.join(', ')}`);
+    else if (!KINDS.includes(s.kind)) errors.push(`${name}: kind must be one of ${KINDS.join(', ')}`);
     if (s.surface && !SURFACES.includes(s.surface)) errors.push(`${name}: surface must be one of ${SURFACES.join(', ')}`);
     if (s.useCase && !ucIds.has(s.useCase)) errors.push(`${name}: use case ${s.useCase} is not in USE_CASES`);
     const uc = UCS.find(c => c.id === s.useCase);
@@ -90,6 +94,11 @@ for (const c of UCS) {
     if (!Array.isArray(c.channels) || c.none) continue;
     const mine = SCS.filter(s => s.useCase === c.id);
     for (const k of c.channels) if (!mine.some(s => s.surface === k)) errors.push(`use case ${c.id}: channel ${k} has no scenario; add one or drop ${k} from channels`);
+    for (const k of c.channels) {
+        const basics = mine.filter(s => s.surface === k && s.kind === 'basic').map(s => s.id);
+        if (basics.length > 1) errors.push(`use case ${c.id}: ${basics.length} basic ${k} scenarios (${basics.join(', ')}); keep one main path, mark the others alternate`);
+        if (!basics.length && mine.some(s => s.surface === k && s.kind)) warnings.push(`use case ${c.id}: no basic ${k} scenario; mark its main path "kind": "basic"`);
+    }
     for (const s of mine) {
         const tokens = storyTokens(s.story);
         const acs = acTokens(s);
@@ -146,12 +155,14 @@ for (const s of SCS) {
 
 const bySurface = list => Object.fromEntries(SURFACES.map(k => [k, list.filter(s => s.surface === k).length]));
 const surfaceText = o => SURFACES.filter(k => o[k]).map(k => `${o[k]} ${k}`).join(', ');
+const byKind = list => Object.fromEntries(KINDS.map(k => [k, list.filter(s => s.kind === k).length]));
 const perUseCase = UCS.map(c => { const l = SCS.filter(s => s.useCase === c.id); return { useCase: c.id, title: c.title, channels: c.channels || [], count: l.length, perSurface: bySurface(l) }; });
 const perSurface = bySurface(SCS);
+const perKind = byKind(SCS);
 const acceptance = ACS == null ? null : { total: acCoverage.length, fullyCovered: acCoverage.filter(r => !r.missing.length).length, rows: acCoverage };
-if (asJson) out(JSON.stringify({ useCases: UCS.length, scenarios: SCS.length, perUseCase, perSurface, acceptance, errors, warnings }, null, 2));
+if (asJson) out(JSON.stringify({ useCases: UCS.length, scenarios: SCS.length, perUseCase, perSurface, perKind, acceptance, errors, warnings }, null, 2));
 else {
-    out(`${count(UCS.length, 'use case')}, ${count(SCS.length, 'scenario')} (${surfaceText(perSurface)})`);
+    out(`${count(UCS.length, 'use case')}, ${count(SCS.length, 'scenario')} (${surfaceText(perSurface)}; ${KINDS.map(k => `${perKind[k]} ${k}`).join(', ')})`);
     perUseCase.forEach(c => out(`  ${c.useCase} ${c.title} [${c.channels.join(', ')}]: ${c.count} (${surfaceText(c.perSurface)})`));
     if (acceptance) out(`${acceptance.total} acceptance criteri${acceptance.total === 1 ? 'on' : 'a'}: ${acceptance.fullyCovered} covered on every channel`);
     if (warnings.length) out(`\n${warnings.length} warning(s):\n- ${warnings.join('\n- ')}`);

@@ -14,7 +14,7 @@ argument-hint: "<plan folder | spec folder | spec number> [--env <name>] [--base
             1 AI tester per use case runs mcp + job ─► ai-results-<UC>.json        (all in one run folder, no HTML yet)
 5 review    1 FRESH reviewer agent checks every step ─► review.json
             test problem ─► fix the test, re-run those files once, review again · product problem ─► finding
-6 report    build-report.mjs ─► one HTML: UC → scenario (surface tag) → steps (screenshot or request / response, review notes)
+6 report    build-report.mjs ─► one HTML: UC → scenario (surface + kind tags) → steps (screenshot or request / response, review notes)
 ```
 
 ## User Input
@@ -105,7 +105,7 @@ workers: <number of spec files, max 4>,
 
 The report keeps these features; keep them when you touch the template:
 
-- Tree: use cases in `use-cases.js` order, then each scenario in file order with a surface tag, then its steps. Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
+- Tree: use cases in `use-cases.js` order, then each scenario in file order with a surface tag and its kind (`basic`, `alternate`, `exception`), then its steps. Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
 - Steps paged like slides: Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot (works on scrolling full-page shots too). A `ui` step without a screenshot shows a "No screenshot for this step" image. A full-page shot (taller than 1.5× its width) scrolls inside the viewer.
 - `api`, `mcp`, `job` steps show the call target, the request and the response in place of the screenshot.
 - A step the reviewer flagged shows ⚑ in the step list and the reviewer's note above the screenshot. Header count and a "Review flags" filter.

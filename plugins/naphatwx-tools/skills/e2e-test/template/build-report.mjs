@@ -92,7 +92,7 @@ for (const [sc, notes] of review) {
 for (const s of SCENARIOS) if (!tests.has(s.id)) tests.set(s.id, { scenario: s.id, status: 'notrun', outcome: 'notrun', ms: 0, steps: [], attempts: [], annotations: [] });
 const out = [...tests.values()].map((t, i) => {
   const s = scenarioById.get(t.scenario);
-  return { ...t, title: s?.title ?? t.title, useCase: s?.useCase ?? t.useCase ?? '', surface: s?.surface ?? t.surface ?? (t.runner === 'ai' ? 'mcp' : 'ui'), order: s ? s.order : SCENARIOS.length + i };
+  return { ...t, title: s?.title ?? t.title, useCase: s?.useCase ?? t.useCase ?? '', surface: s?.surface ?? t.surface ?? (t.runner === 'ai' ? 'mcp' : 'ui'), scKind: s?.kind ?? t.scKind ?? '', order: s ? s.order : SCENARIOS.length + i };
 }).sort((a, b) => a.order - b.order).map(({ order, key, ...t }) => t);
 
 const failed = (t) => t.outcome === 'unexpected';

@@ -27,9 +27,10 @@ The words, used the same way in every skill:
 | Feature | what the spec delivers | a noun | Legacy new version |
 | Use case | one goal a user wants to reach, with every path to it | verb + object | Cut a new version |
 | Scenario | one path through a use case, with one result, on one channel | the condition or the result | Merge request already released |
+| Kind | how a scenario ends: `basic` (the main path to the goal, one per use case and channel), `alternate` (another path that still reaches the goal), `exception` (the goal is not reached: refusal, error, timeout) | the `kind` value | exception |
 | Channel | where a user reaches it: `ui` (a screen), `mcp` (an AI agent calling MCP tools), `api` (REST / gRPC called directly), `job` (a script or scheduled job) | the `surface` value | mcp |
 | Acceptance criterion | one Given / When / Then from the spec | `US<n> · AC<m>` | US1 · AC3 |
-| Flow | the steps of a use case, drawn as its flowchart and sequence diagram | a diagram, not a list item | the flowchart of Cut a new version |
+| Flow diagram | the steps of a use case, drawn as its flowchart and sequence diagram (not a "flow" in the basic / alternate flow sense: that is a scenario) | a diagram, not a list item | the flowchart of Cut a new version |
 
 The file holds real example values but no mock wiring and no selectors, so it works for features with no UI too.
 
@@ -54,7 +55,7 @@ Where the file goes (`<plan>`):
 
 - `<plan>/use-cases.js` already exists → read it and update it in place. Keep every existing scenario `id` that still matches, so links from the mock, the plan and test files keep working.
 - The file is in the old format (`USE_CASE_FLOWS` + `USE_CASES`, grouped by flow `3.N`) → rewrite it in the new one: each flow that is a user goal becomes a use case, each old use case becomes a scenario with the same `id`. Move the scenarios of a flow that is not a goal (step 1).
-- A file with no `channels`, no `ACCEPTANCE`, or MCP scenarios marked `surface: "api"` → update it in place: set `mcp`, add `channels` and `ACCEPTANCE`, then add the missing twins. Keep every id.
+- A file with no `channels`, no `ACCEPTANCE`, no `kind`, or MCP scenarios marked `surface: "api"` → update it in place: set `mcp`, add `channels`, `ACCEPTANCE` and `kind`, then add the missing twins. Keep every id.
 - Run by design-feature → it passes `<plan>` and `.parts/brief.md`; read the brief instead of the spec. Step 1b still applies to any message, permission or example value the brief lacks.
 
 ## Hard Rules
@@ -115,6 +116,7 @@ Start from `template/use-cases.js`.
 | `id` | kebab-case, unique (`create-archived-owner`) |
 | `useCase` | a `USE_CASES` id |
 | `title` | short, the path or its result ("From a merged merge request", "Merge request already released"); never the use case title again |
+| `kind` | `"basic"`, `"alternate"` or `"exception"` (see below). Twins on other channels share it |
 | `story` | user story + acceptance ids (`"US1 · AC2–4"`), or the FR / decision id. Twins on other channels cite the same ref |
 | `surface` | the channel: `"ui"` (a screen), `"mcp"` (an AI agent calling an MCP tool), `"api"` (REST / gRPC called directly), `"job"` (a scheduled job, script or event). Must be in its use case's `channels` |
 | `na` | optional: `{ "<channel>": "<why>" }` for each channel of the use case that has no twin of this scenario |
@@ -152,12 +154,17 @@ Before and after, from a real plan:
 | `expect` | New Revision is disabled; its tooltip says why. | The New Revision card is disabled; under its title, in amber: "This repository has no released line yet. Cut a new version first." |
 | `expect` | The version is created. | Toast: "Version 2.3.3-1 was created."; 2.3.3-1 tops the list as PENDING. |
 
+- **Kind.** Ask: did the user reach the goal?
+    - On the main path, with nothing special → `basic`. Exactly one per use case and channel.
+    - Another way: another option, a filter, empty data, a retry that works → `alternate`.
+    - No: a refusal, a validation error, an unreachable service → `exception`.
 - One scenario = one outcome. A spec scenario with two different outcomes is two scenarios.
 - A title with "and" or "or" usually covers two paths. Split it ("No changelog", "No previous version").
 
 ### 3. Check
 
-- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, and the acceptance coverage.
+- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `kind` with at most one `basic` per use case and channel, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, the count per kind, and the acceptance coverage.
+- It warns when a scenario has no `kind`, or a channel of a use case has no `basic` scenario. Add the kind.
 - It warns when a scenario has no twin (same story ref) on another channel of its use case and no `na` reason, when an `api` scenario talks about MCP, and when an acceptance criterion skips a channel of its use case with no `na`. Add the twin, or the reason.
 - It also warns (exit code stays 0) when a scenario's `expect` has no quoted message, number or identifier, and when a scenario that talks about a role, a permission or "not allowed" names no permission string. Fix each warning by adding the example from step 1b; leave one only when the scenario truly has no value to show, and say why in the reply.
 - Fix every error and re-run until it exits 0.
