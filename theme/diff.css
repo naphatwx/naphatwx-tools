@@ -1,0 +1,52 @@
+/* Change marks for table and message cards: overview, API contracts, ER diagram. One class set for HTML and SVG.
+   Card .tbl (+ .add | .drop | .change, .ext), head .tbl-head (name first, then .tag), rows .row (+ .add | .change | .drop) with .col .type .key. */
+/* Card state shows three ways, not by color alone: a gutter bar, a tinted head and a signed pill */
+.tbl:is(.add, .drop) { position: relative; }
+.tbl.add { border-color: var(--add); }
+.tbl.drop { border-color: var(--drop); }
+.tbl.ext { border-style: dashed; }
+.tbl:is(.add, .drop)::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--add); }
+.tbl.drop::before { background: var(--drop); }
+.tbl:is(.add, .drop) :is(.tbl-head, .row) { padding-left: 16px; }
+.tbl.add .tbl-head { background: var(--ok-soft); }
+.tbl.drop .tbl-head { background: var(--bad-soft); }
+.tbl.drop :is(.tbl-head > :first-child, .tbl-name) { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.tbl.drop .row { opacity: 0.55; }
+.tbl:is(.add, .drop, .change) .tag { align-self: center; padding: 4px 8px; border-radius: 999px; font: 700 var(--fs-tag)/1 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+.tbl.add .tag { color: var(--bg); background: var(--add); }
+.tbl.drop .tag { color: var(--bg); background: var(--drop); }
+.tbl.change .tag { padding: 3px 7px; border: 1px solid var(--change); color: var(--change); }
+.tbl.add .tag::before { content: "+ "; }
+.tbl.drop .tag::before { content: "− "; }
+.tbl.change .tag::before { content: "~ "; }
+/* Changed rows: tinted, name and key in the mark's color; a dropped row is struck through */
+.tbl .row.add { background: var(--ok-soft); }
+.tbl .row.change { background: var(--warn-soft); }
+.tbl .row.drop { background: var(--bad-soft); }
+.tbl .row.add :is(.col, .key) { color: var(--add); }
+.tbl .row.change :is(.col, .key) { color: var(--change); }
+.tbl .row.drop :is(.col, .type, .key) { color: var(--drop); }
+.tbl .row.drop :is(.col, .type) { text-decoration: line-through; text-decoration-thickness: 1px; }
+/* Legend swatches */
+.legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
+.legend i.add { border-color: var(--add); background: var(--ok-soft); box-shadow: inset 3px 0 var(--add); }
+.legend i.drop { border-color: var(--drop); background: var(--bad-soft); box-shadow: inset 3px 0 var(--drop); }
+.legend i.ext { border-style: dashed; }
+/* SVG (ER diagram): the same classes. Text fills with currentColor, so the color rules above apply */
+svg .tbl text { fill: currentColor; }
+svg .tbl-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
+svg .tbl:is(.add, .drop) > .tbl-box { stroke: var(--add); stroke-width: 1.6; }
+svg .tbl.drop > .tbl-box { stroke: var(--drop); }
+svg .tbl.ext > .tbl-box { stroke-dasharray: 5 4; }
+svg .tbl-head { fill: var(--surface-3); }
+svg .tbl.add > .tbl-head { fill: var(--ok-soft); }
+svg .tbl.drop > .tbl-head { fill: var(--bad-soft); }
+svg .tbl-bar { fill: var(--add); }
+svg .tbl.drop .tbl-bar { fill: var(--drop); }
+svg .tag > rect { fill: none; stroke: var(--change); }
+svg .tbl.add .tag > rect { fill: var(--add); stroke: none; }
+svg .tbl.drop .tag > rect { fill: var(--drop); stroke: none; }
+svg .tbl .row > .row-bg { fill: transparent; }
+svg .tbl .row.add > .row-bg { fill: var(--ok-soft); }
+svg .tbl .row.change > .row-bg { fill: var(--warn-soft); }
+svg .tbl .row.drop > .row-bg { fill: var(--bad-soft); }

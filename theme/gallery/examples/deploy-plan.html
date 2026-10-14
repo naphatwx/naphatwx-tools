@@ -86,7 +86,9 @@
       --gutter: clamp(16px, 3vw, 24px);
 
       --radius: 6px;
+      --radius-md: 8px;
       --radius-lg: 10px;
+      --radius-xl: 12px;
       --ease: cubic-bezier(0.2, 0, 0, 1);
   }
   /* theme:tokens:end */
@@ -106,10 +108,20 @@
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   code, kbd, pre, samp { font-family: var(--mono); }
-  /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
-  .label, th, dt { color: var(--text-2); font-weight: 600; }
-  /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
-  th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+  /* Label over a group (section, field, table column, step list): uppercase at meta size, tracked so caps stay readable */
+  .label, th, dt { color: var(--text-2); font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  /* Data inside a label (counts, names, notes, controls) keeps its own case */
+  :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
+  .label-note { font-weight: 400; }
+  /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+  .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+  .sc-kind.basic { color: var(--accent); }
+  .sc-kind.exception { color: var(--warn); }
+  /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
+  .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+  .refs-chip:hover { background: var(--hover); }
+  .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+  .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -118,8 +130,8 @@
   /* theme:pdf:start */
   /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
   /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
-  .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-  .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+  .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
+  .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
   .float-bar button:hover { background: var(--hover); color: var(--text); }
   /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
      An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
@@ -131,20 +143,19 @@
       body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
       pre, figure, img, svg, tr { break-inside: avoid; }
       h1, h2, h3 { break-after: avoid; }
+      .refs-chip { display: none !important; }
+      .refs-ids { display: inline !important; }
   }
   /* theme:pdf:end */
 
+  /* theme:report:start */
+  /* Synced from theme/report.css by theme/sync.mjs. Do not edit here. */
   body { font-size: var(--fs-body); line-height: 1.5; }
   [hidden] { display: none !important; }
   /* no sidebar here, so the report gets a wider column than the theme text width */
   main { max-width: min(80%, var(--max-w-4xl)); margin: 0 auto; padding: 16px var(--gutter) 48px; }
-  header { display: grid; gap: 8px; margin-bottom: 12px; }
   h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
-  h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; }
-  .meta { color: var(--text-3); }
-  .meta code { color: var(--text-2); }
   code { font-size: var(--fs-code); overflow-wrap: anywhere; }
-  .facts { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
 
   .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-tag); white-space: nowrap; }
   .tone-ok { color: var(--ok); background: var(--ok-soft); }
@@ -152,6 +163,40 @@
   .tone-bad { color: var(--bad); background: var(--bad-soft); }
   .tone-neutral { color: var(--neutral); background: var(--neutral-soft); }
   .tone-accent { color: var(--accent); background: var(--accent-soft); }
+
+  .summary-line .lead { font-weight: 600; }
+  .summary-line .meta { font-size: var(--fs-meta); }
+  .summary-line .c-bad { color: var(--bad); }
+  .tools { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .empty-filter { margin-top: 16px; font-size: var(--fs-meta); }
+  .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
+  .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+
+  /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
+  .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
+  .disclosure-head { padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background-color .15s var(--ease); }
+  .disclosure-head:hover { background: var(--hover); }
+  .disclosure.open { border-color: var(--accent); }
+  /* the open row matches the pressed filter button, so it reads as selected */
+  .disclosure.open > .disclosure-head, .disclosure.open > .disclosure-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
+  .disclosure.open > .disclosure-head .mark { color: var(--accent); }
+  .disclosure.open > .disclosure-head h2 { font-weight: 600; }
+  /* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
+  .disclosure-head h2 { min-width: 0; font-size: var(--fs-body); }
+  .disclosure-head h2 button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
+  .disclosure-head h2 .pill { flex: none; }
+  .disclosure-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .disclosure-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
+  .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
+  .mark::before { content: "+"; }
+  /* theme:report:end */
+  header { display: grid; gap: 8px; margin-bottom: 12px; }
+  h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; }
+  .meta { color: var(--text-3); }
+  .meta code { color: var(--text-2); }
+  .facts { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+
 
   .notes { margin: 0; padding: 8px 12px 8px 30px; background: var(--warn-soft); border-radius: var(--radius); }
   .notes li { color: var(--text); }
@@ -163,7 +208,6 @@
   .bar.full > span { background: var(--ok); }
   .count { font-variant-numeric: tabular-nums; font-weight: 600; }
 
-  .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   button { font: inherit; font-size: var(--fs-body); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
   button:hover { background: var(--hover); }
   button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }

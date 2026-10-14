@@ -83,15 +83,17 @@
         --gutter: clamp(16px, 3vw, 24px);
 
         --radius: 6px;
+        --radius-md: 8px;
         --radius-lg: 10px;
+        --radius-xl: 12px;
         --ease: cubic-bezier(0.2, 0, 0, 1);
     }
     /* theme:tokens:end */
     /* theme:pdf:start */
     /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
     /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
-    .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-    .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+    .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
+    .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
     .float-bar button:hover { background: var(--hover); color: var(--text); }
     /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
        An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
@@ -103,6 +105,8 @@
         body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
         pre, figure, img, svg, tr { break-inside: avoid; }
         h1, h2, h3 { break-after: avoid; }
+        .refs-chip { display: none !important; }
+        .refs-ids { display: inline !important; }
     }
     /* theme:pdf:end */
     .edge-label-bg { fill: var(--surface); }

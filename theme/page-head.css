@@ -1,0 +1,19 @@
+/* Page header for the API contracts and ER diagram pages: title and subtitle on the left, action buttons on the right. */
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; }
+.sub { color: var(--text-3); font-size: var(--fs-meta); margin-top: 2px; }
+.actions { display: flex; gap: 8px; }
+
+.btn {
+    font: inherit;
+    font-size: var(--fs-body);
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn:hover { color: var(--text); background: var(--hover); }

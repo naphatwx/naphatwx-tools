@@ -1,0 +1,25 @@
+/* Sequence diagram SVG parts drawn by render.js: actors, lifelines, messages, phases, notes and alt/loop frames. Shared by the design-feature overview and the generate-diagram viewer. */
+.seq .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
+.seq .actor text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; }
+.seq .actor .sub { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 400; }
+.seq .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
+.seq .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
+.seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
+.seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
+.seq .lbl { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
+.seq .lbl.hot { fill: var(--accent); }
+.seq .edge-label-bg { fill: var(--surface); }
+.seq .num { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
+.seq .phase line { stroke: var(--line); }
+.seq .phase rect { fill: var(--surface-2); }
+.seq .phase text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 600; }
+.seq .note rect { fill: var(--bg); stroke: var(--line-strong); }
+.seq .note text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-family: var(--mono); }
+.seq .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
+.seq .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
+.seq .frame text { fill: var(--text); font-size: var(--fs-dia-sub); font-weight: 700; }
+.seq .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
+.seq .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
+.seq .ah { fill: var(--text-2); }
+.seq .ah.ret { fill: var(--text-3); }
+.seq .ah.hot { fill: var(--accent); }

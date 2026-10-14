@@ -7,7 +7,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
 - The tables the source names. From a feature (such as a design-feature brief): every table the feature reads or writes, including external ones another service owns.
 - From migrations, DDL, ORM models or a live database: the tables the user asked for, or every table in the schema. Read a live database with read-only schema queries only.
 - Every FK between the included tables.
-- Changes, when the source has them: new table, added / changed / dropped columns, new or changed FKs. Tags: `new table`, `altered`, `read` (read or written without a schema change), `external`.
+- Changes, when the source has them: new or dropped table, added / changed / dropped columns, new or changed FKs. Tags: `new table`, `dropped table` (all its columns), `altered`, `read` (read or written without a schema change), `external`.
 
 ## diagram-design mode
 

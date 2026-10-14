@@ -86,7 +86,9 @@
       --gutter: clamp(16px, 3vw, 24px);
 
       --radius: 6px;
+      --radius-md: 8px;
       --radius-lg: 10px;
+      --radius-xl: 12px;
       --ease: cubic-bezier(0.2, 0, 0, 1);
   }
   /* theme:tokens:end */
@@ -106,10 +108,20 @@
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   code, kbd, pre, samp { font-family: var(--mono); }
-  /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
-  .label, th, dt { color: var(--text-2); font-weight: 600; }
-  /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
-  th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+  /* Label over a group (section, field, table column, step list): uppercase at meta size, tracked so caps stay readable */
+  .label, th, dt { color: var(--text-2); font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  /* Data inside a label (counts, names, notes, controls) keeps its own case */
+  :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
+  .label-note { font-weight: 400; }
+  /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+  .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+  .sc-kind.basic { color: var(--accent); }
+  .sc-kind.exception { color: var(--warn); }
+  /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
+  .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+  .refs-chip:hover { background: var(--hover); }
+  .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+  .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -118,8 +130,8 @@
   /* theme:pdf:start */
   /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
   /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
-  .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-  .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+  .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
+  .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
   .float-bar button:hover { background: var(--hover); color: var(--text); }
   /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
      An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
@@ -131,25 +143,22 @@
       body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
       pre, figure, img, svg, tr { break-inside: avoid; }
       h1, h2, h3 { break-after: avoid; }
+      .refs-chip { display: none !important; }
+      .refs-ids { display: inline !important; }
   }
   /* theme:pdf:end */
 
+  /* buttons first, so the shared pressed filter style below still wins on hover */
+  button { font: inherit; font-size: var(--fs-body); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
+  button:hover:not(:disabled) { background: var(--hover); }
+  button:disabled { opacity: .45; cursor: default; }
+  /* theme:report:start */
+  /* Synced from theme/report.css by theme/sync.mjs. Do not edit here. */
   body { font-size: var(--fs-body); line-height: 1.5; }
   [hidden] { display: none !important; }
   /* no sidebar here, so the report gets a wider column than the theme text width */
   main { max-width: min(80%, var(--max-w-4xl)); margin: 0 auto; padding: 16px var(--gutter) 48px; }
-  /* Title, one summary line at one size, then the status filter on the left above the rows. */
-  header { display: grid; gap: 8px; justify-items: start; margin-bottom: 8px; }
-  /* Headings use the shared theme steps (--fs-h1/h2/h3); other text uses the role tokens (--fs-body / meta / code / tag). */
   h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
-  h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
-  h3 { font-size: var(--fs-h3); margin: 0; overflow-wrap: anywhere; }
-  .meta { color: var(--text-3); font-size: var(--fs-meta); }
-  .summary-line { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-body); }
-  .summary-line .lead { font-weight: 600; }
-  .summary-line .meta { font-size: var(--fs-meta); }
-  .summary-line .c-bad { color: var(--bad); }
-  .summary-line .c-warn { color: var(--warn); }
   code { font-size: var(--fs-code); overflow-wrap: anywhere; }
 
   .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-tag); white-space: nowrap; }
@@ -157,46 +166,61 @@
   .tone-warn { color: var(--warn); background: var(--warn-soft); }
   .tone-bad { color: var(--bad); background: var(--bad-soft); }
   .tone-neutral { color: var(--neutral); background: var(--neutral-soft); }
+  .tone-accent { color: var(--accent); background: var(--accent-soft); }
 
-  button { font: inherit; font-size: var(--fs-body); border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; }
-  button:hover:not(:disabled) { background: var(--hover); }
-  button:disabled { opacity: .45; cursor: default; }
+  .summary-line .lead { font-weight: 600; }
+  .summary-line .meta { font-size: var(--fs-meta); }
+  .summary-line .c-bad { color: var(--bad); }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .empty-filter { margin-top: 16px; font-size: var(--fs-meta); }
-  .uc-title { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
-  .uc-title .meta { font-weight: 400; }
+  .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
+  .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
-  .test { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
-  .test-head { padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background-color .15s var(--ease); }
-  .test-head:hover { background: var(--hover); }
-  .test.open { border-color: var(--accent); }
-  /* The open test grows past the text column so the screenshot and steps get room; negative margins keep it centered. */
-  .test.open { margin-inline: min(0px, calc((100% - min(96vw, var(--max-w-7xl))) / 2)); }
+  .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
+  .disclosure-head { padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background-color .15s var(--ease); }
+  .disclosure-head:hover { background: var(--hover); }
+  .disclosure.open { border-color: var(--accent); }
   /* the open row matches the pressed filter button, so it reads as selected */
-  .test.open > .test-head, .test.open > .test-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
-  .test.open > .test-head .mark { color: var(--accent); }
-  .test.open > .test-head h2 { font-weight: 600; }
+  .disclosure.open > .disclosure-head, .disclosure.open > .disclosure-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
+  .disclosure.open > .disclosure-head .mark { color: var(--accent); }
+  .disclosure.open > .disclosure-head h2 { font-weight: 600; }
   /* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
-  .test-head h2 { min-width: 0; font-size: var(--fs-body); }
-  .test-head h2 button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
-  .test-head h2 .pill { flex: none; }
-  .test-head h2 button:hover { background: transparent; }
-  .test-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-  .test-head .t { overflow-wrap: anywhere; min-width: 0; }
-  .test-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
+  .disclosure-head h2 { min-width: 0; font-size: var(--fs-body); }
+  .disclosure-head h2 button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
+  .disclosure-head h2 .pill { flex: none; }
+  .disclosure-head h2 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .disclosure-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
   .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
   .mark::before { content: "+"; }
-  .test.open .mark::before { content: "\2212"; }
-  .test-body { padding: 10px 14px 12px; display: grid; gap: 10px; min-width: 0; }
-
+  /* theme:report:end */
   /* Native <details> slide too where the browser can animate to auto height. */
   @supports (interpolate-size: allow-keywords) {
     :root { interpolate-size: allow-keywords; }
     details::details-content { height: 0; overflow: hidden; transition: height .2s var(--ease), content-visibility .2s allow-discrete; }
     details[open]::details-content { height: auto; }
   }
+  /* Title, one summary line at one size, then the status filter on the left above the rows. */
+  header { display: grid; gap: 8px; justify-items: start; margin-bottom: 8px; }
+  /* Headings use the shared theme steps (--fs-h1/h2/h3); other text uses the role tokens (--fs-body / meta / code / tag). */
+  h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
+  h3 { font-size: var(--fs-h3); margin: 0; overflow-wrap: anywhere; }
+  .meta { color: var(--text-3); font-size: var(--fs-meta); }
+  .summary-line { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-body); }
+  .summary-line .c-warn { color: var(--warn); }
+
+
+  .uc-title { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+  .uc-title .meta { font-weight: 400; }
+
+  /* The open test grows past the text column so the screenshot and steps get room; negative margins keep it centered. */
+  .test.open { margin-inline: min(0px, calc((100% - min(96vw, var(--max-w-7xl))) / 2)); }
+  .test-head h2 button:hover { background: transparent; }
+  .test-head .t { overflow-wrap: anywhere; min-width: 0; }
+  .test.open .mark::before { content: "\2212"; }
+  .test-body { padding: 10px 14px 12px; display: grid; gap: 10px; min-width: 0; }
+
 
   .viewer { border-radius: var(--radius); min-width: 0; }
   .viewer:focus-visible { outline-offset: 4px; }
@@ -246,7 +270,6 @@
   .err-label { color: var(--bad); font-weight: 600; }
   .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
   .cmd > .meta { min-width: 4em; font-size: var(--fs-meta); }
-  .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
   .cmds { display: grid; gap: 8px; }
 
   .notes { margin: 0; padding: 10px 12px; list-style: none; display: grid; gap: 4px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
@@ -263,13 +286,9 @@
   dialog img { max-width: 96vw; max-height: calc(96vh - 52px); display: block; object-fit: contain; }
   dialog.tall img { max-height: none; height: auto; }
   dialog::backdrop { background: rgb(0 0 0 / .75); }
-  .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
 
   /* Surface tag (ui / mcp / api / job): the runner that played the scenario. */
-  /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-  .sc-kind { flex: none; font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-  .sc-kind.basic { color: var(--accent); }
-  .sc-kind.exception { color: var(--warn); }
+  .sc-kind { flex: none; }
   .surface { flex: none; font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 0 6px; }
   .tools .sep { width: 1px; align-self: stretch; background: var(--line-strong); margin: 0 4px; }
   .vbody > .msgs { grid-area: err; display: grid; gap: 10px; min-width: 0; }
@@ -543,7 +562,7 @@ let closeOpen = null;
 function testBox(t) {
   const k = kind(t);
   const id = 'test-' + (++uid);
-  const box = el('section', { class: 'test', 'aria-labelledby': id + '-h' });
+  const box = el('section', { class: 'test disclosure', 'aria-labelledby': id + '-h' });
   box.dataset.kind = k;
   const flags = t.steps.filter(flagged).length;
   box.dataset.flags = String(flags);
@@ -554,7 +573,7 @@ function testBox(t) {
   const attempts = t.attempts || [];
   const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : t.retry ? ' · retry ' + t.retry : '';
   const where = t.runner === 'ai' ? 'AI tester' + (t.role ? ' as ' + t.role : '') : t.file;
-  const head = el('div', { class: 'test-head' }, el('h2', { id: id + '-h' }, toggle),
+  const head = el('div', { class: 'test-head disclosure-head' }, el('h2', { id: id + '-h' }, toggle),
     el('div', { class: 'info' }, t.scenario ? el('span', { class: 'meta' }, t.scenario) : null, where ? el('span', { class: 'meta' }, where) : null,
       k === 'notrun' ? null : el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : '')),
       flags ? el('span', { class: 'meta c-warn' }, '⚑ ' + flags + ' review flag' + (flags > 1 ? 's' : '')) : null));

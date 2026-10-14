@@ -182,7 +182,7 @@
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-02-seq" aria-labelledby="uc-02-seq-tab" hidden>
                 <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
-                <div class="seq-steps"><p class="label seq-steps-title">Step details · only steps with extra detail, by their number in the diagram</p><ol>
+                <div class="seq-steps"><p class="label seq-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>
                     <li><span class="n">2</span><code>GetThing</code> id from the route</li>
                     <li><span class="n">·</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
                     <li><span class="n">6</span><code>CreateThing</code> name, ownerId</li>
@@ -225,13 +225,13 @@
             </dl>
             <p class="legend"><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
             <div class="tables">
-                <div class="tbl new" id="db-table_b">
+                <div class="tbl add" id="db-table_b">
                     <div class="tbl-head"><span>schema.table_b</span><span class="tag">new table</span></div>
                     <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
                     <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
                     <div class="row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
                 </div>
-                <div class="tbl" id="db-table_a">
+                <div class="tbl change" id="db-table_a">
                     <div class="tbl-head"><span>schema.table_a</span><span class="tag">altered</span></div>
                     <div class="row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
                     <div class="row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
@@ -243,13 +243,13 @@
             <details class="more">
                 <summary>Full schema <span class="aside">every related table, all columns</span></summary>
                 <div class="tables">
-                    <div class="tbl new">
+                    <div class="tbl add">
                         <div class="tbl-head"><span>schema.table_b</span><span class="tag">new table</span></div>
                         <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
                         <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
                         <div class="row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
                     </div>
-                    <div class="tbl">
+                    <div class="tbl change">
                         <div class="tbl-head"><span>schema.table_a</span><span class="tag">altered</span></div>
                         <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
                         <div class="row"><span class="col">name</span><span class="type">text</span><span class="key">NOT NULL</span></div>
@@ -294,13 +294,13 @@
                 <h3><code>CreateThing</code> <span class="pill">new</span></h3>
                 <p class="refs">POST /api/v1/things · permission things.create</p>
                 <div class="tables">
-                    <div class="tbl new">
+                    <div class="tbl add">
                         <div class="tbl-head"><span>CreateThingRequest</span><span class="tag">new message</span></div>
                         <div class="row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
                         <div class="row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
                         <div class="row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
                     </div>
-                    <div class="tbl">
+                    <div class="tbl change">
                         <div class="tbl-head"><span>ThingResponse</span><span class="tag">altered</span></div>
                         <div class="row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
                         <div class="row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
@@ -325,7 +325,7 @@
             <div class="api" id="api-shared-types" data-part="Shared types">
                 <h3>Shared types</h3>
                 <div class="tables">
-                    <div class="tbl new">
+                    <div class="tbl add">
                         <div class="tbl-head"><span>RepositorySource</span><span class="tag">new enum</span></div>
                         <div class="row"><span class="col">REPOSITORY_SOURCE_UNSPECIFIED</span><span class="type"></span><span class="key">0</span></div>
                         <div class="row"><span class="col">GITLAB</span><span class="type"></span><span class="key">1</span></div>

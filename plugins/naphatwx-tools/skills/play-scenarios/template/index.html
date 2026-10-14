@@ -89,7 +89,9 @@
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
+            --radius-md: 8px;
             --radius-lg: 10px;
+            --radius-xl: 12px;
             --ease: cubic-bezier(0.2, 0, 0, 1);
         }
         /* theme:tokens:end */
@@ -109,10 +111,20 @@
         a { color: var(--accent); }
         :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         code, kbd, pre, samp { font-family: var(--mono); }
-        /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
-        .label, th, dt { color: var(--text-2); font-weight: 600; }
-        /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
-        th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Label over a group (section, field, table column, step list): uppercase at meta size, tracked so caps stay readable */
+        .label, th, dt { color: var(--text-2); font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Data inside a label (counts, names, notes, controls) keeps its own case */
+        :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
+        .label-note { font-weight: 400; }
+        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .sc-kind.basic { color: var(--accent); }
+        .sc-kind.exception { color: var(--warn); }
+        /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
+        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .refs-chip:hover { background: var(--hover); }
+        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -121,8 +133,8 @@
         /* theme:pdf:start */
         /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
         /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
-        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
+        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
         .float-bar button:hover { background: var(--hover); color: var(--text); }
         /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
            An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
@@ -134,10 +146,14 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
+            .refs-chip { display: none !important; }
+            .refs-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
         /* Index chrome only. The frames show the running app with its own design system. */
+        /* theme:scenario:start */
+        /* Synced from theme/scenario.css by theme/sync.mjs. Do not edit here. */
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; overflow-x: clip; }
         /* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
@@ -171,38 +187,21 @@
         .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 4px; }
         /* title, refs chip and plan link share one line; they wrap under the title on narrow screens */
         .uc-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-        .sc-kind.basic { color: var(--accent); }
-        .sc-kind.exception { color: var(--warn); }
-        /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-        .refs-chip:hover { background: var(--hover); }
-        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
-        .role-pill { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: var(--neutral-soft); border-radius: 999px; }
-        /* the result stays on top; the guide text below it scrolls on its own */
+        /* the result stays on top with its own fill; the guide text below it scrolls on its own */
         .guide { display: flex; flex-direction: column; overflow-y: hidden; }
-        /* its own fill and rule, so the guide text scrolling under it never runs into the note box */
         .guide-result { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
         .guide-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 12px; }
         @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs, .guide, .guide-body { overflow-y: visible; } }
         @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
         .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
-        /* surface tag: ui is played by hand; mcp, api and job by your AI agent */
-        .tab-s { flex: none; text-transform: uppercase; }
-        /* a skipped scenario keeps its place in the tree, dimmed, with a dash in its disc */
-        .tab.skipped .tab-t { color: var(--text-3); text-decoration: line-through; }
-        .tab-n.skip { border-style: dashed; }
-        .tab[aria-selected="true"].skipped .tab-t { color: var(--bg); }
         .tab-t { flex: 1; min-width: 0; }
         .tab:hover { color: var(--text); background: var(--hover); }
         /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
         .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
+        .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
         /* the number is a status disc: outlined until marked, then a solid green check or red cross */
         .tab { align-items: center; }
-        .tab-n { display: grid; place-items: center; flex: none; width: 26px; height: 26px; min-width: 0; border: 1.5px solid var(--line-3); border-radius: 50%; }
         .tab-n svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
         .tab-n.pass, .tab[aria-selected="true"] .tab-n.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
         .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
@@ -214,7 +213,16 @@
         .tabs-clear:hover { color: var(--text); background: var(--hover); }
         .tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
         .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
-        .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
+        /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
+        .result-btn { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+        .result-btn:hover { background: var(--hover); }
+        .result-btn.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
+        .result-btn.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
+        .note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
+        .res-table { width: 100%; border-collapse: collapse; }
+        .res-table th, .res-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
+        .res-table th { border-top: 0; }
+        .st-pass { color: var(--ok); } .st-fail { color: var(--bad); } .st-none { color: var(--text-3); }
         .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
         .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-meta); background: var(--surface-2); border-bottom: 1px solid var(--line); }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
@@ -224,6 +232,29 @@
         .rows > * + * { border-top: 1px solid var(--line); }
         /* the screen renders at desktop width and is scaled down to the frame */
         .fit { position: relative; overflow: hidden; }
+        /* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
+        @media print {
+            .page { width: auto; margin: 0; padding: 16px; }
+            .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
+            .guide { position: static; height: auto; margin-top: 0; max-height: none; }
+            .guide, .guide-body { overflow: visible; }
+            .guide-result { display: none; }
+        }
+        /* theme:scenario:end */
+        /* theme:scrollbar:start */
+        /* Synced from theme/scrollbar.css by theme/sync.mjs. Do not edit here. */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--radius-md); }
+        /* theme:scrollbar:end */
+        .role-pill { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: var(--neutral-soft); border-radius: 999px; }
+        /* surface tag: ui is played by hand; mcp, api and job by your AI agent */
+        .tab-s { flex: none; text-transform: uppercase; }
+        /* a skipped scenario keeps its place in the tree, dimmed, with a dash in its disc */
+        .tab.skipped .tab-t { color: var(--text-3); text-decoration: line-through; }
+        .tab-n.skip { border-style: dashed; }
+        .tab[aria-selected="true"].skipped .tab-t { color: var(--bg); }
+        .tab-n { display: grid; place-items: center; flex: none; width: 26px; height: 26px; min-width: 0; border: 1.5px solid var(--line-3); border-radius: 50%; }
         .fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--bg); }
         /* covers the frame while a seed runs, when it failed, or before the first play */
         .overlay { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; background: var(--surface); }
@@ -246,28 +277,8 @@
         .call .ok { color: var(--ok); } .call .err { color: var(--bad); }
         .api-lookup { padding: 8px 12px; color: var(--text-2); border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); }
         .banner { padding: 10px 14px; color: var(--text); background: var(--warn-soft); border: 1px solid var(--warn); border-radius: var(--radius-lg); }
-        .result-btn { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
-        .result-btn:hover { background: var(--hover); }
-        .result-btn.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
-        .result-btn.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
-        .note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
-        .res-table { width: 100%; border-collapse: collapse; }
-        .res-table th, .res-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
-        .res-table th { border-top: 0; }
-        .st-pass { color: var(--ok); } .st-fail { color: var(--bad); } .st-none { color: var(--text-3); }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
-        /* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
         @media print {
-            .page { width: auto; margin: 0; padding: 16px; }
-            .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
             .tabs, .btn-ghost, .overlay, .result-ctl { display: none !important; }
-            .guide { position: static; height: auto; margin-top: 0; max-height: none; }
-            .guide, .guide-body { overflow: visible; }
-            .guide-result { display: none; }
-            .refs-chip { display: none !important; }
-            .refs-ids { display: inline !important; }
         }
     </style>
     <script src="../use-cases.js"></script>
@@ -401,7 +412,7 @@
               <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
                 <div class="uc-row">
                 <div class="tabs">
-                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count" data-count="${uc.id}"></span></div>
+                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${uc.id}"></span></div>
                   <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
                   ${scs.map((s, i) => `<button type="button" role="tab" class="tab${s.skip ? ' skipped' : ''}" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"${s.skip ? ` title="Skipped: ${esc(s.skip)}"` : ''}>${s.skip ? `<span class="tab-n skip" aria-hidden="true">–</span>` : `<span class="tab-n" data-r="${s.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="tab-t">${esc(s.title)}${s.skip ? '<span class="sr-only"> (skipped)</span>' : ''}</span><span class="tab-s" title="${esc(SURFACE[s.surface] || '')}">${esc(s.surface || '')}</span></button>`).join('')}
                   </div>
@@ -508,7 +519,7 @@
                   <button type="button" class="btn-ghost result-ctl ml-auto" onclick="navigator.clipboard.writeText(promptText(byId('${sc.id}'))).then(() => { this.textContent = 'Copied'; setTimeout(() => { this.textContent = 'Copy prompt'; }, 1500); })">Copy prompt</button>
                   <span class="api-status meta w-full"></span></div>
                 <div class="prompt">${esc(promptText(sc))}</div></section>
-              <section class="space-y-2"><div class="label">Recorded calls${calls.length ? ` · ${calls.filter(c => !c.lookup).length} calls${run.by ? ', ' + esc(run.by) : ''}${run.at ? ', ' + esc(run.at) : ''}` : ''}</div>
+              <section class="space-y-2"><div class="label">Recorded calls${calls.length ? `<span class="label-note"> · ${calls.filter(c => !c.lookup).length} calls${run.by ? ', ' + esc(run.by) : ''}${run.at ? ', ' + esc(run.at) : ''}</span>` : ''}</div>
                 ${calls.length ? calls.map(c => callHtml(c, c.lookup ? n : n++)).join('') : '<p class="muted">No recorded run yet. Ask your agent to play the AI scenarios of this plan.</p>'}</section>`;
         }
         async function loadApi(sc, block, token) {

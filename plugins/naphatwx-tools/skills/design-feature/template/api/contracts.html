@@ -87,7 +87,9 @@
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
+            --radius-md: 8px;
             --radius-lg: 10px;
+            --radius-xl: 12px;
             --ease: cubic-bezier(0.2, 0, 0, 1);
         }
         /* theme:tokens:end */
@@ -107,10 +109,20 @@
         a { color: var(--accent); }
         :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         code, kbd, pre, samp { font-family: var(--mono); }
-        /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
-        .label, th, dt { color: var(--text-2); font-weight: 600; }
-        /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
-        th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Label over a group (section, field, table column, step list): uppercase at meta size, tracked so caps stay readable */
+        .label, th, dt { color: var(--text-2); font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Data inside a label (counts, names, notes, controls) keeps its own case */
+        :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
+        .label-note { font-weight: 400; }
+        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .sc-kind.basic { color: var(--accent); }
+        .sc-kind.exception { color: var(--warn); }
+        /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
+        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .refs-chip:hover { background: var(--hover); }
+        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -119,8 +131,8 @@
         /* theme:pdf:start */
         /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
         /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
-        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
+        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
         .float-bar button:hover { background: var(--hover); color: var(--text); }
         /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
            An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
@@ -132,27 +144,26 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
+            .refs-chip { display: none !important; }
+            .refs-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
         * { margin: 0; padding: 0; }
+        /* theme:scrollbar:start */
+        /* Synced from theme/scrollbar.css by theme/sync.mjs. Do not edit here. */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--radius-md); }
+        /* theme:scrollbar:end */
 
         body { padding: 20px 0 32px; }
         /* one column for header and boards, at most 96% of the screen and max-w-5xl */
         .page { max-width: min(96vw, var(--max-w-5xl)); margin: 0 auto; }
 
-        header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
+        /* theme:page-head:start */
+        /* Synced from theme/page-head.css by theme/sync.mjs. Do not edit here. */
+        header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
         h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; }
         .sub { color: var(--text-3); font-size: var(--fs-meta); margin-top: 2px; }
         .actions { display: flex; gap: 8px; }
@@ -163,13 +174,15 @@
             color: var(--text-2);
             background: var(--surface-2);
             border: 1px solid var(--line-strong);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             padding: 6px 12px;
             cursor: pointer;
             text-decoration: none;
         }
 
         .btn:hover { color: var(--text); background: var(--hover); }
+        /* theme:page-head:end */
+        header { margin-bottom: 12px; }
 
         .legend {
             display: flex;
@@ -180,9 +193,6 @@
             color: var(--text-3);
         }
 
-        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
-        .legend .write { border-color: var(--accent); }
-        .legend .external { border-style: dashed; }
         .legend .add { color: var(--add); }
         .legend .change { color: var(--change); }
         .legend .drop { color: var(--drop); }
@@ -193,42 +203,26 @@
         .method h2 .n { color: var(--text-3); font-family: var(--mono); font-size: var(--fs-h3); }
         .method h2 code { font-size: inherit; }
         .method h2 .tag { color: var(--text-3); font-size: var(--fs-tag); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 8px; }
-        .method h2 .tag.write { color: var(--accent); border-color: var(--accent); }
+        .method h2 .tag.write { color: var(--add); border-color: var(--add); }
         .method .sub { margin: 4px 0 10px; }
 
-        /* a board: request and response cards side by side, each half the width; a long name or type wraps */
-        .board {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px 24px;
-            padding: 16px;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: var(--surface);
-        }
+        /* a board: request and response cards side by side, each half the width, no frame around them; a long name or type wraps */
+        .board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
         .c-label { color: var(--text-3); font-size: var(--fs-tag); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 
-        .card { border: 1.5px solid var(--line-3); border-radius: 8px; background: var(--surface-2); overflow: hidden; }
-        .card.write { border-color: var(--accent); }
-        .card.drop { border-color: var(--drop); }
-        .card.external { border-style: dashed; }
-        .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 12px; background: var(--surface-3); }
-        .card-head .name { font: 600 var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
-        .card-head .tag { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; white-space: nowrap; }
-        .card.write .card-head .tag { color: var(--accent); }
-        .card.drop .card-head .tag { color: var(--drop); }
+        /* a card: head with name and tag, then field rows. State marks come from the theme:diff block below */
+        .tbl { border: 1.5px solid var(--line-3); border-radius: var(--radius-md); background: var(--surface-2); overflow: hidden; }
+        .tbl-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 7px 12px; background: var(--surface-3); }
+        .tbl-head .tbl-name { font: 600 var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
+        .tbl-head .tag { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; white-space: nowrap; }
 
         /* field rows: name | number | type. Rows share the card's columns (subgrid), so numbers and types line up */
         .rows { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, max-content); column-gap: 16px; }
         .row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: baseline; padding: 4px 12px; border-top: 1px solid var(--line); }
         .row:nth-child(odd) { background: var(--neutral-soft); }
-        .row .f { font: var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
-        .row .k { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
-        .row .t { color: var(--text-3); font-size: var(--fs-dia-sub); text-align: right; overflow-wrap: anywhere; }
-        .row.add .f, .row.add .k { color: var(--add); }
-        .row.change .f, .row.change .k { color: var(--change); }
-        .row.drop .f, .row.drop .t { color: var(--drop); text-decoration: line-through; }
-        .row.drop .k { color: var(--drop); }
+        .row .col { font: var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
+        .row .key { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
+        .row .type { color: var(--text-3); font-size: var(--fs-dia-sub); text-align: right; overflow-wrap: anywhere; }
         .none { padding: 7px 12px; color: var(--text-3); font-size: var(--fs-dia-sub); font-style: italic; }
 
         /* phones: one card per line */
@@ -238,8 +232,62 @@
 
         @media print {
             .actions { display: none; }
-            .card { break-inside: avoid; }
+            .tbl { break-inside: avoid; }
         }
+
+        /* theme:diff:start */
+        /* Synced from theme/diff.css by theme/sync.mjs. Do not edit here. */
+        /* Card state shows three ways, not by color alone: a gutter bar, a tinted head and a signed pill */
+        .tbl:is(.add, .drop) { position: relative; }
+        .tbl.add { border-color: var(--add); }
+        .tbl.drop { border-color: var(--drop); }
+        .tbl.ext { border-style: dashed; }
+        .tbl:is(.add, .drop)::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--add); }
+        .tbl.drop::before { background: var(--drop); }
+        .tbl:is(.add, .drop) :is(.tbl-head, .row) { padding-left: 16px; }
+        .tbl.add .tbl-head { background: var(--ok-soft); }
+        .tbl.drop .tbl-head { background: var(--bad-soft); }
+        .tbl.drop :is(.tbl-head > :first-child, .tbl-name) { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+        .tbl.drop .row { opacity: 0.55; }
+        .tbl:is(.add, .drop, .change) .tag { align-self: center; padding: 4px 8px; border-radius: 999px; font: 700 var(--fs-tag)/1 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+        .tbl.add .tag { color: var(--bg); background: var(--add); }
+        .tbl.drop .tag { color: var(--bg); background: var(--drop); }
+        .tbl.change .tag { padding: 3px 7px; border: 1px solid var(--change); color: var(--change); }
+        .tbl.add .tag::before { content: "+ "; }
+        .tbl.drop .tag::before { content: "− "; }
+        .tbl.change .tag::before { content: "~ "; }
+        /* Changed rows: tinted, name and key in the mark's color; a dropped row is struck through */
+        .tbl .row.add { background: var(--ok-soft); }
+        .tbl .row.change { background: var(--warn-soft); }
+        .tbl .row.drop { background: var(--bad-soft); }
+        .tbl .row.add :is(.col, .key) { color: var(--add); }
+        .tbl .row.change :is(.col, .key) { color: var(--change); }
+        .tbl .row.drop :is(.col, .type, .key) { color: var(--drop); }
+        .tbl .row.drop :is(.col, .type) { text-decoration: line-through; text-decoration-thickness: 1px; }
+        /* Legend swatches */
+        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
+        .legend i.add { border-color: var(--add); background: var(--ok-soft); box-shadow: inset 3px 0 var(--add); }
+        .legend i.drop { border-color: var(--drop); background: var(--bad-soft); box-shadow: inset 3px 0 var(--drop); }
+        .legend i.ext { border-style: dashed; }
+        /* SVG (ER diagram): the same classes. Text fills with currentColor, so the color rules above apply */
+        svg .tbl text { fill: currentColor; }
+        svg .tbl-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
+        svg .tbl:is(.add, .drop) > .tbl-box { stroke: var(--add); stroke-width: 1.6; }
+        svg .tbl.drop > .tbl-box { stroke: var(--drop); }
+        svg .tbl.ext > .tbl-box { stroke-dasharray: 5 4; }
+        svg .tbl-head { fill: var(--surface-3); }
+        svg .tbl.add > .tbl-head { fill: var(--ok-soft); }
+        svg .tbl.drop > .tbl-head { fill: var(--bad-soft); }
+        svg .tbl-bar { fill: var(--add); }
+        svg .tbl.drop .tbl-bar { fill: var(--drop); }
+        svg .tag > rect { fill: none; stroke: var(--change); }
+        svg .tbl.add .tag > rect { fill: var(--add); stroke: none; }
+        svg .tbl.drop .tag > rect { fill: var(--drop); stroke: none; }
+        svg .tbl .row > .row-bg { fill: transparent; }
+        svg .tbl .row.add > .row-bg { fill: var(--ok-soft); }
+        svg .tbl .row.change > .row-bg { fill: var(--warn-soft); }
+        svg .tbl .row.drop > .row-bg { fill: var(--bad-soft); }
+        /* theme:diff:end */
     </style>
 </head>
 
@@ -256,9 +304,10 @@
     </header>
 
     <div class="legend">
-        <span><i class="write"></i>new message or type</span>
-        <span><i></i>existing message</span>
-        <span><i class="external"></i>external (another service owns it)</span>
+        <span><i class="add"></i>new message or type</span>
+        <span><i class="drop"></i>removed message</span>
+        <span><i></i>existing message (amber pill when altered)</span>
+        <span><i class="ext"></i>external (another service owns it)</span>
         <span><b class="add">+ add</b> · <b class="change">~ change</b> · <b class="drop">− drop</b></span>
     </div>
 
@@ -322,16 +371,16 @@
 
         (function render({ apis, types }) {
             const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-            const kind = c => /^new/.test(c.tag) ? "write" : /removed/.test(c.tag) ? "drop" : "";
+            const kind = c => /^new/.test(c.tag) ? "add" : /removed/.test(c.tag) ? "drop" : /altered/.test(c.tag) ? "change" : "";
 
             // A card: label above, head with name and tag, then one row per field. No message → one muted line.
             const card = (c, label, ext) => {
-                if (!c) return `<div><div class="c-label">${esc(label)}</div><div class="card"><div class="none">no message</div></div></div>`;
-                const cls = ["card", kind(c), ext ? "external" : ""].filter(Boolean).join(" ");
+                if (!c) return `<div><div class="c-label">${esc(label)}</div><div class="tbl"><div class="none">no message</div></div></div>`;
+                const cls = ["tbl", kind(c), ext ? "ext" : ""].filter(Boolean).join(" ");
                 const rows = c.fields.map(([name, type, num, mark]) => `<div class="row${mark ? " " + mark : ""}">`
-                    + `<span class="f">${esc(name)}</span><span class="k">${esc(num)}</span><span class="t">${esc(type)}</span></div>`).join("");
+                    + `<span class="col">${esc(name)}</span><span class="key">${esc(num)}</span><span class="type">${esc(type)}</span></div>`).join("");
                 return `<div><div class="c-label">${esc(label)}</div><div class="${cls}" role="group" aria-label="${esc(label)} ${esc(c.name)}${c.tag ? ", " + esc(c.tag) : ""}">`
-                    + `<div class="card-head"><span class="name">${esc(c.name)}</span><span class="tag">${esc(c.tag || "")}</span></div><div class="rows">${rows}</div></div></div>`;
+                    + `<div class="tbl-head"><span class="tbl-name">${esc(c.name)}</span><span class="tag">${esc(c.tag || "")}</span></div><div class="rows">${rows}</div></div></div>`;
             };
             const board = list => `<div class="board">${list.map(l => card(l.c, l.label, l.ext)).join("")}</div>`;
 

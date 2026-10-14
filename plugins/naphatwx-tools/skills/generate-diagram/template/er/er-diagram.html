@@ -87,7 +87,9 @@
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
+            --radius-md: 8px;
             --radius-lg: 10px;
+            --radius-xl: 12px;
             --ease: cubic-bezier(0.2, 0, 0, 1);
         }
         /* theme:tokens:end */
@@ -107,10 +109,20 @@
         a { color: var(--accent); }
         :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         code, kbd, pre, samp { font-family: var(--mono); }
-        /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
-        .label, th, dt { color: var(--text-2); font-weight: 600; }
-        /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
-        th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Label over a group (section, field, table column, step list): uppercase at meta size, tracked so caps stay readable */
+        .label, th, dt { color: var(--text-2); font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Data inside a label (counts, names, notes, controls) keeps its own case */
+        :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
+        .label-note { font-weight: 400; }
+        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .sc-kind.basic { color: var(--accent); }
+        .sc-kind.exception { color: var(--warn); }
+        /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
+        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .refs-chip:hover { background: var(--hover); }
+        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -119,8 +131,8 @@
         /* theme:pdf:start */
         /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
         /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
-        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
+        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
         .float-bar button:hover { background: var(--hover); color: var(--text); }
         /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
            An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
@@ -132,27 +144,26 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
+            .refs-chip { display: none !important; }
+            .refs-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
         * { margin: 0; padding: 0; }
+        /* theme:scrollbar:start */
+        /* Synced from theme/scrollbar.css by theme/sync.mjs. Do not edit here. */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--radius-md); }
+        /* theme:scrollbar:end */
 
         body { padding: 20px var(--gutter) 32px; }
         /* text stays at the reading width; only the diagram is full width */
         body > :not(.canvas) { max-width: var(--page-w); margin-inline: auto; }
 
-        header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin: 0 auto 12px;
-        }
-
+        /* theme:page-head:start */
+        /* Synced from theme/page-head.css by theme/sync.mjs. Do not edit here. */
+        header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
         h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; }
         .sub { color: var(--text-3); font-size: var(--fs-meta); margin-top: 2px; }
         .actions { display: flex; gap: 8px; }
@@ -163,18 +174,20 @@
             color: var(--text-2);
             background: var(--surface-2);
             border: 1px solid var(--line-strong);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             padding: 6px 12px;
             cursor: pointer;
             text-decoration: none;
         }
 
         .btn:hover { color: var(--text); background: var(--hover); }
+        /* theme:page-head:end */
+        header { margin: 0 auto 12px; }
 
         .canvas {
             margin: 0 auto;
             border: 1px solid var(--line);
-            border-radius: 12px;
+            border-radius: var(--radius-xl);
             background: var(--surface);
             overflow-x: auto;
             padding: 12px;
@@ -194,35 +207,78 @@
             color: var(--text-3);
         }
 
-        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
-        .legend .write { border-color: var(--accent); }
-        .legend .external { border-style: dashed; }
         .legend .fk { height: 0; border-width: 1.5px 0 0; border-radius: 0; }
+        .legend .fk.add { box-shadow: none; background: none; }
 
-        /* svg parts */
-        .t-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
-        .t-box.write { stroke: var(--accent); stroke-width: 1.6; }
-        .t-box.external { stroke-dasharray: 5 4; }
-        .t-head { fill: var(--surface-3); }
-        .t-name { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; font-family: var(--mono); }
-        .t-tag { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
-        .write .t-tag, .t-tag.write { fill: var(--accent); }
-        .r-zebra { fill: var(--text); opacity: 0.025; }
-        .r-line { stroke: var(--line); }
-        .r-col { fill: var(--text); font-size: var(--fs-dia); font-family: var(--mono); }
-        .r-type { fill: var(--text-3); font-size: var(--fs-dia-sub); }
-        .r-key { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
-        .r-drop .r-col, .r-drop .r-type { fill: var(--drop); text-decoration: line-through; }
-        .r-drop .r-key { fill: var(--drop); }
-        .r-add .r-col, .r-add .r-key { fill: var(--add); }
-        .r-change .r-col, .r-change .r-key { fill: var(--change); }
+        /* theme:diff:start */
+        /* Synced from theme/diff.css by theme/sync.mjs. Do not edit here. */
+        /* Card state shows three ways, not by color alone: a gutter bar, a tinted head and a signed pill */
+        .tbl:is(.add, .drop) { position: relative; }
+        .tbl.add { border-color: var(--add); }
+        .tbl.drop { border-color: var(--drop); }
+        .tbl.ext { border-style: dashed; }
+        .tbl:is(.add, .drop)::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--add); }
+        .tbl.drop::before { background: var(--drop); }
+        .tbl:is(.add, .drop) :is(.tbl-head, .row) { padding-left: 16px; }
+        .tbl.add .tbl-head { background: var(--ok-soft); }
+        .tbl.drop .tbl-head { background: var(--bad-soft); }
+        .tbl.drop :is(.tbl-head > :first-child, .tbl-name) { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+        .tbl.drop .row { opacity: 0.55; }
+        .tbl:is(.add, .drop, .change) .tag { align-self: center; padding: 4px 8px; border-radius: 999px; font: 700 var(--fs-tag)/1 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+        .tbl.add .tag { color: var(--bg); background: var(--add); }
+        .tbl.drop .tag { color: var(--bg); background: var(--drop); }
+        .tbl.change .tag { padding: 3px 7px; border: 1px solid var(--change); color: var(--change); }
+        .tbl.add .tag::before { content: "+ "; }
+        .tbl.drop .tag::before { content: "− "; }
+        .tbl.change .tag::before { content: "~ "; }
+        /* Changed rows: tinted, name and key in the mark's color; a dropped row is struck through */
+        .tbl .row.add { background: var(--ok-soft); }
+        .tbl .row.change { background: var(--warn-soft); }
+        .tbl .row.drop { background: var(--bad-soft); }
+        .tbl .row.add :is(.col, .key) { color: var(--add); }
+        .tbl .row.change :is(.col, .key) { color: var(--change); }
+        .tbl .row.drop :is(.col, .type, .key) { color: var(--drop); }
+        .tbl .row.drop :is(.col, .type) { text-decoration: line-through; text-decoration-thickness: 1px; }
+        /* Legend swatches */
+        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
+        .legend i.add { border-color: var(--add); background: var(--ok-soft); box-shadow: inset 3px 0 var(--add); }
+        .legend i.drop { border-color: var(--drop); background: var(--bad-soft); box-shadow: inset 3px 0 var(--drop); }
+        .legend i.ext { border-style: dashed; }
+        /* SVG (ER diagram): the same classes. Text fills with currentColor, so the color rules above apply */
+        svg .tbl text { fill: currentColor; }
+        svg .tbl-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
+        svg .tbl:is(.add, .drop) > .tbl-box { stroke: var(--add); stroke-width: 1.6; }
+        svg .tbl.drop > .tbl-box { stroke: var(--drop); }
+        svg .tbl.ext > .tbl-box { stroke-dasharray: 5 4; }
+        svg .tbl-head { fill: var(--surface-3); }
+        svg .tbl.add > .tbl-head { fill: var(--ok-soft); }
+        svg .tbl.drop > .tbl-head { fill: var(--bad-soft); }
+        svg .tbl-bar { fill: var(--add); }
+        svg .tbl.drop .tbl-bar { fill: var(--drop); }
+        svg .tag > rect { fill: none; stroke: var(--change); }
+        svg .tbl.add .tag > rect { fill: var(--add); stroke: none; }
+        svg .tbl.drop .tag > rect { fill: var(--drop); stroke: none; }
+        svg .tbl .row > .row-bg { fill: transparent; }
+        svg .tbl .row.add > .row-bg { fill: var(--ok-soft); }
+        svg .tbl .row.change > .row-bg { fill: var(--warn-soft); }
+        svg .tbl .row.drop > .row-bg { fill: var(--bad-soft); }
+        /* theme:diff:end */
+
+        /* svg parts. Card state marks come from the theme:diff block above */
+        .tbl-name { color: var(--text); font-size: var(--fs-dia); font-weight: 600; font-family: var(--mono); }
+        svg .tag { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
+        .row-zebra { fill: var(--text); opacity: 0.025; }
+        .row-line { stroke: var(--line); }
+        .row .col { color: var(--text); font-size: var(--fs-dia); font-family: var(--mono); }
+        .row .type { color: var(--text-3); font-size: var(--fs-dia-sub); }
+        .row .key { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
         .fk { fill: none; stroke: var(--connector); stroke-width: 1.4; }
-        .fk.new { stroke: var(--accent); stroke-width: 1.8; }
+        .fk.new { stroke: var(--add); stroke-width: 1.8; }
         .fk-card { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 700; }
         .fk-dot { fill: var(--connector); }
-        .fk-dot.new { fill: var(--accent); }
-        .table { outline: none; cursor: default; }
-        .table:focus-visible .t-box { stroke: var(--accent); stroke-width: 2.4; }
+        .fk-dot.new { fill: var(--add); }
+        .tbl { outline: none; cursor: default; }
+        svg .tbl:focus-visible > .tbl-box { stroke: var(--accent); stroke-width: 2.4; }
         .dim { opacity: 0.25; }
 
         /* PDF: shrink the diagram to the page width instead of cutting it off. */
@@ -247,11 +303,12 @@
 
     <div class="canvas" id="er">
         <div class="legend">
-            <span><i class="write"></i>new table</span>
-            <span><i></i>existing table (altered or read)</span>
-            <span><i class="external"></i>external (another service owns it)</span>
+            <span><i class="add"></i>new table</span>
+            <span><i class="drop"></i>dropped table</span>
+            <span><i></i>existing table (amber pill when altered)</span>
+            <span><i class="ext"></i>external (another service owns it)</span>
             <span><i class="fk"></i>foreign key, column to column</span>
-            <span><i class="fk write"></i>new or changed foreign key</span>
+            <span><i class="fk add"></i>new or changed foreign key</span>
         </div>
     </div>
 
@@ -306,12 +363,17 @@
             const HEAD = 34, ROW = 26, GX = 110, GY = 44, PAD = 16;
             const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
             // Text is 14px; one width fits every table's longest name, key and type (estimated per character, on the wide side).
-            const MONO = 8.6, SANS = 7.9, BOLD = 8.8;
+            const MONO = 8.6, SANS = 7.9, BOLD = 8.8, PILL = 8.2;
+            // new / removed / altered tables get a signed pill; read and external keep a plain tag
+            const state = t => /^new/.test(t.tag) ? "add" : /^(removed|dropped)/.test(t.tag) ? "drop" : /altered/.test(t.tag) ? "change" : "";
+            const SIGN = { add: "+ ", drop: "− ", change: "~ " };
+            const tagText = t => (SIGN[state(t)] || "") + String(t.tag || "");
+            const tagW = t => state(t) ? tagText(t).length * PILL + 16 : String(t.tag || "").length * BOLD;
             const widest = (list, per) => Math.max(0, ...list.map(v => String(v || "").length * per));
             const cols = tables.flatMap(t => t.cols);
             const KEY_X = Math.round(12 + widest(cols.map(c => c[0]), MONO) + 20);
             const W = Math.round(Math.max(300, KEY_X + widest(cols.map(c => c[2]), BOLD) + 20 + widest(cols.map(c => c[1]), SANS) + 12,
-                ...tables.map(t => 12 + t.name.length * MONO + 20 + String(t.tag || "").length * BOLD + 12)));
+                ...tables.map(t => 16 + t.name.length * MONO + 20 + tagW(t) + 10)));
             const byId = Object.fromEntries(tables.map(t => [t.id, t]));
             const height = t => HEAD + t.cols.length * ROW;
 
@@ -364,23 +426,33 @@
             });
 
             const boxes = tables.map(t => {
-                const kind = t.tag === "new table" ? "write" : t.tag === "external" ? "external" : "";
-                const h = height(t);
+                const st = state(t);
+                const kind = ["tbl", st, t.tag === "external" ? "ext" : ""].filter(Boolean).join(" ");
+                const h = height(t), pad = st === "add" || st === "drop" ? 16 : 12;
                 const rows = t.cols.map(([col, type, key, mark], i) => {
                     const y = t.y + HEAD + i * ROW;
-                    return `<g class="${mark ? "r-" + mark : ""}">`
-                        + (i % 2 ? `<rect class="r-zebra" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>` : "")
-                        + (i ? `<line class="r-line" x1="${t.x}" x2="${t.x + W}" y1="${y}" y2="${y}"/>` : "")
-                        + `<text class="r-col" x="${t.x + 12}" y="${y + 18}">${esc(col)}</text>`
-                        + `<text class="r-key" x="${t.x + KEY_X}" y="${y + 18}">${esc(key)}</text>`
-                        + `<text class="r-type" x="${t.x + W - 12}" y="${y + 18}" text-anchor="end">${esc(type)}</text></g>`;
+                    return `<g class="row${mark ? " " + mark : ""}">`
+                        + (mark ? `<rect class="row-bg" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>`
+                            : i % 2 ? `<rect class="row-zebra" x="${t.x}" y="${y}" width="${W}" height="${ROW}"/>` : "")
+                        + (i ? `<line class="row-line" x1="${t.x}" x2="${t.x + W}" y1="${y}" y2="${y}"/>` : "")
+                        + `<text class="col" x="${t.x + pad}" y="${y + 18}">${esc(col)}</text>`
+                        + `<text class="key" x="${t.x + KEY_X}" y="${y + 18}">${esc(key)}</text>`
+                        + `<text class="type" x="${t.x + W - 12}" y="${y + 18}" text-anchor="end">${esc(type)}</text></g>`;
                 }).join("");
-                return `<g class="table ${kind}" data-id="${t.id}" tabindex="0" role="group" aria-label="${esc(t.name)}${t.tag ? ", " + esc(t.tag) : ""}">`
-                    + `<rect class="t-box ${kind}" x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/>`
-                    + `<path class="t-head" d="M${t.x + 1},${t.y + HEAD} V${t.y + 8} a7,7 0 0 1 7,-7 H${t.x + W - 8} a7,7 0 0 1 7,7 V${t.y + HEAD} Z"/>`
-                    + `<text class="t-name" x="${t.x + 12}" y="${t.y + 22}">${esc(t.name)}</text>`
-                    + `<text class="t-tag${kind === "write" ? " write" : ""}" x="${t.x + W - 12}" y="${t.y + 22}" text-anchor="end">${esc(t.tag || "")}</text>`
-                    + rows + `</g>`;
+                // row tints and the gutter bar are clipped to the box's rounded corners
+                const clip = `er-clip-${t.id}`;
+                const bar = pad === 16 ? `<rect class="tbl-bar" x="${t.x}" y="${t.y}" width="4" height="${h}" clip-path="url(#${clip})"/>` : "";
+                const pw = tagW(t), right = t.x + W - 10;
+                const tag = !t.tag ? "" : st
+                    ? `<g class="tag"><rect x="${right - pw + 0.5}" y="${t.y + 7.5}" width="${pw - 1}" height="19" rx="9.5"/>`
+                        + `<text x="${right - pw / 2}" y="${t.y + 21}" text-anchor="middle">${esc(tagText(t))}</text></g>`
+                    : `<text class="tag" x="${t.x + W - 12}" y="${t.y + 22}" text-anchor="end">${esc(t.tag)}</text>`;
+                return `<g class="${kind}" data-id="${t.id}" tabindex="0" role="group" aria-label="${esc(t.name)}${t.tag ? ", " + esc(t.tag) : ""}">`
+                    + `<rect class="tbl-box" x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/>`
+                    + `<path class="tbl-head" d="M${t.x + 1},${t.y + HEAD} V${t.y + 8} a7,7 0 0 1 7,-7 H${t.x + W - 8} a7,7 0 0 1 7,7 V${t.y + HEAD} Z"/>`
+                    + `<text class="tbl-name" x="${t.x + pad}" y="${t.y + 22}">${esc(t.name)}</text>`
+                    + tag + `<clipPath id="${clip}"><rect x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="8"/></clipPath>`
+                    + `<g clip-path="url(#${clip})">${rows}</g>` + bar + `</g>`;
             });
 
             const el = document.getElementById("er");
@@ -390,7 +462,7 @@
 
             // Hover or focus a table: dim everything not related to it.
             const clear = () => el.querySelectorAll(".dim").forEach(n => n.classList.remove("dim"));
-            el.querySelectorAll(".table").forEach(g => {
+            el.querySelectorAll(".tbl").forEach(g => {
                 const id = g.dataset.id;
                 const trace = () => {
                     const near = new Set([id]);
@@ -399,7 +471,7 @@
                         r.classList.toggle("dim", !hit);
                         if (hit) { near.add(r.dataset.a); near.add(r.dataset.b); }
                     });
-                    el.querySelectorAll(".table").forEach(t => t.classList.toggle("dim", !near.has(t.dataset.id)));
+                    el.querySelectorAll(".tbl").forEach(t => t.classList.toggle("dim", !near.has(t.dataset.id)));
                 };
                 g.addEventListener("mouseenter", trace);
                 g.addEventListener("focus", trace);

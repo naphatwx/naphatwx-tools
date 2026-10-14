@@ -1,0 +1,4 @@
+/* Thin WebKit scrollbars for pages with their own scroll areas (frames, diagrams, side lists). */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--radius-md); }

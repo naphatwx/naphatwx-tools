@@ -89,7 +89,9 @@
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
+            --radius-md: 8px;
             --radius-lg: 10px;
+            --radius-xl: 12px;
             --ease: cubic-bezier(0.2, 0, 0, 1);
         }
         /* theme:tokens:end */
@@ -109,10 +111,20 @@
         a { color: var(--accent); }
         :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         code, kbd, pre, samp { font-family: var(--mono); }
-        /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
-        .label, th, dt { color: var(--text-2); font-weight: 600; }
-        /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
-        th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Label over a group (section, field, table column, step list): uppercase at meta size, tracked so caps stay readable */
+        .label, th, dt { color: var(--text-2); font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Data inside a label (counts, names, notes, controls) keeps its own case */
+        :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
+        .label-note { font-weight: 400; }
+        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
+        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .sc-kind.basic { color: var(--accent); }
+        .sc-kind.exception { color: var(--warn); }
+        /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
+        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .refs-chip:hover { background: var(--hover); }
+        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -121,8 +133,8 @@
         /* theme:pdf:start */
         /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
         /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
-        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
+        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
         .float-bar button:hover { background: var(--hover); color: var(--text); }
         /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
            An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
@@ -134,10 +146,14 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
+            .refs-chip { display: none !important; }
+            .refs-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
         /* Index chrome only. The screens inside the frames use the target app's own design system. */
+        /* theme:scenario:start */
+        /* Synced from theme/scenario.css by theme/sync.mjs. Do not edit here. */
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; overflow-x: clip; }
         /* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
@@ -171,15 +187,6 @@
         .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 4px; }
         /* title, refs chip and plan link share one line; they wrap under the title on narrow screens */
         .uc-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-        .sc-kind.basic { color: var(--accent); }
-        .sc-kind.exception { color: var(--warn); }
-        /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-        .refs-chip:hover { background: var(--hover); }
-        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
         /* the result stays on top with its own fill; the guide text below it scrolls on its own */
         .guide { display: flex; flex-direction: column; overflow-y: hidden; }
         .guide-result { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
@@ -188,18 +195,13 @@
         @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
         .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
-        .tab-s { text-transform: uppercase; }
         .tab-t { flex: 1; min-width: 0; }
         .tab:hover { color: var(--text); background: var(--hover); }
-        /* mcp / api / job scenarios: in the tree like every skill's, greyed, "No mock" when picked */
-        .tab.off:not([aria-selected="true"]) .tab-t, .tab.off:not([aria-selected="true"]) .tab-s { color: var(--text-3); }
-        .tab.off .tab-n { border-style: dashed; }
         /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
         .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
         .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
         /* the number is a status disc: outlined until marked, then a solid green check or red cross */
         .tab { align-items: center; }
-        .tab-n { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border: 1.5px solid var(--line-3); border-radius: 50%; }
         .tab-n svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
         .tab-n.pass, .tab[aria-selected="true"] .tab-n.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
         .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
@@ -230,21 +232,30 @@
         .rows > * + * { border-top: 1px solid var(--line); }
         /* the screen renders at desktop width and is scaled down to the frame */
         .fit { position: relative; overflow: hidden; }
-        .fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
-        .no-mock { position: absolute; inset: 0; display: grid; place-content: center; gap: 4px; padding: 24px; text-align: center; background: var(--bg); }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
         /* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
         @media print {
             .page { width: auto; margin: 0; padding: 16px; }
             .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
-            .tabs, .btn-ghost, .result-ctl { display: none !important; }
             .guide { position: static; height: auto; margin-top: 0; max-height: none; }
             .guide, .guide-body { overflow: visible; }
             .guide-result { display: none; }
-            .refs-chip { display: none !important; }
-            .refs-ids { display: inline !important; }
+        }
+        /* theme:scenario:end */
+        /* theme:scrollbar:start */
+        /* Synced from theme/scrollbar.css by theme/sync.mjs. Do not edit here. */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--radius-md); }
+        /* theme:scrollbar:end */
+        .tab-s { text-transform: uppercase; }
+        /* mcp / api / job scenarios: in the tree like every skill's, greyed, "No mock" when picked */
+        .tab.off:not([aria-selected="true"]) .tab-t, .tab.off:not([aria-selected="true"]) .tab-s { color: var(--text-3); }
+        .tab.off .tab-n { border-style: dashed; }
+        .tab-n { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border: 1.5px solid var(--line-3); border-radius: 50%; }
+        .fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
+        .no-mock { position: absolute; inset: 0; display: grid; place-content: center; gap: 4px; padding: 24px; text-align: center; background: var(--bg); }
+        @media print {
+            .tabs, .btn-ghost, .result-ctl { display: none !important; }
         }
     </style>
     <script src="contract/rules.js"></script>
@@ -355,7 +366,7 @@
               <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
                 <div class="uc-row">
                 <div class="tabs">
-                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count" data-count="${uc.id}"></span></div>
+                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${uc.id}"></span></div>
                   <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
                   ${scs.map((s, i) => `<button type="button" role="tab" class="tab${isPlayable(s) ? '' : ' off'}" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"><span class="tab-n"${isPlayable(s) ? ` data-r="${s.id}"` : ''} data-n="${i + 1}">${i + 1}</span><span class="tab-t">${UI.esc(s.title)}${isPlayable(s) ? '' : '<span class="sr-only"> (no mock)</span>'}</span><span class="tab-s">${UI.esc(s.surface || '')}</span></button>`).join('')}
                   </div>
