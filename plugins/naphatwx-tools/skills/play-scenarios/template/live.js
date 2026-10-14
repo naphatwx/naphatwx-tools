@@ -27,10 +27,14 @@ var LIVE_PLAY = [
     "steps": ["You are signed in as VIEWER: has things.read, not things.create.", "Look at the toolbar for Create, then read the list."] },
   { "id": "create-archived", "seed": "node seeds/owner-with-things.mjs --archived",
     "steps": ["The new pluto-<run> is archived.", "Hover or tab to Create and read its tooltip."] },
-  { "id": "create-api", "skip": "An API scenario with no screen. Run it with the e2e-test skill or an MCP client." },
-  { "id": "create-api-empty-name", "skip": "An API scenario with no screen. Run it with the e2e-test skill or an MCP client." },
-  { "id": "backfill-skips-filled", "skip": "An operator script, run once per environment. No screen to play." },
-  { "id": "backfill-rerun", "skip": "An operator script, run once per environment. No screen to play." }
+  { "id": "create-api", "seed": "node seeds/owner-with-things.mjs", "steps": ["Once: connect your AI agent to the app's local MCP server (claude mcp add --transport http example-local http://localhost:3000/mcp).", "Press ▶ Seed: it makes a new owner and puts its id into the prompt.", "Copy the prompt and paste it into your AI agent. Approve the calls it asks to make.", "Check its answer against What you should see. Recorded calls shows one earlier run, call by call."],
+    "prompt": "Use the example-local MCP server. For every call, show me the exact request and the full response. I confirm the write below. Call ThingService CreateThing with ownerId {ownerId} and name \"Third thing\". Then call AuditLogService GetAuditLogs for the new thing. Tell me the new thing's status and the audit message." },
+  { "id": "create-api-empty-name", "seed": "node seeds/owner-with-things.mjs", "steps": ["Once: connect your AI agent to the app's local MCP server (claude mcp add --transport http example-local http://localhost:3000/mcp).", "Press ▶ Seed: it makes a new owner and puts its id into the prompt.", "Copy the prompt and paste it into your AI agent. Approve the calls it asks to make.", "Check its answer against What you should see. Recorded calls shows one earlier run, call by call."],
+    "prompt": "Use the example-local MCP server. For every call, show me the exact request and the full response. Call ThingService CreateThing with ownerId {ownerId} and an empty name. Then call ThingService GetThings with ownerId {ownerId}. Tell me the error of the first call and how many things the owner has." },
+  { "id": "backfill-skips-filled", "steps": ["Copy the prompt and paste it into your AI agent, opened in the app repo. Approve the command it asks to run.", "Check its answer against What you should see."],
+    "prompt": "In the app repo, run npm run backfill against the local database. Show me the exact command and its full output. Tell me the updated and skipped counts." },
+  { "id": "backfill-rerun", "steps": ["Copy the prompt and paste it into your AI agent, opened in the app repo. Approve the command it asks to run.", "Check its answer against What you should see."],
+    "prompt": "In the app repo, run npm run backfill twice against the local database. Show me each command and its full output. Tell me the updated and skipped counts of the second run." }
 ];
 
 // Merge into SCENARIOS (loaded before this file) so the index reads one list; skipped ones stay out of the frames.

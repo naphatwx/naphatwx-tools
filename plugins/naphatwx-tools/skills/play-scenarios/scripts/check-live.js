@@ -92,7 +92,8 @@ PLAY.forEach((p, i) => {
     if (!sc) { errors.push(`${where}: no scenario with this id in use-cases.js`); return; }
     if (CORE.indexOf(sc) !== i) errors.push(`${where}: out of order (use-cases.js has it at ${CORE.indexOf(sc) + 1})`);
     if (p.skip) return;
-    if (!p.seed && !String(p.url || '').startsWith('/')) errors.push(`${where}: needs a seed that prints {"url"}, or a url path starting with /`);
+    if (p.prompt !== undefined && (typeof p.prompt !== 'string' || !p.prompt.trim())) errors.push(`${where}: prompt must be the text your AI agent gets`);
+    if (!p.prompt && !p.seed && !String(p.url || '').startsWith('/')) errors.push(`${where}: needs a seed that prints {"url"}, a url path starting with /, or a prompt for the AI`);
     if (p.url && !String(p.url).startsWith('/')) errors.push(`${where}: url must start with / (got "${p.url}")`);
     if (p.seed && !/^node seeds\/[\w.-]+\.mjs\b/.test(p.seed)) out(`note: ${where}: seed is not a seeds/*.mjs script; fine if it calls the API and prints {"url"}`);
     if (!Array.isArray(p.steps) || !p.steps.length) errors.push(`${where}: steps missing`);
@@ -102,6 +103,23 @@ PLAY.forEach((p, i) => {
     if (hover) warnings.push(`${where}: a step says "${hover[1]}"; confirm in the component that the control still has one (not inline text)`);
     if (p.role && !/\b[a-z][\w-]*(?:[.:][a-z][\w-]*)+\b/.test(steps)) warnings.push(`${where}: signs in as ${p.role} but no step names its permissions (e.g. "You are signed in as ${p.role}: has things.read, not things.create")`);
 });
+
+// ---------------------------------------------------------------- results.js: what the AI recorded for the prompt scenarios
+let AI = {};
+const resultsFile = path.join(dir, 'results.js');
+if (fs.existsSync(resultsFile)) {
+    const src = fs.readFileSync(resultsFile, 'utf8');
+    try { AI = parseVar(src, 'PLAYED_RESULTS'); } catch (e) { errors.push(`results.js is not strict JSON: ${e.message}`); }
+    if (/thanos_pat_\w|"(?:eyJ[\w-]+\.[\w-]+)"|Bearer [\w.-]{20,}/.test(src)) errors.push('results.js seems to hold a token: mask it in the recorded calls');
+    for (const [id, r] of Object.entries(AI)) {
+        if (!CORE.some(s => s.id === id)) errors.push(`results.js ${id}: no scenario with this id in use-cases.js`);
+        if (!['pass', 'fail', ''].includes(r.status)) errors.push(`results.js ${id}: status must be pass, fail or "" (got "${r.status}")`);
+        (r.calls || []).forEach((c, i) => {
+            if (!c.lookup && !c.command && !(c.tool && (c.arguments || c.operation))) errors.push(`results.js ${id} call ${i + 1}: needs tool + arguments, command, or lookup`);
+        });
+    }
+} else if (PLAY.some(p => p.prompt)) errors.push('results.js is missing: start it as `var PLAYED_RESULTS = {};`');
+PLAY.filter(p => p.prompt && !p.skip && !AI[p.id]?.calls?.length).forEach(p => out(`note: ${p.id}: no recorded AI run in results.js yet`));
 
 // ---------------------------------------------------------------- picks, twice each, through server.mjs (same auth and .env as playing)
 const seeded = PLAY.filter(p => p.seed && !p.skip);
@@ -125,7 +143,8 @@ async function runSeeds() {
 (async () => {
     if (process.argv.includes('--run-seeds')) await runSeeds();
     const playable = PLAY.filter(p => !p.skip).length;
-    out(`scenarios: ${CORE.length} · playable live: ${playable} · skipped: ${PLAY.length - playable} · seed commands: ${seeds.length} · secret keys: ${exampleKeys.length}${process.argv.includes('--run-seeds') ? ' (each seeded scenario picked twice)' : ''}`);
+    const prompts = PLAY.filter(p => p.prompt && !p.skip), aiSt = st => prompts.filter(p => AI[p.id]?.calls?.length && AI[p.id].status === st).length;
+    out(`scenarios: ${CORE.length} · playable live: ${playable} (by the AI: ${prompts.length}; recorded ${aiSt('pass')} pass, ${aiSt('fail')} fail, ${aiSt('')} unmarked) · skipped: ${PLAY.length - playable} · seed commands: ${seeds.length} · secret keys: ${exampleKeys.length}${process.argv.includes('--run-seeds') ? ' (each seeded scenario picked twice)' : ''}`);
     warnings.forEach(w => out('WARN ' + w));
     if (errors.length) { errors.forEach(e => out('ERROR ' + e)); process.exit(1); }
     out('OK');

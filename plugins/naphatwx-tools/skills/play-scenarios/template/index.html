@@ -214,6 +214,17 @@
         .overlay[hidden] { display: none; }
         .overlay pre { max-width: 100%; max-height: 60%; overflow: auto; margin: 0; padding: 12px; text-align: left; white-space: pre-wrap; font-size: var(--fs-sm); color: var(--text-2); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); }
         .overlay .bad { color: var(--bad); font-weight: 600; }
+        /* No-screen scenarios: the AI prompt and the recorded calls fill the frame instead of a screen */
+        .api { position: absolute; inset: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; background: var(--bg); }
+        .api pre, .api .prompt { margin: 0; padding: 10px 12px; font-family: var(--mono); font-size: var(--fs-code); white-space: pre-wrap; word-break: break-word; color: var(--text-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+        .api pre { max-height: 320px; overflow: auto; }
+        .api .prompt { color: var(--text); }
+        .api .slot { width: 8rem; padding: 2px 8px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); }
+        .call { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface-2); }
+        .call > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; padding: 8px 12px; cursor: pointer; font-family: var(--mono); font-size: var(--fs-code); }
+        .call > div { display: grid; gap: 6px; padding: 0 12px 12px; }
+        .call .ok { color: var(--ok); } .call .err { color: var(--bad); }
+        .api-lookup { padding: 8px 12px; color: var(--text-2); border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); }
         .banner { padding: 10px 14px; color: var(--text); background: var(--warn-soft); border: 1px solid var(--warn); border-radius: var(--radius-lg); }
         .result-btn { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
         .result-btn:hover { border-color: var(--accent); }
@@ -239,6 +250,7 @@
     </style>
     <script src="../use-cases.js"></script>
     <script src="live.js"></script>
+    <script src="results.js"></script>
 </head>
 
 <body>
@@ -246,7 +258,7 @@
         <header>
             <a href="../overview.html#use-cases" class="link">← Feature plan</a>
             <h1 class="font-bold mt-2">Play · Feature name</h1>
-            <p class="muted mt-1">Each frame is the running app. Picking a scenario creates new data for it through the app's API, then opens it.</p>
+            <p class="muted mt-1">Each frame is the running app. Picking a scenario creates new data for it through the app's API, then opens it. A scenario with no screen shows a prompt for your AI agent and the calls of a recorded run instead.</p>
         </header>
 
         <div id="banner"></div>
@@ -255,7 +267,7 @@
 
         <section>
             <h2 class="font-bold mb-1">Results</h2>
-            <p class="meta mb-3">Saved in this browser only. Mark each scenario after you play it, then copy the table.</p>
+            <p class="meta mb-3">Mark each scenario after you play it, then copy the table. Your marks are saved in this browser only. Results the AI recorded come from <code>results.js</code>; your mark wins.</p>
             <div id="results"></div>
         </section>
     </div>
@@ -297,7 +309,7 @@
             if (LOGIN.type !== 'link') return LIVE_CONFIG.base + pathOf(sc);
             return LIVE_CONFIG.base + LOGIN.path.replace('{role}', encodeURIComponent(roleOf(sc))).replace('{next}', encodeURIComponent(pathOf(sc)));
         }
-        const screenUrl = sc => pathOf(sc) ? (LIVE_CONFIG.base + pathOf(sc)).replace(/^https?:\/\//, '') : 'The seed sets the URL';
+        const screenUrl = sc => pathOf(sc) ? (LIVE_CONFIG.base + pathOf(sc)).replace(/^https?:\/\//, '') : sc.prompt ? 'No screen: a prompt for your AI agent' : 'The seed sets the URL';
         /** server.mjs is needed for a seed to run or a sign-in to post. */
         const needsServer = sc => !!sc.seed || LOGIN.type === 'post';
 
@@ -314,6 +326,8 @@
         const RESULTS_KEY = `play:${LIVE_CONFIG.slug}:results`;
         let results = {};
         try { results = JSON.parse(localStorage.getItem(RESULTS_KEY)) || {}; } catch { }
+        // results recorded by the AI (results.js); what this viewer clicked wins
+        if (typeof PLAYED_RESULTS === 'object') for (const [id, r] of Object.entries(PLAYED_RESULTS)) if (!results[id]?.status) results[id] = { ...(results[id] || {}), status: r.status || '', note: results[id]?.note || r.note || '' };
         function setResult(id, patch) {
             results[id] = { ...(results[id] || {}), ...patch, at: new Date().toISOString() };
             try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { /* storage blocked: kept for this visit only */ }
@@ -366,11 +380,11 @@
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
                   <span class="url">${esc(screenUrl(sc))}</span>
-                  <a href="${esc(screenSrc(sc))}" target="_blank" rel="noopener" class="link whitespace-nowrap open-link">Open ↗</a>
+                  <a href="${esc(screenSrc(sc))}" target="_blank" rel="noopener" class="link whitespace-nowrap open-link"${sc.prompt && !sc.seed ? ' hidden' : ''}>Open ↗</a>
                   <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
-                  <button type="button" onclick="pick('${sc.id}', true)" class="btn-ghost" title="${sc.seed ? 'Create new data and reload' : 'Reload'}">↻ Restart</button>
+                  <button type="button" onclick="pick('${sc.id}', true)" class="btn-ghost"${sc.prompt && !sc.seed ? ' hidden' : ''} title="${sc.seed ? 'Create new data and reload' : 'Reload'}">↻ Restart</button>
                 </div>
-                <div class="fit"><div class="overlay" hidden></div><iframe title="${esc(sc.title)} — running app" width="${SCREEN_W}" height="${SCREEN_H}"></iframe></div>
+                <div class="fit"><div class="overlay" hidden></div>${sc.prompt ? `<div class="api">${apiBody(sc)}</div>` : `<iframe title="${esc(sc.title)} — running app" width="${SCREEN_W}" height="${SCREEN_H}"></iframe>`}</div>
               </div>`;
             block.querySelector('.guide').innerHTML = `
               <div class="guide-result">
@@ -389,6 +403,7 @@
               ${sc.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="t-code meta break-words">${esc(sc.seed)}</code>` : ''}
               </div>`;
             fit(block);
+            if (sc.prompt) { if (run) load(sc, block); return; }
             if (run || !needsServer(sc)) load(sc, block);
             else overlay(block, `<p class="muted">${sc.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${esc(roleOf(sc))} first.`}</p><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">▶ Open</button>`);
         }
@@ -400,6 +415,7 @@
         const loads = {}; // latest load per use case wins, when a chip is picked while a seed still runs
         async function load(sc, block) {
             const token = loads[sc.useCase] = {};
+            if (sc.prompt) return loadApi(sc, block, token);
             const frame = block.querySelector('iframe');
             frame.src = 'about:blank';
             if (needsServer(sc)) overlay(block, sc.seed ? `<p class="muted">Creating data…</p><code class="t-code meta">${esc(sc.seed)}</code>` : `<p class="muted">Signing in as ${esc(roleOf(sc))}…</p>`);
@@ -416,13 +432,66 @@
             frame.src = screenSrc(sc);
         }
 
+        // ---------------------------------------------------------------- no-screen scenarios: AI prompt + recorded calls
+        const vars = {}; // scenario id → { name: value } for the prompt's {name} slots: the seed's "vars", or typed by the viewer
+        const slotsOf = sc => [...new Set([...sc.prompt.matchAll(/\{(\w+)\}/g)].map(m => m[1]))];
+        function promptText(sc) {
+            const v = vars[sc.id] || {};
+            return sc.prompt.replace(/\{(\w+)\}/g, (m, k) => v[k] || (sc.seed ? `<${k}: press ▶ Seed>` : `<${k}>`));
+        }
+        function setVar(id, k, val) {
+            (vars[id] ||= {})[k] = val;
+            document.querySelector(`section[data-use-case="${byId(id).useCase}"] .prompt`).textContent = promptText(byId(id));
+        }
+        const pretty = v => typeof v === 'string' ? v : JSON.stringify(v, null, 2);
+        /** One recorded call: an MCP tools/call, a command (a job), or a lookup note. */
+        function callHtml(c, i) {
+            if (c.lookup) return `<div class="api-lookup t-code">${esc(c.lookup)}</div>`;
+            c = c.arguments || c.command ? c : { ...c, arguments: { operation: c.operation, params: c.params } }; // older shape
+            const what = c.command ? '$ ' + c.command : [c.tool, c.arguments?.operation].filter(Boolean).join(' · ');
+            const req = c.command ? '' : `<div class="label">Request · tools/call</div><pre>${esc(pretty({ name: c.tool, arguments: c.arguments }))}</pre>`;
+            return `<details class="call"><summary><span class="meta">${i + 1}</span><span>${esc(what)}</span>${c.role ? `<span class="meta">as ${esc(c.role)}</span>` : ''}<span class="${c.isError ? 'err' : 'ok'}">${c.isError ? '✗ error' : '✓ answer'}</span></summary>
+              <div>${req}<div class="label">${c.command ? 'Output' : 'Response'}${c.isError ? ' · isError true' : ''}</div><pre>${esc(pretty(c.response))}</pre></div></details>`;
+        }
+        function apiBody(sc) {
+            const run = (typeof PLAYED_RESULTS === 'object' && PLAYED_RESULTS[sc.id]) || {};
+            const calls = run.calls || [];
+            let n = 0;
+            return `<section class="space-y-2">
+                <div class="flex items-center gap-2 flex-wrap"><span class="label">Prompt for your AI agent</span>
+                  ${sc.seed ? `<button type="button" class="btn-ghost result-ctl" onclick="pick('${sc.id}', true)">▶ Seed</button>` : ''}
+                  ${slotsOf(sc).map(k => `<label class="meta">${esc(k)} <input class="slot" data-slot="${esc(k)}" value="${esc(vars[sc.id]?.[k] || '')}" oninput="setVar('${sc.id}', this.dataset.slot, this.value)"></label>`).join('')}
+                  <button type="button" class="btn-ghost result-ctl ml-auto" onclick="navigator.clipboard.writeText(promptText(byId('${sc.id}'))).then(() => { this.textContent = 'Copied'; setTimeout(() => { this.textContent = 'Copy prompt'; }, 1500); })">Copy prompt</button>
+                  <span class="api-status meta w-full"></span></div>
+                <div class="prompt">${esc(promptText(sc))}</div></section>
+              <section class="space-y-2"><div class="label">Recorded calls${calls.length ? ` · ${calls.filter(c => !c.lookup).length} calls${run.by ? ', ' + esc(run.by) : ''}${run.at ? ', ' + esc(run.at) : ''}` : ''}</div>
+                ${calls.length ? calls.map(c => callHtml(c, c.lookup ? n : n++)).join('') : '<p class="muted">No recorded run yet. Ask your agent to play the AI scenarios of this plan.</p>'}</section>`;
+        }
+        async function loadApi(sc, block, token) {
+            const status = t => { const el = block.querySelector('.api-status'); if (el) el.innerHTML = t; };
+            if (!needsServer(sc)) return;
+            status(`Creating data… <code class="t-code">${esc(sc.seed)}</code>`);
+            const r = await play(sc);
+            if (loads[sc.useCase] !== token) return;
+            if (!r.ok) { status(`<span class="st-fail">Seed failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</span><pre>${esc(r.output)}</pre>`); return; }
+            if (r.url) opened[sc.id] = r.url;
+            block.querySelector('.url').textContent = screenUrl(sc);
+            block.querySelector('.open-link').href = screenSrc(sc);
+            Object.entries(r.vars || {}).forEach(([k, v]) => {
+                setVar(sc.id, k, String(v));
+                const input = block.querySelector(`.slot[data-slot="${k}"]`); if (input) input.value = v;
+            });
+            const got = Object.entries(r.vars || {}).map(([k, v]) => `${k} ${v}`).join(', ');
+            status(got ? `Seeded: ${esc(got)}. The prompt has them.` : 'Seeded. The seed gave no values for the prompt.');
+        }
+
         function fit(block) {
             const box = block.querySelector('.fit'); if (!box) return;
             // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
             const row = block.querySelector('.uc-row');
             row.style.removeProperty('--frame-w'); // the full column, not the last fit's frame
             const s = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_W);
-            box.querySelector('iframe').style.transform = `scale(${s})`;
+            const ifr = box.querySelector('iframe'); if (ifr) ifr.style.transform = `scale(${s})`;
             box.style.height = Math.round(SCREEN_H * s) + 'px';
             const frame = box.closest('.frame');
             frame.style.width = Math.round(SCREEN_W * s) + 2 + 'px';
@@ -432,7 +501,7 @@
             // the text column (page title, results) takes the frame's real width, so all of it lines up
             const ws = [...document.querySelectorAll('.uc-row')].map(r => parseFloat(r.style.getPropertyValue('--frame-w'))).filter(Boolean);
             document.documentElement.style.setProperty('--text-w', Math.max(...ws) + 'px');
-            block.querySelector('.scale-label').textContent = `${Math.round(s * 100)}% of ${SCREEN_W} px`;
+            block.querySelector('.scale-label').textContent = ifr ? `${Math.round(s * 100)}% of ${SCREEN_W} px` : '';
         }
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
         addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer

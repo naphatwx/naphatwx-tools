@@ -43,7 +43,14 @@ graph TD
         T5 -->|Restart: new data again| T2
         T5 --> T6[Copy results as Markdown]
     end
+    subgraph AI["No-screen scenarios, the AI"]
+        I1[seed through server.mjs, get the new ids] --> I2[call the local MCP server, or run the job]
+        I2 --> I3[compare with expect]
+        I3 --> I4[results.js: Pass / Fail + every call; ai-results.md report]
+    end
     AGENT --> ENV --> PRE --> TEST
+    PRE --> AI
+    I4 -.->|shown on the page; your mark wins| TEST
 ```
 
 One pick, step by step:
@@ -119,6 +126,8 @@ Rules the diagrams don't show:
 
 - Local only. `server.mjs` refuses a non-local app unless you pass `--allow-remote` for a dev environment you own.
 - Seeds call the app's API only. No SQL, no database client.
+- A scenario with no screen (API, MCP, job) shows a prompt for your AI agent and the calls of the agent's last run. ▶ Seed puts the new ids into the prompt. The agent's Pass / Fail fills the Result until you mark it yourself.
+- The agent records only calls it really made on the local app, with tokens and internal hosts masked.
 - The agent asks before it changes the app (a dev login route, a dev-only frame header).
 
 ## Input → output
@@ -137,6 +146,8 @@ Output:
     ├── README.md          how to run the page, for teammates
     ├── index.html         the play page: one block per use case, framed app, Pass / Fail, results
     ├── live.js            LIVE_CONFIG (app, API, pre-test, login) + LIVE_PLAY (one entry per scenario)
+    ├── results.js         what the AI recorded for the no-screen scenarios: Pass / Fail and every call
+    ├── ai-results.md      the AI's report: how it ran, results table, FAILs
     ├── server.mjs         local server: pre-test, seed, sign in, serve the page
     ├── .env.example       secret key names and where to get each; no values
     ├── .gitignore         lists .env

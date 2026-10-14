@@ -40,7 +40,8 @@ export async function poll(check, { timeoutSec = 120, everyMs = 2000, what = 'co
     }
 }
 
-/** Last line of output, read by server.mjs: the URL the frame opens, relative to LIVE_CONFIG.base. */
+/** Last line of output, read by server.mjs: the URL the frame opens, relative to LIVE_CONFIG.base,
+ *  and optional `vars` ({ ownerId: 1204 }) that fill the {slots} of a no-screen scenario's AI prompt. */
 export function done(result) {
     process.stdout.write(JSON.stringify(result) + '\n');
 }

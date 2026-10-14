@@ -42,6 +42,8 @@ graph TD
 
 - Every pick of a writing scenario makes new data. Nothing is ever deleted.
 - Pass / Fail marks stay in this browser.
+- A scenario with no screen (API, MCP, job) shows a prompt for your AI agent instead of the app. Press ▶ Seed to put the new ids into it, then Copy prompt.
+- Its Result starts as the AI's own Pass / Fail from `results.js`, with every call it made below the prompt. Your mark wins.
 
 ## Files
 
@@ -54,7 +56,9 @@ graph TD
 | `.env` | Your values; git-ignored, never served to the browser |
 | `.gitignore` | Keeps `.env` out of git |
 | `seeds/lib.mjs` | Helpers the seeds share: `api()`, `ensure()`, `unique()`, `poll()`, `done()` |
-| `seeds/<name>.mjs` | One seed per kind of data; prints the URL to open |
+| `seeds/<name>.mjs` | One seed per kind of data; prints the URL to open, and the ids an AI prompt needs |
+| `results.js` | What the AI recorded for the scenarios with no screen: Pass / Fail and every call. Written by the agent |
+| `ai-results.md` | The AI's report on those scenarios |
 | `../use-cases.js` | The use cases and scenarios this page plays |
 
 ## When it fails

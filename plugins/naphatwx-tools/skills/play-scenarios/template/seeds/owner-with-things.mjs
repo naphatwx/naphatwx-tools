@@ -16,5 +16,5 @@ run(async () => {
         await api('POST', `/owners/${owner.id}/things`, { name, status });
     }
     const status = flag('--status');
-    done({ url: `/owners/${owner.id}${status ? `?status=${status}` : ''}` });
+    done({ url: `/owners/${owner.id}${status ? `?status=${status}` : ''}`, vars: { ownerId: owner.id } });
 });
