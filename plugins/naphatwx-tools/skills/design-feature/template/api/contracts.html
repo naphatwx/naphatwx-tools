@@ -136,9 +136,9 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
 
-        body { padding: 20px var(--gutter) 32px; }
-        /* one column as wide as the boards (every board is two cards wide), so titles line up with them */
-        .page { width: fit-content; max-width: 100%; margin: 0 auto; }
+        body { padding: 20px 0 32px; }
+        /* one column for header and boards, at most 96% of the screen and max-w-5xl */
+        .page { max-width: min(96vw, var(--max-w-5xl)); margin: 0 auto; }
 
         header {
             display: flex;
@@ -192,45 +192,49 @@
         .method h2 .tag.write { color: var(--accent); border-color: var(--accent); }
         .method .sub { margin: 4px 0 10px; }
 
-        .canvas {
+        /* a board: request and response cards side by side, each half the width; a long name or type wraps */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px 24px;
+            padding: 16px;
             border: 1px solid var(--line);
             border-radius: 12px;
             background: var(--surface);
-            overflow-x: auto;
-            padding: 12px;
+        }
+        .c-label { color: var(--text-3); font-size: var(--fs-tag); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+
+        .card { border: 1.5px solid var(--line-3); border-radius: 8px; background: var(--surface-2); overflow: hidden; }
+        .card.write { border-color: var(--accent); }
+        .card.drop { border-color: var(--drop); }
+        .card.external { border-style: dashed; }
+        .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 12px; background: var(--surface-3); }
+        .card-head .name { font: 600 var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
+        .card-head .tag { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; white-space: nowrap; }
+        .card.write .card-head .tag { color: var(--accent); }
+        .card.drop .card-head .tag { color: var(--drop); }
+
+        /* field rows: name | number | type. Rows share the card's columns (subgrid), so numbers and types line up */
+        .rows { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, max-content); column-gap: 16px; }
+        .row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: baseline; padding: 4px 12px; border-top: 1px solid var(--line); }
+        .row:nth-child(odd) { background: var(--neutral-soft); }
+        .row .f { font: var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
+        .row .k { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
+        .row .t { color: var(--text-3); font-size: var(--fs-dia-sub); text-align: right; overflow-wrap: anywhere; }
+        .row.add .f, .row.add .k { color: var(--add); }
+        .row.change .f, .row.change .k { color: var(--change); }
+        .row.drop .f, .row.drop .t { color: var(--drop); text-decoration: line-through; }
+        .row.drop .k { color: var(--drop); }
+        .none { padding: 7px 12px; color: var(--text-3); font-size: var(--fs-dia-sub); font-style: italic; }
+
+        /* phones: one card per line */
+        @media (max-width: 760px) {
+            .board { grid-template-columns: minmax(0, 1fr); }
         }
 
-        /* each svg draws at 1:1, so every label renders at 14px; a wider one scrolls. */
-        .canvas svg { display: block; max-width: none; font-family: var(--sans); }
-
-        /* svg parts */
-        .t-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
-        .t-box.write { stroke: var(--accent); stroke-width: 1.6; }
-        .t-box.drop { stroke: var(--drop); stroke-width: 1.6; }
-        .t-box.external { stroke-dasharray: 5 4; }
-        .t-head { fill: var(--surface-3); }
-        .t-name { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; font-family: var(--mono); }
-        .t-tag { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
-        .t-tag.write { fill: var(--accent); }
-        .t-tag.drop { fill: var(--drop); }
-        .c-label { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-        .r-zebra { fill: var(--text); opacity: 0.025; }
-        .r-line { stroke: var(--line); }
-        .r-col { fill: var(--text); font-size: var(--fs-dia); font-family: var(--mono); }
-        .r-type { fill: var(--text-3); font-size: var(--fs-dia-sub); }
-        .r-key { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
-        .r-none { fill: var(--text-3); font-size: var(--fs-dia-sub); font-style: italic; }
-        .r-drop .r-col, .r-drop .r-type { fill: var(--drop); text-decoration: line-through; }
-        .r-drop .r-key { fill: var(--drop); }
-        .r-add .r-col, .r-add .r-key { fill: var(--add); }
-        .r-change .r-col, .r-change .r-key { fill: var(--change); }
-
-        /* PDF: shrink each board to the page width instead of cutting it off. */
         @media print {
             .actions { display: none; }
-            .method { break-inside: avoid; }
-            .canvas { overflow: visible; }
-            .canvas svg { max-width: 100%; height: auto; }
+            .card { break-inside: avoid; }
         }
     </style>
 </head>
@@ -313,65 +317,29 @@
 
 
         (function render({ apis, types }) {
-            const HEAD = 34, ROW = 26, GX = 48, LABEL = 22, PAD = 16;
             const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-            // Text is 14px; widths are estimated per character, on the wide side.
-            const MONO = 8.6, SANS = 7.9, BOLD = 8.8;
-            const widest = (list, per) => Math.max(0, ...list.map(v => String(v || "").length * per));
-            // Every card shares one width, so request and response line up from method to method. keyX is where the number column starts.
-            const cards = [...apis.flatMap(a => [a.req, a.res]).filter(Boolean), ...types];
-            const fields = cards.flatMap(c => c.fields);
-            const keyX = Math.round(12 + widest(fields.map(f => f[0]), MONO) + 20);
-            const W = Math.round(Math.max(280, keyX + widest(fields.map(f => f[2]), BOLD) + 20 + widest(fields.map(f => f[1]), SANS) + 12,
-                ...cards.map(c => 12 + c.name.length * MONO + 20 + String(c.tag || "").length * BOLD + 12)));
             const kind = c => /^new/.test(c.tag) ? "write" : /removed/.test(c.tag) ? "drop" : "";
 
-            // A card: label above, head with name and tag, then one row per field. No message → one muted row.
-            const card = (c, x, label, ext) => {
-                const y = PAD + LABEL;
-                const top = `<text class="c-label" x="${x}" y="${PAD + 12}">${esc(label)}</text>`;
-                if (!c) return { h: HEAD, svg: top + `<rect class="t-box" x="${x}" y="${y}" width="${W}" height="${HEAD}" rx="8"/>`
-                    + `<text class="r-none" x="${x + 12}" y="${y + 22}">no message</text>` };
-                const k = kind(c), cls = [k, ext ? "external" : ""].join(" ").trim();
-                const rows = c.fields.map(([name, type, num, mark], i) => {
-                    const ry = y + HEAD + i * ROW;
-                    return `<g class="${mark ? "r-" + mark : ""}">`
-                        + (i % 2 ? `<rect class="r-zebra" x="${x}" y="${ry}" width="${W}" height="${ROW}"/>` : "")
-                        + (i ? `<line class="r-line" x1="${x}" x2="${x + W}" y1="${ry}" y2="${ry}"/>` : "")
-                        + `<text class="r-col" x="${x + 12}" y="${ry + 18}">${esc(name)}</text>`
-                        + `<text class="r-key" x="${x + keyX}" y="${ry + 18}">${esc(num)}</text>`
-                        + `<text class="r-type" x="${x + W - 12}" y="${ry + 18}" text-anchor="end">${esc(type)}</text></g>`;
-                }).join("");
-                const h = HEAD + c.fields.length * ROW;
-                return { h, svg: top
-                    + `<g role="group" aria-label="${esc(label)} ${esc(c.name)}${c.tag ? ", " + esc(c.tag) : ""}">`
-                    + `<rect class="t-box ${cls}" x="${x}" y="${y}" width="${W}" height="${h}" rx="8"/>`
-                    + `<path class="t-head" d="M${x + 1},${y + HEAD} V${y + 8} a7,7 0 0 1 7,-7 H${x + W - 8} a7,7 0 0 1 7,7 V${y + HEAD} Z"/>`
-                    + `<text class="t-name" x="${x + 12}" y="${y + 22}">${esc(c.name)}</text>`
-                    + `<text class="t-tag ${k}" x="${x + W - 12}" y="${y + 22}" text-anchor="end">${esc(c.tag || "")}</text>`
-                    + rows + `</g>` };
+            // A card: label above, head with name and tag, then one row per field. No message → one muted line.
+            const card = (c, label, ext) => {
+                if (!c) return `<div><div class="c-label">${esc(label)}</div><div class="card"><div class="none">no message</div></div></div>`;
+                const cls = ["card", kind(c), ext ? "external" : ""].filter(Boolean).join(" ");
+                const rows = c.fields.map(([name, type, num, mark]) => `<div class="row${mark ? " " + mark : ""}">`
+                    + `<span class="f">${esc(name)}</span><span class="k">${esc(num)}</span><span class="t">${esc(type)}</span></div>`).join("");
+                return `<div><div class="c-label">${esc(label)}</div><div class="${cls}" role="group" aria-label="${esc(label)} ${esc(c.name)}${c.tag ? ", " + esc(c.tag) : ""}">`
+                    + `<div class="card-head"><span class="name">${esc(c.name)}</span><span class="tag">${esc(c.tag || "")}</span></div><div class="rows">${rows}</div></div></div>`;
             };
-            // A board: cards side by side, at least two cards wide so every board has the same width.
-            const board = list => {
-                const drawn = list.map((item, i) => card(item.c, PAD + i * (W + GX), item.label, item.ext));
-                const n = Math.max(2, list.length);
-                const w = PAD * 2 + n * W + (n - 1) * GX;
-                const h = PAD * 2 + LABEL + Math.max(...drawn.map(d => d.h));
-                return `<div class="canvas"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${list.map(l => esc(l.label)).join(" and ")}">`
-                    + drawn.map(d => d.svg).join("") + `</svg></div>`;
-            };
+            const board = list => `<div class="board">${list.map(l => card(l.c, l.label, l.ext)).join("")}</div>`;
 
             const blocks = apis.map((a, i) => `<section class="method" id="api-${esc(a.id)}">`
                 + `<h2><span class="n">${i + 1}.</span><code>${esc(a.name)}</code><span class="tag${a.tag === "new" ? " write" : ""}">${esc(a.tag)}</span></h2>`
                 + `<p class="sub">${esc(a.route)} · permission ${esc(a.perm)}</p>`
                 + board([{ c: a.req, label: "request", ext: a.ext }, { c: a.res, label: "response", ext: a.ext }])
                 + `</section>`);
-            // Shared types: two cards per board row.
-            for (let i = 0; i < types.length; i += 2) {
-                blocks.push(`<section class="method"${i ? "" : ` id="api-shared-types"`}>`
-                    + (i ? "" : `<h2><span class="n">${apis.length + 1}.</span>Shared types</h2><p class="sub">Enums and nested messages used by more than one API.</p>`)
-                    + board(types.slice(i, i + 2).map(t => ({ c: t, label: /enum/.test(t.tag) ? "enum" : "message" }))) + `</section>`);
-            }
+            // Shared types: one last block, two cards per line.
+            if (types.length) blocks.push(`<section class="method" id="api-shared-types">`
+                + `<h2><span class="n">${apis.length + 1}.</span>Shared types</h2><p class="sub">Enums and nested messages used by more than one API.</p>`
+                + board(types.map(t => ({ c: t, label: /enum/.test(t.tag) ? "enum" : "message" }))) + `</section>`);
             document.getElementById("board").innerHTML = blocks.join("");
         })(API);
 
