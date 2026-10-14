@@ -27,9 +27,9 @@ web
 ## Capabilities and Constraints
 - Must work fully offline: no CDN fonts, scripts or images.
 - Diagrams come from two modes, and both must keep working: manual (SVG flowcharts + `render.js` sequence diagrams) and diagram-design (iframe embeds).
-- Detail stays hidden until opened: diagrams, rules, full schema and full contracts.
+- Detail stays hidden until opened: diagrams, rules and full schema. Full contracts are their own board page.
 - DB columns and API fields carry `+ add`, `~ change`, `− drop` marks.
-- Sections: overview + summary, scope, use cases (flowchart, sequence, rules, scenarios), database changes + ER page, API changes + shared types + full contracts, errors, open questions. The mock UI is its own page, linked from the use cases.
+- Sections: overview + summary, scope, use cases (flowchart, sequence, rules, scenarios), database changes + ER page, API changes + shared types + API contracts page, errors, open questions. The ER and API contracts pages and the mock UI are their own pages, linked from their sections.
 
 ## Brand Commitments
 - Dark theme is the default.

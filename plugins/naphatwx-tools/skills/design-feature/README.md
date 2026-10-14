@@ -59,7 +59,7 @@ sequenceDiagram
     U-->>M: .parts/uc-NN.html
     D->>G: ER diagram of every related table
     D-->>M: database/er-diagram.html, .parts/database.html
-    A-->>M: .parts/api.html
+    A-->>M: api/contracts.html, .parts/api.html
     C-->>M: use-cases.js, by generate-use-case
     M->>M: write Overview, Scope, Errors, Open questions
     M->>M: merge .parts/, delete it
@@ -74,6 +74,7 @@ graph LR
     OV[overview.html] -->|"Flowchart view"| FC["flowchart/NN-slug"]
     OV -->|"Sequence view"| SQ["sequence-diagram/NN-slug"]
     OV -->|"ER diagram link"| ER[database/er-diagram.html]
+    OV -->|"API contracts link"| API[api/contracts.html]
     UCJ[use-cases.js] -->|scenarios-panels.js| SC["Scenarios view per use case"]
     UCJ -->|acceptance-section.js| AC["Acceptance criteria section"]
     SC --> OV
@@ -114,6 +115,8 @@ Output:
 │   └── NN-<uc-slug>.js        one per use case (.html in diagram-design mode)
 ├── database/
 │   └── er-diagram.html        every related table and FK
+├── api/
+│   └── contracts.html         one block per method: its request and response, side by side
 ├── use-cases.js               use cases, scenarios and acceptance criteria, by generate-use-case
 └── mock/                      optional standalone mock, by generate-mock-ui
 ```
@@ -135,6 +138,7 @@ Step 8 (only when asked) writes a publish copy outside the plan folder: `overvie
 | [template/flowchart/](template/flowchart/) | Preview diagrams; not copied. Synced from `generate-diagram` |
 | [template/sequence-diagram/](template/sequence-diagram/) | Preview diagrams + `render.js`; not copied. Synced from `generate-diagram` |
 | [template/database/](template/database/) | Preview ER diagram; not copied. Synced from `generate-diagram` |
+| [template/api/contracts.html](template/api/contracts.html) | The API contracts board; the API agent copies it and fills its `API` data |
 | [template/mock/](template/mock/) | Preview mock; not copied. Synced from `generate-mock-ui` |
 | [template/use-cases.js](template/use-cases.js) | Example use cases, scenarios and acceptance criteria for the preview (one gap on purpose); not copied |
 

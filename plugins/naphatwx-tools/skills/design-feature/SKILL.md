@@ -21,6 +21,8 @@ Turn a spec, ticket or idea into a plan folder people can open in a browser.
 │   └── 02-<uc-slug>.js
 ├── database/
 │   └── er-diagram.html        every related table and FK, opened from the Database section
+├── api/
+│   └── contracts.html         every related API with its full request and response, opened from the API section
 ├── use-cases.js               use cases, scenarios and acceptance criteria, by the generate-use-case skill; the Acceptance criteria
 │                              section and each use case's Scenarios view are generated from it
 └── mock/                      optional, standalone mock by the generate-mock-ui skill
@@ -43,7 +45,7 @@ Every diagram is drawn by the `generate-diagram` skill (`naphatwx-tools:generate
 | diagram-design | the `diagram-design` skill is available | `flowchart/NN-<slug>.html` | `sequence-diagram/NN-<slug>.html` | `<iframe class="diagram-frame">` |
 | manual | no `diagram-design` skill | `flowchart/NN-<slug>.svg` | `sequence-diagram/NN-<slug>.js` | `<img>` / `render.js` |
 
-The ER diagram is its own page in both modes (`database/er-diagram.html`), opened from the Database section. Sections are built by parallel sub-agents after the source is read (step 3).
+The ER diagram is its own page in both modes (`database/er-diagram.html`), opened from the Database section. So is the API contracts board (`api/contracts.html`), opened from the API section. Sections are built by parallel sub-agents after the source is read (step 3).
 
 ## User Input
 
@@ -68,7 +70,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Floating tools (bottom right of the page, top right on phones): `Open all` shows every use case view stacked; `Zoom` makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the top right resets; off by default); `Present` (or `P`) starts presentation mode; `?` opens the shortcut sheet (`#keys` dialog: `1`–`4`, `P`, `←`/`→`, `Esc`, `[`, `/`, `?`).
     - Keep the skip link (`.skip` → `#sheet`) as the first element of `<body>`.
     - Each diagram has a border and a `⛶` button at its top right that opens it in a lightbox: the page dims behind, the diagram sits in a frame 80% of the window's width and 90% of its height, fitted whole inside it, with its use case name and view as a caption below. Zoom works there even with the switch off (`✕`, Esc or a backdrop click closes it).
-    - Presentation mode shows one step per screen with a `← N / M · label →` bar: each use case gives one step per view, the API section an intro step plus one per `.api[data-part]`, every other `.slide` one step. A long step scrolls down; nothing scrolls sideways. A diagram draws at 1:1, never scaled (labels 14px, secondary lines 12px); its box ends above the bar, and a taller one scrolls inside its box with a `continues ↓` cue on the bottom edge; refs chips stay closed. `←` / `→` / Space step, Esc leaves. Full schema and full contracts stay out of it.
+    - Presentation mode shows one step per screen with a `← N / M · label →` bar: each use case gives one step per view, the API section an intro step plus one per `.api[data-part]`, every other `.slide` one step. A long step scrolls down; nothing scrolls sideways. A diagram draws at 1:1, never scaled (labels 14px, secondary lines 12px); its box ends above the bar, and a taller one scrolls inside its box with a `continues ↓` cue on the bottom edge; refs chips stay closed. `←` / `→` / Space step, Esc leaves. Full schema stays out of it.
     - The browser remembers each viewer's settings (`localStorage`): rail collapse, zoom and Open all.
 2. **Every use case has both diagrams** (they draw its flow): `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
 3. Each use case is one `<section class="slide use-case" id="uc-NN" data-title="UC<n> · <name>">` with four view buttons (disclosure buttons in a `role="group"` `.views` row: Flowchart, Sequence, Rules, Scenarios, each `aria-expanded` + `aria-controls`) and their four panels (`role="region"`), all closed by default (`aria-expanded="false"`, every `.panel` `hidden`). A click opens one panel at a time; a second click closes it.
@@ -113,7 +115,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 2. Pick the mode and copy the template
 
 - Mode: the `diagram-design` skill is available (`diagram-design:diagram-design` in Claude Code; any agent: listed in its skills) → diagram-design; otherwise manual. Pass it to every `generate-diagram` run.
-- Copy `template/overview.html` → `<output>/overview.html` and `template/assets/` → `<output>/assets/`. The template's `flowchart/`, `sequence-diagram/`, `database/`, `mock/` and `use-cases.js` files exist only to preview it; don't copy them — `generate-diagram`, `generate-use-case` and `generate-mock-ui` write the real ones.
+- Copy `template/overview.html` → `<output>/overview.html` and `template/assets/` → `<output>/assets/`. The API agent copies `template/api/contracts.html` (step 3). The template's `flowchart/`, `sequence-diagram/`, `database/`, `mock/` and `use-cases.js` files exist only to preview it; don't copy them — `generate-diagram`, `generate-use-case` and `generate-mock-ui` write the real ones.
 - The template shows the same example use case twice: UC1 in manual mode (`<img>` + `render.js`), UC2 in diagram-design mode (`<iframe class="diagram-frame">`, files drawn by the diagram-design skill). Copy the block of the chosen mode as the use case block, then delete UC2 and its rail link from the output.
 - diagram-design mode: remove the `render.js` `<script>` lines and `SeqDiagrams.renderAll()` from the output `overview.html`.
 
@@ -126,7 +128,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 |-------|------|--------|
 | Use case (one per use case; over 6 → 2–3 each) | `generate-diagram flowchart` and `generate-diagram sequence` for the use case, then the use case block (Use cases rules in step 4) | `flowchart/NN-<slug>.*`, `sequence-diagram/NN-<slug>.*`, `.parts/uc-NN.html` |
 | Database | `generate-diagram er` for every related table, then the section (Database rules in step 4) | `database/er-diagram.html` (or `er-<area>.html`), `.parts/database.html` |
-| API | the section (API rules in step 4) | `.parts/api.html` |
+| API | copies `template/api/contracts.html` and fills its `API` data, then the section (API rules in step 4) | `api/contracts.html`, `.parts/api.html` |
 | Use cases + scenarios | `generate-use-case` with `<output>` and `.parts/brief.md`, use cases numbered as in the brief; reply with the counts and acceptance coverage from its `check.js` | `use-cases.js` (`USE_CASES`, `SCENARIOS`, `ACCEPTANCE`) |
 
 - The main agent keeps the short sections: Overview, Scope, Errors, Open questions, and runs `scenarios-panels.js` and `acceptance-section.js` (step 4).
@@ -175,8 +177,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Tags: `new table` / `altered` (changed rows keep their marks), `read` for a table only read or only written to without a schema change, `external` + `.tbl.ext` for a table another service owns.
             - `.rel` lines for every relation between the listed tables.
         - No related table at all → keep the section with one sentence: "This feature has no database changes."
-    6. **API changes**: the facts, one block per changed API, then the full contracts hidden in a closed `<details class="more">` (copy the API block).
+    6. **API changes**: the API contracts link, the facts, then one block per changed API (copy the API block).
         - Source: the proto / OpenAPI / DTO diff in the spec's contracts.
+        - **API contracts ↗** link, inside the `<h2 id="api">` right after its text: `<a class="side-link" href="api/contracts.html" target="_blank" rel="noopener">`. No related API → no page and no link.
         - **Facts** (`dl.facts`), leave out a fact with nothing to say:
             - `Summary`: count of new / changed RPCs and the service.
             - `Files`: one file per line with its change count (`+4 RPCs, +8 messages`) or `new file`.
@@ -191,9 +194,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Any runtime rule change (with or without a contract change) → a closed `<details class="more">` under the cards, summary `Behaviour` + `<span class="aside">what changes at runtime</span>`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain paragraph.
         - **Shared types** (`<div class="api" id="api-shared-types" data-part="Shared types">` + `<h3>Shared types</h3>`): new or changed enums and nested messages used by more than one API. Leave the block out when there are none.
         - When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
-        - **Full contracts** (hidden, summary `Full contracts` + `<span class="aside">every related API, full request and response</span>`): every API the feature adds, changes or calls.
-            - `<h4>` per API (name · route · `new` / `changed` / `called, unchanged`), then full request and response cards with every field in field-number order. Changed fields keep their marks.
-            - An API another service owns → `.tbl.ext`.
+        - **API contracts board** (`api/contracts.html`, copied from `template/api/contracts.html`): every API the feature adds, changes or calls, one numbered block per method (`1. CreateThing` + its tag, then its route and permission), each with a board showing its request and response cards side by side. No lines between cards. Change only the `<title>`, the `<h1>` and the `API` data object; the page renders the rest.
+            - One `apis` entry per API, in the order of the API blocks, then the ones only called: `id` (the `api-<kebab-name>` slug), `name`, `tag` (`new` / `changed` / `behaviour` / `called, unchanged`), `route`, `perm` (`none · system caller` when it has none), `ext: true` when another service owns it.
+            - `req` and `res`: the message `name`, its `tag` (`new message` / `altered` / `removed message` / `unchanged`) and every field in field-number order as `[name, type, number, mark?]`. Changed fields keep their marks (`add` / `change` / `drop`, number `+ N` / `~ N` / `− N`, type `old → new`). No request or response message → leave it out (the board shows `no message`).
+            - `types`: the shared enums and nested messages, the same shape. They form the last numbered block, `Shared types`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
     7. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
     8. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker (a tinted amber band with the label), then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
@@ -220,8 +224,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Every rail link hash, nested ones included, matches an id on the page; every `.slide` has a `data-title`; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
 - Every use case has both a flowchart and a sequence diagram file; every view button has `aria-expanded="false"`, every `.panel` is `hidden` and every `details.more` is closed by default.
 - Every flowchart decision, call, write and error node shows a real value from the brief (or `TBD`); no sequence note or `alt` says only `guards` / `checks`.
-- Database "Full schema" lists every table in the sequence diagrams; API "Full contracts" lists every API in them.
-- Every table in the Full schema appears on an ER diagram page, and every ER button points to a page that exists.
+- Database "Full schema" lists every table in the sequence diagrams; the API contracts board lists every API in them.
+- Every table in the Full schema appears on an ER diagram page, and every ER and API contracts link points to a page that exists.
 - `.parts/` is deleted.
 - Every `href="#…"` on the page (rail, use case index) resolves to an id.
 - Each use case keeps one name everywhere: rail, use case index, `data-title`, its `<h3>` and its `USE_CASES` title. Its Scenarios panel lists scenarios of that use case only.
@@ -229,7 +233,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Run `node <this skill dir>/scripts/acceptance-section.js <output>` again. Its printed coverage matches `check.js`; every gap it lists is either fixed or reported in step 7. Every `#sc-<id>` link in the section resolves to a Scenarios row.
 - Mock built (standalone) → run the generate-mock-ui skill's `scripts/check-scenarios.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, every ui scenario has one play entry with a real state (in `states.js`) and page, and no mcp / api / job scenario has one (those show "No mock" in the mock). Then check each use case's Scenarios count and Play links match `use-cases.js` (re-run `scenarios-panels.js` if not).
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
-- Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
+- Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws. Open the API contracts board: every method block and card draws. Each page's `← Overview` link works.
 - Presentation mode, in the same browser at 1440×900, 1280×720 and 1024×768: press `P` and step through every step; on each, the page is no wider than the window (`document.documentElement.scrollWidth <= innerWidth`), the step's diagram or tables show whole across, the diagram box ends above the bar, every diagram label renders at its set size, 14px or 12px (not scaled up or down), and a box that scrolls shows the `continues ↓` cue.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 

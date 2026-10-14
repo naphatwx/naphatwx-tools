@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API contracts · Feature Name</title>
+    <style>
+        /* theme:tokens:start */
+        /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
+        :root {
+            color-scheme: dark;
+
+            /* Surfaces, darkest first */
+            --bg: #121316;
+            --surface: #18191d;
+            --surface-2: #1f2025;
+            --surface-3: #24262c;
+            --line: #26282e;
+            --line-strong: #363940;
+            --line-3: #4a4d55;
+            /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
+            --hover: #33353b;
+
+            /* Ink. Running text is --text; text-2 / text-3 are for chrome and meta labels only */
+            --text: #e2e3e7;
+            --text-2: #c6c8cf;
+            --text-3: #a3a6b0;
+
+            /* One accent */
+            --accent: #8ab0ff;
+            --accent-fill: #1b2232;
+            --accent-soft: rgba(138, 176, 255, 0.12);
+
+            /* Status: one hue set, two meanings. ok = add / pass, warn = change / flaky, bad = drop / fail */
+            --ok: #8fd694;
+            --warn: #f0c26b;
+            --bad: #f28b8d;
+            --neutral: #a3a6b0;
+            --ok-soft: rgba(143, 214, 148, 0.12);
+            --warn-soft: rgba(240, 194, 107, 0.12);
+            --bad-soft: rgba(242, 139, 141, 0.12);
+            --neutral-soft: rgba(163, 166, 176, 0.12);
+            --add: var(--ok);
+            --change: var(--warn);
+            --drop: var(--bad);
+
+            /* Diagrams: connectors and their labels */
+            --connector: #6b6e78;
+
+            /* Type. ui-monospace first, or macOS Chromium falls back to Courier */
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Code", monospace;
+
+            /* Type scale. Nothing renders below --fs-xs. Pages set font sizes by role (below), not by step. */
+            --fs-xs: 0.75rem;
+            --fs-sm: 0.875rem;
+            --fs-md: 1rem;
+            --fs-lg: 1.25rem;
+            --fs-xl: 1.5rem;
+            --fs-2xl: 2rem;
+            /* Headings and lead line: the same steps on every page */
+            --fs-lead: var(--fs-lg);
+            --fs-h3: var(--fs-lg);
+            --fs-h2: var(--fs-xl);
+            --fs-h1: var(--fs-2xl);
+            /* Roles: one step down per role, so the eye lands on body text first.
+               body = running text, tables, buttons, action bars · meta = hints, asides, legends, captions, code · tag = pills, kbd, counts */
+            --fs-body: var(--fs-md);
+            --fs-meta: var(--fs-sm);
+            --fs-code: var(--fs-sm);
+            --fs-tag: var(--fs-xs);
+            /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+            --fs-dia: var(--fs-sm);
+            --fs-dia-sub: var(--fs-xs);
+
+            /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px, 6xl 1152px, 7xl 1280px). Use these, not raw px */
+            --max-w-md: 28rem;
+            --max-w-3xl: 48rem;
+            --max-w-4xl: 56rem;
+            --max-w-5xl: 64rem;
+            --max-w-6xl: 72rem;
+            --max-w-7xl: 80rem;
+
+            /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-3xl */
+            --page-w: min(80%, var(--max-w-3xl));
+            --gutter: clamp(16px, 3vw, 24px);
+
+            --radius: 6px;
+            --radius-lg: 10px;
+            --ease: cubic-bezier(0.2, 0, 0, 1);
+        }
+        /* theme:tokens:end */
+        /* theme:base:start */
+        /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        a { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        code, kbd, pre, samp { font-family: var(--mono); }
+        /* Label over a group (list, field, table column, step list): body size, brighter and bolder than meta text */
+        .label, th, dt { color: var(--text-2); font-weight: 600; }
+        /* Table column headers: uppercase at meta size, a little tracking so caps stay readable */
+        th { font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: 0.04em; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* theme:base:end */
+        /* theme:pdf:start */
+        /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
+        /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
+        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
+        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+        .float-bar button:hover { background: var(--hover); color: var(--text); }
+        @page { margin: 0; }
+        @media print {
+            html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            pre, figure, img, svg, tr { break-inside: avoid; }
+            h1, h2, h3 { break-after: avoid; }
+        }
+        /* theme:pdf:end */
+
+        * { margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
+
+        body { padding: 20px var(--gutter) 32px; }
+        /* one column as wide as the boards (every board is two cards wide), so titles line up with them */
+        .page { width: fit-content; max-width: 100%; margin: 0 auto; }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; }
+        .sub { color: var(--text-3); font-size: var(--fs-meta); margin-top: 2px; }
+        .actions { display: flex; gap: 8px; }
+
+        .btn {
+            font: inherit;
+            font-size: var(--fs-body);
+            color: var(--text-2);
+            background: var(--surface-2);
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn:hover { color: var(--text); background: var(--hover); }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 24px;
+            font-size: var(--fs-sm);
+            color: var(--text-3);
+        }
+
+        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
+        .legend .write { border-color: var(--accent); }
+        .legend .external { border-style: dashed; }
+        .legend .add { color: var(--add); }
+        .legend .change { color: var(--change); }
+        .legend .drop { color: var(--drop); }
+
+        /* one block per method: numbered title, route line, then its board */
+        .method { margin-bottom: 32px; }
+        .method h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; font-size: var(--fs-h2); font-weight: 600; }
+        .method h2 .n { color: var(--text-3); font-family: var(--mono); font-size: var(--fs-h3); }
+        .method h2 code { font-size: inherit; }
+        .method h2 .tag { color: var(--text-3); font-size: var(--fs-tag); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 8px; }
+        .method h2 .tag.write { color: var(--accent); border-color: var(--accent); }
+        .method .sub { margin: 4px 0 10px; }
+
+        .canvas {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            overflow-x: auto;
+            padding: 12px;
+        }
+
+        /* each svg draws at 1:1, so every label renders at 14px; a wider one scrolls. */
+        .canvas svg { display: block; max-width: none; font-family: var(--sans); }
+
+        /* svg parts */
+        .t-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
+        .t-box.write { stroke: var(--accent); stroke-width: 1.6; }
+        .t-box.drop { stroke: var(--drop); stroke-width: 1.6; }
+        .t-box.external { stroke-dasharray: 5 4; }
+        .t-head { fill: var(--surface-3); }
+        .t-name { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; font-family: var(--mono); }
+        .t-tag { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
+        .t-tag.write { fill: var(--accent); }
+        .t-tag.drop { fill: var(--drop); }
+        .c-label { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        .r-zebra { fill: var(--text); opacity: 0.025; }
+        .r-line { stroke: var(--line); }
+        .r-col { fill: var(--text); font-size: var(--fs-dia); font-family: var(--mono); }
+        .r-type { fill: var(--text-3); font-size: var(--fs-dia-sub); }
+        .r-key { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
+        .r-none { fill: var(--text-3); font-size: var(--fs-dia-sub); font-style: italic; }
+        .r-drop .r-col, .r-drop .r-type { fill: var(--drop); text-decoration: line-through; }
+        .r-drop .r-key { fill: var(--drop); }
+        .r-add .r-col, .r-add .r-key { fill: var(--add); }
+        .r-change .r-col, .r-change .r-key { fill: var(--change); }
+
+        /* PDF: shrink each board to the page width instead of cutting it off. */
+        @media print {
+            .actions { display: none; }
+            .method { break-inside: avoid; }
+            .canvas { overflow: visible; }
+            .canvas svg { max-width: 100%; height: auto; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+    <header>
+        <div>
+            <h1>API contracts · Feature Name</h1>
+            <p class="sub">Every API the feature adds, changes or calls, with its full request and response.</p>
+        </div>
+        <div class="actions">
+            <a class="btn" href="../overview.html#api">← Overview</a>
+        </div>
+    </header>
+
+    <div class="legend">
+        <span><i class="write"></i>new message or type</span>
+        <span><i></i>existing message</span>
+        <span><i class="external"></i>external (another service owns it)</span>
+        <span><b class="add">+ add</b> · <b class="change">~ change</b> · <b class="drop">− drop</b></span>
+    </div>
+
+    <main id="board"></main>
+    </div>
+
+    <script>
+        /* theme:pdf-js:start */
+        /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
+        function addExportPdf(target, prepare) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'export-pdf no-print';
+            if (!target) {
+                target = document.querySelector('.float-bar');
+                if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+            }
+            b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
+            b.textContent = 'Export PDF';
+            b.addEventListener('click', async () => {
+                if (prepare) await prepare();
+                window.print();
+            });
+            target.append(b);
+            return b;
+        }
+        /* theme:pdf-js:end */
+        addExportPdf();
+
+        // Renders one numbered block per method: its title, route and permission, then a board with its request and response cards.
+        // fields: [name, type, number, mark?] · mark: add | change | drop. Shared types get one last block.
+        // tag: "new" / "changed" / "behaviour" / "called, unchanged" on an API; "new message" / "altered" / "removed message" / "unchanged" on a message.
+        const API = {
+            apis: [
+                { id: "create-thing", name: "CreateThing", tag: "new", route: "POST /api/v1/things", perm: "things.create",
+                    req: { name: "CreateThingRequest", tag: "new message", fields: [
+                        ["name", "string", "1"], ["ownerId", "int32", "2"], ["note", "optional string", "3"],
+                    ] },
+                    res: { name: "ThingResponse", tag: "altered", fields: [
+                        ["id", "int64", "1"], ["name", "string", "2"], ["legacyFlag", "bool", "− 4", "drop"],
+                        ["count", "int32 → int64", "~ 9", "change"], ["source", "RepositorySource", "+ 17", "add"],
+                    ] } },
+                { id: "get-things", name: "GetThings", tag: "behaviour", route: "GET /api/v1/things", perm: "things.read",
+                    req: { name: "GetThingsRequest", tag: "unchanged", fields: [
+                        ["source", "optional RepositorySource", "1"], ["page", "int32", "2"],
+                    ] },
+                    res: { name: "GetThingsResponse", tag: "unchanged", fields: [
+                        ["items", "repeated ThingResponse", "1"], ["total", "int64", "2"],
+                    ] } },
+                { id: "get-owner", name: "GetOwner", tag: "called, unchanged", ext: true, route: "GET /api/v1/owners/{id}", perm: "none · system caller",
+                    req: { name: "GetOwnerRequest", tag: "unchanged", fields: [["id", "int32", "1"]] },
+                    res: { name: "Owner", tag: "unchanged", fields: [["id", "int32", "1"], ["displayName", "string", "2"]] } },
+            ],
+            types: [
+                { name: "RepositorySource", tag: "new enum", fields: [
+                    ["REPOSITORY_SOURCE_UNSPECIFIED", "", "0"], ["GITLAB", "", "1"],
+                ] },
+            ],
+        };
+
+
+        (function render({ apis, types }) {
+            const HEAD = 34, ROW = 26, GX = 48, LABEL = 22, PAD = 16;
+            const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+            // Text is 14px; widths are estimated per character, on the wide side.
+            const MONO = 8.6, SANS = 7.9, BOLD = 8.8;
+            const widest = (list, per) => Math.max(0, ...list.map(v => String(v || "").length * per));
+            // Every card shares one width, so request and response line up from method to method. keyX is where the number column starts.
+            const cards = [...apis.flatMap(a => [a.req, a.res]).filter(Boolean), ...types];
+            const fields = cards.flatMap(c => c.fields);
+            const keyX = Math.round(12 + widest(fields.map(f => f[0]), MONO) + 20);
+            const W = Math.round(Math.max(280, keyX + widest(fields.map(f => f[2]), BOLD) + 20 + widest(fields.map(f => f[1]), SANS) + 12,
+                ...cards.map(c => 12 + c.name.length * MONO + 20 + String(c.tag || "").length * BOLD + 12)));
+            const kind = c => /^new/.test(c.tag) ? "write" : /removed/.test(c.tag) ? "drop" : "";
+
+            // A card: label above, head with name and tag, then one row per field. No message → one muted row.
+            const card = (c, x, label, ext) => {
+                const y = PAD + LABEL;
+                const top = `<text class="c-label" x="${x}" y="${PAD + 12}">${esc(label)}</text>`;
+                if (!c) return { h: HEAD, svg: top + `<rect class="t-box" x="${x}" y="${y}" width="${W}" height="${HEAD}" rx="8"/>`
+                    + `<text class="r-none" x="${x + 12}" y="${y + 22}">no message</text>` };
+                const k = kind(c), cls = [k, ext ? "external" : ""].join(" ").trim();
+                const rows = c.fields.map(([name, type, num, mark], i) => {
+                    const ry = y + HEAD + i * ROW;
+                    return `<g class="${mark ? "r-" + mark : ""}">`
+                        + (i % 2 ? `<rect class="r-zebra" x="${x}" y="${ry}" width="${W}" height="${ROW}"/>` : "")
+                        + (i ? `<line class="r-line" x1="${x}" x2="${x + W}" y1="${ry}" y2="${ry}"/>` : "")
+                        + `<text class="r-col" x="${x + 12}" y="${ry + 18}">${esc(name)}</text>`
+                        + `<text class="r-key" x="${x + keyX}" y="${ry + 18}">${esc(num)}</text>`
+                        + `<text class="r-type" x="${x + W - 12}" y="${ry + 18}" text-anchor="end">${esc(type)}</text></g>`;
+                }).join("");
+                const h = HEAD + c.fields.length * ROW;
+                return { h, svg: top
+                    + `<g role="group" aria-label="${esc(label)} ${esc(c.name)}${c.tag ? ", " + esc(c.tag) : ""}">`
+                    + `<rect class="t-box ${cls}" x="${x}" y="${y}" width="${W}" height="${h}" rx="8"/>`
+                    + `<path class="t-head" d="M${x + 1},${y + HEAD} V${y + 8} a7,7 0 0 1 7,-7 H${x + W - 8} a7,7 0 0 1 7,7 V${y + HEAD} Z"/>`
+                    + `<text class="t-name" x="${x + 12}" y="${y + 22}">${esc(c.name)}</text>`
+                    + `<text class="t-tag ${k}" x="${x + W - 12}" y="${y + 22}" text-anchor="end">${esc(c.tag || "")}</text>`
+                    + rows + `</g>` };
+            };
+            // A board: cards side by side, at least two cards wide so every board has the same width.
+            const board = list => {
+                const drawn = list.map((item, i) => card(item.c, PAD + i * (W + GX), item.label, item.ext));
+                const n = Math.max(2, list.length);
+                const w = PAD * 2 + n * W + (n - 1) * GX;
+                const h = PAD * 2 + LABEL + Math.max(...drawn.map(d => d.h));
+                return `<div class="canvas"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${list.map(l => esc(l.label)).join(" and ")}">`
+                    + drawn.map(d => d.svg).join("") + `</svg></div>`;
+            };
+
+            const blocks = apis.map((a, i) => `<section class="method" id="api-${esc(a.id)}">`
+                + `<h2><span class="n">${i + 1}.</span><code>${esc(a.name)}</code><span class="tag${a.tag === "new" ? " write" : ""}">${esc(a.tag)}</span></h2>`
+                + `<p class="sub">${esc(a.route)} · permission ${esc(a.perm)}</p>`
+                + board([{ c: a.req, label: "request", ext: a.ext }, { c: a.res, label: "response", ext: a.ext }])
+                + `</section>`);
+            // Shared types: two cards per board row.
+            for (let i = 0; i < types.length; i += 2) {
+                blocks.push(`<section class="method"${i ? "" : ` id="api-shared-types"`}>`
+                    + (i ? "" : `<h2><span class="n">${apis.length + 1}.</span>Shared types</h2><p class="sub">Enums and nested messages used by more than one API.</p>`)
+                    + board(types.slice(i, i + 2).map(t => ({ c: t, label: /enum/.test(t.tag) ? "enum" : "message" }))) + `</section>`);
+            }
+            document.getElementById("board").innerHTML = blocks.join("");
+        })(API);
+
+    </script>
+</body>
+
+</html>

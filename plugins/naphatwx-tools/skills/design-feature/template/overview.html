@@ -273,11 +273,11 @@
             </details>
         </section>
 
-        <!-- ============ 06 API: intro facts, one .api block per changed API (data-part = its name: one presentation step each),
-             then the full request / response of every related API in a closed details.more.
+        <!-- ============ 06 API: intro facts, one .api block per changed API (data-part = its name: one presentation step each).
+             The full request / response of every related API is the board at api/contracts.html, linked from the h2.
              No related API at all → keep this section, replace its body with "This feature has no API changes." ============ -->
         <section class="slide" id="api" data-title="API">
-            <h2><span class="sec-n">06</span>API changes</h2>
+            <h2><span class="sec-n">06</span>API changes <a class="side-link" href="api/contracts.html" target="_blank" rel="noopener">API contracts ↗</a></h2>
             <dl class="facts">
                 <dt>Summary</dt>
                 <dd>1 new RPC, 1 behaviour change on <code>ThingService</code></dd>
@@ -332,39 +332,6 @@
                     </div>
                 </div>
             </div>
-
-            <details class="more">
-                <summary>Full contracts <span class="aside">every related API, full request and response</span></summary>
-                <h4><code>CreateThing</code> <span class="aside">POST /api/v1/things · new</span></h4>
-                <div class="tables">
-                    <div class="tbl new">
-                        <div class="tbl-head"><span>CreateThingRequest</span><span class="tag">new message</span></div>
-                        <div class="row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
-                        <div class="row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
-                        <div class="row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
-                    </div>
-                    <div class="tbl">
-                        <div class="tbl-head"><span>ThingResponse</span><span class="tag">altered</span></div>
-                        <div class="row"><span class="col">id</span><span class="type">int64</span><span class="key">1</span></div>
-                        <div class="row"><span class="col">name</span><span class="type">string</span><span class="key">2</span></div>
-                        <div class="row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
-                        <div class="row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
-                        <div class="row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
-                    </div>
-                </div>
-                <h4><code>GetOwner</code> <span class="aside">GET /api/v1/owners/{id} · called, unchanged</span></h4>
-                <div class="tables">
-                    <div class="tbl ext">
-                        <div class="tbl-head"><span>GetOwnerRequest</span><span class="tag">unchanged</span></div>
-                        <div class="row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
-                    </div>
-                    <div class="tbl ext">
-                        <div class="tbl-head"><span>Owner</span><span class="tag">unchanged</span></div>
-                        <div class="row"><span class="col">id</span><span class="type">int32</span><span class="key">1</span></div>
-                        <div class="row"><span class="col">displayName</span><span class="type">string</span><span class="key">2</span></div>
-                    </div>
-                </div>
-            </details>
         </section>
 
         <!-- ============ 07 ERRORS ============ -->
