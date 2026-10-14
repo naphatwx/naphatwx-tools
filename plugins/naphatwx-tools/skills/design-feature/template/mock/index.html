@@ -118,21 +118,10 @@
         /* theme:base:end */
         /* theme:pdf:start */
         /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
-        .export-pdf-float {
-            position: fixed;
-            right: 16px;
-            bottom: 16px;
-            z-index: 50;
-            padding: 6px 12px;
-            font: inherit;
-            font-size: var(--fs-body);
-            color: var(--text);
-            background: var(--surface-2);
-            border: 1px solid var(--line-strong);
-            border-radius: var(--radius);
-            cursor: pointer;
-        }
-        .export-pdf-float:hover { background: var(--hover); }
+        /* .float-bar: one long box at the bottom right; Export PDF goes last, page tools can sit before it */
+        .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
+        .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
+        .float-bar button:hover { background: var(--hover); color: var(--text); }
         @page { margin: 0; }
         @media print {
             html, body { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -207,10 +196,6 @@
         .tabs-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .tabs-clear { padding: 0 8px; font: inherit; font-size: var(--fs-tag); font-weight: 400; color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
         .tabs-clear:hover { color: var(--text); background: var(--hover); }
-        /* bottom right: one long box with Clear all and Export PDF, like design-feature's tools bar */
-        .float-actions { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px; }
-        .float-btn { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
-        .float-btn:hover { background: var(--hover); color: var(--text); }
         .tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
         .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
         /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
@@ -258,7 +243,7 @@
 </head>
 
 <body>
-    <div class="float-actions no-print"><button type="button" class="float-btn" onclick="clearAll()" title="Clear every Pass / Fail and note, to test again">Clear all</button></div>
+    <div class="float-bar no-print"><button type="button" onclick="clearAll()" title="Clear every Pass / Fail and note, to test again">Clear all</button></div>
     <div class="page py-6 space-y-8">
         <header>
             <a href="../overview.html#use-cases" class="link">← Feature plan</a>
@@ -295,18 +280,22 @@
         function addExportPdf(target, prepare) {
             const b = document.createElement('button');
             b.type = 'button';
-            b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+            b.className = 'export-pdf no-print';
+            if (!target) {
+                target = document.querySelector('.float-bar');
+                if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+            }
             b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
             b.textContent = 'Export PDF';
             b.addEventListener('click', async () => {
                 if (prepare) await prepare();
                 window.print();
             });
-            (target || document.body).append(b);
+            target.append(b);
             return b;
         }
         /* theme:pdf-js:end */
-        addExportPdf(document.querySelector('.float-actions')).classList.add('float-btn');
+        addExportPdf();
         const SCREEN_W = 1920, SCREEN_H = 1080; // 16:9; the frame scales to the column width and keeps this ratio
         const list = items => items.map(s => `<li>${UI.esc(s)}</li>`).join('');
         const nn = ucId => ucId.slice(2).padStart(2, '0');

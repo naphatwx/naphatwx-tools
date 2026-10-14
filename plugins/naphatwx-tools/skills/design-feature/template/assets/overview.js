@@ -3,14 +3,18 @@
 function addExportPdf(target, prepare) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'export-pdf no-print' + (target ? '' : ' export-pdf-float');
+    b.className = 'export-pdf no-print';
+    if (!target) {
+        target = document.querySelector('.float-bar');
+        if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+    }
     b.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
     b.textContent = 'Export PDF';
     b.addEventListener('click', async () => {
         if (prepare) await prepare();
         window.print();
     });
-    (target || document.body).append(b);
+    target.append(b);
     return b;
 }
 /* theme:pdf-js:end */
