@@ -12,7 +12,6 @@ Checks after a deploy that every service in a real flow still reaches the next o
 | You want | Use instead |
 |----------|-------------|
 | Browser tests of the UI, with screenshots | `e2e-test` |
-| A test case file an AI runs later | `generate-test-cases` |
 | The steps to do before and after a deploy | `deploy-plan` |
 | A feature's scenarios played by hand on the running app | `play-scenarios` |
 | Why a Jenkins build failed | `check-job` |

@@ -30,5 +30,11 @@ var Rules = (function () {
     /** @type {ApiError} */
     const UNREACHABLE = { code: 'Unavailable', message: 'The service could not be reached. Try again.' };
 
-    return { MAX_LIMIT, STATUS_MAP, toResponse, validateCreate, UNREACHABLE };
+    // Screen texts, copied verbatim from the app (or the spec while there is no code)
+    const NAME_REQUIRED = 'Name is required.';
+    const ARCHIVED = 'This owner is archived. Things cannot be created.';
+    /** @param {string} name */
+    const created = name => `${name} was created.`;
+
+    return { MAX_LIMIT, STATUS_MAP, toResponse, validateCreate, UNREACHABLE, NAME_REQUIRED, ARCHIVED, created };
 })();

@@ -2,7 +2,17 @@
 // Written by the agent, never by hand. `calls`: every call of that run, request and response as returned, secrets masked.
 // A Pass/Fail you click in the browser wins. Strict JSON after `var PLAYED_RESULTS = `. Preview data: a real run starts at {}.
 var PLAYED_RESULTS = {
- "create-api": {
+ "mcp-list": {
+  "status": "pass",
+  "by": "Claude over MCP on the local app",
+  "at": "2026-10-14",
+  "note": "Claude over MCP, 2026-10-14: 2 things, Second thing PENDING then First thing READY.",
+  "calls": [
+   { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "ListThings", "params": { "ownerId": 1202 } }, "isError": false,
+     "response": { "things": [{ "id": 1205, "name": "Second thing", "status": "PENDING" }, { "id": 1204, "name": "First thing", "status": "READY" }], "total": 2 } }
+  ]
+ },
+ "mcp-create": {
   "status": "pass",
   "by": "Claude over MCP on the local app",
   "at": "2026-10-14",
@@ -14,17 +24,17 @@ var PLAYED_RESULTS = {
      "response": { "entities": [{ "message": "created thing #1207" }], "total": 1 } }
   ]
  },
- "create-api-empty-name": {
+ "mcp-create-empty-name": {
   "status": "pass",
   "by": "Claude over MCP on the local app",
   "at": "2026-10-14",
-  "note": "Claude over MCP, 2026-10-14: Invalid argument: name is required. The owner still has its 3 things.",
+  "note": "Claude over MCP, 2026-10-14: Invalid argument: name is required. The owner still has its 2 things.",
   "calls": [
    { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "CreateThing", "params": { "ownerId": 1210, "name": "" } }, "isError": true,
      "response": "Invalid argument: name is required." },
    { "lookup": "The owner id 1210 came from ▶ Seed (the seed's vars)." },
-   { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "GetThings", "params": { "ownerId": 1210 } }, "isError": false,
-     "response": { "entities": [{ "id": 1213 }, { "id": 1212 }, { "id": 1211 }], "total": 3 } }
+   { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "ListThings", "params": { "ownerId": 1210 } }, "isError": false,
+     "response": { "things": [{ "id": 1212 }, { "id": 1211 }], "total": 2 } }
   ]
  }
 };

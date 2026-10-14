@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Checks a standalone mock's play data against the plan's scenarios, and runs every console (API / MCP) scenario
-// against the fake API: its message must match the expect's quoted text. Scenarios come from <mock-dir>/../use-cases.js.
-// Usage: node check-scenarios.js <mock-dir> [--use-cases <file>] [--json]. Exit 1 on any structural error or message mismatch.
+// Checks a standalone mock against the plan's scenarios (<mock-dir>/../use-cases.js): every ui scenario has one play
+// entry with a real state and page; mcp / api / job scenarios have none (they show as "No mock"). Syntax-checks all scripts.
+// Usage: node check-scenarios.js <mock-dir> [--use-cases <file>] [--json]. Exit 1 on any error.
 
 const fs = require('fs');
 const os = require('os');
@@ -57,50 +57,30 @@ catch (e) { errors.push(`${ucFile} is missing, not strict JSON or in the old for
 try { PLAY = parseVar(read('shared/scenario-play.js'), 'SCENARIO_PLAY'); }
 catch (e) { errors.push(`shared/scenario-play.js is missing or not strict JSON: ${e.message}`); }
 // The merged view the pages see: each scenario plus its play entry.
-const SCS = CORE.map(s => ({ ...s, ...(PLAY.find(p => p.id === s.id) || { skip: 'No play entry.' }) }));
+const SCS = CORE.map(s => ({ ...s, ...(PLAY.find(p => p.id === s.id) || {}) }));
 
-/** The mock's shared scripts in a VM, with location and storage stubbed and latency removed. */
-function sandbox(state, sc) {
-    const store = new Map();
-    const ctx = {
-        console, URLSearchParams, Intl, Date, Math, JSON, Promise, Object, Array, String, Number, Error,
-        setTimeout: f => { Promise.resolve().then(f); return 0; }, clearTimeout() { }, setInterval() { return 0; },
-        location: { search: `?state=${encodeURIComponent(state)}${sc ? `&sc=${sc}` : ''}`, pathname: '/page/console.html', hash: '' },
-        sessionStorage: { getItem: k => store.has(k) ? store.get(k) : null, setItem: (k, v) => store.set(k, String(v)), removeItem: k => store.delete(k), key: i => [...store.keys()][i], get length() { return store.size; } },
-        localStorage: { getItem: () => null, setItem() { } },
-        document: { documentElement: { classList: { remove() { }, toggle() { }, contains: () => true } } },
-    };
-    ctx.window = ctx;
+/** states.js in a VM (location stubbed), for its state ids. */
+function stateIdsOf() {
+    const ctx = { URLSearchParams, location: { search: '', pathname: '/page/x.html', hash: '' } };
     vm.createContext(ctx);
-    const files = ['contract/rules.js', 'contract/data.js', 'shared/states.js', 'shared/components.js', 'shared/fake-api.js'].map(f => path.join(dir, f))
-        .concat(ucFile, path.join(dir, 'shared/scenario-play.js'));
-    for (const f of files) {
+    for (const f of ['contract/rules.js', 'shared/states.js']) {
         // top-level const/let would stay script-scoped; var makes them reachable from runInContext
-        if (fs.existsSync(f)) vm.runInContext(fs.readFileSync(f, 'utf8').replace(/^(const|let) (\w+) =/gm, 'var $2 ='), ctx, { filename: path.relative(dir, f) });
+        vm.runInContext(read(f).replace(/^(const|let) (\w+) =/gm, 'var $2 ='), ctx, { filename: f });
     }
-    return ctx;
-}
-
-// ---------------------------------------------------------------- messages: the fake API's text must be the text use-cases.js quotes
-const messageOf = v => v && typeof v === 'object' ? String(v.message || v.error || '') : '';
-// quoted runs of 8+ characters with a letter: messages, not values like "2.3.3"
-const quotedIn = lines => (lines || []).flatMap(l => [...String(l).matchAll(/"([^"]{8,})"/g)].map(m => m[1])).filter(q => /[a-z]{3}/i.test(q));
-const norm = t => t.replace(/\s+/g, ' ').trim();
-/** A quote ending in … or ... is a prefix of the full message. */
-function sameText(quote, message) {
-    const q = norm(quote), m = norm(message), cut = q.match(/^(.*?)\s*(?:…|\.\.\.)$/);
-    return cut ? m.startsWith(cut[1]) : m === q || m.includes(q) || q.includes(m);
+    return vm.runInContext('States.LIST.map(s => s.id)', ctx);
 }
 
 let stateIds = [];
-try { stateIds = vm.runInContext('States.LIST.map(s => s.id)', sandbox('')); }
-catch (e) { errors.push(`could not load the mock in a sandbox: ${e.message}`); }
+try { stateIds = stateIdsOf(); }
+catch (e) { errors.push(`could not load shared/states.js: ${e.message}`); }
 
+const SURFACES = ['ui', 'mcp', 'api', 'job'];
 const ids = new Set();
 for (const s of CORE) {
     if (ids.has(s.id)) errors.push(`duplicate scenario id: ${s.id}`);
     ids.add(s.id);
     if (!USE_CASES.some(c => c.id === s.useCase)) errors.push(`${s.id}: use case ${s.useCase} is not in USE_CASES`);
+    if (!SURFACES.includes(s.surface)) errors.push(`${s.id}: surface "${s.surface}" is not one of ${SURFACES.join(' | ')}`);
 }
 const playIds = new Set();
 for (const p of PLAY) {
@@ -109,48 +89,26 @@ for (const p of PLAY) {
     if (!ids.has(p.id)) errors.push(`play entry ${p.id} matches no scenario in use-cases.js`);
 }
 for (const s of SCS) {
-    if (!playIds.has(s.id)) { errors.push(`${s.id}: no play entry; add one, or one with "skip" and why`); continue; }
-    if (s.skip) continue;
-    for (const k of ['state', 'page', 'steps']) if (s[k] == null || s[k] === '') errors.push(`${s.id}: missing ${k}`);
+    if (s.surface !== 'ui') {
+        if (playIds.has(s.id)) errors.push(`${s.id}: a ${s.surface} scenario has no mock; remove its play entry`);
+        continue;
+    }
+    if (!playIds.has(s.id)) { errors.push(`${s.id}: ui scenario with no play entry; add one`); continue; }
+    for (const k of ['state', 'page', 'steps']) if (s[k] == null || s[k] === '' || (k === 'steps' && !s[k].length)) errors.push(`${s.id}: missing ${k}`);
     if (stateIds.length && !stateIds.includes(s.state)) errors.push(`${s.id}: state ${s.state} is not in states.js`);
     if (!fs.existsSync(path.join(dir, 'page', `${s.page}.html`))) errors.push(`${s.id}: page/${s.page}.html does not exist`);
-    if (s.page === 'console' && (!s.op || !s.req)) errors.push(`${s.id}: console scenario needs op and req`);
 }
 USE_CASES.forEach(c => { if (!CORE.some(s => s.useCase === c.id) && !c.none) errors.push(`use case ${c.id} has no scenario and no "none" sentence`); });
 
-// ---------------------------------------------------------------- run console scenarios (first run only; later steps are manual)
-(async () => {
-    const runs = [];
-    for (const s of SCS.filter(s => !s.skip && s.page === 'console' && s.op)) {
-        let result;
-        try {
-            const ctx = sandbox(s.state, s.id);
-            if (typeof ctx.FakeApi?.[s.op] !== 'function') { errors.push(`${s.id}: FakeApi has no operation ${s.op}`); continue; }
-            ctx.__req = JSON.parse(JSON.stringify(s.req));
-            result = { ok: true, value: await vm.runInContext(`FakeApi[${JSON.stringify(s.op)}](__req)`, ctx) };
-        } catch (e) { result = { ok: false, value: e instanceof Error ? { error: e.message } : e }; }
-        const message = messageOf(result.value);
-        const quotes = quotedIn(s.expect);
-        const matched = !message || !quotes.length || quotes.some(q => sameText(q, message));
-        if (!matched) errors.push(`${s.id}: the fake API answered "${message}", but expect quotes ${quotes.map(q => `"${q}"`).join(', ')}; use the code's exact text in both`);
-        runs.push({ id: s.id, op: s.op, state: s.state, result, message, matched, expect: s.expect, moreSteps: s.steps.length > 1 });
-    }
-
-    const inUseCase = c => SCS.filter(s => s.useCase === c.id);
-    const perUseCase = USE_CASES.map(c => ({ useCase: c.id, title: c.title, count: inUseCase(c).length, playable: inUseCase(c).filter(s => !s.skip).length }));
-    const playable = SCS.filter(s => !s.skip).length;
-    if (asJson) out(JSON.stringify({ scenarios: SCS.length, playable, perUseCase, errors, runs }, null, 2));
-    else {
-        out(`${SCS.length} scenarios, ${playable} playable in the mock`);
-        perUseCase.forEach(c => out(`  ${c.useCase} ${c.title}: ${c.count} (${c.playable} playable)`));
-        out(`\nConsole runs (${runs.length}), compare each result with expect:`);
-        for (const r of runs) {
-            out(`\n# ${r.id} · ${r.op} · state ${r.state}${r.moreSteps ? ' (later steps not run)' : ''}`);
-            out(`  ${r.result.ok ? 'OK' : 'ERROR'} ${JSON.stringify(r.result.value).slice(0, 400)}`);
-            if (r.message) out(`  message ${r.matched ? 'matches' : 'DOES NOT MATCH'} the quoted expect text`);
-            r.expect.forEach(e => out(`  expect: ${e}`));
-        }
-        out(errors.length ? `\n${errors.length} error(s):\n- ${errors.join('\n- ')}` : '\nNo errors.');
-    }
-    process.exit(errors.length ? 1 : 0);
-})();
+// ---------------------------------------------------------------- counts: every scenario is in the tree; ui ones play
+const played = s => s.surface === 'ui' && playIds.has(s.id);
+const inUseCase = c => SCS.filter(s => s.useCase === c.id);
+const perUseCase = USE_CASES.map(c => ({ useCase: c.id, title: c.title, count: inUseCase(c).length, playable: inUseCase(c).filter(played).length }));
+const playable = SCS.filter(played).length;
+if (asJson) out(JSON.stringify({ scenarios: SCS.length, playable, noMock: SCS.length - playable, perUseCase, errors }, null, 2));
+else {
+    out(`${SCS.length} scenarios, ${playable} playable in the mock, ${SCS.length - playable} shown as No mock`);
+    perUseCase.forEach(c => out(`  ${c.useCase} ${c.title}: ${c.count} (${c.playable} playable)`));
+    out(errors.length ? `\n${errors.length} error(s):\n- ${errors.join('\n- ')}` : '\nNo errors.');
+}
+process.exit(errors.length ? 1 : 0);

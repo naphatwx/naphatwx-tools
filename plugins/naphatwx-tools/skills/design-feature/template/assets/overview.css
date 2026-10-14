@@ -478,6 +478,20 @@ details.more > :not(summary) { margin-bottom: 12px; }
 table { width: 100%; border-collapse: collapse; font-size: var(--fs-body); }
 th { text-align: left; padding: 0 16px 6px 0; border-bottom: 1px solid var(--line-strong); }
 td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
+tr { scroll-margin-top: 32px; }
+tr:target > td { background: var(--accent-soft); }
+
+/* Channel tag (ui / mcp / api / job) in the Scenarios views and Acceptance criteria; .gap = no scenario on it */
+.ch-tag { display: inline-block; min-width: 3.4em; margin-right: 6px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 999px; font: 500 var(--fs-tag)/1.5 var(--mono); color: var(--text-2); text-align: center; text-transform: uppercase; vertical-align: 1px; }
+.ch-tag.gap { color: var(--warn); border-color: var(--warn); }
+td .aside.na { color: var(--text-3); }
+.ac-table { margin-top: 10px; }
+.ac-table td:first-child { width: 58%; }
+.ac-cover { list-style: none; padding: 0; }
+.ac-cover li { display: flex; align-items: baseline; }
+.ac-cover li + li { margin-top: 4px; }
+.ac-cover .ch-tag { flex: none; }
+.ac-gap { color: var(--warn); font-weight: 600; }
 
 .blocker-line { margin: 4px 0 6px; padding: 8px 14px; border-radius: var(--radius-lg); background: var(--warn-soft); color: var(--text); }
 .blocker-line + .blocker-line { margin-top: 8px; }
@@ -523,7 +537,7 @@ td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(-
 html[data-present="on"] { --fs-h3: var(--fs-xl); }
 html[data-present="on"], html[data-present="on"] body { overflow-x: hidden; }
 html[data-present="on"] .rail, html[data-present="on"] .rail-edge, html[data-present="on"] .tools,
-html[data-present="on"] .zoom-tools, html[data-present="on"] .zoom-shield, html[data-present="on"] details.more, html[data-present="on"] .step-off,
+html[data-present="on"] .zoom-tools, html[data-present="on"] .zoom-shield, html[data-present="on"] details.more, html[data-present="on"] .step-off { display: none !important; }
 html[data-present="on"] .refs { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* flex column + auto margins: a short step sits in the middle, a tall one starts at the top and scrolls */
 /* bottom padding = the bar's footprint (set by show()) + 24px, so the last line clears it */

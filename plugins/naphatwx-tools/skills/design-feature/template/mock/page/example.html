@@ -22,7 +22,7 @@
 
 <body>
     <script>
-        // One screen. State comes from ?state= plus any param a scenario needs (?status= pre-sets the filter).
+        // One screen. State comes from ?state= plus any param a scenario needs (?status= pre-sets the filter, ?modal=CREATE opens the form).
         const P = States.params;
         const { page: el, owner } = Shell.mount();
         const S = window.S = { page: 1, status: P.get('status') || '', loading: true, error: null, res: null };
@@ -34,15 +34,42 @@
         }
         function setStatus(v) { S.status = v; load(); }
 
-        // No permission → hidden, as the real app hides it. A reason the spec names → shown unavailable with a tooltip;
-        // aria-disabled, not native disabled: a disabled button gets no hover, so the tooltip would never show.
+        // No permission → hidden, as the real app hides it. A reason the spec names → disabled, reason under it.
+        // aria-disabled, not native disabled: the button stays focusable, so the reason is announced with it.
         function createBtn() {
             if (!States.current.perms.includes('things.create')) return '';
             const reason = States.current.blocked;
-            if (!reason) return UI.btn('primary', 'md', 'Create', 'onclick="alert(\'Create form\')"');
-            return `<span class="relative group inline-block">${UI.btn('primary', 'md', 'Create', 'aria-disabled="true" aria-describedby="createReason"')
+            if (!reason) return UI.btn('primary', 'md', 'Create', 'onclick="openCreate()"');
+            return `<span class="inline-flex flex-col items-end">${UI.btn('primary', 'md', 'Create', 'aria-disabled="true" aria-describedby="createReason"')
                 .replace('class="', 'class="opacity-50 cursor-not-allowed ')}
-              <span id="createReason" role="tooltip" class="absolute right-0 top-full mt-2 w-64 rounded-md bg-gray-900 text-white text-xs p-2 hidden group-hover:block group-focus-within:block">${UI.esc(reason)}</span></span>`;
+              <span id="createReason" class="mt-1 max-w-64 text-right text-xs text-gray-500">${UI.esc(reason)}</span></span>`;
+        }
+
+        // Create form: the field check runs first, then the operation (its refusal shows as an alert in the form)
+        const F = S.form = { open: P.get('modal') === 'CREATE', name: '', error: '', busy: false };
+        function openCreate() { Object.assign(F, { open: true, name: '', error: '', busy: false }); renderModal(); }
+        function closeCreate() { F.open = false; renderModal(); }
+        async function submitCreate() {
+            F.name = document.getElementById('thingName').value;
+            if (!F.name.trim()) { F.error = Rules.NAME_REQUIRED; return renderModal(); }
+            F.busy = true; F.error = ''; renderModal();
+            try {
+                const t = await FakeApi.CreateThing({ ownerId: owner.id, name: F.name });
+                F.open = false; renderModal(); UI.toast(Rules.created(t.name), ''); load();
+            } catch (e) { F.busy = false; F.error = e.message; renderModal(); }
+        }
+        function renderModal() {
+            document.getElementById('modalRoot').innerHTML = !F.open ? '' : UI.modal(`
+              <div class="p-6 space-y-4">
+                <h3 class="text-lg font-semibold">Create thing</h3>
+                <label class="block text-sm font-medium">Name
+                  <input id="thingName" value="${UI.esc(F.name)}" aria-invalid="${!!F.error}" aria-describedby="nameError" class="mt-1 w-full rounded-lg border ${F.error ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-900 px-3 py-2 text-sm">
+                </label>
+                ${F.error ? `<p id="nameError" class="-mt-2 text-xs text-red-600 dark:text-red-400">${UI.esc(F.error)}</p>` : ''}
+                <div class="flex justify-end gap-2">
+                  ${UI.btn('neutral', 'md', 'Cancel', 'onclick="closeCreate()"')}${UI.btn('primary', 'md', F.busy ? 'Creating…' : 'Create', `onclick="submitCreate()" ${F.busy ? 'disabled' : ''}`)}
+                </div>
+              </div>`, 'max-w-md', 'closeCreate()');
         }
 
         function render() {
@@ -62,7 +89,7 @@
                 : S.res.entities.map(t => `<div class="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 mb-2">
                     <span class="font-medium">${UI.esc(t.name)}</span>${UI.statusBadge(t.status)}<span class="text-xs text-gray-500 ml-auto">${UI.date(t.createdAt)}</span></div>`).join('')}`;
         }
-        load();
+        load(); renderModal();
     </script>
 </body>
 

@@ -99,13 +99,18 @@ function valueKeys(file) {
 // a value the seed knows is written as {key}; a secret keeps its <placeholder>
 const VAGUE = /\b(?:that|the newest|the latest) (?:merge request|MR|repo(?:sitory)?|branch|version|tag|project|ticket|user|owner|pipeline|build)\b(?! named\b)|<(?![^>]*(?:token|secret|password|key\b|pat\b))[^<>\n]+>|\b[a-z]+-(?:…|\.\.\.)/i;
 
+const SURFACES = ['ui', 'mcp', 'api', 'job'];
 CORE.forEach(s => { if (!PLAY.some(p => p.id === s.id)) errors.push(`scenario ${s.id}: no entry in live.js`); });
 PLAY.forEach((p, i) => {
     const where = `live.js entry ${p.id || '#' + (i + 1)}`;
     const sc = CORE.find(s => s.id === p.id);
     if (!sc) { errors.push(`${where}: no scenario with this id in use-cases.js`); return; }
     if (CORE.indexOf(sc) !== i) errors.push(`${where}: out of order (use-cases.js has it at ${CORE.indexOf(sc) + 1})`);
+    if (!SURFACES.includes(sc.surface)) errors.push(`scenario ${sc.id}: surface must be ${SURFACES.join(', ')} (got "${sc.surface}"); fix it with the generate-use-case skill`);
     if (p.skip) return;
+    // ui is played by hand in the frame; mcp, api and job have no screen, so the AI plays them from a prompt
+    if (sc.surface === 'ui' && p.prompt) errors.push(`${where}: surface ui is played by hand in the frame; drop the prompt`);
+    if (SURFACES.includes(sc.surface) && sc.surface !== 'ui' && !p.prompt) errors.push(`${where}: surface ${sc.surface} has no screen; give it a prompt for the AI agent (or skip with a reason)`);
     if (p.prompt !== undefined && (typeof p.prompt !== 'string' || !p.prompt.trim())) errors.push(`${where}: prompt must be the text your AI agent gets`);
     if (!p.prompt && !p.seed && !String(p.url || '').startsWith('/')) errors.push(`${where}: needs a seed that prints {"url"}, a url path starting with /, or a prompt for the AI`);
     if (p.url && !String(p.url).startsWith('/')) errors.push(`${where}: url must start with / (got "${p.url}")`);
@@ -167,7 +172,8 @@ async function runSeeds() {
     if (process.argv.includes('--run-seeds')) await runSeeds();
     const playable = PLAY.filter(p => !p.skip).length;
     const prompts = PLAY.filter(p => p.prompt && !p.skip), aiSt = st => prompts.filter(p => AI[p.id]?.calls?.length && AI[p.id].status === st).length;
-    out(`scenarios: ${CORE.length} · playable live: ${playable} (by the AI: ${prompts.length}; recorded ${aiSt('pass')} pass, ${aiSt('fail')} fail, ${aiSt('')} unmarked) · skipped: ${PLAY.length - playable} · seed commands: ${seeds.length} · secret keys: ${exampleKeys.length}${process.argv.includes('--run-seeds') ? ' (each seeded scenario picked twice)' : ''}`);
+    const bySurface = SURFACES.map(k => [k, CORE.filter(s => s.surface === k).length]).filter(([, n]) => n).map(([k, n]) => `${n} ${k}`).join(', ');
+    out(`scenarios: ${CORE.length} (${bySurface}) · playable live: ${playable} (by the AI: ${prompts.length}; recorded ${aiSt('pass')} pass, ${aiSt('fail')} fail, ${aiSt('')} unmarked) · skipped: ${PLAY.length - playable} · seed commands: ${seeds.length} · secret keys: ${exampleKeys.length}${process.argv.includes('--run-seeds') ? ' (each seeded scenario picked twice)' : ''}`);
     warnings.forEach(w => out('WARN ' + w));
     if (errors.length) { errors.forEach(e => out('ERROR ' + e)); process.exit(1); }
     out('OK');

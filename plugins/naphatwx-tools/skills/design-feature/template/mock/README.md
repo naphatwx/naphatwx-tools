@@ -1,6 +1,8 @@
 # Mock UI
 
-A clickable mock of this feature's screens, with fake data and every edge state, to play each scenario and mark it Pass or Fail.
+A clickable mock of this feature's screens, in the app's design system, with data shaped like the real API answers and every edge state. Play each screen scenario and mark it Pass or Fail.
+
+The scenario lists show every scenario of the feature, in the same order as the other tools. MCP, API and job scenarios are greyed: picking one shows "No mock". Play those with the `play-scenarios` skill, or test them with `e2e-test`.
 
 ## How to open it
 
@@ -27,7 +29,9 @@ The pink, dashed **Mock state** panel on that screen switches states. It is mock
 ```mermaid
 graph TD
     A[open mock/index.html] --> B[pick a scenario in a use case's list]
-    B --> C[mock data is cleared, the frame opens the screen in the scenario's state]
+    B --> NM{ui scenario?}
+    NM -->|no: mcp, api, job| X[No mock: read what it should do, pick another]
+    NM -->|yes| C[mock data is cleared, the frame opens the screen in the scenario's state]
     C --> D[follow How to play, compare with What you should see]
     D --> E{works?}
     E -->|yes| F[mark Pass]
@@ -51,13 +55,12 @@ graph TD
 |------|------|
 | `index.html` | The play page: one block per use case, framed screen, guide, Results, audit log, contract links |
 | `page/<screen>.html` | One screen; its state comes from `?state=` and the params a scenario needs |
-| `page/console.html` | MCP / API client for API scenarios; only when the feature has one |
 | `contract/types.ts` | The real request, response and error shapes to implement |
-| `contract/rules.js` | The spec's rules as pure functions; the fake API runs them |
+| `contract/rules.js` | The spec's rules and screen texts; the screens and their data run them |
 | `contract/data.js` | Mock data in the real upstream shapes |
-| `shared/scenario-play.js` | How to play each scenario: state, page, steps |
+| `shared/scenario-play.js` | How to play each screen scenario: state, page, steps |
 | `shared/states.js` | The screens, and each mock state's data, permissions and faults |
-| `shared/fake-api.js` | Stand-in for the real operations, same names and request shapes |
+| `shared/fake-api.js` | Local data for the screens: the real operation names, request and answer shapes |
 | `shared/components.js` | The app's component class strings |
 | `shared/shell.js` | The app's chrome, plus the mock-only state / scenario panel |
 | `../use-cases.js` | The use cases and scenarios this mock plays |

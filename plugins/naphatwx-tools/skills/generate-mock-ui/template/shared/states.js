@@ -17,7 +17,7 @@ var States = (function () {
         { id: 'unreachable', ownerId: 1204, perms: RW, faults: { readUnavailableOnce: true }, label: 'Upstream unreachable', useCase: 'UC1', hint: 'First read fails; Retry works. Never shown as empty.' },
         { id: 'read-only', ownerId: 1204, perms: RO, faults: {}, label: 'Read-only user — pluto', useCase: 'UC2', hint: 'No things.create: Create is hidden, as the real app hides it.' },
         // `blocked` = a reason the spec says to show on an unavailable control (not a permission)
-        { id: 'archived', ownerId: 1204, perms: RW, faults: {}, blocked: 'This owner is archived. Things cannot be created.', label: 'Archived owner — pluto', useCase: 'UC2', hint: 'Create is shown unavailable with the reason in its tooltip, as the spec says.' },
+        { id: 'archived', ownerId: 1204, perms: RW, faults: {}, blocked: Rules.ARCHIVED, label: 'Archived owner — pluto', useCase: 'UC2', hint: 'Create is disabled with the reason under it, as the spec says.' },
     ];
     const params = new URLSearchParams(location.search);
     const current = LIST.find(s => s.id === params.get('state')) || LIST[0];

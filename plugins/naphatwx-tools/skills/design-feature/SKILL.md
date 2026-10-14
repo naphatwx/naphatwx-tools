@@ -1,6 +1,6 @@
 ---
 name: design-feature
-description: Plan a feature as a browsable HTML folder (use cases with their flow diagrams and scenarios, database and API changes, open questions) from a spec or idea. Use when the user says "design this feature" or "plan spec 127". The full plan; one diagram is generate-diagram, a mock alone is generate-mock-ui.
+description: Plan a feature as a browsable HTML folder (acceptance criteria, use cases with their flow diagrams and scenarios, database and API changes, open questions) from a spec or idea. Use when the user says "design this feature" or "plan spec 127". The full plan; one diagram is generate-diagram, a mock alone is generate-mock-ui.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 
@@ -21,7 +21,8 @@ Turn a spec, ticket or idea into a plan folder people can open in a browser.
 │   └── 02-<uc-slug>.js
 ├── database/
 │   └── er-diagram.html        every related table and FK, opened from the Database section
-├── use-cases.js               use cases + scenarios, by the generate-use-case skill; each use case's Scenarios view is generated from it
+├── use-cases.js               use cases, scenarios and acceptance criteria, by the generate-use-case skill; the Acceptance criteria
+│                              section and each use case's Scenarios view are generated from it
 └── mock/                      optional, standalone mock by the generate-mock-ui skill
     └── shared/scenario-play.js   how to play each scenario; adds the Play links
                                (in-project mock lives in the app instead)
@@ -32,6 +33,7 @@ Scripts in this skill's `scripts/` (Node, no install):
 | Script | Does |
 |--------|------|
 | `scenarios-panels.js <output>` | writes every use case's "Scenarios (N)" view from `use-cases.js`, with Play links from `mock/shared/scenario-play.js` when a mock exists; prints the counts |
+| `acceptance-section.js <output>` | writes the Acceptance criteria section from `use-cases.js`: each criterion with the scenarios that cite it, per channel, and every gap; prints the coverage |
 | `publish-copy.js <output> <copy-dir>` | builds a copy that works as a claude.ai Artifact (step 8) and prints the publish arguments |
 
 Every diagram is drawn by the `generate-diagram` skill (`naphatwx-tools:generate-diagram` in Claude Code): it uses diagram-design when installed, else its own templates. This skill picks the **mode** once (step 2) so all diagrams match, and embeds what it returns:
@@ -62,7 +64,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Hard Rules
 
 1. `overview.html` starts from `template/overview.html`. Its styles and script live in `template/assets/overview.css` and `overview.js`: copy them unchanged, and keep the rail, its search, the rail edge button, the floating tools, the presentation bar and the shortcut sheet (`#keys`) markup. Pages are always dark, in the Quiet Sheet theme: its colors are the `/* theme:tokens */` block at the top of `overview.css` (one blue accent; green, amber and red only mark the diffs + ~ −). Use `var(--token)`, never a hex. Don't edit between the `theme:` markers: change `theme/` in this plugin's repo and run `node theme/sync.mjs`. Dark only: add no light theme, theme toggle or other palette. The floating tools hold an **Export PDF** button (synced `theme:pdf` blocks): it loads every diagram frame, then opens the print dialog; the PDF shows every section and every use case view. Diagrams use the same palette and paper (the generate-diagram skill sets it).
-    - Rail: always open on the left, numbered `01`–`07`, with use cases, changed tables and changed APIs nested as `UC<n>` / `4.N` / `5.N`. The round edge button or `[` hides it; `/` focuses its search.
+    - Rail: always open on the left, numbered `01`–`08`, with use cases, changed tables and changed APIs nested as `UC<n>` / `5.N` / `6.N`. The round edge button or `[` hides it; `/` focuses its search.
     - Floating tools (bottom right of the page, top right on phones): `Open all` shows every use case view stacked; `Zoom` makes every `.flowchart` and `.seq` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the top right resets; off by default); `Present` (or `P`) starts presentation mode; `?` opens the shortcut sheet (`#keys` dialog: `1`–`4`, `P`, `←`/`→`, `Esc`, `[`, `/`, `?`).
     - Keep the skip link (`.skip` → `#sheet`) as the first element of `<body>`.
     - Each diagram has a border and a `⛶` button at its top right that opens it in a lightbox: the page dims behind, the diagram sits in a frame 80% of the window's width and 90% of its height, fitted whole inside it, with its use case name and view as a caption below. Zoom works there even with the switch off (`✕`, Esc or a backdrop click closes it).
@@ -79,8 +81,11 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 6. No external scripts, styles or fonts in `overview.html` or the diagram files: text uses the OS font. `assets/`, `render.js` and the diagram files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
-9. Use cases and scenarios are written only by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code) to `<output>/use-cases.js`. Each use case's Scenarios button and panel are generated from it by `scripts/scenarios-panels.js`, never typed by hand, so they can't drift from the mock. Every count you report (scenarios per use case, total) comes from a script's output, never an estimate.
-10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. The Scenarios panel uses its `.nowrap` utility class (Play cells).
+9. Use cases, scenarios and acceptance criteria are written only by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code) to `<output>/use-cases.js`. Two scripts build from it, and their output is never typed by hand, so it can't drift from the mock or the tests:
+    - `scripts/scenarios-panels.js`: each use case's Scenarios button and panel.
+    - `scripts/acceptance-section.js`: the Acceptance criteria section, between its `acceptance:start` / `acceptance:end` markers.
+    - Every count you report (scenarios per use case, total, acceptance coverage) comes from a script's output, never an estimate.
+10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. The generated views use its classes: `.ch-tag` (channel tag), `.aside.na` (n/a reason), `.ac-table` / `.ac-cover` / `.ac-gap` (Acceptance criteria) and `.nowrap` (Play cells).
 
 ## Workflow
 
@@ -95,7 +100,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Participants: user, frontend, backend services, databases, external systems.
     - Tables read and written, relations, and any external (read-through) tables.
     - Error mapping: cause → code → what the user sees.
-    - Acceptance scenarios, edge cases and refusal rows, each with its story / AC id (or FR / decision id) and the exact user-facing message. They become the scenarios (step 3).
+    - Acceptance scenarios, edge cases and refusal rows, each with its story / AC id (or FR / decision id) and the exact user-facing message. They become the scenarios (step 3). Keep each acceptance scenario's Given / When / Then too: it becomes an acceptance criterion.
+    - Channels: every way a user reaches each use case: a screen (`ui`), an MCP tool an AI agent calls (`mcp`), a REST / gRPC call made directly (`api`), a script or job (`job`).
     - **Roles and permissions**: each role the feature touches and the exact permission strings it holds or lacks, read from the seed or permission map (`DEV: repositories.versions.read, not repositories.versions.create`), plus any upstream rule (`legacy group BA, page 7 not writable`). Scenarios name them.
     - **Examples**: real values a scenario can show — versions, counts, ids, names the dev seed creates, a request and its answer. Each scenario carries one.
     - **Messages from the code**: when the code exists, copy each user-facing message verbatim from it (`file:line`), because the spec drifts. List every place the spec's text and the code's differ.
@@ -121,9 +127,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 | Use case (one per use case; over 6 → 2–3 each) | `generate-diagram flowchart` and `generate-diagram sequence` for the use case, then the use case block (Use cases rules in step 4) | `flowchart/NN-<slug>.*`, `sequence-diagram/NN-<slug>.*`, `.parts/uc-NN.html` |
 | Database | `generate-diagram er` for every related table, then the section (Database rules in step 4) | `database/er-diagram.html` (or `er-<area>.html`), `.parts/database.html` |
 | API | the section (API rules in step 4) | `.parts/api.html` |
-| Use cases + scenarios | `generate-use-case` with `<output>` and `.parts/brief.md`, use cases numbered as in the brief | `use-cases.js` |
+| Use cases + scenarios | `generate-use-case` with `<output>` and `.parts/brief.md`, use cases numbered as in the brief; reply with the counts and acceptance coverage from its `check.js` | `use-cases.js` (`USE_CASES`, `SCENARIOS`, `ACCEPTANCE`) |
 
-- The main agent keeps the short sections: Overview, Scope, Errors, Open questions, and runs `scenarios-panels.js` (step 4).
+- The main agent keeps the short sections: Overview, Scope, Errors, Open questions, and runs `scenarios-panels.js` and `acceptance-section.js` (step 4).
 - Each sub-agent prompt gives:
     - The path of this `SKILL.md` and the rules to follow, the path of `.parts/brief.md`, the mode and `<output>`.
     - For diagrams: run the `generate-diagram` skill with the type, `.parts/brief.md` as source, the output path above, the mode, and "embedded in design-feature's `overview.html`" (manual sequence then skips its standalone viewer).
@@ -136,10 +142,16 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Merge the sub-agent fragments from `.parts/` into their sections, add their open questions to Open questions, then delete `.parts/`.
 - Replace the `<title>`, the rail brand (`.rail-mark` letter + name) and the kicker (spec number, ticket, status).
-- Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="sec-n">` (`02`–`07` in the `<h2>`, `01` at the start of the Overview kicker; use cases `UC<n>`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
+- Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="sec-n">` (`02`–`08` in the `<h2>`, `01` at the start of the Overview kicker; use cases `UC<n>`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
     1. **Overview**: the `<h1>`, a one-sentence `.lead` + a `<dl class="facts">` of 3–4 key facts (key decision, data impact, API impact, UI impact or eligibility/scale), each `<dd>` one short line; a fact about data or API ends with a link to its section.
     2. **Scope**: the `.scope` block, full width: `<h3 class="label">In scope</h3>` with its bullet list, then `<h3 class="label">Out of scope</h3>` with its bullet list below it. Each out-of-scope item ends with its reason in `<span class="aside">— why</span>`.
-    3. **Use cases**: one muted line naming the four views, then an `ol.uc-index` with one row per use case (`UC<n>` + name, link to `#uc-NN`, user story and priority on the right, which `overview.js` folds into a `N refs` chip). Then one block per use case (copy the block between the `one block per use case` comments):
+    3. **Acceptance criteria** (`id="acceptance"`): keep the template's `<h2>` and its two markers; leave the body to the script. Once `use-cases.js` exists, run `node <this skill dir>/scripts/acceptance-section.js <output>`. It writes:
+        - A summary line: `N criteria · M covered on every channel · K gaps · J n/a`.
+        - A table with one row per `ACCEPTANCE` entry, in file order (`id="ac-us1-ac3"`): its id, then Given / when / then in one sentence.
+        - Per channel of the criterion, a `.ch-tag` and the scenarios that cite it (through their `story`, `US1 · AC2–4` included), each a link to its row `#sc-<id>` in the Scenarios view (a click opens that view). A channel with no citing scenario shows an amber `gap` line; an `na` channel shows its reason, muted.
+        - No `ACCEPTANCE` list, or an empty one → one line saying so, pointing to the generate-use-case skill.
+        - Re-run it after `use-cases.js` changes; it is safe to re-run.
+    4. **Use cases**: one muted line naming the four views, then an `ol.uc-index` with one row per use case (`UC<n>` + name, link to `#uc-NN`, user story and priority on the right, which `overview.js` folds into a `N refs` chip). Then one block per use case (copy the block between the `one block per use case` comments):
         - `<header class="uc-head">`: `<h3>` with `<span class="sec-n">UC<n></span>` + the use case name, then `<p class="refs">` with its tags (user story, requirement ids joined by ` · `; no file names). `overview.js` turns the line into a `N refs` chip on the title line; a click shows the IDs, and Export PDF prints them all.
         - `<p class="uc-line">`: the user's goal in one sentence, then `<span class="aside">Starts from <trigger>.</span>`.
         - The `.views` button row and four panels, ids `uc-NN-chart`, `uc-NN-seq`, `uc-NN-rules`, `uc-NN-sc` (buttons `…-tab`, linked by `aria-controls` / `aria-labelledby`):
@@ -148,10 +160,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
             - Scenarios button and panel (`.panel`, not wide, always last in the block): leave them out of the fragment. `node <this skill dir>/scripts/scenarios-panels.js <output>`, run once the use case blocks are in, writes them from `use-cases.js`:
                 - Button `Scenarios (K)`, K = the use case's scenario count.
-                - A `.table-wrap` table: Scenario (title, its story as a `N refs` chip, then the first expect line in `.aside`) | with a mock, `Play ↗` → `mock/index.html#sc-<id>` (new tab), or "not in the mock" for a skipped one. A use case with no scenario → one `.muted` line with its `none` sentence.
+                - A `.table-wrap` table, one row per scenario with `id="sc-<id>"`: Scenario (its channel as a `.ch-tag` — ui, mcp, api or job — the title, its story as a `N refs` chip, the first expect line in `.aside`, then one muted `.aside.na` line per `na` reason) | with a mock, `Play ↗` → `mock/index.html#sc-<id>` (new tab) for a ui scenario in the mock, "not in the mock" for a ui one it skips, "No mock" for mcp / api / job. A use case with no scenario → one `.muted` line with its `none` sentence.
                 - The first expect line carries the scenario's example (generate-use-case writes it so), so the panel shows real values with no extra work. Re-run the script after `use-cases.js` changes.
                 - With a mock, it also adds `.side-link` "Open the mock ↗" (new tab) to the Use cases `<h2>`.
-    4. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
+    5. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
         - **ER diagram ↗** link, inside the `<h2 id="database">` right after its text: `<a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one link per page (`ER diagram · catalog ↗`). No related table → no page and no link.
         - **Facts** (`dl.facts`): `Migration`, `Changed` (each table + `new` / `altered`), `Left alone` (tables read but not changed, each with why). Name indexes and constraints here too.
         - **Changes** (always visible): the `+ add ~ change − drop` legend, then one `.tbl` card per table whose schema changes inside a `.tables` grid, each with `id="db-<table>"` for its rail sub-link:
@@ -163,7 +175,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Tags: `new table` / `altered` (changed rows keep their marks), `read` for a table only read or only written to without a schema change, `external` + `.tbl.ext` for a table another service owns.
             - `.rel` lines for every relation between the listed tables.
         - No related table at all → keep the section with one sentence: "This feature has no database changes."
-    5. **API changes**: the facts, one block per changed API, then the full contracts hidden in a closed `<details class="more">` (copy the API block).
+    6. **API changes**: the facts, one block per changed API, then the full contracts hidden in a closed `<details class="more">` (copy the API block).
         - Source: the proto / OpenAPI / DTO diff in the spec's contracts.
         - **Facts** (`dl.facts`), leave out a fact with nothing to say:
             - `Summary`: count of new / changed RPCs and the service.
@@ -183,13 +195,14 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - `<h4>` per API (name · route · `new` / `changed` / `called, unchanged`), then full request and response cards with every field in field-number order. Changed fields keep their marks.
             - An API another service owns → `.tbl.ext`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
-    6. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
-    7. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker (a tinted amber band with the label), then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
+    7. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
+    8. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker (a tinted amber band with the label), then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per use case before the final `SeqDiagrams.renderAll()` line.
 - Rewrite the rail to match, one `<li>` per section in page order, numbers matching each `.sec-n`:
     - Use cases: one nested link per use case (`#uc-NN`, `UC<n>` + use case name).
-    - Database: one nested link per changed table card (`#db-<table>`, `4.N` + table name).
-    - API: one nested link per changed API (`#api-<kebab-name>`, `5.N` + RPC name), plus `Shared types` when that block exists.
+    - Acceptance criteria: the section link alone (`#acceptance`), no nested items.
+    - Database: one nested link per changed table card (`#db-<table>`, `5.N` + table name).
+    - API: one nested link per changed API (`#api-<kebab-name>`, `6.N` + RPC name), plus `Shared types` when that block exists.
     - No nested items (no changes) → the section link alone, no nested `<ol>`.
 
 ### 5. Offer the mock
@@ -212,8 +225,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - `.parts/` is deleted.
 - Every `href="#…"` on the page (rail, use case index) resolves to an id.
 - Each use case keeps one name everywhere: rail, use case index, `data-title`, its `<h3>` and its `USE_CASES` title. Its Scenarios panel lists scenarios of that use case only.
-- Run the generate-use-case skill's `scripts/check.js <output>/use-cases.js` and fix every error it reports.
-- Mock built (standalone) → run the generate-mock-ui skill's `scripts/check-scenarios.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, one play entry per scenario, every state id in `states.js`, and every API / console scenario run against the fake API with a result matching its `expect`. Then check each use case's Scenarios count and Play links match `use-cases.js` (re-run `scenarios-panels.js` if not).
+- Run the generate-use-case skill's `scripts/check.js <output>/use-cases.js` and fix every error it reports (re-run the generate-use-case skill for a missing scenario). Keep its acceptance coverage line for step 7.
+- Run `node <this skill dir>/scripts/acceptance-section.js <output>` again. Its printed coverage matches `check.js`; every gap it lists is either fixed or reported in step 7. Every `#sc-<id>` link in the section resolves to a Scenarios row.
+- Mock built (standalone) → run the generate-mock-ui skill's `scripts/check-scenarios.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, every ui scenario has one play entry with a real state (in `states.js`) and page, and no mcp / api / job scenario has one (those show "No mock" in the mock). Then check each use case's Scenarios count and Play links match `use-cases.js` (re-run `scenarios-panels.js` if not).
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
 - Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws, and its `← Overview` link works.
 - Presentation mode, in the same browser at 1440×900, 1280×720 and 1024×768: press `P` and step through every step; on each, the page is no wider than the window (`document.documentElement.scrollWidth <= innerWidth`), the step's diagram or tables show whole across, the diagram box ends above the bar, every diagram label renders at its set size, 14px or 12px (not scaled up or down), and a box that scrolls shows the `continues ↓` cue.
@@ -225,7 +239,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - two **fresh**, review-only agents in one message, in parallel: a UI fidelity reviewer ("Would a user think this IS the real app?") and a functional reviewer ("Does every scenario behave as the spec says?");
     - merge their reports; settle each conflict against the spec first, then the real code, and note which won;
     - one **fresh** fix agent applies every fix (never a reviewer);
-    - then `node <this skill dir>/scripts/scenarios-panels.js <output>` and re-run step 6.
+    - then `node <this skill dir>/scripts/scenarios-panels.js <output>` (and `acceptance-section.js` if `use-cases.js` changed) and re-run step 6.
 - Don't run the reviewers again unless the fix agent reports a finding it could not apply.
 - No mock → skip.
 
@@ -234,7 +248,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Output: `✅ Plan created at: {output}/overview.html`
 - Say the diagram mode (diagram-design or manual).
 - List the use cases (one line each), the ER diagram page(s), and which mock was built (standalone, in-project with its folder, or none).
-- Scenarios: the total, the count per use case and how many are playable, copied from the script output, plus the path of `use-cases.js` (generate-test-cases reads it too).
+- Scenarios: the total, the count per use case and channel and how many are playable, copied from the script output, plus the path of `use-cases.js` (play-scenarios and e2e-test read it too).
+- Acceptance criteria: the summary line from `acceptance-section.js` (`N criteria · M covered on every channel · K gaps`), then each gap as `US<n> · AC<m>: no <channel> scenario`, and each `n/a` channel with its reason, one line each.
 - Mock review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
 - Remind the user: each diagram is edited in its own file under `flowchart/`, `sequence-diagram/` or `database/`; the overview picks up the change on reload.
 

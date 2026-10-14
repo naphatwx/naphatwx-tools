@@ -1,6 +1,6 @@
 # generate-mock-ui
 
-Builds a clickable mock of a planned feature in the app's real design system, with a fake API and every edge state, where a reviewer plays each scenario and marks Pass / Fail.
+Builds a clickable mock UI of a planned feature in the app's real design system, with data shaped like the real API answers and every edge state. A reviewer plays each `ui` scenario and marks Pass / Fail. `mcp`, `api` and `job` scenarios stay in the tree, greyed, as "No mock".
 
 ## When to use it
 
@@ -13,9 +13,8 @@ Builds a clickable mock of a planned feature in the app's real design system, wi
 |----------|-------------|
 | The full plan: use cases, diagrams, database and API changes | `design-feature` |
 | The use cases and scenarios themselves | `generate-use-case` |
-| Play the scenarios on the real running app, with real data | `play-scenarios` |
+| Play the scenarios on the real running app, with real data, MCP / API / job ones too | `play-scenarios` |
 | Automated browser tests with screenshots | `e2e-test` |
-| A test case file an AI runs later | `generate-test-cases` |
 | One flowchart, sequence or ER diagram | `generate-diagram` |
 
 ## How it works
@@ -32,8 +31,8 @@ graph TD
     S1 --> S2[scan the app's design system: class strings, shell, components]
     S2 --> S3["copy template/ to plan/mock/, replace the placeholder domain"]
     S3 --> S4["contract/: types.ts, rules.js, data.js"]
-    S4 --> S5["shared/scenario-play.js: how to play each scenario"]
-    S5 --> S6["shared/: states, fake API, components, shell"]
+    S4 --> S5["shared/scenario-play.js: how to play each ui scenario"]
+    S5 --> S6["shared/: states, local data, components, shell"]
     S6 --> S7["page/*.html: one per screen, every state"]
     MODE -->|in-project| P1["references/in-project.md: routes in the app at mock/spec NNN"]
     P1 --> P2["_mock/: types, rules, data, states, one hook per screen"]
@@ -45,7 +44,7 @@ graph TD
     R --> C[confirm: counts from the script output]
 ```
 
-What loads what in a standalone mock. Every rule runs through `rules.js`, so the mock is never looser or stricter than the spec:
+What loads what in a standalone mock. Every rule runs through `rules.js`, so the mock is never looser or stricter than the spec. `fake-api.js` only feeds the screens; nothing plays it directly:
 
 ```mermaid
 graph LR
@@ -72,6 +71,7 @@ sequenceDiagram
     participant F as Frame: page/screen.html
     participant A as FakeApi
     U->>I: pick a scenario chip
+    Note over I: mcp, api or job scenario: an empty frame with "No mock", and stop here
     I->>SS: clear every FakeApi.STORE key
     I->>F: load with state, sc, embed=1 and the scenario's params
     F->>A: the real operation name, real request shape
@@ -100,6 +100,7 @@ Rules the diagrams don't show:
 
 - Standalone opens from `file://`: classic `<script src>` only, no modules, no `fetch()`, data as `.js` globals.
 - Use cases and scenarios are read-only here. A wrong one is fixed with `generate-use-case`.
+- Only `ui` scenarios play. `mcp`, `api` and `job` ones show "No mock": no console, no fake call. Play them with `play-scenarios` or test them with `e2e-test`.
 - Every count reported comes from `check-scenarios.js` (or `scenarios-panels.js` in-project), never by eye.
 - In-project writes only inside `mock/spec<NNN>/`: no API or RPC calls, no edits to other app files.
 - Run by `design-feature`: the review is skipped here, since design-feature runs it after its own checks.
@@ -126,11 +127,10 @@ Output, standalone:
     │   ├── rules.js        spec rules as pure functions
     │   └── data.js         realistic data in the upstream shapes
     ├── page/
-    │   ├── <screen>.html   one per screen; state from ?state=
-    │   └── console.html    MCP / API client, only when the feature has one
+    │   └── <screen>.html   one per screen; state from ?state=
     └── shared/
-        ├── scenario-play.js  how to play each scenario, keyed by id
-        ├── fake-api.js     the real operation names, served from contract/
+        ├── scenario-play.js  how to play each ui scenario, keyed by id
+        ├── fake-api.js     local data for the screens: real operation names and answer shapes
         ├── components.js   the app's component class strings
         ├── shell.js        the app's chrome + the mock-only panel
         └── states.js       pages + mock states
@@ -153,7 +153,7 @@ Output, in-project:
 | [SKILL.md](SKILL.md) | The agent's instructions; standalone mode |
 | [references/in-project.md](references/in-project.md) | In-project mode: mock routes inside the real app |
 | [references/mock-review.md](references/mock-review.md) | The review: two fresh reviewers, then one fix agent |
-| [scripts/check-scenarios.js](scripts/check-scenarios.js) | Syntax-checks every script, matches play entries to scenarios, runs console scenarios against the fake API and fails when a message differs from the text the scenario quotes |
+| [scripts/check-scenarios.js](scripts/check-scenarios.js) | Syntax-checks every script; checks every `ui` scenario has one play entry with a real state and page, and no `mcp` / `api` / `job` scenario has one; prints the counts |
 | [template/](template/) | The standalone `mock/` folder on a placeholder domain; copied whole and filled in per feature |
 | [template/README.md](template/README.md) | Ships as `mock/README.md` |
 | [use-cases.js](use-cases.js) | Example use cases for the template preview; never copied |
@@ -163,5 +163,4 @@ Output, in-project:
 - `generate-use-case`: writes the `use-cases.js` this skill plays.
 - `design-feature`: makes the plan folder that holds `mock/`, and runs the mock review.
 - `play-scenarios`: the same layout, on the real running app with real data.
-- `e2e-test`: plays the same flows as automated browser tests.
-- `generate-test-cases`: reads the same `use-cases.js`.
+- `e2e-test`: tests the same scenarios as automated browser tests.

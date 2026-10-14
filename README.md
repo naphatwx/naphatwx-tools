@@ -9,13 +9,12 @@ Each skill folder has a `README.md` with diagrams of how it works.
 | Skill | What it does |
 |-------|--------------|
 | [work-flow](plugins/naphatwx-tools/skills/work-flow/) | Carry one task from idea to a merge-ready branch: spec, code, your review, tests, AI review, docs, pre-merge gate |
-| [design-feature](plugins/naphatwx-tools/skills/design-feature/) | Plan a feature as a browsable HTML folder: use cases, diagrams, scenarios, database and API changes |
+| [design-feature](plugins/naphatwx-tools/skills/design-feature/) | Plan a feature as a browsable HTML folder: acceptance criteria, use cases, diagrams, scenarios, database and API changes |
 | [generate-use-case](plugins/naphatwx-tools/skills/generate-use-case/) | Write a feature's use cases and scenarios to one `use-cases.js` file |
 | [generate-diagram](plugins/naphatwx-tools/skills/generate-diagram/) | Draw one flowchart, sequence diagram or ER diagram as a local file |
 | [generate-mock-ui](plugins/naphatwx-tools/skills/generate-mock-ui/) | Build a clickable mock UI in the app's real design system, with every edge state |
 | [play-scenarios](plugins/naphatwx-tools/skills/play-scenarios/) | Play a feature's scenarios by hand on the real running app, with Pass / Fail |
-| [generate-test-cases](plugins/naphatwx-tools/skills/generate-test-cases/) | Write a test case file an AI can run later against MCP tools, APIs or the web UI |
-| [e2e-test](plugins/naphatwx-tools/skills/e2e-test/) | Write and run Playwright browser tests, with a screenshot per step and one HTML report |
+| [e2e-test](plugins/naphatwx-tools/skills/e2e-test/) | Test every scenario of a feature (UI in the browser, API by request, MCP by an AI agent), with a fresh-agent review and one HTML report |
 | [smoke-test](plugins/naphatwx-tools/skills/smoke-test/) | Check after a deploy that every service in a real flow still reaches the next one |
 | [deploy-plan](plugins/naphatwx-tools/skills/deploy-plan/) | Build a deployment plan as a clickable HTML checklist, split into Pre-deploy and Post-deploy |
 | [review-code](plugins/naphatwx-tools/skills/review-code/) | Review only the changed lines of staged changes, files or a GitLab MR |

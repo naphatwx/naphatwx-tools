@@ -8,5 +8,5 @@ run(async () => {
     );
     const name = unique('neptune');
     const owner = await api('POST', '/owners', { orgId: org.id, name });
-    done({ url: `/owners/${owner.id}`, values: { ownerName: name } });
+    done({ url: `/owners/${owner.id}`, values: { ownerId: owner.id, ownerName: name } });
 });

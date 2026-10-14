@@ -12,7 +12,6 @@ Builds a local page where you play a feature's scenarios by hand on the real run
 |----------|-------------|
 | A clickable mock with fake data, no app running | `generate-mock-ui` |
 | Automated browser tests with screenshots | `e2e-test` |
-| A test case file an AI runs later | `generate-test-cases` |
 | Checks that services reach each other after a deploy | `smoke-test` |
 | The use cases and scenarios themselves | `generate-use-case` |
 
@@ -44,7 +43,7 @@ graph TD
         T5 --> T6[Copy results as Markdown]
     end
     subgraph AI["No-screen scenarios, the AI"]
-        I1[seed through server.mjs, get the new ids] --> I2[call the local MCP server, or run the job]
+        I1[seed through server.mjs, get the new ids] --> I2[mcp: call the MCP tools · api: curl or grpcurl · job: run the command]
         I2 --> I3[compare with expect]
         I3 --> I4[results.js: Pass / Fail + every call; ai-results.md report]
     end
@@ -122,11 +121,27 @@ graph TD
     SRV -->|output to the page: every secret replaced by ***| PG[play page]
 ```
 
+Who plays each scenario, by its surface tag in `use-cases.js`:
+
+```mermaid
+graph LR
+    S[scenario] --> Q{surface}
+    Q -->|ui| H[you, by hand: the real screen in the frame]
+    Q -->|mcp| M[AI agent: the app's MCP tools]
+    Q -->|api| R[AI agent: REST or gRPC, curl or grpcurl]
+    Q -->|job| J[AI agent: the job's command]
+    M --> P[prompt + recorded calls in the frame]
+    R --> P
+    J --> P
+```
+
 Rules the diagrams don't show:
 
 - Local only. `server.mjs` refuses a non-local app unless you pass `--allow-remote` for a dev environment you own.
 - Seeds call the app's API only. No SQL, no database client.
-- A scenario with no screen (API, MCP, job) shows a prompt for your AI agent and the calls of the agent's last run. ▶ Seed puts the new ids into the prompt. The agent's Pass / Fail fills the Result until you mark it yourself.
+- The page shows the same tree as the mock and e2e-test: use cases in order, each with its scenarios in order, each with a surface tag (`ui`, `mcp`, `api`, `job`).
+- A skipped scenario keeps its place in the tree, struck through, with its reason.
+- A scenario with no screen (`mcp`, `api`, `job`) shows a prompt for your AI agent and the calls of the agent's last run. ▶ Seed puts the new ids into the prompt. The agent's Pass / Fail fills the Result until you mark it yourself.
 - The agent records only calls it really made on the local app, with tokens and internal hosts masked.
 - The agent asks before it changes the app (a dev login route, a dev-only frame header).
 
@@ -161,7 +176,7 @@ Output:
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
-| [scripts/check-live.js](scripts/check-live.js) | Checks `live/` against `use-cases.js`; warns on tooltip / hover steps and on roles whose permissions no step names; `--run-seeds` picks every seeded scenario twice |
+| [scripts/check-live.js](scripts/check-live.js) | Checks `live/` against `use-cases.js`: one entry per scenario in order, a prompt for every `mcp` / `api` / `job` scenario; warns on tooltip / hover steps and on roles whose permissions no step names; `--run-seeds` picks every seeded scenario twice |
 | [template/](template/) | The `live/` folder, working against a stand-in app; copied and filled in per feature |
 | [template/README.md](template/README.md) | Ships as `live/README.md` |
 | [template/preview/](template/preview/) | Stand-in app and fake API for the template; not copied |
@@ -172,4 +187,4 @@ Output:
 - `generate-use-case`: writes the `use-cases.js` this skill plays.
 - `design-feature`: makes the plan folder that holds `live/`.
 - `generate-mock-ui`: the same layout, with fake data and no app.
-- `e2e-test`: plays the same flows as automated browser tests.
+- `e2e-test`: plays the same `use-cases.js` as automated browser tests, with its own setup.

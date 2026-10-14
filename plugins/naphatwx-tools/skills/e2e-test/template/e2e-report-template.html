@@ -257,11 +257,25 @@
   dialog::backdrop { background: rgb(0 0 0 / .75); }
   .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
 
+  /* Surface tag (ui / mcp / api / job): the runner that played the scenario. */
+  .surface { flex: none; font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 0 6px; }
+  .tools .sep { width: 1px; align-self: stretch; background: var(--line-strong); margin: 0 4px; }
+  .vbody > .msgs { grid-area: err; display: grid; gap: 10px; min-width: 0; }
+  .review { display: grid; gap: 4px; padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); }
+  .review-label { color: var(--warn); font-weight: 600; }
+  .review .meta { font-weight: 400; margin-left: 6px; }
+  .test-head .info .c-warn { color: var(--warn); }
+  .list .flag { color: var(--warn); font-size: var(--fs-tag); font-weight: 600; margin-left: 6px; white-space: nowrap; }
+  /* Request / response of an mcp, api or job step, in the place of the screenshot. */
+  .callview { grid-area: stage; display: grid; gap: 8px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
+  .callview .target { font-family: var(--mono); font-size: var(--fs-code); color: var(--text); overflow-wrap: anywhere; }
+  .callview pre { margin: 0; max-height: 40vh; }
+
   /* PDF: the tests as filtered and opened on screen, full height, no controls. */
   @media print {
     main { max-width: none; padding: 16px; }
     .tools, .bar .btns, .hint, .edge { display: none !important; }
-    .stage img, .stage.tall .frame, pre { max-height: none; overflow: visible; }
+    .stage img, .stage.tall .frame, pre, .callview pre { max-height: none; overflow: visible; }
   }
 </style>
 </head>
@@ -322,11 +336,13 @@ const STATUS = {
   timedout: { word: 'timed out', glyph: '✕', tone: 'bad' },
   interrupted: { word: 'interrupted', glyph: '✕', tone: 'bad' },
   skipped: { word: 'skipped', glyph: '–', tone: 'neutral' },
+  notrun: { word: 'not run', glyph: '○', tone: 'neutral' },
+  incomplete: { word: 'incomplete', glyph: '–', tone: 'warn' },
 };
 const st = (s) => STATUS[s] || { word: String(s), glyph: '–', tone: 'neutral' };
 const pill = (s) => el('span', { class: 'pill tone-' + st(s).tone }, el('span', { 'aria-hidden': 'true' }, st(s).glyph), st(s).word);
 // Buckets follow Playwright's own outcome, so header and filters match its summary.
-const OUTCOME = { expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped' };
+const OUTCOME = { expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped', notrun: 'notrun' };
 const kind = (t) => OUTCOME[t.outcome] || (t.status === 'passed' ? (t.retry ? 'flaky' : 'passed') : t.status === 'skipped' ? 'skipped' : 'failed');
 
 const announcer = document.getElementById('announce');
@@ -360,8 +376,14 @@ const NO_SHOT = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://w
   + '<text x="640" y="440" fill="#a3a6b0" font-family="-apple-system, Segoe UI, system-ui, sans-serif" font-size="32" text-anchor="middle">No screenshot for this step</text></svg>');
 const isTall = (img) => img.naturalWidth > 0 && img.naturalHeight / img.naturalWidth > 1.5;
 
+// Reviewer flags: 'ok' shows nothing; the rest show the reviewer's note on the step.
+const FLAG = { test: 'Test problem', product: 'Product problem', unsure: 'Check by hand' };
+const flagged = (s) => s.review && s.review.flag !== 'ok';
+const show = (v) => (v == null ? '' : typeof v === 'string' ? v : JSON.stringify(v, null, 2));
+
 // One step at a time, like slides. Built once per test, so collapse and re-expand keeps the last step seen.
-function viewer(slides) {
+// ui steps show their screenshot; mcp / api / job steps show the call's request and response.
+function viewer(slides, surface) {
   let i = 0;
   const box = el('div', { class: 'viewer', tabindex: '0', 'aria-label': 'Step viewer, use left and right arrow keys' });
   const title = el('h3', {});
@@ -372,6 +394,10 @@ function viewer(slides) {
   const next = el('button', { type: 'button' }, 'Next ›');
   const full = el('button', { type: 'button' }, 'Zoom');
   const err = el('div', { class: 'err' }, el('div', { class: 'err-label' }, 'Error in this step'), el('pre', {}));
+  const revLabel = el('div', { class: 'review-label' });
+  const revNote = el('div', {});
+  const rev = el('div', { class: 'review' }, revLabel, revNote);
+  const msgs = el('div', { class: 'msgs' }, err, rev);
   const img = el('img', { alt: '' });
   // Clicking the shot is a mouse shortcut only; keyboard users have Prev/Next and the step list.
   const left = el('span', { class: 'edge prev', 'aria-hidden': 'true' }, '‹');
@@ -379,6 +405,13 @@ function viewer(slides) {
   const hint = el('span', { class: 'hint', 'aria-hidden': 'true', hidden: '' }, 'scroll ↓');
   const frame = el('div', { class: 'frame' }, img);
   const stage = el('div', { class: 'stage' }, frame, left, right, hint);
+  const target = el('div', { class: 'target' });
+  const reqPre = el('pre', {});
+  const resPre = el('pre', {});
+  const reqBox = el('div', {}, el('div', { class: 'label' }, 'Request'), reqPre);
+  const resBox = el('div', {}, el('div', { class: 'label' }, 'Response'), resPre);
+  const none = el('div', { class: 'meta' }, 'No call recorded for this step.');
+  const callview = el('div', { class: 'callview' }, target, reqBox, resBox, none);
   const side = (e) => {
     const r = frame.getBoundingClientRect();
     if (e.clientX - r.left > frame.clientWidth) return '';  // on the scrollbar
@@ -402,7 +435,8 @@ function viewer(slides) {
     const t = st(s.status);
     const b = el('button', { type: 'button' }, el('span', { class: 'n' }, n + 1 + '.'),
       el('span', { class: 'g ' + t.tone, 'aria-hidden': 'true' }, t.glyph), el('span', { class: 't' }, s.title,
-      el('span', { class: 'sr-only' }, ', ' + t.word)), el('span', { class: 'ms' }, ms(s.ms)));
+      el('span', { class: 'sr-only' }, ', ' + t.word), flagged(s) ? el('span', { class: 'flag' }, '⚑ ' + (FLAG[s.review.flag] || 'Review')) : null),
+      el('span', { class: 'ms' }, ms(s.ms)));
     b.onclick = () => { i = n; update(); };
     return el('li', {}, b);
   });
@@ -419,10 +453,30 @@ function viewer(slides) {
     full.disabled = !s.shot;
     err.hidden = !s.error;
     err.querySelector('pre').textContent = s.error || '';
-    frame.scrollTop = 0;
-    img.src = s.shot || NO_SHOT;
-    img.alt = s.shot ? s.title : 'No screenshot for this step';
-    fit();
+    rev.hidden = !flagged(s);
+    if (flagged(s)) {
+      revLabel.replaceChildren('⚑ Review: ' + (FLAG[s.review.flag] || s.review.flag), s.review.check ? el('span', { class: 'meta' }, s.review.check) : null);
+      revNote.textContent = s.review.note || '';
+    }
+    msgs.hidden = err.hidden && rev.hidden;
+    // A step with a screenshot shows it; a call step, or any non-ui step, shows the request and response.
+    const asCall = !s.shot && (s.call || surface !== 'ui');
+    stage.hidden = asCall;
+    callview.hidden = !asCall;
+    if (asCall) {
+      const c = s.call;
+      target.textContent = c ? c.target || '' : '';
+      target.hidden = !c || !c.target;
+      reqBox.hidden = resBox.hidden = !c;
+      none.hidden = !!c;
+      reqPre.textContent = c ? show(c.request) : '';
+      resPre.textContent = c ? show(c.response) : '';
+    } else {
+      frame.scrollTop = 0;
+      img.src = s.shot || NO_SHOT;
+      img.alt = s.shot ? s.title : 'No screenshot for this step';
+      fit();
+    }
     items.forEach((li, n) => {
       const b = li.firstChild;
       if (n === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
@@ -446,7 +500,7 @@ function viewer(slides) {
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   };
   box.append(el('div', { class: 'bar' }, title, status, time, count, el('div', { class: 'btns' }, prev, next, full)),
-    el('div', { class: 'vbody' }, err, stage, list));
+    el('div', { class: 'vbody' }, msgs, stage, callview, list));
   update();
   return box;
 }
@@ -478,12 +532,18 @@ function testBox(t) {
   const id = 'test-' + (++uid);
   const box = el('section', { class: 'test', 'aria-labelledby': id + '-h' });
   box.dataset.kind = k;
+  const flags = t.steps.filter(flagged).length;
+  box.dataset.flags = String(flags);
   const toggle = el('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
-    el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' && st(t.status).tone === 'bad' ? t.status : k), el('span', { class: 't' }, t.title));
+    el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' && st(t.status).tone === 'bad' ? t.status : k),
+    t.surface ? el('span', { class: 'surface', title: 'Surface: ' + t.surface }, t.surface) : null, el('span', { class: 't' }, t.title));
   const attempts = t.attempts || [];
   const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : t.retry ? ' · retry ' + t.retry : '';
+  const where = t.runner === 'ai' ? 'AI tester' + (t.role ? ' as ' + t.role : '') : t.file;
   const head = el('div', { class: 'test-head' }, el('h2', { id: id + '-h' }, toggle),
-    el('div', { class: 'info' }, t.scenario ? el('span', { class: 'meta' }, 'scenario ' + t.scenario) : null, el('span', { class: 'meta' }, t.file), el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : ''))));
+    el('div', { class: 'info' }, t.scenario ? el('span', { class: 'meta' }, t.scenario) : null, where ? el('span', { class: 'meta' }, where) : null,
+      k === 'notrun' ? null : el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : '')),
+      flags ? el('span', { class: 'meta c-warn' }, '⚑ ' + flags + ' review flag' + (flags > 1 ? 's' : '')) : null));
   // The whole row is a mouse target; keyboard and screen readers use the heading's button.
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
   const body = el('div', { class: 'test-body', id: id + '-b' });
@@ -504,8 +564,9 @@ function testBox(t) {
     notes.map((a) => el('li', {}, el('b', {}, NOTE[a.type] || a.type), a.description || 'no reason given'))));
   const slides = t.steps.slice();
   if (t.finalShot) slides.push({ title: 'Page at failure', status: 'failed', shot: t.finalShot });
-  if (slides.length) body.append(viewer(slides));
-  else if (!notes.length) body.append(el('div', { class: 'meta' }, k === 'skipped' ? 'Skipped, with no reason given.' : 'This test has no named steps.'));
+  if (slides.length) body.append(viewer(slides, t.surface || 'ui'));
+  else if (!notes.length) body.append(el('div', { class: 'meta' }, k === 'skipped' ? 'Skipped, with no reason given.'
+    : k === 'notrun' ? 'This scenario is in use-cases.js but has no result in this run.' : 'This test has no named steps.'));
   // Playwright usually repeats the failed step's error as the test error; show it once.
   const stepErrors = t.steps.map((s) => (s.error || '').trim()).filter(Boolean);
   if (t.error && !stepErrors.some((e) => e === t.error.trim())) body.append(el('div', {}, el('h3', {}, 'Test error'), el('pre', {}, t.error)));
@@ -514,7 +575,7 @@ function testBox(t) {
     el('ol', {}, attempts.map((a) => el('li', {},
       el('div', { class: 'att-head' }, el('span', {}, a.retry ? 'Retry ' + a.retry : 'First run'), pill(a.status), el('span', { class: 'meta' }, ms(a.duration))),
       a.error ? el('pre', {}, a.error) : null)))));
-  if (k !== 'passed') {
+  if (k !== 'passed' && k !== 'notrun' && t.runner !== 'ai' && t.file) {
     const cmd = 'npx playwright test ' + t.file + (t.project ? ' --project=' + JSON.stringify(t.project).replace(/^"([\w.-]+)"$/, '$1') : '');
     body.append(el('div', { class: 'cmds' }, cmdRow('Rerun', cmd, 'rerun command for ' + t.title),
       t.trace ? cmdRow('Trace', 'npx playwright show-trace ' + t.trace, 'trace command for ' + t.title) : null));
@@ -527,56 +588,65 @@ function testBox(t) {
 function render() {
   const app = document.getElementById('app');
   if (!DATA) { app.append(el('p', {}, 'No data in this report.')); return; }
-  const n = { failed: 0, flaky: 0, passed: 0, skipped: 0 };
+  const n = { failed: 0, flaky: 0, passed: 0, skipped: 0, notrun: 0 };
   for (const t of DATA.tests) n[kind(t)]++;
   const tools = el('div', { class: 'tools', role: 'group', 'aria-label': 'Show tests' });
   const boxes = DATA.tests.map(testBox);
-  // Group by use case (UC1, UC2, … then tests with no use case) when any test carries a `use case` annotation.
-  const grouped = DATA.tests.some((t) => t.useCase);
-  const ucKey = (u) => { const m = /^UC(\d+)/.exec(u || ''); return m ? +m[1] : Infinity; };
-  const useCases = [...new Set(DATA.tests.map((t) => t.useCase || ''))].sort((a, b) => ucKey(a) - ucKey(b));
+  const flaggedTests = boxes.filter((b) => +b.dataset.flags > 0).length;
+  const flagCount = boxes.reduce((c, b) => c + +b.dataset.flags, 0);
+  // The tree from use-cases.js: UC1 → its scenarios in file order, UC2 → …, then tests with no known use case.
+  const known = new Set((DATA.useCases || []).map((u) => u.id));
+  const ucOf = (t) => (known.has(t.useCase) ? t.useCase : '');
+  const useCases = [...(DATA.useCases || []), { id: '', title: 'Other tests' }].filter((u) => DATA.tests.some((t) => ucOf(t) === u.id));
   const heads = new Map(useCases.map((u) => {
-    const tests = DATA.tests.filter((t) => (t.useCase || '') === u);
+    const tests = DATA.tests.filter((t) => ucOf(t) === u.id);
     const passed = tests.filter((t) => kind(t) === 'passed').length;
-    return [u, el('h2', { class: 'uc-title' }, u || 'Other tests', el('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
+    return [u.id, el('h2', { class: 'uc-title' }, (u.id ? u.id + ' ' : '') + u.title, el('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
   }));
   const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
-  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['flaky', 'Flaky', n.flaky], ['passed', 'Passed', n.passed], ['skipped', 'Skipped', n.skipped]];
+  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['flaky', 'Flaky', n.flaky], ['passed', 'Passed', n.passed],
+    ['skipped', 'Skipped', n.skipped], ['notrun', 'Not run', n.notrun], ['review', 'Review flags', flaggedTests]].filter(([key, , c]) => c || ['all', 'failed', 'passed'].includes(key));
+  let failedFirst = false;
+  const order = { failed: 0, flaky: 1, passed: 2, skipped: 3, notrun: 4 };
+  const place = () => {
+    const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => (failedFirst ? order[a[0].dataset.kind] - order[b[0].dataset.kind] : 0) || a[1] - b[1]);
+    for (const u of useCases) {
+      app.append(heads.get(u.id));
+      sorted.filter(([, i]) => ucOf(DATA.tests[i]) === u.id).forEach(([b]) => app.append(b));
+    }
+    app.append(none);
+  };
   const buttons = FILTERS.map(([key, label, c]) => {
     const b = el('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + c);
     b.onclick = () => {
       buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       let shown = 0;
       for (const box of boxes) {
-        box.hidden = key !== 'all' && box.dataset.kind !== key;
+        box.hidden = key !== 'all' && (key === 'review' ? box.dataset.flags === '0' : box.dataset.kind !== key);
         if (!box.hidden) shown++;
       }
-      for (const [u, h] of heads) h.hidden = !boxes.some((box, i) => !box.hidden && (DATA.tests[i].useCase || '') === u);
+      for (const [u, h] of heads) h.hidden = !boxes.some((box, i) => !box.hidden && ucOf(DATA.tests[i]) === u);
       none.hidden = shown > 0;
     };
     return b;
   });
-  tools.append(...buttons);
+  // Default order is use-cases.js order, the same tree every skill shows; this toggle lifts failures to the top of each use case.
+  const sortBtn = el('button', { type: 'button', 'aria-pressed': 'false' }, 'Failed first');
+  sortBtn.onclick = () => { failedFirst = !failedFirst; sortBtn.setAttribute('aria-pressed', String(failedFirst)); place(); };
+  tools.append(...buttons, el('span', { class: 'sep', 'aria-hidden': 'true' }), sortBtn);
   // Same buckets and order as the filters; a count is colored only when it is not zero.
   const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' c-' + tone : '') }, c + ' ' + word);
   app.append(el('header', {},
     el('div', {}, el('h1', {}, 'E2E report · ' + DATA.name, pill(DATA.status)),
       el('div', { class: 'summary-line' },
         count(n.failed, 'failed', 'bad'), count(n.flaky, 'flaky', 'warn'), count(n.passed, 'passed'), count(n.skipped, 'skipped'),
-        el('span', { class: 'meta' }, DATA.tests.length + ' tests · ' + ms(DATA.ms)),
+        n.notrun ? count(n.notrun, 'not run') : null, count(flagCount, 'review flag' + (flagCount === 1 ? '' : 's'), 'warn'),
+        el('span', { class: 'meta' }, DATA.tests.length + ' scenarios · ' + ms(DATA.ms)),
         el('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
         DATA.baseURL ? el('span', { class: 'meta' }, DATA.baseURL) : null)),
     el('div', { class: 'head-row' }, tools)));
   addExportPdf();
-  // Failed tests first (inside each use case), so the report opens on what needs attention.
-  const order = { failed: 0, flaky: 1, passed: 2, skipped: 3 };
-  const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => order[a[0].dataset.kind] - order[b[0].dataset.kind] || a[1] - b[1]);
-  if (!grouped) sorted.forEach(([b]) => app.append(b));
-  else for (const u of useCases) {
-    app.append(heads.get(u));
-    sorted.filter(([, i]) => (DATA.tests[i].useCase || '') === u).forEach(([b]) => app.append(b));
-  }
-  app.append(none);
+  place();
 }
 render();
 </script>

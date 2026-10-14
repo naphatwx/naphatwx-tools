@@ -8,9 +8,20 @@ argument-hint: <plan-folder | spec-folder> [base-url] [app-repo-path]
 
 Play each scenario of a feature on the running app, by hand. The page looks like the mock UI's index: one block per **use case**, a side list of its **scenarios**, the picked one in a 16:9 frame, and a guide beside it (Result, How to play, What you should see). The difference: the frame is the real app, and each pick first **seeds** new data for that scenario by calling the app's API.
 
-A scenario with **no screen** (surface `api`, `mcp` or `job`) is played by an AI agent, not by hand. Its frame shows a **prompt** for the agent (▶ Seed fills in the ids of new data) and the **recorded calls** of the agent's last run: each request and the response as returned. The agent writes its Pass / Fail to `results.js`, which the page reads, and a report to `ai-results.md`.
+The page shows the same tree as every skill that reads `use-cases.js`: use cases in `USE_CASES` order, each with its scenarios in `SCENARIOS` order, same ids. Each scenario has a small surface tag:
 
-The use cases and scenarios are not written here. They live in `<plan>/use-cases.js`, written by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code). This skill only adds how to play each one on the real app.
+| Surface | Who plays it | How |
+|---------|--------------|-----|
+| `ui` | you, by hand | the real screen in the frame |
+| `mcp` | an AI agent | calls the app's MCP tools |
+| `api` | an AI agent | calls REST or gRPC directly (`curl`, `grpcurl`) |
+| `job` | an AI agent | runs the job's command |
+
+A skipped scenario stays in its place in the tree, struck through, with its reason in the frame and the Results table.
+
+A scenario with **no screen** (surface `mcp`, `api` or `job`) is played by an AI agent, not by hand. Its frame shows a **prompt** for the agent (▶ Seed fills in the ids of new data) and the **recorded calls** of the agent's last run: each request and the response as returned. The agent writes its Pass / Fail to `results.js`, which the page reads, and a report to `ai-results.md`.
+
+The use cases and scenarios are not written here. They live in `<plan>/use-cases.js`, written by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code). This skill reads that file directly, never another skill's output, and only adds how to play each one on the real app.
 
 It is generic: it needs a way to start the app, a health URL and an HTTP API. It needs no seed framework, no database access and no change to the app's code, except a dev login route when the app has none (step 3).
 
@@ -63,11 +74,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 6. **Secrets live only in `live/.env`.** The agent writes `.env.example` (keys, no values) and never reads, prints or writes `.env`; `live.js`, seeds and output name keys, never values. `.env` stays git-ignored (`.gitignore` next to it), the server never serves a dotfile, and it hides every `.env` value and credential in output shown on the page.
 7. **Same host name as the app** (`localhost` or `127.0.0.1`, never mixed), so login cookies reach the frame.
 8. **Use cases and scenarios are data, owned by `<plan>/use-cases.js`.** `LIVE_PLAY` has exactly one entry per scenario, same id, same order. A wrong or missing scenario → fix it with the `generate-use-case` skill.
-9. **AI results are recorded, never invented.** Every status in `results.js` comes from calls the agent really made on the local app, kept in `calls` as sent and as answered. Mask tokens, cookies and internal hosts in them; never record a credential. A viewer's own Pass / Fail on the page wins.
-10. **`live.js` and `results.js` are strict JSON** (double quotes, no trailing commas, no comments inside the values).
-11. **Every count you report is computed** (by `scripts/check-live.js`), never estimated.
-12. **Ask before you change the app.** A dev login route or a dev-only frame header is a change to the user's repo: list it and get a yes first. Seeds live in `<plan>/live/seeds/` and change nothing in the app.
-13. No absolute local paths in any file (`appDir` is relative to `live/`). Code comments max 3 lines. Wrap every `localStorage` call in `try/catch`.
+9. **The surface decides who plays it.** `ui` → `steps` played by hand in the frame, no `prompt`. `mcp`, `api`, `job` → a `prompt` the AI plays. `check-live.js` fails on any other mix.
+10. **AI results are recorded, never invented.** Every status in `results.js` comes from calls the agent really made on the local app, kept in `calls` as sent and as answered. Mask tokens, cookies and internal hosts in them; never record a credential. A viewer's own Pass / Fail on the page wins.
+11. **`live.js` and `results.js` are strict JSON** (double quotes, no trailing commas, no comments inside the values).
+12. **Every count you report is computed** (by `scripts/check-live.js`), never estimated.
+13. **Ask before you change the app.** A dev login route or a dev-only frame header is a change to the user's repo: list it and get a yes first. Seeds live in `<plan>/live/seeds/` and change nothing in the app.
+14. No absolute local paths in any file (`appDir` is relative to `live/`). Code comments max 3 lines. Wrap every `localStorage` call in `try/catch`.
 
 ## Workflow
 
@@ -76,7 +88,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - From the plan folder: `overview.html` (scope, screens, errors) and `use-cases.js`.
 - When `<plan>/mock/shared/scenario-play.js` exists, it has each scenario's screen, params and steps. Start from it; names and values change to the seeded ones.
 - List per scenario: the screen and route, the data it needs, whether it **writes** (creates or changes data) or only reads, and the role it runs as with the permissions that matter (the scenario's `given` names them).
-- A scenario with no screen (surface `api`, `mcp` or `job`) is an **AI scenario**: list the MCP tool and operation, API call or job command it plays, and the ids it needs from a seed.
+- A scenario with no screen (surface `mcp`, `api` or `job`) is an **AI scenario**: list the MCP tool and operation (`mcp`), the REST or gRPC call (`api`), or the job command (`job`) it plays, and the ids it needs from a seed.
 
 ### 2. Scan the app
 
@@ -95,7 +107,7 @@ Delegate to a read-only sub-agent when the agent can. Ask for concrete answers w
 
 ### 3. Agree the app changes
 
-- Usually none. List any that are needed and wait for a yes (Hard Rule 12):
+- Usually none. List any that are needed and wait for a yes (Hard Rule 13):
     - No dev login route → offer one (dev-only, off in production), or use login type `manual`.
     - A frame header blocks the page → a dev-only relaxation.
 - A scenario needing data the API can't create (e.g. no "create user" call) → `skip` with the reason, unless the user agrees to another way.
@@ -150,20 +162,22 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 | `prompt` | AI scenarios only: the text a viewer pastes into an AI agent, below. `{key}` tokens are filled from the seed's `values`; with no seed, the viewer types them |
 | `skip` | instead of the fields above, for a scenario you can't play live: one sentence saying why and where to play it instead |
 
-- `title`, `story` and `expect` come from `use-cases.js`; the file's last lines merge both lists. Keep those lines as the template has them.
+- `title`, `story`, `surface` and `expect` come from `use-cases.js`; the file's last lines merge both lists. Keep those lines as the template has them: they keep every scenario in file order, skipped ones included.
 - The reviewer compares the screen with "What you should see", so the steps must lead to those exact values:
     - A scenario that signs in as a role other than the default starts with that role and its relevant permissions: "You are signed in as DEV: has repositories.versions.read, not repositories.versions.create." Add any upstream rule the scenario depends on ("Your linked Groot user is in the BA group, whose page 7 is not writable").
     - Use the values the seed really creates (project names, tags, versions, merge request titles). When they differ from the scenario's `e.g.` values, the seed wins in the steps; tell the user so the scenario can be updated with the `generate-use-case` skill.
     - Never write `that <thing>`, `the newest <thing>`, `<placeholder>` or `pluto-…` for a value the seed knows. Write a fixed value, or a `{key}` the seed returns in `values`. Before the seed runs, the page shows `[<label>: filled in after the seed]`. Only secrets keep a `<placeholder>`.
     - Before writing "tooltip", "hover" or "point at", read the control's component: a tooltip replaced by inline text is read, not hovered (`Read the amber reason under the card's title`).
-- Skip, with a reason, only what can't be caused safely on a dev machine (an upstream outage, a 502 from a proxy; point to the mock or the unit tests). A scenario with no screen is not skipped: it gets a `prompt`.
+- Skip, with a reason, only what can't be caused safely on a dev machine (an upstream outage, a 502 from a proxy; point to the mock or the unit tests). A scenario with no screen is not skipped: it gets a `prompt`. A skipped scenario still shows in the tree, with its reason.
 - An AI scenario's `prompt`:
-    - Names the MCP server (the name the steps tell the viewer to add), or the command and the repo it runs in.
+    - `mcp`: names the MCP server (the name the steps tell the viewer to add) and the tools to call.
+    - `api`: names the endpoint on the local app (method and path, or gRPC service and method) and how to authenticate (the `.env` key, never its value). The agent calls it with `curl` or `grpcurl`.
+    - `job`: names the command and the repo it runs in.
     - Asks the agent to show the exact request and the full response of every call, and to read the tool's input schema first when it has one.
     - Lists the calls in order with their values, `{key}` for what a seed makes. Says "I confirm the writes below" when a call writes.
     - Ends by asking for the values `expect` checks ("Tell me the new version's status, source and releaseBranch, and the second call's error").
     - A value MCP can't give (e.g. a merge request number only the screen shows) → the seed returns it in `values`. With no seed, a `{key}` the viewer types, and a `lookup` line in the recorded calls saying where it came from.
-- An AI scenario's `steps`: connect the agent to the local MCP server once (the exact `claude mcp add` command, the token's source; never a token), press ▶ Seed, copy the prompt into the agent and approve its calls, check its answer against What you should see.
+- An AI scenario's `steps`: for `mcp`, connect the agent to the local MCP server once (the exact `claude mcp add` command, the token's source; never a token); for `api`, where the agent gets the API token. Then press ▶ Seed, copy the prompt into the agent and approve its calls, check its answer against What you should see.
 - A scenario whose `expect` doesn't match what the app should do → report it; don't change `use-cases.js`.
 
 ### 5b. List the secrets (`.env.example`)
@@ -185,7 +199,7 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 
 ### 7. Verify
 
-- `node <this skill dir>/scripts/check-live.js <plan>/live`: syntax of `live.js`, `server.mjs` and every seed; `live.js` as strict JSON; one entry per scenario in order; every playable entry has a seed or a url, and steps; login and roles consistent.
+- `node <this skill dir>/scripts/check-live.js <plan>/live`: syntax of `live.js`, `server.mjs` and every seed; `live.js` as strict JSON; one entry per scenario in order; every surface is `ui`, `mcp`, `api` or `job`; `ui` entries have a seed or a url and steps, no prompt; `mcp` / `api` / `job` entries have a prompt; login and roles consistent.
 - It warns (`WARN`, exit 0) when a step says "tooltip", "hover" or "point at" (confirm the control still has one, then keep it), and when an entry with a `role` has no step naming its permissions.
 - It also warns when a step or prompt uses a `{key}` its seed doesn't return in `done({ values })` (it scans the seed file), and on vague names (`that merge request`, `the newest …`, `<…>` that is not a secret, `pluto-…`). Fix each one.
 - Pre-test: `node <plan>/live/server.mjs --up`. It runs `pretest.up`, waits for `health`, warns about framing headers, and prints the page URL.
@@ -201,8 +215,11 @@ Do this after step 7 with the app up and `server.mjs` running, or when the user 
 - Get a client the way a viewer would: a local token for each role the scenarios need, made through the app (its token page or API, signed in by the dev login). Keep tokens in scratch files only; never print them or write them to `live/`.
 - For each AI scenario, in order:
     - Seed it through the server, as the page does: `POST /__play/<id>` with header `X-Play: 1`. Fill the prompt's `{key}` tokens from the answer's `values`.
-    - Do what the prompt says, as the scenario's role: MCP `tools/call` through the agent's own MCP tools when they point at the local app, else JSON-RPC over HTTP to the local endpoint (`initialize`, `notifications/initialized`, `tools/call`). A job runs its command in `appDir`.
-    - Record every call in order: `{ role, tool, arguments, isError, response }` for MCP, `{ command, isError, response }` for a command, `{ lookup }` for a value found another way. The response as returned, masked (Hard Rule 9).
+    - Do what the prompt says, as the scenario's role:
+        - `mcp`: `tools/call` through the agent's own MCP tools when they point at the local app, else JSON-RPC over HTTP to the local endpoint (`initialize`, `notifications/initialized`, `tools/call`).
+        - `api`: `curl` or `grpcurl` to the local endpoint.
+        - `job`: its command, run in `appDir`.
+    - Record every call in order: `{ role, tool, arguments, isError, response }` for MCP, `{ command, isError, response }` for an API call (the `curl` / `grpcurl` line, token masked) or a job, `{ lookup }` for a value found another way. The response as returned, masked (Hard Rule 10).
     - Compare with `expect`. Pass only when every item matches. A value that comes from the mock (an id, a count) and differs only because the local data differs is a pass with a note; a different message, status or field is a fail.
 - Write `live/results.js`: `PLAYED_RESULTS[<id>] = { status, by, at, note, calls }`. `note` is one line starting with who and when ("Claude over MCP, 2026-10-14: …"). An AI scenario that can't be played gets `status: ""` and the reason in `note`.
 - Write `live/ai-results.md`, the report:
@@ -215,7 +232,7 @@ Do this after step 7 with the app up and `server.mjs` running, or when the user 
 ### 9. Confirm
 
 - Output: `✅ Play page created at: <plan>/live/index.html`
-- Counts copied from `check-live.js`: scenarios, playable live, by the AI (recorded pass, fail), skipped, seed commands.
+- Counts copied from `check-live.js`: scenarios (by surface), playable live, by the AI (recorded pass, fail), skipped, seed commands.
 - The AI's FAILs from `ai-results.md`, each with the call and the answer.
 - App changes made (login route, headers), each with its path.
 - The keys to fill in `live/.env`, each with where to get it (from `.env.example`).

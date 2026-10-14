@@ -12,7 +12,7 @@ Mock pages written inside the real frontend app, built from its real components 
     ├── data.ts             realistic data, typed with the real types
     ├── states.ts           mock state id → data set or forced state
     ├── use-cases.ts        copy of <plan>/use-cases.js as TS exports; never edited here
-    ├── scenario-play.ts    SCENARIO_PLAY: how to play each scenario, same shape as standalone
+    ├── scenario-play.ts    SCENARIO_PLAY: how to play each ui scenario, same shape as standalone
     ├── use<Screen>.ts      one hook per screen: state + events
     └── StatePanel.tsx      mock-only state switcher
 ```
@@ -56,7 +56,7 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - `rules.ts`: every spec rule as a pure function — status and field mapping, eligibility, validation, error classification, the user-facing messages copied verbatim from the code (the same text `use-cases.js` quotes; SKILL.md Hard Rule 5).
 - `data.ts`: realistic names, ids, dates and volumes (enough rows to page), typed with the real types. One entity per state that needs different data. Keep ids consistent with the plan's diagrams.
 - `use-cases.ts`: `<plan>/use-cases.js` (from the `generate-use-case` skill) copied as-is, with `var` turned into `export const`. The app can't load a file outside itself, so this is a copy: re-copy it whenever `use-cases.js` changes, never edit it here.
-- `scenario-play.ts`: `export const SCENARIO_PLAY = [...]`, a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment), one entry per scenario id.
+- `scenario-play.ts`: `export const SCENARIO_PLAY = [...]`, a strict-JSON array with the fields of `SKILL.md` step 4b (`page` = the screen route segment), one entry per `ui` scenario id. `mcp`, `api` and `job` scenarios get no entry: the mock has no console or fake call for them.
 - `states.ts`: `STATES` list (`id`, `label`, `useCase` = the plan use cases it shows, `hint` telling the viewer what to try, the data set or forced state) and a `useMockState()` helper that reads `?state=`.
 - `use<Screen>.ts`: the screen's state and events. Fake latency with a short timeout so loading states show; state faults turn into the real error codes and messages from `rules.ts`.
 - `StatePanel.tsx`: a select of the states that changes `?state=`, plus the current hint (Hard Rule 8). With `?sc=<id>` it shows that scenario's steps and expect instead, with a link back to the index.
@@ -67,8 +67,11 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 - Show every state the real screen has: loading skeleton, error with retry, empty, filtered-empty, success toast, refusal alert, outcome-unknown.
 - Every interaction works: submit, edit, delete, filter, sort, paginate, open / close modal, confirm, cancel.
 - Deep links: read extra query params (`?mode=`, `?line=`) so each scenario can open the exact state.
-- `page.tsx` at the folder root: one block per use case (`UC<n>` + name), each listing its playable scenarios as links to `<screen>?state=<state id>&sc=<scenario id>` with the first `expect` line, then a `Not in the mock` line per skipped one; a use case with none shows its `none` sentence.
-- Controls follow the spec, then the real app: a control the user has no permission for is hidden when the real app hides it; shown unavailable with a reason (`aria-disabled` + tooltip) only where the spec says so.
+- `page.tsx` at the folder root: the same tree as every skill. One block per use case (`UC<n>` + name), then every scenario in `use-cases.js` order with its surface tag (`ui` / `mcp` / `api` / `job`) and first `expect` line.
+    - A `ui` scenario links to `<screen>?state=<state id>&sc=<scenario id>`.
+    - Any other is greyed with "No mock" and no link.
+    - A use case with no scenario shows its `none` sentence.
+- Controls follow the spec, then the real app: a control the user has no permission for is hidden when the real app hides it; shown unavailable with a reason (`aria-disabled`, the reason where the spec puts it) only where the spec says so.
 
 ### 5. Link the plan (when a plan folder exists)
 

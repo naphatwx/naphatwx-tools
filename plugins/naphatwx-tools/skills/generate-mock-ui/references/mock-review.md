@@ -46,13 +46,13 @@ Agent: general-purpose.
 
 Question: **"Does every scenario behave as the spec says?"**
 
-- Standalone mock: load the mock's JS into a Node `vm` (stub `location`, `sessionStorage`, `window`). `scripts/check-scenarios.js` shows how; reuse its `sandbox()`.
-    - Run every scenario that has `op` / `req` under its mock state.
-    - For a screen scenario, call the RPCs the screen calls with the params it sends, and check the data supports each step (the MR, version or row the step names exists, the filter returns what `expect` says).
+- Only `ui` scenarios play in the mock. `mcp`, `api` and `job` ones show "No mock" and are not reviewed here.
+- Standalone mock: open each `ui` scenario's screen in a headless browser and follow its steps, or load the mock's JS into a Node `vm` (stub `location`, `sessionStorage`, `window`; `scripts/check-scenarios.js` loads `states.js` this way).
+    - Call the operations the screen calls (`fake-api.js`) with the params it sends, and check the data supports each step (the MR, version or row the step names exists, the filter returns what `expect` says).
 - In-project mock: read `_mock/use<Screen>.ts` and `rules.ts`, and trace each scenario through them.
 - Compare every code and exact message with `spec.md` and `contracts/`.
 - Read the screen logic for dead buttons, wrong or ignored query params, and state leaking between frames (storage keys the index does not clear).
-- List every acceptance scenario, edge case and refusal row in the spec that has **no** scenario in `<plan>/use-cases.js`, and every `skip` that could be played.
+- List every acceptance scenario, edge case and refusal row in the spec that has **no** scenario in `<plan>/use-cases.js`, and every `ui` scenario with no play entry.
 - Report: numbered findings, each with severity, scenario id, `file:line`, spec line and the fix; then the gaps.
 
 ## 3. Merge and fix

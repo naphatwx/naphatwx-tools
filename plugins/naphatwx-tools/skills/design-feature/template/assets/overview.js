@@ -127,6 +127,19 @@ viewButtons.forEach(btn => {
     btn.addEventListener("click", () => selectView(btn));
 });
 document.querySelectorAll(".panel").forEach(p => p.addEventListener("animationend", () => p.classList.remove("entering")));
+// a link into a closed view (Acceptance criteria → #sc-<id>) opens that view first, so the browser can scroll to it
+function reveal(id) {
+    const el = id && document.getElementById(decodeURIComponent(id));
+    const panel = el?.closest(".panel[hidden]");
+    const tab = panel && document.getElementById(panel.getAttribute("aria-labelledby"));
+    if (tab) selectView(tab, true);
+    return el;
+}
+document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (a) reveal(a.getAttribute("href").slice(1));
+});
+if (location.hash) reveal(location.hash.slice(1))?.scrollIntoView();
 // the use case a 1–4 key acts on: the current slide when presenting, else the one nearest the top of the screen
 function useCaseInView() {
     if (presenting()) return steps[current]?.slide.classList.contains("use-case") ? steps[current].slide : null;
@@ -264,9 +277,14 @@ viewButtons.forEach(tab => tab.addEventListener("click", () => {
 // a link while presenting jumps to the first step that holds the target
 addEventListener("hashchange", () => {
     if (!presenting()) return;
-    const el = document.getElementById(location.hash.slice(1));
-    const i = steps.findIndex(st => (st.part || st.slide).contains(el));
+    const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (!el) return;
+    // a row inside a use case view (#sc-<id>) goes to that view's step, not the use case's first one
+    const panel = el.closest(".panel");
+    let i = panel ? steps.findIndex(st => st.tab?.getAttribute("aria-controls") === panel.id) : -1;
+    if (i < 0) i = steps.findIndex(st => (st.part || st.slide).contains(el));
     if (i >= 0 && i !== current) show(i);
+    if (panel) el.scrollIntoView({ block: "center" });
 });
 
 // ===== Shortcut sheet ( ? ) =====

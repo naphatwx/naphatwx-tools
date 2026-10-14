@@ -1,5 +1,5 @@
-// Mock-only stand-in for the real operations, named exactly as in contract/types.ts.
-// Serves contract/data.js through contract/rules.js; swap for the real client and pages stay the same.
+// Mock-only stand-in for the operations the screens call, named exactly as in contract/types.ts.
+// Serves contract/data.js through contract/rules.js, so screens get real answer shapes; swap for the real client.
 // Writes and the side-effect log persist in sessionStorage under STORE, so they survive page changes;
 // index.html clears every STORE key when a scenario starts, so each one starts clean.
 
@@ -48,14 +48,8 @@ var FakeApi = (function () {
         return Rules.toResponse(row);
     }
 
-    /** Sample requests for page/console.html, one per operation (a scenario's `req` overrides it). */
-    const SAMPLES = {
-        GetThings: { ownerId: st.ownerId, page: 1, limit: 10 },
-        CreateThing: { ownerId: st.ownerId, name: 'Third thing' },
-    };
-
     return {
-        GetThings, CreateThing, SAMPLES, STORE,
+        GetThings, CreateThing, STORE,
         owner: () => D.owners.find(o => o.id === st.ownerId),
         // read from storage, not memory: screens in other frames write it too
         log: () => load('log', mem.log),

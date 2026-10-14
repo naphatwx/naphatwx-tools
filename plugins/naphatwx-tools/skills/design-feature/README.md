@@ -1,11 +1,12 @@
 # design-feature
 
-Plans a feature as a browsable HTML folder: use cases with their flowcharts, sequence diagrams and scenarios, database and API changes, errors and open questions.
+Plans a feature as a browsable HTML folder: acceptance criteria with the scenarios that cover them, use cases with their flowcharts, sequence diagrams and scenarios, database and API changes, errors and open questions.
 
 ## When to use it
 
 - You have a spec, ticket or idea, and you want the whole plan in one page people open in a browser.
 - You want each use case drawn twice: its logic (flowchart) and how its services talk (sequence).
+- You want to see, per acceptance criterion, which scenario covers it on each channel (UI, MCP, API, job), and where the gaps are.
 - You want an optional clickable mock linked from each scenario.
 - Say: "design this feature", "plan spec 127".
 
@@ -15,7 +16,6 @@ Plans a feature as a browsable HTML folder: use cases with their flowcharts, seq
 | A mock alone, for a plan that already exists | `generate-mock-ui` |
 | Only the use cases and scenarios | `generate-use-case` |
 | Play the scenarios on the real running app | `play-scenarios` |
-| A test case file an AI runs later | `generate-test-cases` |
 | A styled docs page from files or a topic | `html-document` |
 
 ## How it works
@@ -30,7 +30,7 @@ graph TD
     M1 --> CP[copy overview.html + assets/ from template/]
     M2 --> CP
     CP --> S3[3. fan out section agents, in parallel]
-    S3 --> S4["4. merge .parts/ into overview.html, run scenarios-panels.js"]
+    S3 --> S4["4. merge .parts/ into overview.html, run scenarios-panels.js + acceptance-section.js"]
     S4 --> S5{"5. which mock?"}
     S5 -->|in project or standalone| GM[generate-mock-ui]
     S5 -->|no mock, or no UI| S6
@@ -64,6 +64,7 @@ sequenceDiagram
     M->>M: write Overview, Scope, Errors, Open questions
     M->>M: merge .parts/, delete it
     M->>M: scenarios-panels.js writes each Scenarios view
+    M->>M: acceptance-section.js writes the Acceptance criteria section
 ```
 
 How the plan folder links together:
@@ -74,7 +75,10 @@ graph LR
     OV -->|"Sequence view"| SQ["sequence-diagram/NN-slug"]
     OV -->|"ER diagram link"| ER[database/er-diagram.html]
     UCJ[use-cases.js] -->|scenarios-panels.js| SC["Scenarios view per use case"]
+    UCJ -->|acceptance-section.js| AC["Acceptance criteria section"]
     SC --> OV
+    AC --> OV
+    AC -->|"#sc-id link"| SC
     SC -->|"Play link, new tab"| MK["mock/index.html#sc-id"]
     UCJ --> MK
     OV -->|styles + script| AS[assets/overview.css + overview.js]
@@ -83,10 +87,10 @@ graph LR
 Rules the diagrams don't show:
 
 - Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → `TBD`.
-- Use cases and scenarios are written only by `generate-use-case`. Scenarios views are generated, never typed by hand.
+- Use cases, scenarios and acceptance criteria are written only by `generate-use-case`. The Acceptance criteria section and the Scenarios views are generated, never typed by hand.
 - Pages are dark only, Quiet Sheet theme. `overview.css` is a template copy; no new classes, no inline styles.
 - No external scripts, styles or fonts in `overview.html` or the diagram files.
-- Every count reported (scenarios per use case, total) comes from a script's output.
+- Every count reported (scenarios per use case, total, acceptance coverage) comes from a script's output.
 
 ## Input → output
 
@@ -110,7 +114,7 @@ Output:
 │   └── NN-<uc-slug>.js        one per use case (.html in diagram-design mode)
 ├── database/
 │   └── er-diagram.html        every related table and FK
-├── use-cases.js               use cases + scenarios, by generate-use-case
+├── use-cases.js               use cases, scenarios and acceptance criteria, by generate-use-case
 └── mock/                      optional standalone mock, by generate-mock-ui
 ```
 
@@ -124,6 +128,7 @@ Step 8 (only when asked) writes a publish copy outside the plan folder: `overvie
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
 | [scripts/scenarios-panels.js](scripts/scenarios-panels.js) | Writes each use case's Scenarios view from `use-cases.js`, with Play links when a mock exists; prints the counts |
+| [scripts/acceptance-section.js](scripts/acceptance-section.js) | Writes the Acceptance criteria section from `use-cases.js`: each criterion's scenarios per channel, and every gap; prints the coverage |
 | [scripts/publish-copy.js](scripts/publish-copy.js) | Builds a copy that works as a claude.ai Artifact and prints the publish arguments |
 | [template/overview.html](template/overview.html) | The entry page; copied, then filled in |
 | [template/assets/](template/assets/) | `overview.css` + `overview.js`; copied unchanged |
@@ -131,12 +136,12 @@ Step 8 (only when asked) writes a publish copy outside the plan folder: `overvie
 | [template/sequence-diagram/](template/sequence-diagram/) | Preview diagrams + `render.js`; not copied. Synced from `generate-diagram` |
 | [template/database/](template/database/) | Preview ER diagram; not copied. Synced from `generate-diagram` |
 | [template/mock/](template/mock/) | Preview mock; not copied. Synced from `generate-mock-ui` |
-| [template/use-cases.js](template/use-cases.js) | Example use cases for the preview; not copied |
+| [template/use-cases.js](template/use-cases.js) | Example use cases, scenarios and acceptance criteria for the preview (one gap on purpose); not copied |
 
 ## Related skills
 
-- `generate-use-case`: writes `use-cases.js`.
+- `generate-use-case`: writes `use-cases.js` (use cases, scenarios on every channel, acceptance criteria).
 - `generate-diagram`: draws every flowchart, sequence and ER diagram.
 - `generate-mock-ui`: builds the optional mock and its Play links.
 - `play-scenarios`: plays the plan's scenarios on the running app, in `<plan>/live/`.
-- `generate-test-cases`: reads the same `use-cases.js`.
+- `e2e-test`: tests the plan's `ui` scenarios in the browser, with the `live/` seeds.

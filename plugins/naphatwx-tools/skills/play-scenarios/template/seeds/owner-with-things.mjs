@@ -1,4 +1,5 @@
-// A new owner with three things, newest first. Flags: --status <S> opens the list filtered; --archived archives it.
+// A new owner with two things, newest first. Flags: --status <S> opens the list filtered; --archived archives it;
+// --create opens the Create form.
 import { api, ensure, unique, done, run } from './lib.mjs';
 
 const args = process.argv.slice(2);
@@ -13,9 +14,10 @@ run(async () => {
     // written by the scenario: a new one on every pick
     const name = unique('pluto');
     const owner = await api('POST', '/owners', { orgId: org.id, name, archived: !!flag('--archived') });
-    for (const [name, status] of [['First thing', 'READY'], ['Second thing', 'FAILED'], ['Third thing', 'PENDING']]) {
+    for (const [name, status] of [['First thing', 'READY'], ['Second thing', 'PENDING']]) {
         await api('POST', `/owners/${owner.id}/things`, { name, status });
     }
     const status = flag('--status');
-    done({ url: `/owners/${owner.id}${status ? `?status=${status}` : ''}`, values: { ownerId: owner.id, ownerName: name } });
+    const tail = flag('--create') ? '/things/new' : status ? `?status=${status}` : '';
+    done({ url: `/owners/${owner.id}${tail}`, values: { ownerId: owner.id, ownerName: name } });
 });

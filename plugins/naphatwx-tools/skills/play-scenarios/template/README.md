@@ -42,7 +42,9 @@ graph TD
 
 - Every pick of a writing scenario makes new data. Nothing is ever deleted.
 - Pass / Fail marks stay in this browser.
-- A scenario with no screen (API, MCP, job) shows a prompt for your AI agent instead of the app. Press ▶ Seed to put the new ids into it, then Copy prompt.
+- Each scenario has a surface tag. `ui` is played by hand in the frame. `mcp`, `api` and `job` have no screen.
+- A skipped scenario stays in the list, struck through. Pick it to read why, and where to play it instead.
+- A scenario with no screen shows a prompt for your AI agent instead of the app. Press ▶ Seed to put the new ids into it, then Copy prompt.
 - Its Result starts as the AI's own Pass / Fail from `results.js`, with every call it made below the prompt. Your mark wins.
 - To test again, **Clear** in a use case's scenario list drops its Pass / Fail and notes. **Clear all** (bottom right) does it for the whole page. A cleared scenario does not take the AI's result back. The screens and their data stay.
 

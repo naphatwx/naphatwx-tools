@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.9.203
+
+**One use-cases.js for every skill that plays or tests a feature**
+
+- Every skill reads `<plan>/use-cases.js` directly and shows the same tree: use case → scenarios, in file order, with a surface tag. A missing file → run generate-use-case first.
+- generate-use-case:
+  - surface `mcp` (an AI agent calling MCP tools) is now separate from `api` (REST / gRPC).
+  - Each use case lists its `channels`. Each outcome needs one scenario per channel, or an `na` reason.
+  - The new `ACCEPTANCE` list holds the spec's Given / When / Then.
+  - `check.js` errors on an uncovered channel or acceptance criterion, and warns on a scenario with no twin on another channel.
+- design-feature: new section 03 **Acceptance criteria**, built by `acceptance-section.js`. Each criterion links to its scenarios by channel and shows gaps. Use cases is now 04, and the sections after it move down by one.
+- generate-mock-ui: mocks `ui` scenarios only. `mcp` / `api` / `job` scenarios stay in the tree, greyed, and show "No mock". The console page and fake-API play are removed.
+- play-scenarios: knows `mcp`; skipped scenarios stay in the tree with their reason; Results have a Surface column.
+- e2e-test tests every surface, not only the UI:
+  - ui runs in Playwright with screenshots, and api runs as Playwright requests.
+  - An AI tester agent runs mcp and job scenarios and records every call.
+  - New review step: a fresh agent checks every screenshot and every recorded call before the report is built. The reporter now writes run data, and `build-report.mjs` builds the one HTML.
+- generate-test-cases is removed.
+
 ## 1.9.165
 
 **generate-test-scenario is now generate-test-cases**

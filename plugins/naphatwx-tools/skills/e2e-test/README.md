@@ -1,99 +1,126 @@
 # e2e-test
 
-Writes and runs Playwright browser tests for a feature, with a screenshot at every step and one self-contained HTML report.
+Writes and runs automated tests for every scenario in a feature's `use-cases.js`, on every surface: the browser (`ui`), direct API calls (`api`), MCP tools (`mcp`) and scripts (`job`). A fresh reviewer agent then checks every step, and one self-contained HTML report shows it all, in the same use case tree as every other skill.
 
 ## When to use it
 
-- You want a feature tested in a real browser, with proof of every step.
-- You want the results grouped by use case and scenario, in one file you can share.
-- Say: "e2e test spec 127", "test this in the browser".
+- You want a feature tested end to end, with proof of every step: a screenshot, or the request and response.
+- You want the MCP side tested by an AI agent, the way users reach it.
+- You want one shareable file, grouped by use case and scenario.
+- Say: "e2e test spec 127", "test this end to end".
 
 | You want | Use instead |
 |----------|-------------|
-| A test case file only, run later | `generate-test-cases` |
+| Write or fix the use cases and scenarios | `generate-use-case` |
 | Play the scenarios by hand on the running app | `play-scenarios` |
 | Check after a deploy that services reach each other | `smoke-test` |
 | A clickable mock with fake data | `generate-mock-ui` |
 
 ## How it works
 
-Five phases. The harness is added once per repo; the rest runs per feature.
+Six phases. The harness is added once per repo; the rest runs per feature.
 
 ```mermaid
 graph TD
-    A[read the repo's guide files] --> B["1 test cases: generate-test-cases --target ui"]
-    B --> C[group the cases by use case, about 3-8 per group]
-    C --> D{Playwright set up?}
-    D -->|config + login exist| D1[reuse them]
-    D -->|nothing| D2["add @playwright/test, a config, a login setup"]
-    D1 --> E["2 harness: copy step.ts, reporters/ unchanged"]
-    D2 --> E
-    E --> F["3 write: one writer agent per group, in parallel, one spec file each"]
-    F --> G[check every file imports step and wraps each action]
-    G --> H["4 run: npx playwright test, spec files on parallel workers"]
-    H -->|environment failure| H1[fix it, re-run only the failed files once]
-    H1 --> H
-    H --> I["5 report: one HTML, check every step has a screenshot"]
-    I --> J[check no __e2e_ records are left]
-    J --> K[reply: counts, failures with cause, findings, report path]
+    A[read the repo's guide files] --> B["1 read: use-cases.js, UC1 → scenarios, UC2 → ..."]
+    B -->|missing or check fails| B1[run generate-use-case first]
+    B1 --> B
+    B --> C{Playwright set up?}
+    C -->|config + login exist| C1[reuse them]
+    C -->|nothing| C2["add @playwright/test, a config, a login setup"]
+    C1 --> D["2 harness: copy step.ts, reporters/ unchanged"]
+    C2 --> D
+    D --> E["3 write: one writer agent per use case, in parallel"]
+    E --> E1["uc.e2e.spec.ts: ui + api scenarios"]
+    E --> E2["uc.ai-tests.json: mcp + job scenarios"]
+    E1 --> F1["4 run: Playwright → run-data.json + shots/"]
+    E2 --> F2["4 run: one AI tester per use case → ai-results-UC.json"]
+    F1 --> G["5 review: a fresh reviewer checks every step → review.json"]
+    F2 --> G
+    G -->|test problem| H[fix the test, re-run those files once, review again]
+    H --> G
+    G -->|product problem| I[keep as a finding]
+    G --> J["6 report: build-report.mjs → one HTML"]
+    I --> J
+    J --> K[reply: counts per use case, failures with cause, review flags, findings, report path]
 ```
 
-One test, step by step:
+The runner per scenario comes from its `surface`; nothing is grouped or split by surface:
+
+| surface | Runner | Proof per step |
+|---|---|---|
+| `ui` | Playwright browser test, `step()` | screenshot |
+| `api` | Playwright request test, `apiStep()` | masked request + response |
+| `mcp` | AI tester agent calling the local MCP tools as the scenario's role | each call, request + response |
+| `job` | AI tester agent running the command | command, exit code, output |
+
+One run, end to end:
 
 ```mermaid
 sequenceDiagram
-    participant T as Spec file
-    participant S as step.ts
-    participant P as Page
-    participant R as one-html-reporter.ts
-    T->>S: step(page, "Click Save as draft", body)
-    S->>P: run the body
-    S->>P: screenshot, JPEG quality 60, pass or fail
-    S->>S: attach as "step: Click Save as draft"
-    S-->>T: rethrow the failure, if any
-    Note over R: onTestEnd: pair each step with its screenshot, keep the last attempt
-    R->>R: onEnd: fill the template, one HTML with the screenshots inside
-    R-->>T: prints "E2E report: path"
+    participant S as Skill
+    participant P as Playwright + run-data reporter
+    participant A as AI tester
+    participant R as Fresh reviewer
+    participant B as build-report.mjs
+    S->>P: npx playwright test (ui + api), E2E_RUN_DIR=run
+    S->>A: play uc.ai-tests.json (mcp + job), at the same time
+    P-->>S: run/run-data.json + run/shots/
+    A-->>S: run/ai-results-UC.json
+    S->>R: review every step against use-cases.js
+    R-->>S: run/review.json (ok / test / product / unsure)
+    S->>B: build run --use-cases use-cases.js
+    B-->>S: run/e2e-report-run.html, one line per use case
 ```
 
-How the report groups tests:
+How the report shows it:
 
 ```mermaid
 graph LR
-    A["use case annotation: UC1 title"] --> U[use case heading, passed / total]
-    U --> T["test card: TC-01 title + scenario id"]
-    T --> S["steps paged like slides: screenshot, pass or fail, error"]
-    N[no use case annotation] --> O[Other tests, last]
+    U["UC1 title, passed / total"] --> T["scenario: status, surface tag, id"]
+    T --> S1["ui step: screenshot"]
+    T --> S2["mcp / api / job step: request + response"]
+    S1 --> F["⚑ reviewer note on a flagged step"]
+    S2 --> F
+    N[scenario with no result] --> NR[not run]
 ```
 
 Rules the diagrams don't show:
 
+- `use-cases.js` is the one source. It never writes its own test cases; a wrong scenario is fixed in `generate-use-case`.
 - Tests only. It never changes app code to make a test pass; a missing selector or a bug is a finding.
-- It owns its data: records prefixed `__e2e_`, deleted after, checked gone.
+- Each test creates its own data through the app's API: records prefixed `__e2e_`, deleted after, checked gone.
+- No tokens, cookies or passwords in any recorded call.
 - Never against production unless named for this run.
 - The repo's own guide (where tests live, how to run tools) wins over the skill.
-- Report: failed tests first, every test starts closed, filters use Playwright's own outcome; retries show under "Earlier attempts" and flaky tests are marked.
+- Report: use-cases.js order by default, a "Failed first" toggle, every test starts closed, filters use Playwright's own outcome, retries under "Earlier attempts", flaky tests marked, Export PDF.
 
 ## Input → output
 
-Input: `<spec folder | spec number | feature description> [--env <name>] [--base-url <url>]`
+Input: `<plan folder | spec folder | spec number> [--env <name>] [--base-url <url>]`
 
 - No `--env` or `--base-url` → the repo's local dev URL.
 
 Output, in the target repo:
 
 ```
-<spec-path>/PRIVATE/test/
-└── test-cases-ui-<n>.md               from generate-test-cases
+<plan>/use-cases.js                       read only (from generate-use-case)
 <e2e-dir>/
-├── README.md                           how to run the tests, for teammates
-├── step.ts                             step() helper: one screenshot per step
+├── README.md                             how to run the tests, for teammates
+├── step.ts                               step() screenshot per step, apiStep() request + response per step
 ├── reporters/
-│   ├── one-html-reporter.ts            writes one HTML per run
-│   └── e2e-report-template.html        the report page, dark theme, Export PDF
-├── <group>.e2e.spec.ts                 one per use case group
-└── e2e-results/                        gitignored
-    └── e2e-report-<feature>-<stamp>.html
+│   ├── run-data-reporter.ts              writes the run folder, no HTML
+│   ├── build-report.mjs                  run folder → one HTML
+│   └── e2e-report-template.html          the report page, dark theme, Export PDF
+├── <uc-slug>.e2e.spec.ts                 ui + api scenarios of one use case
+├── <uc-slug>.ai-tests.json               mcp + job scenarios of one use case
+└── e2e-results/                          gitignored
+    └── <feature>-<stamp>/
+        ├── run-data.json                 Playwright results
+        ├── shots/                        step screenshots
+        ├── ai-results-<UC>.json          AI tester results
+        ├── review.json                   reviewer notes per step
+        └── e2e-report-<feature>-<stamp>.html
 ```
 
 Plus a `playwright.config.*` and login setup when the repo had none.
@@ -102,16 +129,19 @@ Plus a `playwright.config.*` and login setup when the repo had none.
 
 | Path | What |
 |------|------|
-| [SKILL.md](SKILL.md) | The agent's instructions |
-| [references/writer-agent.md](references/writer-agent.md) | The prompt for each writer agent: selectors, annotations, `step()`, data, waits |
-| [template/step.ts](template/step.ts) | `step()`: wraps `test.step` and attaches a screenshot of how it ended |
-| [template/one-html-reporter.ts](template/one-html-reporter.ts) | Playwright reporter: one self-contained HTML per run |
-| [template/e2e-report-template.html](template/e2e-report-template.html) | The report page the reporter fills in |
+| [SKILL.md](SKILL.md) | The agent's instructions and the file formats |
+| [references/writer-agent.md](references/writer-agent.md) | Prompt for each writer agent: per-surface rules, selectors, data, waits |
+| [references/ai-tester-agent.md](references/ai-tester-agent.md) | Prompt for the AI tester: plays mcp and job scenarios, records each call |
+| [references/reviewer-agent.md](references/reviewer-agent.md) | Prompt for the fresh reviewer: the per-step checklist and flags |
+| [template/step.ts](template/step.ts) | `step()` and `apiStep()` |
+| [template/run-data-reporter.ts](template/run-data-reporter.ts) | Playwright reporter: writes `run-data.json` + `shots/` |
+| [template/build-report.mjs](template/build-report.mjs) | Merges the run folder into one HTML |
+| [template/e2e-report-template.html](template/e2e-report-template.html) | The report page the build fills in |
 | [template/README.md](template/README.md) | Ships as the e2e folder's `README.md` |
 
 ## Related skills
 
-- `generate-test-cases`: writes the `--target ui` test case file this skill turns into tests.
-- `generate-use-case`: its use case and scenario ids group the report.
-- `play-scenarios`: the same flows, played by hand.
-- `smoke-test`: service checks after a deploy, not the UI.
+- `generate-use-case`: writes `use-cases.js`, the scenarios this skill tests.
+- `play-scenarios`: the same scenarios, played by hand.
+- `design-feature`, `generate-mock-ui`: the same use case tree, as a plan and a mock.
+- `smoke-test`: service checks after a deploy, not the feature.
