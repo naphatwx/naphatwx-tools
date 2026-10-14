@@ -156,7 +156,7 @@ async function play(id) {
     if (missing.length) return { ok: false, output: `Missing in live/.env (copy .env.example, then fill in):\n${missingText(missing)}` };
     const started = Date.now();
     const role = sc.role || c.role;
-    let url = sc.url, vars, output = '', code = 0;
+    let url = sc.url, values = {}, output = '', code = 0;
     if (sc.seed) {
         let auth;
         try { auth = await apiHeaders(c, role); }
@@ -165,7 +165,7 @@ async function play(id) {
         ({ code, output } = await sh(sc.seed, { cwd: HERE, env, timeoutSec: c.seedTimeoutSec || 180 }));
         out(`${code === 0 ? 'seeded' : 'SEED FAILED'} ${id} (${Date.now() - started} ms, exit ${code}): ${sc.seed}`);
         if (code !== 0) return { ok: false, code, output };
-        try { const last = JSON.parse(output.trim().split('\n').pop()); url = last.url || url; vars = last.vars; }
+        try { const last = JSON.parse(output.trim().split('\n').pop()); url = last.url || url; values = last.values || {}; }
         catch { return { ok: false, output: output + '\nThe seed did not end with a JSON line like {"url": "/..."}.' }; }
     }
     if (!url) return { ok: false, output: output + '\nNo URL: set "url" in live.js or print it from the seed.' };
@@ -174,7 +174,7 @@ async function play(id) {
         try { cookies = await signIn(c, role); }
         catch (e) { return { ok: false, output: `${output}\nSign-in as ${role} failed: POST ${c.login.path} → ${e.message}` }; }
     }
-    return { ok: true, url, vars, ms: Date.now() - started, output, cookies };
+    return { ok: true, url, values, ms: Date.now() - started, output, cookies };
 }
 
 // ---------------------------------------------------------------- static files under the plan folder

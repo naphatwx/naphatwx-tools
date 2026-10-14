@@ -10,7 +10,7 @@ var USE_CASES = [
 
 var SCENARIOS = [
   { "id": "read-list", "useCase": "UC1", "title": "Newest first", "story": "US1 · AC1", "surface": "ui",
-    "given": "The owner has 3 things (e.g. the new pluto-<run>: First thing READY, Second thing FAILED, Third thing PENDING). The user holds things.read.",
+    "given": "The owner has 3 things (e.g. pluto-k3x9: First thing READY, Second thing FAILED, Third thing PENDING). The user holds things.read.",
     "when": "The user opens the owner's things.",
     "expect": ["3 rows, newest first: Third thing PENDING, Second thing FAILED, First thing READY."] },
   { "id": "read-failed", "useCase": "UC1", "title": "Failed filter", "story": "US1 · AC3", "surface": "ui",
@@ -34,7 +34,7 @@ var SCENARIOS = [
     "when": "The user opens the owner's things.",
     "expect": ["No Create button at all; the list still reads 3 rows, Third thing on top."] },
   { "id": "create-archived", "useCase": "UC2", "title": "Archived owner", "story": "US2 · AC4", "surface": "ui",
-    "given": "The owner is archived (e.g. the new pluto-<run>, archived). The user holds things.create.",
+    "given": "The owner is archived (e.g. pluto-k3x9, archived). The user holds things.create.",
     "when": "The user points at Create.",
     "expect": ["Create is shown unavailable; its tooltip reads \"This owner is archived. Things cannot be created.\""] },
   { "id": "create-api", "useCase": "UC2", "title": "Valid name over the API", "story": "US2 · AC1", "surface": "api",

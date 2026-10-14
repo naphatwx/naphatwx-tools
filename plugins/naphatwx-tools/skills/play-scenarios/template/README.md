@@ -74,6 +74,6 @@ graph TD
 | `Warning: … sends X-Frame-Options` or `CSP frame-ancestors` | The app blocks the frame, so it stays blank. Relax that header in dev only. |
 | `API credentials (…) failed: …` | The API key, token or dev login did not work. Check the key in `.env` or the command in `live.js`. |
 | `SEED FAILED` / a seed error in the frame | A seed's API call failed. The message names the call and status; check the app's API and data. |
-| `The seed did not end with a JSON line like {"url": "/..."}.` | The seed must end with `done({ url })`. |
+| `The seed did not end with a JSON line like {"url": "/..."}.` | The seed must end with `done({ url, values })`. |
 | `Sign-in as … failed` | The dev login route refused that role. Check the role names in `live.js`. |
 | Frame is blank, or signed out | Use the same host name as the app (`localhost` or `127.0.0.1`, not both). |

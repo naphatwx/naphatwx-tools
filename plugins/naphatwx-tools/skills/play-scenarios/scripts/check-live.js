@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Checks live/live.js and live/.env.example against the plan's scenarios; WARN lines (tooltip steps, roles with no permissions) keep exit 0.
+// Checks live/live.js and live/.env.example against the plan's scenarios; WARN lines (tooltip steps, roles with no permissions,
+// {keys} no seed returns, vague names like "that merge request") keep exit 0.
 // With --run-seeds (app and server.mjs running), picks every seeded scenario twice: both must succeed, writing ones get a new URL.
 // Usage: node check-live.js <live-dir> [--use-cases <file>] [--run-seeds [--server http://localhost:4000]]. Exit 1 on any error.
 
@@ -85,6 +86,19 @@ const envFile = (() => { try { return parseEnv(fs.readFileSync(path.join(dir, '.
 const unset = exampleKeys.filter(k => !optional.has(k) && !process.env[k] && !(envFile && envFile[k]));
 if (unset.length) (process.argv.includes('--run-seeds') ? errors : { push: m => out('note: ' + m) }).push(`required keys with no value yet (set them in live/.env): ${unset.join(', ')}`);
 
+/** Keys a seed file returns in done({ values }): `values: {…}`, `Object.assign(values, {…})`, `values.k =`. A scan, not a parse. */
+function valueKeys(file) {
+    let src = '';
+    try { src = fs.readFileSync(path.join(dir, file), 'utf8'); } catch { return null; }
+    const keys = new Set([...src.matchAll(/\bvalues\.(\w+)\s*=/g)].map(m => m[1]));
+    for (const m of src.matchAll(/(?:\bvalues\s*[:=]\s*|Object\.assign\(\s*values\s*,\s*)\{([^{}]*)\}/g)) {
+        m[1].split(',').map(p => p.trim()).filter(p => p && !p.startsWith('...')).forEach(p => keys.add(p.match(/^['"]?(\w+)/)[1]));
+    }
+    return keys;
+}
+// a value the seed knows is written as {key}; a secret keeps its <placeholder>
+const VAGUE = /\b(?:that|the newest|the latest) (?:merge request|MR|repo(?:sitory)?|branch|version|tag|project|ticket|user|owner|pipeline|build)\b(?! named\b)|<(?![^>]*(?:token|secret|password|key\b|pat\b))[^<>\n]+>|\b[a-z]+-(?:…|\.\.\.)/i;
+
 CORE.forEach(s => { if (!PLAY.some(p => p.id === s.id)) errors.push(`scenario ${s.id}: no entry in live.js`); });
 PLAY.forEach((p, i) => {
     const where = `live.js entry ${p.id || '#' + (i + 1)}`;
@@ -101,6 +115,15 @@ PLAY.forEach((p, i) => {
     const steps = (p.steps || []).join(' ');
     const hover = steps.match(/\b(tooltip|hover|point at)\b/i);
     if (hover) warnings.push(`${where}: a step says "${hover[1]}"; confirm in the component that the control still has one (not inline text)`);
+    const seedFile = (String(p.seed || '').match(/\bseeds\/[\w.-]+\.mjs\b/) || [])[0];
+    const returned = seedFile ? valueKeys(seedFile) : null;
+    for (const [what, text] of [['a step', steps], ['the prompt', p.prompt || '']]) {
+        const keys = [...new Set([...text.matchAll(/\{(\w+)\}/g)].map(m => m[1]))];
+        if (p.seed && returned) keys.filter(k => !returned.has(k)).forEach(k => warnings.push(`${where}: ${what} uses {${k}} but ${seedFile} returns no "${k}" in done({ values })`));
+        if (!p.seed && what === 'a step') keys.forEach(k => warnings.push(`${where}: a step uses {${k}} but the scenario has no seed to return it`));
+        const vague = text.match(VAGUE);
+        if (vague) warnings.push(`${where}: ${what} says "${vague[0]}"; name the value: a fixed one, or a {key} the seed returns`);
+    }
     if (p.role && !/\b[a-z][\w-]*(?:[.:][a-z][\w-]*)+\b/.test(steps)) warnings.push(`${where}: signs in as ${p.role} but no step names its permissions (e.g. "You are signed in as ${p.role}: has things.read, not things.create")`);
 });
 

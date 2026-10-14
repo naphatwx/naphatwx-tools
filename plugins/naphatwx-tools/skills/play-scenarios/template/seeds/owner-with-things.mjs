@@ -11,10 +11,11 @@ run(async () => {
         () => api('POST', '/orgs', { name: 'Astro Payments' }),
     );
     // written by the scenario: a new one on every pick
-    const owner = await api('POST', '/owners', { orgId: org.id, name: unique('pluto'), archived: !!flag('--archived') });
+    const name = unique('pluto');
+    const owner = await api('POST', '/owners', { orgId: org.id, name, archived: !!flag('--archived') });
     for (const [name, status] of [['First thing', 'READY'], ['Second thing', 'FAILED'], ['Third thing', 'PENDING']]) {
         await api('POST', `/owners/${owner.id}/things`, { name, status });
     }
     const status = flag('--status');
-    done({ url: `/owners/${owner.id}${status ? `?status=${status}` : ''}`, vars: { ownerId: owner.id } });
+    done({ url: `/owners/${owner.id}${status ? `?status=${status}` : ''}`, values: { ownerId: owner.id, ownerName: name } });
 });

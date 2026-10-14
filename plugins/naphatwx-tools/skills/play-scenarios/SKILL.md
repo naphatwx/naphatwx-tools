@@ -27,8 +27,8 @@ live/
 ├── .env                   the user pastes the values here (git-ignored, never served, never read by the agent)
 ├── .gitignore             lists .env
 └── seeds/
-    ├── lib.mjs            api(), ensure(), unique(), poll(), done({ url, vars })
-    └── <name>.mjs         one seed per kind of data a scenario needs; ends by printing {"url": "/...", "vars": {...}}
+    ├── lib.mjs            api(), ensure(), unique(), poll(), done({ url, values })
+    └── <name>.mjs         one seed per kind of data a scenario needs; ends by printing {"url": "/...", "values": {...}}
 ```
 
 `template/` already has this working against a stand-in app (`template/preview/`): copy it and fill it in, don't rebuild it. Its index reads `../use-cases.js`, which is this skill's `use-cases.js` (preview data only; never copy it).
@@ -58,7 +58,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 1. **Local only.** `server.mjs` listens on localhost and refuses a non-local `base` unless the user passes `--allow-remote` for a dev environment they own. Never point it at staging or production.
 2. **Seeds call the app's API only.** No SQL, no database client, no app internals: the API applies the app's own validation, permissions and events, so seeded data looks like real data.
 3. **Writing scenarios get new data on every pick** (`unique(name)`); shared and read-only data uses `ensure()` (find, create if missing). A seed never deletes.
-4. **Every seed ends with one JSON line** `{"url": "/..."}`, the path to open relative to `base`, plus `"vars"` when a prompt needs the new ids (`{"ownerId": 1204}`). No id is hardcoded in `live.js` or the steps; steps name things (`the new pluto repo`), not ids.
+4. **Every seed ends with one JSON line** `{"url": "/...", "values": {...}}`: the path to open relative to `base`, and every value the seed makes at run time that a step or prompt needs (ids, names, merge request numbers, authors: `{"repositoryName": "pluto-k3x9", "masterMR": 159}`). `live.js` never hardcodes them; steps and prompts write them as `{key}` tokens, and the page fills them in after each seed.
 5. **Commands come from `live.js` only.** The server reads them by scenario id; the page never sends one. Keep the `X-Play` header check: it stops other sites from triggering a pick.
 6. **Secrets live only in `live/.env`.** The agent writes `.env.example` (keys, no values) and never reads, prints or writes `.env`; `live.js`, seeds and output name keys, never values. `.env` stays git-ignored (`.gitignore` next to it), the server never serves a dotfile, and it hides every `.env` value and credential in output shown on the page.
 7. **Same host name as the app** (`localhost` or `127.0.0.1`, never mixed), so login cookies reach the frame.
@@ -146,22 +146,23 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 | `seed` | `node seeds/<name>.mjs [args]`; prints `{"url"}`. Several scenarios share one seed with args |
 | `url` | only for a scenario with no seed: a fixed path starting with `/` |
 | `role` | optional role for this scenario (read-only user, another team) |
-| `steps` | "How to play": imperative; name what the seed created (`the new pluto repo`, `merge request !159`) and the values the reviewer should see |
-| `prompt` | AI scenarios only: the text a viewer pastes into an AI agent, below. `{name}` slots are filled from the seed's `vars`, or typed by the viewer |
+| `steps` | "How to play": imperative; name the exact values the reviewer picks and should see, with `{key}` for what the seed creates (`Pick merge request !{masterMR} - Play {repositoryName}: add order export`) |
+| `prompt` | AI scenarios only: the text a viewer pastes into an AI agent, below. `{key}` tokens are filled from the seed's `values`; with no seed, the viewer types them |
 | `skip` | instead of the fields above, for a scenario you can't play live: one sentence saying why and where to play it instead |
 
 - `title`, `story` and `expect` come from `use-cases.js`; the file's last lines merge both lists. Keep those lines as the template has them.
 - The reviewer compares the screen with "What you should see", so the steps must lead to those exact values:
     - A scenario that signs in as a role other than the default starts with that role and its relevant permissions: "You are signed in as DEV: has repositories.versions.read, not repositories.versions.create." Add any upstream rule the scenario depends on ("Your linked Groot user is in the BA group, whose page 7 is not writable").
     - Use the values the seed really creates (project names, tags, versions, merge request titles). When they differ from the scenario's `e.g.` values, the seed wins in the steps; tell the user so the scenario can be updated with the `generate-use-case` skill.
+    - Never write `that <thing>`, `the newest <thing>`, `<placeholder>` or `pluto-…` for a value the seed knows. Write a fixed value, or a `{key}` the seed returns in `values`. Before the seed runs, the page shows `[<label>: filled in after the seed]`. Only secrets keep a `<placeholder>`.
     - Before writing "tooltip", "hover" or "point at", read the control's component: a tooltip replaced by inline text is read, not hovered (`Read the amber reason under the card's title`).
 - Skip, with a reason, only what can't be caused safely on a dev machine (an upstream outage, a 502 from a proxy; point to the mock or the unit tests). A scenario with no screen is not skipped: it gets a `prompt`.
 - An AI scenario's `prompt`:
     - Names the MCP server (the name the steps tell the viewer to add), or the command and the repo it runs in.
     - Asks the agent to show the exact request and the full response of every call, and to read the tool's input schema first when it has one.
-    - Lists the calls in order with their values, `{slots}` for ids a seed makes. Says "I confirm the writes below" when a call writes.
+    - Lists the calls in order with their values, `{key}` for what a seed makes. Says "I confirm the writes below" when a call writes.
     - Ends by asking for the values `expect` checks ("Tell me the new version's status, source and releaseBranch, and the second call's error").
-    - A value MCP can't give (e.g. a merge request number only the screen shows) → a `{slot}` the viewer types, and a `lookup` line in the recorded calls saying where it came from.
+    - A value MCP can't give (e.g. a merge request number only the screen shows) → the seed returns it in `values`. With no seed, a `{key}` the viewer types, and a `lookup` line in the recorded calls saying where it came from.
 - An AI scenario's `steps`: connect the agent to the local MCP server once (the exact `claude mcp add` command, the token's source; never a token), press ▶ Seed, copy the prompt into the agent and approve its calls, check its answer against What you should see.
 - A scenario whose `expect` doesn't match what the app should do → report it; don't change `use-cases.js`.
 
@@ -179,17 +180,18 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
     - `ensure()` the shared data it depends on (org, environment, base records), by natural key.
     - Creates its scenario's own entity with `unique('<name>')` when the scenario writes.
     - Drives the data to the state the scenario starts from, through the same API calls a user or job would make; `poll()` for states a background job reaches.
-    - Ends with `done({ url })`, with `vars` for every `{slot}` of its prompts (`done({ url, vars: { repositoryId: repo.id } })`). Any failed call throws: the frame shows the output, so make messages say what failed.
+    - Ends with `done({ url, values })`, with a key for every `{key}` its steps and prompts use (`done({ url, values: { repositoryId: repo.id, repositoryName: name, masterMR: mr.iid } })`). Any failed call throws: the frame shows the output, so make messages say what failed.
 - Never handle auth in a seed: `api()` already sends the credential server.mjs resolved. Never print an env value.
 
 ### 7. Verify
 
 - `node <this skill dir>/scripts/check-live.js <plan>/live`: syntax of `live.js`, `server.mjs` and every seed; `live.js` as strict JSON; one entry per scenario in order; every playable entry has a seed or a url, and steps; login and roles consistent.
 - It warns (`WARN`, exit 0) when a step says "tooltip", "hover" or "point at" (confirm the control still has one, then keep it), and when an entry with a `role` has no step naming its permissions.
+- It also warns when a step or prompt uses a `{key}` its seed doesn't return in `done({ values })` (it scans the seed file), and on vague names (`that merge request`, `the newest …`, `<…>` that is not a secret, `pluto-…`). Fix each one.
 - Pre-test: `node <plan>/live/server.mjs --up`. It runs `pretest.up`, waits for `health`, warns about framing headers, and prints the page URL.
 - `check-live.js` also checks the secrets: `.env.example` exists with no values, every `apiAuth.env` is listed in it, `.env` is git-ignored, and `live.js` holds nothing that looks like a secret. It names keys still empty, never values.
 - With the app up, `.env` filled in and `server.mjs` running, `check-live.js <plan>/live --run-seeds [--server http://localhost:4000]`: picks every seeded scenario twice through the server, with the same `.env` and auth as playing. Both picks must succeed; a writing scenario must get a **new** URL each time (it prints which ones get the same).
-- Open the page in a headless browser when one is available and pick every playable scenario: no console errors, the "Creating data…" cover clears, the frame shows the right screen signed in as the right role. On an AI scenario, ▶ Seed fills every seeded slot of the prompt. Look at the screenshots.
+- Open the page in a headless browser when one is available and pick every playable scenario: no console errors, the "Creating data…" cover clears, the frame shows the right screen signed in as the right role. After each seed, every `{key}` in the steps and the prompt shows a value, not `[…: filled in after the seed]`. Look at the screenshots.
 - Grep for absolute local paths and secrets, and remove them.
 
 ### 8. Play the AI scenarios
@@ -198,7 +200,7 @@ Do this after step 7 with the app up and `server.mjs` running, or when the user 
 
 - Get a client the way a viewer would: a local token for each role the scenarios need, made through the app (its token page or API, signed in by the dev login). Keep tokens in scratch files only; never print them or write them to `live/`.
 - For each AI scenario, in order:
-    - Seed it through the server, as the page does: `POST /__play/<id>` with header `X-Play: 1`. Fill the prompt's slots from the answer's `vars`.
+    - Seed it through the server, as the page does: `POST /__play/<id>` with header `X-Play: 1`. Fill the prompt's `{key}` tokens from the answer's `values`.
     - Do what the prompt says, as the scenario's role: MCP `tools/call` through the agent's own MCP tools when they point at the local app, else JSON-RPC over HTTP to the local endpoint (`initialize`, `notifications/initialized`, `tools/call`). A job runs its command in `appDir`.
     - Record every call in order: `{ role, tool, arguments, isError, response }` for MCP, `{ command, isError, response }` for a command, `{ lookup }` for a value found another way. The response as returned, masked (Hard Rule 9).
     - Compare with `expect`. Pass only when every item matches. A value that comes from the mock (an id, a count) and differs only because the local data differs is a pass with a note; a different message, status or field is a fail.

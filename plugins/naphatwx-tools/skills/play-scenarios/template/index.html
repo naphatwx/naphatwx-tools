@@ -228,7 +228,11 @@
         .api .slot { width: 8rem; padding: 2px 8px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); }
         .call { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface-2); }
         .call > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; padding: 8px 12px; cursor: pointer; font-family: var(--mono); font-size: var(--fs-code); }
-        .call > div { display: grid; gap: 6px; padding: 0 12px 12px; }
+        /* request and response side by side; a command has only its output, which spans both columns */
+        .call > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0 12px 12px; }
+        .call > div > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+        .call > div > div:only-child { grid-column: 1 / -1; }
+        @media (max-width: 900px) { .call > div { grid-template-columns: minmax(0, 1fr); } }
         .call .ok { color: var(--ok); } .call .err { color: var(--bad); }
         .api-lookup { padding: 8px 12px; color: var(--text-2); border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); }
         .banner { padding: 10px 14px; color: var(--text); background: var(--warn-soft); border: 1px solid var(--warn); border-radius: var(--radius-lg); }
@@ -316,6 +320,18 @@
 
         // ---------------------------------------------------------------- where each scenario opens
         const opened = {}; // scenario id → the URL its last seed returned
+        const values = {}; // scenario id → { key: value } its last seed created (names, ids, merge request numbers), or typed by the viewer
+        const labelOf = k => k.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase().replace(/\b(mr|id|url)\b/g, m => m.toUpperCase());
+        /** {key} in a step or prompt → the value the seed created; before the seed, a marker saying the seed fills it. */
+        const fill = (sc, text) => String(text).replace(/\{(\w+)\}/g, (m, k) => values[sc.id]?.[k] ?? (sc.seed ? `[${labelOf(k)}: filled in after the seed]` : `[${labelOf(k)}: type it above]`));
+        /** After a seed: keep its URL and values, and fill them into the steps. */
+        function seeded(sc, block, r) {
+            if (r.url) opened[sc.id] = r.url;
+            values[sc.id] = { ...(values[sc.id] || {}), ...Object.fromEntries(Object.entries(r.values || {}).map(([k, v]) => [k, String(v)])) };
+            block.querySelector('.url').textContent = screenUrl(sc);
+            block.querySelector('.open-link').href = screenSrc(sc);
+            block.querySelector('.guide .steps').innerHTML = list((sc.steps || []).map(t => fill(sc, t)));
+        }
         const pathOf = sc => opened[sc.id] || sc.url || '';
         const roleOf = sc => sc.role || LIVE_CONFIG.role || '';
         /** A link login wraps the URL, so every scenario signs in as its role; a post login is done by server.mjs. */
@@ -411,7 +427,7 @@
               </div>
               <div class="guide-body">
               <div class="label mt-4 mb-1">How to play</div>
-              <ol class="list-decimal pl-5 space-y-1 muted">${list(sc.steps)}</ol>
+              <ol class="list-decimal pl-5 space-y-1 muted steps">${list((sc.steps || []).map(t => fill(sc, t)))}</ol>
               <div class="label mt-4 mb-1">What you should see</div>
               <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>
               ${sc.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="t-code meta break-words">${esc(sc.seed)}</code>` : ''}
@@ -439,23 +455,20 @@
                 overlay(block, `<p class="bad">${sc.seed ? 'Seed' : 'Sign-in'} failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</p><pre>${esc(r.output)}</pre><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">↻ Try again</button>`);
                 return;
             }
-            if (r.url) opened[sc.id] = r.url;
-            block.querySelector('.url').textContent = screenUrl(sc);
-            block.querySelector('.open-link').href = screenSrc(sc);
+            seeded(sc, block, r);
             overlay(block, '');
             frame.src = screenSrc(sc);
         }
 
         // ---------------------------------------------------------------- no-screen scenarios: AI prompt + recorded calls
-        const vars = {}; // scenario id → { name: value } for the prompt's {name} slots: the seed's "vars", or typed by the viewer
-        const slotsOf = sc => [...new Set([...sc.prompt.matchAll(/\{(\w+)\}/g)].map(m => m[1]))];
-        function promptText(sc) {
-            const v = vars[sc.id] || {};
-            return sc.prompt.replace(/\{(\w+)\}/g, (m, k) => v[k] || (sc.seed ? `<${k}: press ▶ Seed>` : `<${k}>`));
-        }
-        function setVar(id, k, val) {
-            (vars[id] ||= {})[k] = val;
-            document.querySelector(`section[data-use-case="${byId(id).useCase}"] .prompt`).textContent = promptText(byId(id));
+        // a scenario with no seed has no values: the viewer types its prompt's {keys}
+        const slotsOf = sc => sc.seed ? [] : [...new Set([...sc.prompt.matchAll(/\{(\w+)\}/g)].map(m => m[1]))];
+        const promptText = sc => fill(sc, sc.prompt);
+        function setValue(id, k, val) {
+            (values[id] ||= {})[k] = val;
+            const sc = byId(id), block = document.querySelector(`section[data-use-case="${sc.useCase}"]`);
+            block.querySelector('.prompt').textContent = promptText(sc);
+            block.querySelector('.guide .steps').innerHTML = list((sc.steps || []).map(t => fill(sc, t)));
         }
         const pretty = v => typeof v === 'string' ? v : JSON.stringify(v, null, 2);
         /** One recorded call: an MCP tools/call, a command (a job), or a lookup note. */
@@ -463,9 +476,9 @@
             if (c.lookup) return `<div class="api-lookup t-code">${esc(c.lookup)}</div>`;
             c = c.arguments || c.command ? c : { ...c, arguments: { operation: c.operation, params: c.params } }; // older shape
             const what = c.command ? '$ ' + c.command : [c.tool, c.arguments?.operation].filter(Boolean).join(' · ');
-            const req = c.command ? '' : `<div class="label">Request · tools/call</div><pre>${esc(pretty({ name: c.tool, arguments: c.arguments }))}</pre>`;
+            const req = c.command ? '' : `<div><div class="label">Request · tools/call</div><pre>${esc(pretty({ name: c.tool, arguments: c.arguments }))}</pre></div>`;
             return `<details class="call"><summary><span class="meta">${i + 1}</span><span>${esc(what)}</span>${c.role ? `<span class="meta">as ${esc(c.role)}</span>` : ''}<span class="${c.isError ? 'err' : 'ok'}">${c.isError ? '✗ error' : '✓ answer'}</span></summary>
-              <div>${req}<div class="label">${c.command ? 'Output' : 'Response'}${c.isError ? ' · isError true' : ''}</div><pre>${esc(pretty(c.response))}</pre></div></details>`;
+              <div>${req}<div><div class="label">${c.command ? 'Output' : 'Response'}${c.isError ? ' · isError true' : ''}</div><pre>${esc(pretty(c.response))}</pre></div></div></details>`;
         }
         function apiBody(sc) {
             const run = (typeof PLAYED_RESULTS === 'object' && PLAYED_RESULTS[sc.id]) || {};
@@ -474,7 +487,7 @@
             return `<section class="space-y-2">
                 <div class="flex items-center gap-2 flex-wrap"><span class="label">Prompt for your AI agent</span>
                   ${sc.seed ? `<button type="button" class="btn-ghost result-ctl" onclick="pick('${sc.id}', true)">▶ Seed</button>` : ''}
-                  ${slotsOf(sc).map(k => `<label class="meta">${esc(k)} <input class="slot" data-slot="${esc(k)}" value="${esc(vars[sc.id]?.[k] || '')}" oninput="setVar('${sc.id}', this.dataset.slot, this.value)"></label>`).join('')}
+                  ${slotsOf(sc).map(k => `<label class="meta">${esc(k)} <input class="slot" data-slot="${esc(k)}" value="${esc(values[sc.id]?.[k] || '')}" oninput="setValue('${sc.id}', this.dataset.slot, this.value)"></label>`).join('')}
                   <button type="button" class="btn-ghost result-ctl ml-auto" onclick="navigator.clipboard.writeText(promptText(byId('${sc.id}'))).then(() => { this.textContent = 'Copied'; setTimeout(() => { this.textContent = 'Copy prompt'; }, 1500); })">Copy prompt</button>
                   <span class="api-status meta w-full"></span></div>
                 <div class="prompt">${esc(promptText(sc))}</div></section>
@@ -488,15 +501,10 @@
             const r = await play(sc);
             if (loads[sc.useCase] !== token) return;
             if (!r.ok) { status(`<span class="st-fail">Seed failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</span><pre>${esc(r.output)}</pre>`); return; }
-            if (r.url) opened[sc.id] = r.url;
-            block.querySelector('.url').textContent = screenUrl(sc);
-            block.querySelector('.open-link').href = screenSrc(sc);
-            Object.entries(r.vars || {}).forEach(([k, v]) => {
-                setVar(sc.id, k, String(v));
-                const input = block.querySelector(`.slot[data-slot="${k}"]`); if (input) input.value = v;
-            });
-            const got = Object.entries(r.vars || {}).map(([k, v]) => `${k} ${v}`).join(', ');
-            status(got ? `Seeded: ${esc(got)}. The prompt has them.` : 'Seeded. The seed gave no values for the prompt.');
+            seeded(sc, block, r);
+            block.querySelector('.prompt').textContent = promptText(sc);
+            const got = Object.entries(r.values || {}).map(([k, v]) => `${labelOf(k)} ${v}`).join(', ');
+            status(got ? `Seeded: ${esc(got)}. The prompt and steps have them.` : 'Seeded. The seed returned no values.');
         }
 
         function fit(block) {
