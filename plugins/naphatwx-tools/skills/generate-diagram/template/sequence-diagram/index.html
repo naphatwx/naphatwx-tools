@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sequence diagrams · Feature Name</title>
     <style>
-        /* Standalone viewer for manual-mode sequence files; same .seq styles as design-feature's overview. */
+        /* Standalone viewer for manual-mode sequence files; same .sequence styles as design-feature's overview. */
         /* theme:tokens:start */
         /* Synced from theme/tokens.css by theme/sync.mjs. Do not edit here. */
         :root {
@@ -116,14 +116,14 @@
         :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
         .label-note { font-weight: 400; }
         /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-        .sc-kind.basic { color: var(--accent); }
-        .sc-kind.exception { color: var(--warn); }
+        .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .scenario-kind.basic { color: var(--accent); }
+        .scenario-kind.exception { color: var(--warn); }
         /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-        .refs-chip:hover { background: var(--hover); }
-        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+        .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .references-chip:hover { background: var(--hover); }
+        .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .references-chip[aria-expanded="false"] + .references-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -145,8 +145,8 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
-            .refs-chip { display: none !important; }
-            .refs-ids { display: inline !important; }
+            .references-chip { display: none !important; }
+            .references-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
@@ -161,14 +161,14 @@
         body { padding: 20px var(--gutter) 32px; }
         main { margin: 0 auto; }
         /* text stays at the reading width; only the diagram is full width */
-        main > :not(.seq) { max-width: var(--page-w); margin-inline: auto; }
+        main > :not(.sequence) { max-width: var(--page-w); margin-inline: auto; }
         header { margin-bottom: 8px; }
         h1 { font-size: var(--fs-h1); }
         h2 { font-size: var(--fs-h2); margin-top: 20px; }
         code { font-size: var(--fs-sm); }
 
-        /* ============ SEQUENCE DIAGRAM (.seq) ============ */
-        .seq {
+        /* ============ SEQUENCE DIAGRAM (.sequence) ============ */
+        .sequence {
             border: 1px solid var(--line);
             background: var(--surface);
             border-radius: var(--radius-xl);
@@ -178,42 +178,42 @@
         }
 
         /* render.js sets the SVG's width and height: it draws at 1:1, so every label renders at 14px; a wider one scrolls. */
-        .seq svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
+        .sequence svg { display: block; max-width: none; margin: 0 auto; font-family: var(--sans); }
         /* theme:seq:start */
         /* Synced from theme/seq.css by theme/sync.mjs. Do not edit here. */
-        .seq .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
-        .seq .actor text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; }
-        .seq .actor .sub { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 400; }
-        .seq .life { stroke: var(--line-strong); stroke-dasharray: 3 4; }
-        .seq .msg { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
-        .seq .msg.ret { stroke-dasharray: 5 4; stroke: var(--text-3); }
-        .seq .msg.hot { stroke: var(--accent); stroke-width: 1.8; }
-        .seq .lbl { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
-        .seq .lbl.hot { fill: var(--accent); }
-        .seq .edge-label-bg { fill: var(--surface); }
-        .seq .num { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
-        .seq .phase line { stroke: var(--line); }
-        .seq .phase rect { fill: var(--surface-2); }
-        .seq .phase text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 600; }
-        .seq .note rect { fill: var(--bg); stroke: var(--line-strong); }
-        .seq .note text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-family: var(--mono); }
-        .seq .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
-        .seq .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
-        .seq .frame text { fill: var(--text); font-size: var(--fs-dia-sub); font-weight: 700; }
-        .seq .frame .cond { fill: var(--text-3); font-weight: 500; font-style: italic; }
-        .seq .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
-        .seq .ah { fill: var(--text-2); }
-        .seq .ah.ret { fill: var(--text-3); }
-        .seq .ah.hot { fill: var(--accent); }
+        .sequence .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
+        .sequence .actor text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; }
+        .sequence .actor .subtitle { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 400; }
+        .sequence .lifeline { stroke: var(--line-strong); stroke-dasharray: 3 4; }
+        .sequence .message { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
+        .sequence .message.return { stroke-dasharray: 5 4; stroke: var(--text-3); }
+        .sequence .message.hot { stroke: var(--accent); stroke-width: 1.8; }
+        .sequence .label-text { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
+        .sequence .label-text.hot { fill: var(--accent); }
+        .sequence .edge-label-background { fill: var(--surface); }
+        .sequence .number { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
+        .sequence .phase line { stroke: var(--line); }
+        .sequence .phase rect { fill: var(--surface-2); }
+        .sequence .phase text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 600; }
+        .sequence .note rect { fill: var(--bg); stroke: var(--line-strong); }
+        .sequence .note text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-family: var(--mono); }
+        .sequence .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
+        .sequence .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
+        .sequence .frame text { fill: var(--text); font-size: var(--fs-dia-sub); font-weight: 700; }
+        .sequence .frame .condition { fill: var(--text-3); font-weight: 500; font-style: italic; }
+        .sequence .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
+        .sequence .arrowhead { fill: var(--text-2); }
+        .sequence .arrowhead.return { fill: var(--text-3); }
+        .sequence .arrowhead.hot { fill: var(--accent); }
         /* theme:seq:end */
-        .seq .step { cursor: default; }
-        .seq-steps { margin-top: 8px; font-size: var(--fs-meta); color: var(--text-2); }
-        .seq-steps-title { margin: 0; }
-        .seq-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
-        .seq-steps li { padding: 2px 0 2px 30px; text-indent: -30px; }
-        .seq-steps .n { display: inline-block; width: 22px; margin-right: 8px; text-indent: 0; color: var(--text-3); font-weight: 600; text-align: right; }
+        .sequence .step { cursor: default; }
+        .sequence-steps { margin-top: 8px; font-size: var(--fs-meta); color: var(--text-2); }
+        .sequence-steps-title { margin: 0; }
+        .sequence-steps ol { list-style: none; padding: 0 !important; margin: 8px 0 0; }
+        .sequence-steps li { padding: 2px 0 2px 30px; text-indent: -30px; }
+        .sequence-steps .number { display: inline-block; width: 22px; margin-right: 8px; text-indent: 0; color: var(--text-3); font-weight: 600; text-align: right; }
 
-        .seq-legend {
+        .sequence-legend {
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
@@ -223,7 +223,7 @@
             margin: 12px 0 4px;
         }
 
-        .seq-legend span::before {
+        .sequence-legend span::before {
             content: "";
             display: inline-block;
             width: 26px;
@@ -232,13 +232,13 @@
             border-top: 2px solid var(--text-2);
         }
 
-        .seq-legend .ret::before { border-top-style: dashed; border-color: var(--text-3); }
-        .seq-legend .hot::before { border-color: var(--accent); }
+        .sequence-legend .return::before { border-top-style: dashed; border-color: var(--text-3); }
+        .sequence-legend .hot::before { border-color: var(--accent); }
 
         /* PDF: shrink each diagram to the page width instead of cutting it off. */
         @media print {
-            .seq { overflow: visible; break-inside: avoid; }
-            .seq svg { max-width: 100%; height: auto; }
+            .sequence { overflow: visible; break-inside: avoid; }
+            .sequence svg { max-width: 100%; height: auto; }
         }
     </style>
 </head>
@@ -249,12 +249,12 @@
             <h1>Sequence diagrams · Feature Name</h1>
         </header>
 
-        <!-- one h2 + .seq per flow file; the .seq-legend inside stays under the drawing -->
+        <!-- one h2 + .sequence per flow file; the .sequence-legend inside stays under the drawing -->
         <h2>1. Example flow</h2>
-        <div class="seq" data-flow="01-example-flow">
-            <div class="seq-legend">
+        <div class="sequence" data-flow="01-example-flow">
+            <div class="sequence-legend">
                 <span>call</span>
-                <span class="ret">response</span>
+                <span class="return">response</span>
                 <span class="hot">side effect (external write / audit)</span>
             </div>
         </div>

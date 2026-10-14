@@ -114,14 +114,14 @@
   :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
   .label-note { font-weight: 400; }
   /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-  .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-  .sc-kind.basic { color: var(--accent); }
-  .sc-kind.exception { color: var(--warn); }
+  .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+  .scenario-kind.basic { color: var(--accent); }
+  .scenario-kind.exception { color: var(--warn); }
   /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-  .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-  .refs-chip:hover { background: var(--hover); }
-  .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-  .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+  .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+  .references-chip:hover { background: var(--hover); }
+  .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+  .references-chip[aria-expanded="false"] + .references-ids { display: none; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -143,8 +143,8 @@
       body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
       pre, figure, img, svg, tr { break-inside: avoid; }
       h1, h2, h3 { break-after: avoid; }
-      .refs-chip { display: none !important; }
-      .refs-ids { display: inline !important; }
+      .references-chip { display: none !important; }
+      .references-ids { display: inline !important; }
   }
   /* theme:pdf:end */
 
@@ -170,12 +170,12 @@
 
   .summary-line .lead { font-weight: 600; }
   .summary-line .meta { font-size: var(--fs-meta); }
-  .summary-line .c-bad { color: var(--bad); }
+  .summary-line .color-bad { color: var(--bad); }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .empty-filter { margin-top: 16px; font-size: var(--fs-meta); }
   .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
-  .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+  .command code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
   .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
@@ -208,16 +208,16 @@
   h3 { font-size: var(--fs-h3); margin: 0; overflow-wrap: anywhere; }
   .meta { color: var(--text-3); font-size: var(--fs-meta); }
   .summary-line { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-body); }
-  .summary-line .c-warn { color: var(--warn); }
+  .summary-line .color-warn { color: var(--warn); }
 
 
-  .uc-title { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
-  .uc-title .meta { font-weight: 400; }
+  .use-case-title { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+  .use-case-title .meta { font-weight: 400; }
 
   /* The open test grows past the text column so the screenshot and steps get room; negative margins keep it centered. */
   .test.open { margin-inline: min(0px, calc((100% - min(96vw, var(--max-w-7xl))) / 2)); }
   .test-head h2 button:hover { background: transparent; }
-  .test-head .t { overflow-wrap: anywhere; min-width: 0; }
+  .test-head .title { overflow-wrap: anywhere; min-width: 0; }
   .test.open .mark::before { content: "\2212"; }
   .test-body { padding: 10px 14px 12px; display: grid; gap: 10px; min-width: 0; }
 
@@ -226,13 +226,13 @@
   .viewer:focus-visible { outline-offset: 4px; }
   .bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 8px; }
   .bar h3 { flex: 1 1 240px; }
-  .bar .btns { display: flex; gap: 6px; }
-  .vbody { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "err" "stage" "list"; }
-  .vbody > .err { grid-area: err; }
-  .vbody > .stage { grid-area: stage; }
-  .vbody > .list { grid-area: list; }
+  .bar .buttons { display: flex; gap: 6px; }
+  .viewer-body { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "err" "stage" "list"; }
+  .viewer-body > .error { grid-area: err; }
+  .viewer-body > .stage { grid-area: stage; }
+  .viewer-body > .list { grid-area: list; }
   @media (min-width: 1100px) {
-    .vbody { grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "stage err" "stage list"; align-items: start; }
+    .viewer-body { grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "stage err" "stage list"; align-items: start; }
   }
 
   .stage { position: relative; user-select: none; }
@@ -247,9 +247,9 @@
   .stage[data-side="prev"] .frame { cursor: w-resize; }
   .stage[data-side="next"] .frame { cursor: e-resize; }
   .edge { position: absolute; top: 50%; transform: translateY(-50%); padding: 4px 12px; border-radius: 999px; font-size: var(--fs-lg); color: var(--text); background: var(--surface-3); border: 1px solid var(--line-strong); pointer-events: none; opacity: 0; transition: opacity .15s var(--ease); }
-  .edge.prev { left: 12px; }
+  .edge.previous { left: 12px; }
   .edge.next { right: 20px; }
-  .stage[data-side="prev"] .edge.prev, .stage[data-side="next"] .edge.next { opacity: 1; }
+  .stage[data-side="prev"] .edge.previous, .stage[data-side="next"] .edge.next { opacity: 1; }
 
   .list { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
   .list li + li { border-top: 1px solid var(--line); }
@@ -257,20 +257,20 @@
   .list button:hover { background: var(--hover); }
   .list button:focus-visible { outline-offset: -2px; }
   .list button[aria-current="step"] { background: var(--accent-fill); box-shadow: inset 2px 0 0 var(--accent); }
-  .list .n { color: var(--text-3); font-variant-numeric: tabular-nums; }
-  .list .g.ok { color: var(--ok); }
-  .list .g.bad { color: var(--bad); }
-  .list .g.neutral { color: var(--neutral); }
-  .list .t { overflow-wrap: anywhere; }
-  .list .ms { color: var(--text-3); font-size: var(--fs-meta); font-variant-numeric: tabular-nums; }
+  .list .number { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .list .glyph.ok { color: var(--ok); }
+  .list .glyph.bad { color: var(--bad); }
+  .list .glyph.neutral { color: var(--neutral); }
+  .list .title { overflow-wrap: anywhere; }
+  .list .duration { color: var(--text-3); font-size: var(--fs-meta); font-variant-numeric: tabular-nums; }
 
   pre { font-size: var(--fs-code); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; max-height: 50vh; overflow-y: auto; }
-  .err { display: grid; gap: 4px; }
-  .err pre { margin: 0; }
-  .err-label { color: var(--bad); font-weight: 600; }
-  .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-  .cmd > .meta { min-width: 4em; font-size: var(--fs-meta); }
-  .cmds { display: grid; gap: 8px; }
+  .error { display: grid; gap: 4px; }
+  .error pre { margin: 0; }
+  .error-label { color: var(--bad); font-weight: 600; }
+  .command { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .command > .meta { min-width: 4em; font-size: var(--fs-meta); }
+  .commands { display: grid; gap: 8px; }
 
   .notes { margin: 0; padding: 10px 12px; list-style: none; display: grid; gap: 4px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
   .notes b { font-weight: 600; margin-right: 6px; }
@@ -278,24 +278,24 @@
   details.attempts > summary { padding: 8px 12px; cursor: pointer; color: var(--text-2); }
   details.attempts > summary:focus-visible { outline-offset: -2px; }
   details.attempts ol { margin: 0; padding: 0 12px 12px; list-style: none; display: grid; gap: 10px; }
-  .att-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+  .attempt-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
 
   dialog { border: 1px solid var(--line-strong); border-radius: var(--radius-lg); padding: 0; background: var(--surface); color: var(--text); max-width: 96vw; max-height: 96vh; }
-  dialog .dhead { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--line); }
-  dialog .dbody { max-height: calc(96vh - 52px); overflow: auto; }
+  dialog .dialog-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  dialog .dialog-body { max-height: calc(96vh - 52px); overflow: auto; }
   dialog img { max-width: 96vw; max-height: calc(96vh - 52px); display: block; object-fit: contain; }
   dialog.tall img { max-height: none; height: auto; }
   dialog::backdrop { background: rgb(0 0 0 / .75); }
 
   /* Surface tag (ui / mcp / api / job): the runner that played the scenario. */
-  .sc-kind { flex: none; }
+  .scenario-kind { flex: none; }
   .surface { flex: none; font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 0 6px; }
-  .tools .sep { width: 1px; align-self: stretch; background: var(--line-strong); margin: 0 4px; }
-  .vbody > .msgs { grid-area: err; display: grid; gap: 10px; min-width: 0; }
+  .tools .separator { width: 1px; align-self: stretch; background: var(--line-strong); margin: 0 4px; }
+  .viewer-body > .messages { grid-area: err; display: grid; gap: 10px; min-width: 0; }
   .review { display: grid; gap: 4px; padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); }
   .review-label { color: var(--warn); font-weight: 600; }
   .review .meta { font-weight: 400; margin-left: 6px; }
-  .test-head .info .c-warn { color: var(--warn); }
+  .test-head .info .color-warn { color: var(--warn); }
   .list .flag { color: var(--warn); font-size: var(--fs-tag); font-weight: 600; margin-left: 6px; white-space: nowrap; }
   /* Request / response of an mcp, api or job step, in the place of the screenshot. */
   .callview { grid-area: stage; display: grid; gap: 8px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
@@ -306,7 +306,7 @@
   @media print {
     main { max-width: none; padding: 16px; }
     .test.open { margin-inline: 0; }
-    .tools, .bar .btns, .hint, .edge { display: none !important; }
+    .tools, .bar .buttons, .hint, .edge { display: none !important; }
     .stage img, .stage.tall .frame, pre, .callview pre { max-height: none; overflow: visible; }
   }
 </style>
@@ -314,8 +314,8 @@
 <body>
 <main id="app"></main>
 <dialog id="zoom" aria-labelledby="zoom-title">
-  <div class="dhead"><span id="zoom-title" class="meta"></span><button type="button" id="zoom-close">Close</button></div>
-  <div class="dbody"><img alt=""></div>
+  <div class="dialog-head"><span id="zoom-title" class="meta"></span><button type="button" id="zoom-close">Close</button></div>
+  <div class="dialog-body"><img alt=""></div>
 </dialog>
 <div id="announce" class="sr-only" aria-live="polite"></div>
 <script>
@@ -394,7 +394,7 @@ async function copy(text, btn, what) {
 const cmdRow = (label, cmd, what) => {
   const btn = el('button', { type: 'button', 'aria-label': 'Copy ' + what }, 'Copy');
   btn.onclick = () => copy(cmd, btn, what);
-  return el('div', { class: 'cmd' }, el('span', { class: 'meta' }, label), el('code', {}, cmd), btn);
+  return el('div', { class: 'command' }, el('span', { class: 'meta' }, label), el('code', {}, cmd), btn);
 };
 
 const zoom = document.getElementById('zoom');
@@ -425,14 +425,14 @@ function viewer(slides, surface) {
   const prev = el('button', { type: 'button' }, '‹ Prev');
   const next = el('button', { type: 'button' }, 'Next ›');
   const full = el('button', { type: 'button' }, 'Zoom');
-  const err = el('div', { class: 'err' }, el('div', { class: 'err-label' }, 'Error in this step'), el('pre', {}));
+  const err = el('div', { class: 'error' }, el('div', { class: 'error-label' }, 'Error in this step'), el('pre', {}));
   const revLabel = el('div', { class: 'review-label' });
   const revNote = el('div', {});
   const rev = el('div', { class: 'review' }, revLabel, revNote);
-  const msgs = el('div', { class: 'msgs' }, err, rev);
+  const msgs = el('div', { class: 'messages' }, err, rev);
   const img = el('img', { alt: '' });
   // Clicking the shot is a mouse shortcut only; keyboard users have Prev/Next and the step list.
-  const left = el('span', { class: 'edge prev', 'aria-hidden': 'true' }, '‹');
+  const left = el('span', { class: 'edge previous', 'aria-hidden': 'true' }, '‹');
   const right = el('span', { class: 'edge next', 'aria-hidden': 'true' }, '›');
   const hint = el('span', { class: 'hint', 'aria-hidden': 'true', hidden: '' }, 'scroll ↓');
   const frame = el('div', { class: 'frame' }, img);
@@ -465,10 +465,10 @@ function viewer(slides, surface) {
   frame.onscroll = fit;
   const items = slides.map((s, n) => {
     const t = st(s.status);
-    const b = el('button', { type: 'button' }, el('span', { class: 'n' }, n + 1 + '.'),
-      el('span', { class: 'g ' + t.tone, 'aria-hidden': 'true' }, t.glyph), el('span', { class: 't' }, s.title,
+    const b = el('button', { type: 'button' }, el('span', { class: 'number' }, n + 1 + '.'),
+      el('span', { class: 'glyph ' + t.tone, 'aria-hidden': 'true' }, t.glyph), el('span', { class: 'title' }, s.title,
       el('span', { class: 'sr-only' }, ', ' + t.word), flagged(s) ? el('span', { class: 'flag' }, '⚑ ' + (FLAG[s.review.flag] || 'Review')) : null),
-      el('span', { class: 'ms' }, ms(s.ms)));
+      el('span', { class: 'duration' }, ms(s.ms)));
     b.onclick = () => { i = n; update(); };
     return el('li', {}, b);
   });
@@ -531,8 +531,8 @@ function viewer(slides, surface) {
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   };
-  box.append(el('div', { class: 'bar' }, title, status, time, count, el('div', { class: 'btns' }, prev, next, full)),
-    el('div', { class: 'vbody' }, msgs, stage, callview, list));
+  box.append(el('div', { class: 'bar' }, title, status, time, count, el('div', { class: 'buttons' }, prev, next, full)),
+    el('div', { class: 'viewer-body' }, msgs, stage, callview, list));
   update();
   return box;
 }
@@ -568,15 +568,15 @@ function testBox(t) {
   box.dataset.flags = String(flags);
   const toggle = el('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
     el('span', { class: 'mark', 'aria-hidden': 'true' }), pill(k === 'failed' && st(t.status).tone === 'bad' ? t.status : k),
-    t.surface ? el('span', { class: 'surface', title: 'Surface: ' + t.surface }, t.surface) : null, el('span', { class: 't' }, t.title),
-    t.scKind ? el('span', { class: 'sc-kind ' + t.scKind, title: 'Scenario kind' }, t.scKind) : null);
+    t.surface ? el('span', { class: 'surface', title: 'Surface: ' + t.surface }, t.surface) : null, el('span', { class: 'title' }, t.title),
+    t.scKind ? el('span', { class: 'scenario-kind ' + t.scKind, title: 'Scenario kind' }, t.scKind) : null);
   const attempts = t.attempts || [];
   const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : t.retry ? ' · retry ' + t.retry : '';
   const where = t.runner === 'ai' ? 'AI tester' + (t.role ? ' as ' + t.role : '') : t.file;
   const head = el('div', { class: 'test-head disclosure-head' }, el('h2', { id: id + '-h' }, toggle),
     el('div', { class: 'info' }, t.scenario ? el('span', { class: 'meta' }, t.scenario) : null, where ? el('span', { class: 'meta' }, where) : null,
       k === 'notrun' ? null : el('span', { class: 'meta' }, ms(t.ms) + runs + (t.project ? ' · ' + t.project : '')),
-      flags ? el('span', { class: 'meta c-warn' }, '⚑ ' + flags + ' review flag' + (flags > 1 ? 's' : '')) : null));
+      flags ? el('span', { class: 'meta color-warn' }, '⚑ ' + flags + ' review flag' + (flags > 1 ? 's' : '')) : null));
   // The whole row is a mouse target; keyboard and screen readers use the heading's button.
   head.onclick = (e) => { if (!e.target.closest('button')) toggle.click(); };
   const body = el('div', { class: 'test-body', id: id + '-b' });
@@ -606,11 +606,11 @@ function testBox(t) {
   if (attempts.length) body.append(el('details', { class: 'attempts' },
     el('summary', {}, 'Earlier attempts (' + attempts.length + ')'),
     el('ol', {}, attempts.map((a) => el('li', {},
-      el('div', { class: 'att-head' }, el('span', {}, a.retry ? 'Retry ' + a.retry : 'First run'), pill(a.status), el('span', { class: 'meta' }, ms(a.duration))),
+      el('div', { class: 'attempt-head' }, el('span', {}, a.retry ? 'Retry ' + a.retry : 'First run'), pill(a.status), el('span', { class: 'meta' }, ms(a.duration))),
       a.error ? el('pre', {}, a.error) : null)))));
   if (k !== 'passed' && k !== 'notrun' && t.runner !== 'ai' && t.file) {
     const cmd = 'npx playwright test ' + t.file + (t.project ? ' --project=' + JSON.stringify(t.project).replace(/^"([\w.-]+)"$/, '$1') : '');
-    body.append(el('div', { class: 'cmds' }, cmdRow('Rerun', cmd, 'rerun command for ' + t.title),
+    body.append(el('div', { class: 'commands' }, cmdRow('Rerun', cmd, 'rerun command for ' + t.title),
       t.trace ? cmdRow('Trace', 'npx playwright show-trace ' + t.trace, 'trace command for ' + t.title) : null));
   }
   box.append(head, body);
@@ -634,7 +634,7 @@ function render() {
   const heads = new Map(useCases.map((u) => {
     const tests = DATA.tests.filter((t) => ucOf(t) === u.id);
     const passed = tests.filter((t) => kind(t) === 'passed').length;
-    return [u.id, el('h2', { class: 'uc-title' }, (u.id ? u.id + ' ' : '') + u.title, el('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
+    return [u.id, el('h2', { class: 'use-case-title' }, (u.id ? u.id + ' ' : '') + u.title, el('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
   }));
   const none = el('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
   const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', n.failed], ['flaky', 'Flaky', n.flaky], ['passed', 'Passed', n.passed],
@@ -666,9 +666,9 @@ function render() {
   // Default order is use-cases.js order, the same tree every skill shows; this toggle lifts failures to the top of each use case.
   const sortBtn = el('button', { type: 'button', 'aria-pressed': 'false' }, 'Failed first');
   sortBtn.onclick = () => { failedFirst = !failedFirst; sortBtn.setAttribute('aria-pressed', String(failedFirst)); place(); };
-  tools.append(...buttons, el('span', { class: 'sep', 'aria-hidden': 'true' }), sortBtn);
+  tools.append(...buttons, el('span', { class: 'separator', 'aria-hidden': 'true' }), sortBtn);
   // Same buckets and order as the filters; a count is colored only when it is not zero.
-  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' c-' + tone : '') }, c + ' ' + word);
+  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' color-' + tone : '') }, c + ' ' + word);
   app.append(el('header', {},
     el('div', {}, el('h1', {}, 'E2E report · ' + DATA.name, pill(DATA.status)),
       el('div', { class: 'summary-line' },

@@ -67,13 +67,13 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ```html
 <g class="edge-label" data-cx="616">            <!-- data-cx: the midpoint of the line it labels -->
-  <rect class="edge-label-bg" y="281" height="18" rx="3"/>   <!-- x and width: set by the script -->
+  <rect class="edge-label-background" y="281" height="18" rx="3"/>   <!-- x and width: set by the script -->
   <text x="616" y="295" text-anchor="middle">SELECT infra.user</text>
-  <g class="edge-label-num"><circle cx="0" cy="290" r="11"/><text x="0" y="295" text-anchor="middle">5</text></g>
+  <g class="edge-label-number"><circle cx="0" cy="290" r="11"/><text x="0" y="295" text-anchor="middle">5</text></g>
 </g>
 ```
 
-- The text centers on `data-cx`; the box fits the rendered text plus 6px each side, centered on the same x; the step badge (`.edge-label-num`, optional) moves to just left of the box, outside it. The label itself never moves for the badge.
+- The text centers on `data-cx`; the box fits the rendered text plus 6px each side, centered on the same x; the step badge (`.edge-label-number`, optional) moves to just left of the box, outside it. The label itself never moves for the badge.
 - `data-cx` per type: a message arrow → `(x1 + x2) / 2`; a self-call loop → the middle of the loop's horizontal span; a flowchart edge → the middle of the segment it labels (above a level segment, on a vertical one, the box hiding the line behind it); an ER relationship → the middle of its line or level stub.
 - Lay out room for the widest label and its badge (about 8.6px per 14px mono character, on the wide side); the script only fits the box and moves the badge.
 - diagram-design mode, every type: paste `template/embed.html` (the page kit) just before `</body>` of every saved `.html`, unchanged. It adds the Export PDF button and label fitting, and keeps the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
@@ -97,8 +97,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 | Type · mode | Embed |
 |-------------|-------|
 | `flowchart` · either | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>` (no inline height) |
-| `sequence` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>`, plus its `<div class="seq-steps">` fragment (see the sequence reference) |
-| `sequence` · manual | `<div class="seq" data-flow="NN-<slug>">` with the `.seq-legend` line inside it (it stays under the drawing), plus `<script src="<dir>/render.js">` once, `<script src="<dir>/NN-<slug>.js">` per flow, then `SeqDiagrams.renderAll()` |
+| `sequence` · diagram-design | `<iframe class="diagram-frame" src="<dir>/NN-<slug>.html" title="…" loading="lazy"></iframe>`, plus its `<div class="sequence-steps">` fragment (see the sequence reference) |
+| `sequence` · manual | `<div class="sequence" data-flow="NN-<slug>">` with the `.sequence-legend` line inside it (it stays under the drawing), plus `<script src="<dir>/render.js">` once, `<script src="<dir>/NN-<slug>.js">` per flow, then `SeqDiagrams.renderAll()` |
 | `er` · either | `<a href="<dir>/er-diagram.html" target="_blank" rel="noopener">Open ER diagram ↗</a>` (one link per page when split) |
 
 - Every `TBD` and open question found.

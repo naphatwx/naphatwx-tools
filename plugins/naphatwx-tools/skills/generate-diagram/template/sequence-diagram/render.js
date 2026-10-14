@@ -1,4 +1,4 @@
-// Draws sequence diagrams defined in sibling files (one flow per file) as inline SVG: <div class="seq" data-flow="NN-slug">.
+// Draws sequence diagrams defined in sibling files (one flow per file) as inline SVG: <div class="sequence" data-flow="NN-slug">.
 // Steps: phase | call | ret | hot | note | alt | else | opt | loop | end; a call to itself (from = to) draws a loop.
 // Labels are the name only (≤ 40 chars, or one bare name); an optional last `detail` shows on hover and in "Step details".
 
@@ -68,8 +68,8 @@ var SeqDiagrams = (function () {
                 const [kind, a, b, label, detail] = s;
                 long(kind, label);
                 const self = a === b, x1 = X[a], x2 = self ? x1 + LOOP : X[b], d = x2 > x1 ? 1 : -1;
-                const cls = { call: 'msg', ret: 'msg ret', hot: 'msg hot' }[kind];
-                const ah = { call: 'ah', ret: 'ah ret', hot: 'ah hot' }[kind];
+                const cls = { call: 'message', ret: 'message return', hot: 'message hot' }[kind];
+                const ah = { call: 'arrowhead', ret: 'arrowhead return', hot: 'arrowhead hot' }[kind];
                 // centered on the arrow's midpoint (a self-call: on its loop), kept inside the drawing
                 const lw = label.length * MONO, sw = lw / 2 + PAD;
                 const lx = Math.round(Math.min(Math.max((x1 + x2) / 2, sw + GAP + NUM), W - sw - 6));
@@ -78,9 +78,9 @@ var SeqDiagrams = (function () {
                 body.push(`<g class="step">${tip(detail)}`, self
                     ? `<path class="${cls}" d="M${x1},${y} H${x2} V${y + 16} H${x1 + 8}"/><path class="${ah}" d="M${x1 + 1},${y + 16} l9,-4.5 v9 z"/>`
                     : `<line class="${cls}" x1="${x1}" y1="${y}" x2="${x2 - d * 8}" y2="${y}"/><path class="${ah}" d="M${x2 - d},${y} l${-d * 9},-4.5 v9 z"/>`,
-                    `<g class="edge-label" data-cx="${lx}"><rect class="edge-label-bg" x="${lx - sw}" y="${y - 20}" width="${2 * sw}" height="18" rx="3"/>`,
-                    `<text class="lbl${kind === 'hot' ? ' hot' : ''}" x="${lx}" y="${y - 7}" text-anchor="middle">${esc(label)}</text>`,
-                    `<text class="num edge-label-num" x="${lx - sw - GAP}" y="${y - 7}" text-anchor="end">${num}</text></g></g>`);
+                    `<g class="edge-label" data-cx="${lx}"><rect class="edge-label-background" x="${lx - sw}" y="${y - 20}" width="${2 * sw}" height="18" rx="3"/>`,
+                    `<text class="label-text${kind === 'hot' ? ' hot' : ''}" x="${lx}" y="${y - 7}" text-anchor="middle">${esc(label)}</text>`,
+                    `<text class="number edge-label-number" x="${lx - sw - GAP}" y="${y - 7}" text-anchor="end">${num}</text></g></g>`);
                 y += self ? 46 : 30;
             }
         }
@@ -88,40 +88,40 @@ var SeqDiagrams = (function () {
         // width / height are the 1:1 size: hosts never scale it, so 14px labels render at 14px; a wider box scrolls.
         const ariaName = `${title}: sequence diagram, ${actors.length} participants, ${num} steps`;
         const out = [`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(ariaName)}">`];
-        actors.forEach(([k]) => out.push(`<line class="life" x1="${X[k]}" x2="${X[k]}" y1="${TOP + HEAD}" y2="${H - 4}"/>`));
+        actors.forEach(([k]) => out.push(`<line class="lifeline" x1="${X[k]}" x2="${X[k]}" y1="${TOP + HEAD}" y2="${H - 4}"/>`));
         for (const f of frames) {
             const x0 = f.inset, x1 = W - f.inset, tabw = Math.round(f.kind.length * BOLD + 20);
-            out.push(`<g class="frame"><rect class="box" x="${x0}" y="${f.y0}" width="${x1 - x0}" height="${f.y1 - f.y0}" rx="6"/><rect class="tab" x="${x0}" y="${f.y0}" width="${tabw}" height="22" rx="4"/><text x="${x0 + 10}" y="${f.y0 + 16}">${f.kind}</text><text class="cond" x="${x0 + tabw + 8}" y="${f.y0 + 16}">[${esc(f.cond)}]</text>`);
-            f.cuts.forEach(([cy, cond]) => out.push(`<line x1="${x0}" x2="${x1}" y1="${cy}" y2="${cy}"/><text class="cond" x="${x0 + 8}" y="${cy + 17}">[${esc(cond)}]</text>`));
+            out.push(`<g class="frame"><rect class="box" x="${x0}" y="${f.y0}" width="${x1 - x0}" height="${f.y1 - f.y0}" rx="6"/><rect class="tab" x="${x0}" y="${f.y0}" width="${tabw}" height="22" rx="4"/><text x="${x0 + 10}" y="${f.y0 + 16}">${f.kind}</text><text class="condition" x="${x0 + tabw + 8}" y="${f.y0 + 16}">[${esc(f.cond)}]</text>`);
+            f.cuts.forEach(([cy, cond]) => out.push(`<line x1="${x0}" x2="${x1}" y1="${cy}" y2="${cy}"/><text class="condition" x="${x0 + 8}" y="${cy + 17}">[${esc(cond)}]</text>`));
             out.push('</g>');
         }
         actors.forEach(([k, name, sub = ''], i) => {
             const w = aw[i];
-            out.push(`<g class="actor"><rect x="${X[k] - w / 2}" y="${TOP}" width="${w}" height="${HEAD}" rx="8"/><text x="${X[k]}" y="${TOP + 22}" text-anchor="middle">${esc(name)}</text><text class="sub" x="${X[k]}" y="${TOP + 41}" text-anchor="middle">${esc(sub)}</text></g>`);
+            out.push(`<g class="actor"><rect x="${X[k] - w / 2}" y="${TOP}" width="${w}" height="${HEAD}" rx="8"/><text x="${X[k]}" y="${TOP + 22}" text-anchor="middle">${esc(name)}</text><text class="subtitle" x="${X[k]}" y="${TOP + 41}" text-anchor="middle">${esc(sub)}</text></g>`);
         });
         // numbers are the diagram's own, so a list of 2, ·, 6 reads as a selection, not a gap
-        const list = !details.length ? '' : `<div class="seq-steps"><p class="label seq-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>${details.map(([n, label, d]) =>
-            `<li><span class="n">${n === 'note' ? '·' : n}</span><code>${esc(label)}</code> ${esc(d)}</li>`).join('')}</ol></div>`;
+        const list = !details.length ? '' : `<div class="sequence-steps"><p class="label sequence-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>${details.map(([n, label, d]) =>
+            `<li><span class="number">${n === 'note' ? '·' : n}</span><code>${esc(label)}</code> ${esc(d)}</li>`).join('')}</ol></div>`;
         return [out.concat(body, '</svg>').join(''), list];
     }
 
     const watched = new WeakSet();
     function renderAll(root = document) {
-        root.querySelectorAll('.seq[data-flow]').forEach(el => {
+        root.querySelectorAll('.sequence[data-flow]').forEach(el => {
             const spec = flows[el.dataset.flow];
             const [drawing, list] = spec ? svg(el.dataset.flow, spec) : [`<p>Missing diagram file for <code>${esc(el.dataset.flow)}</code>.</p>`, ''];
-            // a .seq-legend inside the box stays, under the drawing
-            const legend = el.querySelector(':scope > .seq-legend');
+            // a .sequence-legend inside the box stays, under the drawing
+            const legend = el.querySelector(':scope > .sequence-legend');
             el.innerHTML = drawing;
             if (legend) el.append(legend);
             // the list sits on the page after the box, so zoom and the lightbox leave it out
-            if (el.nextElementSibling?.classList.contains('seq-steps')) el.nextElementSibling.remove();
+            if (el.nextElementSibling?.classList.contains('sequence-steps')) el.nextElementSibling.remove();
             el.insertAdjacentHTML('afterend', list);
             // label boxes fit the rendered text; a hidden panel measures 0, so fit again once it gets a size
             fitDiagramLabels(el);
             if (!watched.has(el)) { watched.add(el); new ResizeObserver(() => fitDiagramLabels(el)).observe(el); }
         });
-        document.fonts?.ready.then(() => root.querySelectorAll('.seq[data-flow]').forEach(el => fitDiagramLabels(el)));
+        document.fonts?.ready.then(() => root.querySelectorAll('.sequence[data-flow]').forEach(el => fitDiagramLabels(el)));
     }
 
     /* theme:diagram-labels-js:start */
@@ -143,9 +143,9 @@ var SeqDiagrams = (function () {
             text.setAttribute('x', r1(cx));
             text.setAttribute('text-anchor', 'middle');
             const left = cx - w / 2 - PAD;
-            const bg = g.querySelector(':scope > .edge-label-bg');
+            const bg = g.querySelector(':scope > .edge-label-background');
             if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
-            const num = g.querySelector(':scope > .edge-label-num');
+            const num = g.querySelector(':scope > .edge-label-number');
             if (num) {
                 num.removeAttribute('transform');
                 try {

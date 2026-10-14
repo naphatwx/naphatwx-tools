@@ -13,6 +13,6 @@ body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); 
     body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
     pre, figure, img, svg, tr { break-inside: avoid; }
     h1, h2, h3 { break-after: avoid; }
-    .refs-chip { display: none !important; }
-    .refs-ids { display: inline !important; }
+    .references-chip { display: none !important; }
+    .references-ids { display: inline !important; }
 }

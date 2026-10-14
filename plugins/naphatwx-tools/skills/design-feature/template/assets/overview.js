@@ -50,17 +50,17 @@ document.addEventListener("click", (e) => {
 });
 
 // ===== Trace IDs: each refs line hides behind a "N refs" chip; a click shows it on the same line =====
-document.querySelectorAll(".uc-head > .refs, .uc-index .aside, td > .refs").forEach((ids) => {
+document.querySelectorAll(".use-case-head > .references, .use-case-index .aside, td > .references").forEach((ids) => {
     const n = ids.textContent.split(" · ").filter((s) => s.trim()).length;
     if (!n) return;
     const chip = document.createElement("button");
     chip.type = "button";
-    chip.className = "refs-chip";
+    chip.className = "references-chip";
     chip.title = "Show trace IDs";
     chip.textContent = `${n} ref${n > 1 ? "s" : ""}`;
     chip.setAttribute("aria-expanded", "false");
     chip.addEventListener("click", () => chip.setAttribute("aria-expanded", String(chip.getAttribute("aria-expanded") !== "true")));
-    ids.classList.add("refs-ids");
+    ids.classList.add("references-ids");
     ids.before(chip);
 });
 
@@ -217,7 +217,7 @@ function fitRoom() {
     if (!presenting()) return;
     const room = innerHeight - hudSpace();
     const slide = steps[current].slide;
-    const box = slide.querySelector(".panel:not([hidden]) .flowchart, .panel:not([hidden]) .seq");
+    const box = slide.querySelector(".panel:not([hidden]) .flowchart, .panel:not([hidden]) .sequence");
     if (!box) return;
     const sheetTop = parseFloat(getComputedStyle(document.getElementById("sheet")).paddingTop);
     const top = sheetTop + box.getBoundingClientRect().top - slide.getBoundingClientRect().top;
@@ -340,7 +340,7 @@ addEventListener("message", (e) => {
     frame.style.height = Math.ceil(e.data.height) + "px";
     if (e.data.width) frame.dataset.w = Math.ceil(e.data.width);
     if (lit?.stage.contains(frame)) fitLitFrame();
-    const box = frame.closest(".flowchart, .seq");
+    const box = frame.closest(".flowchart, .sequence");
     if (box) updateCue(box);
 });
 
@@ -484,7 +484,7 @@ addEventListener("resize", railTitles);
 document.addEventListener("DOMContentLoaded", () => {
     document.body.append(lightbox);
     railTitles();
-    document.querySelectorAll(".flowchart, .seq").forEach(makeZoomable);
+    document.querySelectorAll(".flowchart, .sequence").forEach(makeZoomable);
     // sequence diagrams have drawn by now, so section offsets are final
     spy();
 });

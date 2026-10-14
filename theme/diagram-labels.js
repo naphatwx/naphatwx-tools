@@ -1,5 +1,5 @@
 /* Fits every diagram label to its rendered text, so no box is guessed from a character count.
-   Markup: <g class="edge-label" data-cx="X"><rect class="edge-label-bg"/><text>…</text><g class="edge-label-num">…</g></g>
+   Markup: <g class="edge-label" data-cx="X"><rect class="edge-label-background"/><text>…</text><g class="edge-label-number">…</g></g>
    The text centers on data-cx (the line's midpoint), the box fits the text, the step badge sits just left of the box. */
 function fitDiagramLabels(root = document) {
     const PAD = 6, GAP = 4, r1 = n => Math.round(n * 10) / 10;
@@ -18,9 +18,9 @@ function fitDiagramLabels(root = document) {
         text.setAttribute('x', r1(cx));
         text.setAttribute('text-anchor', 'middle');
         const left = cx - w / 2 - PAD;
-        const bg = g.querySelector(':scope > .edge-label-bg');
+        const bg = g.querySelector(':scope > .edge-label-background');
         if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
-        const num = g.querySelector(':scope > .edge-label-num');
+        const num = g.querySelector(':scope > .edge-label-number');
         if (num) {
             num.removeAttribute('transform');
             try {

@@ -115,14 +115,14 @@
         :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
         .label-note { font-weight: 400; }
         /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-        .sc-kind.basic { color: var(--accent); }
-        .sc-kind.exception { color: var(--warn); }
+        .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .scenario-kind.basic { color: var(--accent); }
+        .scenario-kind.exception { color: var(--warn); }
         /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-        .refs-chip:hover { background: var(--hover); }
-        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+        .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .references-chip:hover { background: var(--hover); }
+        .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .references-chip[aria-expanded="false"] + .references-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -144,8 +144,8 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
-            .refs-chip { display: none !important; }
-            .refs-ids { display: inline !important; }
+            .references-chip { display: none !important; }
+            .references-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
@@ -320,7 +320,7 @@
             margin-left: auto;
         }
 
-        .fs-picker {
+        .font-size-picker {
             display: flex;
             align-items: center;
             gap: 2px;
@@ -330,7 +330,7 @@
             border-radius: var(--radius-md);
         }
 
-        .fs-btn {
+        .font-size-button {
             min-width: 28px;
             height: 28px;
             padding: 0 6px;
@@ -346,24 +346,24 @@
         }
 
         /* px, not rem: the picker must not resize itself when it changes the root size */
-        .fs-btn[data-fs="small"] {
+        .font-size-button[data-fs="small"] {
             font-size: 12px;
         }
 
-        .fs-btn[data-fs="normal"] {
+        .font-size-button[data-fs="normal"] {
             font-size: 15px;
         }
 
-        .fs-btn[data-fs="big"] {
+        .font-size-button[data-fs="big"] {
             font-size: 18px;
         }
 
-        .fs-btn:hover {
+        .font-size-button:hover {
             background: var(--hover);
             color: var(--text);
         }
 
-        .fs-btn.active {
+        .font-size-button.active {
             background: var(--accent-soft);
             color: var(--accent);
         }
@@ -514,7 +514,7 @@
             color: var(--text-2);
         }
 
-        .callout .ic {
+        .callout .icon {
             flex-shrink: 0;
             font-size: var(--fs-icon);
         }
@@ -557,7 +557,7 @@
             background: var(--hover);
         }
 
-        .card .ic {
+        .card .icon {
             width: 38px;
             height: 38px;
             border-radius: 9px;
@@ -646,7 +646,7 @@
         }
 
         /* ============ MOBILE ============ */
-        .menu-btn {
+        .menu-button {
             display: none;
         }
 
@@ -674,7 +674,7 @@
                 padding: 28px 18px 100px;
             }
 
-            .menu-btn {
+            .menu-button {
                 display: grid;
                 place-items: center;
                 width: 34px;
@@ -723,12 +723,12 @@
         <!-- ============ MAIN ============ -->
         <div class="main">
             <header class="topbar">
-                <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+                <button class="menu-button" id="menuBtn" aria-label="Menu">☰</button>
                 <div class="topbar-actions">
-                    <div class="fs-picker" id="fsPicker" role="group" aria-label="Base font size">
-                        <button class="fs-btn" data-fs="small" title="Small text (14px)" aria-label="Small text">A</button>
-                        <button class="fs-btn" data-fs="normal" title="Normal text (16px)" aria-label="Normal text">A</button>
-                        <button class="fs-btn" data-fs="big" title="Big text (18px)" aria-label="Big text">A</button>
+                    <div class="font-size-picker" id="fsPicker" role="group" aria-label="Base font size">
+                        <button class="font-size-button" data-fs="small" title="Small text (14px)" aria-label="Small text">A</button>
+                        <button class="font-size-button" data-fs="normal" title="Normal text (16px)" aria-label="Normal text">A</button>
+                        <button class="font-size-button" data-fs="big" title="Big text (18px)" aria-label="Big text">A</button>
                     </div>
                 </div>
             </header>
@@ -740,22 +740,22 @@
 
                 <div class="card-grid">
                     <a class="card" href="#quickstart">
-                        <div class="ic">⚡</div>
+                        <div class="icon">⚡</div>
                         <h4>Quickstart</h4>
                         <p>Get up and running in a few minutes with a guided setup.</p>
                     </a>
                     <a class="card" href="#concepts">
-                        <div class="ic">📦</div>
+                        <div class="icon">📦</div>
                         <h4>Core concepts</h4>
                         <p>Understand the building blocks before you go deeper.</p>
                     </a>
                     <a class="card" href="#reference">
-                        <div class="ic">🔌</div>
+                        <div class="icon">🔌</div>
                         <h4>API reference</h4>
                         <p>Dig into every endpoint, parameter, and response shape.</p>
                     </a>
                     <a class="card" href="#troubleshooting">
-                        <div class="ic">🛟</div>
+                        <div class="icon">🛟</div>
                         <h4>Troubleshooting</h4>
                         <p>Fixes for the problems people hit most often.</p>
                     </a>
@@ -773,7 +773,7 @@
 example init</code></pre>
 
                 <div class="callout">
-                    <span class="ic">💡</span>
+                    <span class="icon">💡</span>
                     <div>Tip: keep your secret keys out of version control.</div>
                 </div>
 
@@ -811,7 +811,7 @@ example init</code></pre>
                 <h2 id="reference">API reference</h2>
                 <p>Reference details go here.</p>
                 <div class="callout warn">
-                    <span class="ic">⚠️</span>
+                    <span class="icon">⚠️</span>
                     <div>This endpoint is rate limited. Plan your calls accordingly.</div>
                 </div>
 
@@ -819,7 +819,7 @@ example init</code></pre>
                 <h3>Something does not load</h3>
                 <p>Check your network and confirm your keys are valid.</p>
                 <div class="callout danger">
-                    <span class="ic">🚫</span>
+                    <span class="icon">🚫</span>
                     <div>Never share your secret key in a public channel.</div>
                 </div>
             </article>
@@ -852,7 +852,7 @@ example init</code></pre>
         const root = document.documentElement;
 
         // ===== Base font size (small 14 / normal 16 / big 18, remembers choice) =====
-        const fsButtons = [...document.querySelectorAll(".fs-btn")];
+        const fsButtons = [...document.querySelectorAll(".font-size-button")];
         const savedFs = localStorage.getItem("docs-fs");
         if (savedFs && fsButtons.some(b => b.dataset.fs === savedFs)) root.setAttribute("data-fs", savedFs);
         function paintFs() {

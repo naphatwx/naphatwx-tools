@@ -19,30 +19,30 @@
             <input id="railSearch" type="search" placeholder="Search  /" autocomplete="off">
         </label>
         <ol class="rail-list" id="railList">
-            <li><a href="#overview"><span class="n">01</span><span class="rail-label">Overview</span></a></li>
-            <li><a href="#scope"><span class="n">02</span><span class="rail-label">Scope</span></a></li>
-            <li><a href="#acceptance"><span class="n">03</span><span class="rail-label">Acceptance criteria</span></a></li>
-            <li><a href="#use-cases"><span class="n">04</span><span class="rail-label">Use cases</span></a>
+            <li><a href="#overview"><span class="number">01</span><span class="rail-label">Overview</span></a></li>
+            <li><a href="#scope"><span class="number">02</span><span class="rail-label">Scope</span></a></li>
+            <li><a href="#acceptance"><span class="number">03</span><span class="rail-label">Acceptance criteria</span></a></li>
+            <li><a href="#use-cases"><span class="number">04</span><span class="rail-label">Use cases</span></a>
                 <ol>
-                    <li><a href="#uc-01"><span class="n">UC1</span><span class="rail-label">Create a thing</span></a></li>
-                    <li><a href="#uc-02"><span class="n">UC2</span><span class="rail-label">Create a thing · diagram-design</span></a></li>
+                    <li><a href="#uc-01"><span class="number">UC1</span><span class="rail-label">Create a thing</span></a></li>
+                    <li><a href="#uc-02"><span class="number">UC2</span><span class="rail-label">Create a thing · diagram-design</span></a></li>
                 </ol>
             </li>
-            <li><a href="#database"><span class="n">05</span><span class="rail-label">Database</span></a>
+            <li><a href="#database"><span class="number">05</span><span class="rail-label">Database</span></a>
                 <ol>
-                    <li><a href="#db-table_b"><span class="n">5.1</span><span class="rail-label">schema.table_b</span></a></li>
-                    <li><a href="#db-table_a"><span class="n">5.2</span><span class="rail-label">schema.table_a</span></a></li>
+                    <li><a href="#db-table_b"><span class="number">5.1</span><span class="rail-label">schema.table_b</span></a></li>
+                    <li><a href="#db-table_a"><span class="number">5.2</span><span class="rail-label">schema.table_a</span></a></li>
                 </ol>
             </li>
-            <li><a href="#api"><span class="n">06</span><span class="rail-label">API</span></a>
+            <li><a href="#api"><span class="number">06</span><span class="rail-label">API</span></a>
                 <ol>
-                    <li><a href="#api-create-thing"><span class="n">6.1</span><span class="rail-label">CreateThing</span></a></li>
-                    <li><a href="#api-get-things"><span class="n">6.2</span><span class="rail-label">GetThings</span></a></li>
-                    <li><a href="#api-shared-types"><span class="n">6.3</span><span class="rail-label">Shared types</span></a></li>
+                    <li><a href="#api-create-thing"><span class="number">6.1</span><span class="rail-label">CreateThing</span></a></li>
+                    <li><a href="#api-get-things"><span class="number">6.2</span><span class="rail-label">GetThings</span></a></li>
+                    <li><a href="#api-shared-types"><span class="number">6.3</span><span class="rail-label">Shared types</span></a></li>
                 </ol>
             </li>
-            <li><a href="#errors"><span class="n">07</span><span class="rail-label">Errors</span></a></li>
-            <li><a href="#open-questions"><span class="n">08</span><span class="rail-label">Open questions</span></a></li>
+            <li><a href="#errors"><span class="number">07</span><span class="rail-label">Errors</span></a></li>
+            <li><a href="#open-questions"><span class="number">08</span><span class="rail-label">Open questions</span></a></li>
         </ol>
     </nav>
     <button class="rail-edge" id="railEdge" type="button" aria-controls="rail" aria-expanded="true" title="Hide index ( [ )" aria-label="Hide index">
@@ -58,7 +58,7 @@
 
         <!-- ============ 01 OVERVIEW ============ -->
         <section class="slide" id="overview" data-title="Overview">
-            <p class="kicker"><span class="sec-n">01</span>Spec NNN · TICKET-123 · Draft</p>
+            <p class="kicker"><span class="section-number">01</span>Spec NNN · TICKET-123 · Draft</p>
             <h1>Feature Name</h1>
             <p class="lead">One short sentence: what the feature lets a user do.</p>
             <dl class="facts">
@@ -75,7 +75,7 @@
 
         <!-- ============ 02 SCOPE ============ -->
         <section class="slide" id="scope" data-title="Scope">
-            <h2><span class="sec-n">02</span>Scope</h2>
+            <h2><span class="section-number">02</span>Scope</h2>
             <div class="scope">
                 <div>
                     <h3 class="label">In scope</h3>
@@ -97,38 +97,38 @@
         <!-- ============ 03 ACCEPTANCE CRITERIA: the body between the markers is written by scripts/acceptance-section.js
              from use-cases.js (ACCEPTANCE + SCENARIOS). Never type it by hand. ============ -->
         <section class="slide" id="acceptance" data-title="Acceptance criteria">
-            <h2><span class="sec-n">03</span>Acceptance criteria</h2>
+            <h2><span class="section-number">03</span>Acceptance criteria</h2>
             <!-- acceptance:start · generated by scripts/acceptance-section.js. Don't hand-edit. -->
             <p class="muted">3 criteria · 2 covered on every channel · 1 gap · 2 n/a</p>
-            <div class="table-wrap"><table class="ac-table">
+            <div class="table-wrap"><table class="acceptance-table">
                 <thead><tr><th>Criterion</th><th>Scenarios that cite it, by channel</th></tr></thead><tbody>
-                    <tr id="ac-us2-ac1"><td><strong class="nowrap">US2 · AC1</strong><br><strong>Given</strong> a user who may create things, <strong>when</strong> they create one with a valid name, <strong>then</strong> it is created as PENDING and an audit row records it.</td><td><ul class="ac-cover"><li><span class="ch-tag">mcp</span><span><a href="#sc-mcp-create" title="UC1 · Valid name over MCP">mcp-create</a></span></li><li><span class="ch-tag">api</span><span><a href="#sc-create-api" title="UC1 · Valid name over the API">create-api</a></span></li><li><span class="ch-tag">ui</span><span class="aside na">n/a: The preview mock has no Create dialog.</span></li></ul></td></tr>
-                    <tr id="ac-us2-ac3"><td><strong class="nowrap">US2 · AC3</strong><br><strong>Given</strong> a user who may create things, <strong>when</strong> they create one with an empty name, <strong>then</strong> it is refused with &quot;name is required&quot; and nothing is created.</td><td><ul class="ac-cover"><li><span class="ch-tag">mcp</span><span><a href="#sc-mcp-create-empty-name" title="UC1 · Empty name over MCP">mcp-create-empty-name</a></span></li><li><span class="ch-tag">api</span><span><a href="#sc-create-api-empty-name" title="UC1 · Empty name over the API">create-api-empty-name</a></span></li><li><span class="ch-tag">ui</span><span class="aside na">n/a: The preview mock has no Create dialog.</span></li></ul></td></tr>
-                    <tr id="ac-us2-ac4"><td><strong class="nowrap">US2 · AC4</strong><br><strong>Given</strong> an archived owner, <strong>when</strong> a user tries to create a thing, <strong>then</strong> it is refused with the archived reason and nothing is created.</td><td><ul class="ac-cover"><li><span class="ch-tag">ui</span><span><a href="#sc-create-archived" title="UC1 · Archived owner">create-archived</a></span></li><li><span class="ch-tag">mcp</span><span><a href="#sc-mcp-create-archived" title="UC1 · Archived owner over MCP">mcp-create-archived</a></span></li><li><span class="ch-tag gap">api</span><span class="ac-gap">gap: no api scenario cites it</span></li></ul></td></tr>
+                    <tr id="ac-us2-ac1"><td><strong class="nowrap">US2 · AC1</strong><br><strong>Given</strong> a user who may create things, <strong>when</strong> they create one with a valid name, <strong>then</strong> it is created as PENDING and an audit row records it.</td><td><ul class="acceptance-cover"><li><span class="channel-tag">mcp</span><span><a href="#sc-mcp-create" title="UC1 · Valid name over MCP">mcp-create</a></span></li><li><span class="channel-tag">api</span><span><a href="#sc-create-api" title="UC1 · Valid name over the API">create-api</a></span></li><li><span class="channel-tag">ui</span><span class="aside not-applicable">n/a: The preview mock has no Create dialog.</span></li></ul></td></tr>
+                    <tr id="ac-us2-ac3"><td><strong class="nowrap">US2 · AC3</strong><br><strong>Given</strong> a user who may create things, <strong>when</strong> they create one with an empty name, <strong>then</strong> it is refused with &quot;name is required&quot; and nothing is created.</td><td><ul class="acceptance-cover"><li><span class="channel-tag">mcp</span><span><a href="#sc-mcp-create-empty-name" title="UC1 · Empty name over MCP">mcp-create-empty-name</a></span></li><li><span class="channel-tag">api</span><span><a href="#sc-create-api-empty-name" title="UC1 · Empty name over the API">create-api-empty-name</a></span></li><li><span class="channel-tag">ui</span><span class="aside not-applicable">n/a: The preview mock has no Create dialog.</span></li></ul></td></tr>
+                    <tr id="ac-us2-ac4"><td><strong class="nowrap">US2 · AC4</strong><br><strong>Given</strong> an archived owner, <strong>when</strong> a user tries to create a thing, <strong>then</strong> it is refused with the archived reason and nothing is created.</td><td><ul class="acceptance-cover"><li><span class="channel-tag">ui</span><span><a href="#sc-create-archived" title="UC1 · Archived owner">create-archived</a></span></li><li><span class="channel-tag">mcp</span><span><a href="#sc-mcp-create-archived" title="UC1 · Archived owner over MCP">mcp-create-archived</a></span></li><li><span class="channel-tag gap">api</span><span class="acceptance-gap">gap: no api scenario cites it</span></li></ul></td></tr>
                 </tbody></table></div>
             <!-- acceptance:end -->
         </section>
 
         <!-- ============ 04 USE CASES ============ -->
         <section class="slide" id="use-cases" data-title="Use cases">
-            <h2><span class="sec-n">04</span>Use cases <a class="side-link" href="mock/index.html" target="_blank" rel="noopener">Open the mock ↗</a></h2>
+            <h2><span class="section-number">04</span>Use cases <a class="side-link" href="mock/index.html" target="_blank" rel="noopener">Open the mock ↗</a></h2>
             <p class="muted">Each use case is one user goal with four views, closed until you open one: <strong>Flowchart</strong> is its logic, <strong>Sequence</strong> is how the services talk, <strong>Rules</strong> is what the build must keep, <strong>Scenarios</strong> are its paths to test.</p>
-            <ol class="uc-index">
-                <li><a href="#uc-01"><span class="n">UC1</span>Create a thing</a><span class="aside">US2 · P1</span></li>
-                <li><a href="#uc-02"><span class="n">UC2</span>Create a thing · diagram-design</a><span class="aside">US2 · P1</span></li>
+            <ol class="use-case-index">
+                <li><a href="#uc-01"><span class="number">UC1</span>Create a thing</a><span class="aside">US2 · P1</span></li>
+                <li><a href="#uc-02"><span class="number">UC2</span>Create a thing · diagram-design</a><span class="aside">US2 · P1</span></li>
             </ol>
         </section>
 
         <!-- ===== one block per use case: section.slide.use-case id="uc-NN" + 4 view buttons + 4 hidden panels (Flowchart, Sequence, Rules, Scenarios).
              The Scenarios button and panel are generated by scripts/scenarios-panels.js.
-             Flowchart: <iframe class="diagram-frame"> in both modes. Sequence: manual <div class="seq" data-flow="NN-slug">;
-             diagram-design <iframe class="diagram-frame"> + the returned <div class="seq-steps"> right after the .seq box. ===== -->
+             Flowchart: <iframe class="diagram-frame"> in both modes. Sequence: manual <div class="sequence" data-flow="NN-slug">;
+             diagram-design <iframe class="diagram-frame"> + the returned <div class="sequence-steps"> right after the .sequence box. ===== -->
         <section class="slide use-case" id="uc-01" data-title="UC1 · Create a thing">
-            <header class="uc-head">
-                <h3><span class="sec-n">UC1</span>Create a thing</h3>
-                <p class="refs">US2 · P1 · FR-002 · FR-003</p>
+            <header class="use-case-head">
+                <h3><span class="section-number">UC1</span>Create a thing</h3>
+                <p class="references">US2 · P1 · FR-002 · FR-003</p>
             </header>
-            <p class="uc-line">Save a new thing. <span class="aside">Starts from Things page → New.</span></p>
+            <p class="use-case-line">Save a new thing. <span class="aside">Starts from Things page → New.</span></p>
             <div class="views" role="group" aria-label="UC1 views">
                 <button type="button" aria-expanded="false" aria-controls="uc-01-chart" id="uc-01-chart-tab">Flowchart</button>
                 <button type="button" aria-expanded="false" aria-controls="uc-01-seq" id="uc-01-seq-tab">Sequence</button>
@@ -139,7 +139,7 @@
                 <div class="flowchart"><iframe class="diagram-frame" src="flowchart/01-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-01-seq" aria-labelledby="uc-01-seq-tab" hidden>
-                <div class="seq" data-flow="01-example-flow"><p class="seq-legend"><span>call</span><span class="ret">response</span><span class="hot">side effect</span></p></div>
+                <div class="sequence" data-flow="01-example-flow"><p class="sequence-legend"><span>call</span><span class="return">response</span><span class="hot">side effect</span></p></div>
             </div>
             <div class="panel" role="region" tabindex="-1" id="uc-01-rules" aria-labelledby="uc-01-rules-tab" hidden>
                 <ul>
@@ -151,14 +151,14 @@
                 <!-- Generated by scripts/scenarios-panels.js from use-cases.js and the mock's play file. Don't hand-edit. -->
                 <div class="table-wrap"><table>
                     <thead><tr><th>Scenario</th><th></th></tr></thead><tbody>
-                        <tr id="sc-create-read-only"><td><span class="ch-tag">ui</span> Read-only user <span class="sc-kind exception">exception</span> <span class="refs">FR-003</span><br><span class="aside">No Create button at all; the list still reads 2 rows, Second thing on top.</span><br><span class="aside na">api n/a: The API runs the same permission check as MCP (mcp-create-read-only).</span></td><td class="nowrap"><a href="mock/index.html#sc-create-read-only" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                        <tr id="sc-create-archived"><td><span class="ch-tag">ui</span> Archived owner <span class="sc-kind exception">exception</span> <span class="refs">US2 · AC4</span><br><span class="aside">Create is shown unavailable; its tooltip reads &quot;This owner is archived. Things cannot be created.&quot;</span></td><td class="nowrap"><a href="mock/index.html#sc-create-archived" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                        <tr id="sc-mcp-create"><td><span class="ch-tag">mcp</span> Valid name over MCP <span class="sc-kind basic">basic</span> <span class="refs">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr id="sc-mcp-create-empty-name"><td><span class="ch-tag">mcp</span> Empty name over MCP <span class="sc-kind exception">exception</span> <span class="refs">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr id="sc-mcp-create-read-only"><td><span class="ch-tag">mcp</span> Caller without create permission <span class="sc-kind exception">exception</span> <span class="refs">FR-003</span><br><span class="aside">PermissionDenied &quot;You need things.create to create a thing.&quot; — nothing is created.</span><br><span class="aside na">api n/a: Same check and message as MCP.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr id="sc-mcp-create-archived"><td><span class="ch-tag">mcp</span> Archived owner over MCP <span class="sc-kind exception">exception</span> <span class="refs">US2 · AC4</span><br><span class="aside">FailedPrecondition &quot;This owner is archived. Things cannot be created.&quot; — nothing is created.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr id="sc-create-api"><td><span class="ch-tag">api</span> Valid name over the API <span class="sc-kind basic">basic</span> <span class="refs">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr id="sc-create-api-empty-name"><td><span class="ch-tag">api</span> Empty name over the API <span class="sc-kind exception">exception</span> <span class="refs">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr id="sc-create-read-only"><td><span class="channel-tag">ui</span> Read-only user <span class="scenario-kind exception">exception</span> <span class="references">FR-003</span><br><span class="aside">No Create button at all; the list still reads 2 rows, Second thing on top.</span><br><span class="aside not-applicable">api n/a: The API runs the same permission check as MCP (mcp-create-read-only).</span></td><td class="nowrap"><a href="mock/index.html#sc-create-read-only" target="_blank" rel="noopener">Play ↗</a></td></tr>
+                        <tr id="sc-create-archived"><td><span class="channel-tag">ui</span> Archived owner <span class="scenario-kind exception">exception</span> <span class="references">US2 · AC4</span><br><span class="aside">Create is shown unavailable; its tooltip reads &quot;This owner is archived. Things cannot be created.&quot;</span></td><td class="nowrap"><a href="mock/index.html#sc-create-archived" target="_blank" rel="noopener">Play ↗</a></td></tr>
+                        <tr id="sc-mcp-create"><td><span class="channel-tag">mcp</span> Valid name over MCP <span class="scenario-kind basic">basic</span> <span class="references">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr id="sc-mcp-create-empty-name"><td><span class="channel-tag">mcp</span> Empty name over MCP <span class="scenario-kind exception">exception</span> <span class="references">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr id="sc-mcp-create-read-only"><td><span class="channel-tag">mcp</span> Caller without create permission <span class="scenario-kind exception">exception</span> <span class="references">FR-003</span><br><span class="aside">PermissionDenied &quot;You need things.create to create a thing.&quot; — nothing is created.</span><br><span class="aside not-applicable">api n/a: Same check and message as MCP.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr id="sc-mcp-create-archived"><td><span class="channel-tag">mcp</span> Archived owner over MCP <span class="scenario-kind exception">exception</span> <span class="references">US2 · AC4</span><br><span class="aside">FailedPrecondition &quot;This owner is archived. Things cannot be created.&quot; — nothing is created.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr id="sc-create-api"><td><span class="channel-tag">api</span> Valid name over the API <span class="scenario-kind basic">basic</span> <span class="references">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr id="sc-create-api-empty-name"><td><span class="channel-tag">api</span> Empty name over the API <span class="scenario-kind exception">exception</span> <span class="references">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
                     </tbody></table></div>
             </div>
         </section>
@@ -166,11 +166,11 @@
 
         <!-- Template preview only: UC2 is UC1 again in diagram-design mode. A real overview uses one mode for every use case. -->
         <section class="slide use-case" id="uc-02" data-title="UC2 · Create a thing · diagram-design">
-            <header class="uc-head">
-                <h3><span class="sec-n">UC2</span>Create a thing · diagram-design</h3>
-                <p class="refs">US2 · P1 · FR-002 · FR-003</p>
+            <header class="use-case-head">
+                <h3><span class="section-number">UC2</span>Create a thing · diagram-design</h3>
+                <p class="references">US2 · P1 · FR-002 · FR-003</p>
             </header>
-            <p class="uc-line">The same use case as UC1, drawn by diagram-design. <span class="aside">Starts from Things page → New.</span></p>
+            <p class="use-case-line">The same use case as UC1, drawn by diagram-design. <span class="aside">Starts from Things page → New.</span></p>
             <div class="views" role="group" aria-label="UC2 views">
                 <button type="button" aria-expanded="false" aria-controls="uc-02-chart" id="uc-02-chart-tab">Flowchart</button>
                 <button type="button" aria-expanded="false" aria-controls="uc-02-seq" id="uc-02-seq-tab">Sequence</button>
@@ -181,13 +181,13 @@
                 <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-02-seq" aria-labelledby="uc-02-seq-tab" hidden>
-                <div class="seq"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
-                <div class="seq-steps"><p class="label seq-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>
-                    <li><span class="n">2</span><code>GetThing</code> id from the route</li>
-                    <li><span class="n">·</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
-                    <li><span class="n">6</span><code>CreateThing</code> name, ownerId</li>
-                    <li><span class="n">7</span><code>POST /things</code> timeout 10 s</li>
-                    <li><span class="n">12</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
+                <div class="sequence"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
+                <div class="sequence-steps"><p class="label sequence-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>
+                    <li><span class="number">2</span><code>GetThing</code> id from the route</li>
+                    <li><span class="number">·</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
+                    <li><span class="number">6</span><code>CreateThing</code> name, ownerId</li>
+                    <li><span class="number">7</span><code>POST /things</code> timeout 10 s</li>
+                    <li><span class="number">12</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>
                 </ol></div>
             </div>
             <div class="panel" role="region" tabindex="-1" id="uc-02-rules" aria-labelledby="uc-02-rules-tab" hidden>
@@ -199,14 +199,14 @@
                 <!-- Preview only: a copy of UC1's generated view, without row ids (ids are unique per page). -->
                 <div class="table-wrap"><table>
                     <thead><tr><th>Scenario</th><th></th></tr></thead><tbody>
-                        <tr><td><span class="ch-tag">ui</span> Read-only user <span class="refs">FR-003</span><br><span class="aside">No Create button at all; the list still reads 2 rows, Second thing on top.</span><br><span class="aside na">api n/a: The API runs the same permission check as MCP (mcp-create-read-only).</span></td><td class="nowrap"><a href="mock/index.html#sc-create-read-only" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                        <tr><td><span class="ch-tag">ui</span> Archived owner <span class="refs">US2 · AC4</span><br><span class="aside">Create is shown unavailable; its tooltip reads &quot;This owner is archived. Things cannot be created.&quot;</span></td><td class="nowrap"><a href="mock/index.html#sc-create-archived" target="_blank" rel="noopener">Play ↗</a></td></tr>
-                        <tr><td><span class="ch-tag">mcp</span> Valid name over MCP <span class="refs">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr><td><span class="ch-tag">mcp</span> Empty name over MCP <span class="refs">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr><td><span class="ch-tag">mcp</span> Caller without create permission <span class="refs">FR-003</span><br><span class="aside">PermissionDenied &quot;You need things.create to create a thing.&quot; — nothing is created.</span><br><span class="aside na">api n/a: Same check and message as MCP.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr><td><span class="ch-tag">mcp</span> Archived owner over MCP <span class="refs">US2 · AC4</span><br><span class="aside">FailedPrecondition &quot;This owner is archived. Things cannot be created.&quot; — nothing is created.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr><td><span class="ch-tag">api</span> Valid name over the API <span class="refs">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
-                        <tr><td><span class="ch-tag">api</span> Empty name over the API <span class="refs">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside na">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr><td><span class="channel-tag">ui</span> Read-only user <span class="references">FR-003</span><br><span class="aside">No Create button at all; the list still reads 2 rows, Second thing on top.</span><br><span class="aside not-applicable">api n/a: The API runs the same permission check as MCP (mcp-create-read-only).</span></td><td class="nowrap"><a href="mock/index.html#sc-create-read-only" target="_blank" rel="noopener">Play ↗</a></td></tr>
+                        <tr><td><span class="channel-tag">ui</span> Archived owner <span class="references">US2 · AC4</span><br><span class="aside">Create is shown unavailable; its tooltip reads &quot;This owner is archived. Things cannot be created.&quot;</span></td><td class="nowrap"><a href="mock/index.html#sc-create-archived" target="_blank" rel="noopener">Play ↗</a></td></tr>
+                        <tr><td><span class="channel-tag">mcp</span> Valid name over MCP <span class="references">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr><td><span class="channel-tag">mcp</span> Empty name over MCP <span class="references">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr><td><span class="channel-tag">mcp</span> Caller without create permission <span class="references">FR-003</span><br><span class="aside">PermissionDenied &quot;You need things.create to create a thing.&quot; — nothing is created.</span><br><span class="aside not-applicable">api n/a: Same check and message as MCP.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr><td><span class="channel-tag">mcp</span> Archived owner over MCP <span class="references">US2 · AC4</span><br><span class="aside">FailedPrecondition &quot;This owner is archived. Things cannot be created.&quot; — nothing is created.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr><td><span class="channel-tag">api</span> Valid name over the API <span class="references">US2 · AC1</span><br><span class="aside">A thing named Third thing with status PENDING, and one audit row &quot;created thing #&lt;id&gt;&quot;.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
+                        <tr><td><span class="channel-tag">api</span> Empty name over the API <span class="references">US2 · AC3</span><br><span class="aside">InvalidArgument &quot;name is required.&quot; — nothing is created.</span><br><span class="aside not-applicable">ui n/a: The preview mock has no Create dialog.</span></td><td class="nowrap"><span class="aside">No mock</span></td></tr>
                     </tbody></table></div>
             </div>
         </section>
@@ -214,7 +214,7 @@
         <!-- ============ 05 DATABASE: changes first, then the full schema of every related table in a closed details.more.
              No related table at all → keep this section, replace its body with "This feature has no database changes." ============ -->
         <section class="slide" id="database" data-title="Database">
-            <h2><span class="sec-n">05</span>Database changes <a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">ER diagram ↗</a></h2>
+            <h2><span class="section-number">05</span>Database changes <a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">ER diagram ↗</a></h2>
             <dl class="facts">
                 <dt>Migration</dt>
                 <dd><code>path/to/migration.sql</code></dd>
@@ -225,49 +225,49 @@
             </dl>
             <p class="legend"><span class="add">+ add</span><span class="change">~ change</span><span class="drop">− drop</span></p>
             <div class="tables">
-                <div class="tbl add" id="db-table_b">
-                    <div class="tbl-head"><span>schema.table_b</span><span class="tag">new table</span></div>
-                    <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                    <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
-                    <div class="row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                <div class="table-card add" id="db-table_b">
+                    <div class="table-card-head"><span>schema.table_b</span><span class="tag">new table</span></div>
+                    <div class="row"><span class="column">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                    <div class="row"><span class="column">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                    <div class="row"><span class="column">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
                 </div>
-                <div class="tbl change" id="db-table_a">
-                    <div class="tbl-head"><span>schema.table_a</span><span class="tag">altered</span></div>
-                    <div class="row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
-                    <div class="row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
-                    <div class="row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
-                    <div class="row add"><span class="col">new_column</span><span class="type">index</span><span class="key">+ add</span></div>
+                <div class="table-card change" id="db-table_a">
+                    <div class="table-card-head"><span>schema.table_a</span><span class="tag">altered</span></div>
+                    <div class="row add"><span class="column">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
+                    <div class="row change"><span class="column">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                    <div class="row drop"><span class="column">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
+                    <div class="row add"><span class="column">new_column</span><span class="type">index</span><span class="key">+ add</span></div>
                 </div>
             </div>
-            <p class="rel"><code>schema.table_a.id</code> <span class="card-n">1 ── *</span> <code>schema.table_b.table_a_id</code> <span class="aside">new FK</span></p>
+            <p class="relation"><code>schema.table_a.id</code> <span class="cardinality">1 ── *</span> <code>schema.table_b.table_a_id</code> <span class="aside">new FK</span></p>
             <details class="more">
                 <summary>Full schema <span class="aside">every related table, all columns</span></summary>
                 <div class="tables">
-                    <div class="tbl add">
-                        <div class="tbl-head"><span>schema.table_b</span><span class="tag">new table</span></div>
-                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                        <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
-                        <div class="row"><span class="col">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                    <div class="table-card add">
+                        <div class="table-card-head"><span>schema.table_b</span><span class="tag">new table</span></div>
+                        <div class="row"><span class="column">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="column">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                        <div class="row"><span class="column">status</span><span class="type">text</span><span class="key">NOT NULL</span></div>
                     </div>
-                    <div class="tbl change">
-                        <div class="tbl-head"><span>schema.table_a</span><span class="tag">altered</span></div>
-                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                        <div class="row"><span class="col">name</span><span class="type">text</span><span class="key">NOT NULL</span></div>
-                        <div class="row add"><span class="col">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
-                        <div class="row change"><span class="col">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
-                        <div class="row drop"><span class="col">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
-                        <div class="row"><span class="col">created_at</span><span class="type">timestamptz</span><span class="key"></span></div>
+                    <div class="table-card change">
+                        <div class="table-card-head"><span>schema.table_a</span><span class="tag">altered</span></div>
+                        <div class="row"><span class="column">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="column">name</span><span class="type">text</span><span class="key">NOT NULL</span></div>
+                        <div class="row add"><span class="column">new_column</span><span class="type">text null</span><span class="key">+ add</span></div>
+                        <div class="row change"><span class="column">changed_column</span><span class="type">int → bigint</span><span class="key">~ type</span></div>
+                        <div class="row drop"><span class="column">old_column</span><span class="type">text</span><span class="key">− drop</span></div>
+                        <div class="row"><span class="column">created_at</span><span class="type">timestamptz</span><span class="key"></span></div>
                     </div>
-                    <div class="tbl">
-                        <div class="tbl-head"><span>schema.table_c</span><span class="tag">read</span></div>
-                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                        <div class="row"><span class="col">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
-                        <div class="row"><span class="col">enabled</span><span class="type">boolean</span><span class="key"></span></div>
+                    <div class="table-card">
+                        <div class="table-card-head"><span>schema.table_c</span><span class="tag">read</span></div>
+                        <div class="row"><span class="column">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="column">table_a_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                        <div class="row"><span class="column">enabled</span><span class="type">boolean</span><span class="key"></span></div>
                     </div>
-                    <div class="tbl ext">
-                        <div class="tbl-head"><span>other.table_x</span><span class="tag">external</span></div>
-                        <div class="row"><span class="col">id</span><span class="type">bigint</span><span class="key">PK</span></div>
-                        <div class="row"><span class="col">code</span><span class="type">text</span><span class="key"></span></div>
+                    <div class="table-card external">
+                        <div class="table-card-head"><span>other.table_x</span><span class="tag">external</span></div>
+                        <div class="row"><span class="column">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                        <div class="row"><span class="column">code</span><span class="type">text</span><span class="key"></span></div>
                     </div>
                 </div>
             </details>
@@ -277,7 +277,7 @@
              The full request / response of every related API is the board at api/contracts.html, linked from the h2.
              No related API at all → keep this section, replace its body with "This feature has no API changes." ============ -->
         <section class="slide" id="api" data-title="API">
-            <h2><span class="sec-n">06</span>API changes <a class="side-link" href="api/contracts.html" target="_blank" rel="noopener">API contracts ↗</a></h2>
+            <h2><span class="section-number">06</span>API changes <a class="side-link" href="api/contracts.html" target="_blank" rel="noopener">API contracts ↗</a></h2>
             <dl class="facts">
                 <dt>Summary</dt>
                 <dd>1 new RPC, 1 behaviour change on <code>ThingService</code></dd>
@@ -292,26 +292,26 @@
             <!-- ===== one block per changed API ===== -->
             <div class="api" id="api-create-thing" data-part="CreateThing">
                 <h3><code>CreateThing</code> <span class="pill">new</span></h3>
-                <p class="refs">POST /api/v1/things · permission things.create</p>
+                <p class="references">POST /api/v1/things · permission things.create</p>
                 <div class="tables">
-                    <div class="tbl add">
-                        <div class="tbl-head"><span>CreateThingRequest</span><span class="tag">new message</span></div>
-                        <div class="row"><span class="col">name</span><span class="type">string</span><span class="key">1</span></div>
-                        <div class="row"><span class="col">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
-                        <div class="row"><span class="col">note</span><span class="type">optional string</span><span class="key">3</span></div>
+                    <div class="table-card add">
+                        <div class="table-card-head"><span>CreateThingRequest</span><span class="tag">new message</span></div>
+                        <div class="row"><span class="column">name</span><span class="type">string</span><span class="key">1</span></div>
+                        <div class="row"><span class="column">ownerId</span><span class="type">int32</span><span class="key">2</span></div>
+                        <div class="row"><span class="column">note</span><span class="type">optional string</span><span class="key">3</span></div>
                     </div>
-                    <div class="tbl change">
-                        <div class="tbl-head"><span>ThingResponse</span><span class="tag">altered</span></div>
-                        <div class="row add"><span class="col">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
-                        <div class="row change"><span class="col">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
-                        <div class="row drop"><span class="col">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
+                    <div class="table-card change">
+                        <div class="table-card-head"><span>ThingResponse</span><span class="tag">altered</span></div>
+                        <div class="row add"><span class="column">source</span><span class="type">RepositorySource</span><span class="key">+ 17</span></div>
+                        <div class="row change"><span class="column">count</span><span class="type">int32 → int64</span><span class="key">~ 9</span></div>
+                        <div class="row drop"><span class="column">legacyFlag</span><span class="type">bool</span><span class="key">− 4</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="api" id="api-get-things" data-part="GetThings">
                 <h3><code>GetThings</code> <span class="pill quiet">behaviour</span></h3>
-                <p class="refs">GET /api/v1/things · permission things.read · no field change</p>
+                <p class="references">GET /api/v1/things · permission things.read · no field change</p>
                 <details class="more">
                     <summary>Behaviour <span class="aside">what changes at runtime</span></summary>
                     <ul>
@@ -325,10 +325,10 @@
             <div class="api" id="api-shared-types" data-part="Shared types">
                 <h3>Shared types</h3>
                 <div class="tables">
-                    <div class="tbl add">
-                        <div class="tbl-head"><span>RepositorySource</span><span class="tag">new enum</span></div>
-                        <div class="row"><span class="col">REPOSITORY_SOURCE_UNSPECIFIED</span><span class="type"></span><span class="key">0</span></div>
-                        <div class="row"><span class="col">GITLAB</span><span class="type"></span><span class="key">1</span></div>
+                    <div class="table-card add">
+                        <div class="table-card-head"><span>RepositorySource</span><span class="tag">new enum</span></div>
+                        <div class="row"><span class="column">REPOSITORY_SOURCE_UNSPECIFIED</span><span class="type"></span><span class="key">0</span></div>
+                        <div class="row"><span class="column">GITLAB</span><span class="type"></span><span class="key">1</span></div>
                     </div>
                 </div>
             </div>
@@ -336,7 +336,7 @@
 
         <!-- ============ 07 ERRORS ============ -->
         <section class="slide" id="errors" data-title="Errors">
-            <h2><span class="sec-n">07</span>Errors</h2>
+            <h2><span class="section-number">07</span>Errors</h2>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -353,7 +353,7 @@
 
         <!-- ============ 08 OPEN QUESTIONS ============ -->
         <section class="slide" id="open-questions" data-title="Open questions">
-            <h2><span class="sec-n">08</span>Open questions</h2>
+            <h2><span class="section-number">08</span>Open questions</h2>
             <p class="blocker-line"><strong class="blocker">Blocker:</strong> the upstream timeout for <code>POST /things</code> is not agreed yet.</p>
             <ol class="questions">
                 <li><p>Should a dropped <code>legacyFlag</code> wait one release behind a deprecation?</p><span class="who">Owner: API lead</span></li>
@@ -371,12 +371,12 @@
     </div>
 
     <!-- presentation bar: shown only in presentation mode (P) -->
-    <div class="hud" id="hud" hidden>
+    <div class="present-bar" id="hud" hidden>
         <button type="button" id="prevSlide" aria-label="Previous section">←</button>
         <span id="hudLabel">1 / 1</span>
         <button type="button" id="nextSlide" aria-label="Next section">→</button>
-        <button type="button" id="exitPresent" class="hud-exit" aria-label="Leave presentation">Esc</button>
-        <span class="hud-keys" aria-hidden="true">? keys</span>
+        <button type="button" id="exitPresent" class="present-bar-exit" aria-label="Leave presentation">Esc</button>
+        <span class="present-bar-keys" aria-hidden="true">? keys</span>
     </div>
 
     <!-- shortcut sheet: "?" or the ? tool opens it -->

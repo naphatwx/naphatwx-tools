@@ -114,14 +114,14 @@
   :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
   .label-note { font-weight: 400; }
   /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-  .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-  .sc-kind.basic { color: var(--accent); }
-  .sc-kind.exception { color: var(--warn); }
+  .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+  .scenario-kind.basic { color: var(--accent); }
+  .scenario-kind.exception { color: var(--warn); }
   /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-  .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-  .refs-chip:hover { background: var(--hover); }
-  .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-  .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+  .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+  .references-chip:hover { background: var(--hover); }
+  .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+  .references-chip[aria-expanded="false"] + .references-ids { display: none; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -143,8 +143,8 @@
       body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
       pre, figure, img, svg, tr { break-inside: avoid; }
       h1, h2, h3 { break-after: avoid; }
-      .refs-chip { display: none !important; }
-      .refs-ids { display: inline !important; }
+      .references-chip { display: none !important; }
+      .references-ids { display: inline !important; }
   }
   /* theme:pdf:end */
 
@@ -166,12 +166,12 @@
 
   .summary-line .lead { font-weight: 600; }
   .summary-line .meta { font-size: var(--fs-meta); }
-  .summary-line .c-bad { color: var(--bad); }
+  .summary-line .color-bad { color: var(--bad); }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .empty-filter { margin-top: 16px; font-size: var(--fs-meta); }
   .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
-  .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+  .command code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
   .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
@@ -227,7 +227,7 @@
   .verdict { margin: 0 14px 8px; padding: 6px 12px; color: var(--text); border-radius: var(--radius); overflow-wrap: anywhere; }
   .verdict.bad { background: var(--bad-soft); font-weight: 600; }
   .facts { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 0 14px 8px; }
-  .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 0 14px 8px; }
+  .command { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 0 14px 8px; }
 
   /* Hops are a numbered table-like list: fixed columns so status, route and time line up row to row.
      The cause lives in the opened row, not the summary, so a closed row stays one line. */
@@ -236,7 +236,7 @@
   .hops > li + li { border-top: 1px solid var(--line); }
   .hop-row { display: grid; grid-template-columns: 1ch 2ch 8.5em minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 5px 12px; }
   .hop-row .pill { justify-self: start; }
-  .hop-row .n { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
+  .hop-row .number { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
   .hop-row .route { overflow-wrap: anywhere; min-width: 0; }
   .hop-row .via { color: var(--text-3); }
   .hop-row .meta { text-align: right; white-space: nowrap; }
@@ -408,7 +408,7 @@ function polled(p) {
 
 // One numbered row per hop; a closed row is a single line, the cause and evidence open below it.
 function hopShell(tag, n, status, from, to, via, time) {
-  return el(tag, { class: 'hop-row' }, el('span', { class: 'mark', 'aria-hidden': 'true' }), el('span', { class: 'n' }, n), pill(status),
+  return el(tag, { class: 'hop-row' }, el('span', { class: 'mark', 'aria-hidden': 'true' }), el('span', { class: 'number' }, n), pill(status),
     el('span', { class: 'route' }, (from ? from + ' → ' : '') + to, via ? el('span', { class: 'via' }, '  via ' + via) : null),
     el('span', { class: 'meta' }, time));
 }
@@ -501,7 +501,7 @@ function flowBox(f) {
   if (f.probeId) facts.append(el('span', { class: 'meta' }, 'Probe ID: ', el('code', {}, f.probeId)));
   if (f.startedAt) facts.append(el('span', { class: 'meta' }, 'Started ' + isoLocal(f.startedAt)));
   if (facts.childNodes.length) panel.append(facts);
-  if (failed && f.rerun) panel.append(el('div', { class: 'cmd' }, el('span', { class: 'meta' }, 'Rerun this flow:'), el('code', {}, f.rerun), copyBtn(f.rerun, 'rerun command for ' + f.flow)));
+  if (failed && f.rerun) panel.append(el('div', { class: 'command' }, el('span', { class: 'meta' }, 'Rerun this flow:'), el('code', {}, f.rerun), copyBtn(f.rerun, 'rerun command for ' + f.flow)));
 
   const list = el('ol', { class: 'hops', 'aria-label': 'Hops of ' + f.flow });
   if (f.trigger) {
@@ -541,7 +541,7 @@ function render() {
   });
   tools.append(...buttons);
   // Same header as the e2e report: counts in filter order, colored only when not zero.
-  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' c-' + tone : '') }, c + ' ' + word);
+  const count = (c, word, tone) => el('span', { class: 'lead' + (c && tone ? ' color-' + tone : '') }, c + ' ' + word);
   app.append(el('header', {},
     el('div', {}, el('h1', {}, 'Smoke report · ' + DATA.env, pill(DATA.status)),
       el('div', { class: 'summary-line' },

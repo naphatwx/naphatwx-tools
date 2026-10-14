@@ -18,14 +18,14 @@
 - Export PDF: `theme/pdf.css` (print rules, `.no-print`) syncs into `/* theme:pdf:start */ … end */`; `theme/pdf.js` (`addExportPdf(target, prepare)`) syncs into `/* theme:pdf-js:start */ … end */` inside a `<script>` or `.js` file. Every HTML template has both and calls `addExportPdf` once. With no target, Export PDF goes into the bottom-right `.float-bar` (one long box); put page tools in a `<div class="float-bar no-print">` before it. Page-specific print layout goes in its own `@media print`, outside the markers.
 - Diagrams: `theme/diagram-labels.js` (`fitDiagramLabels`: each `.edge-label` box fits its rendered text) syncs into `/* theme:diagram-labels-js:start */ … end */`; `theme/diagram-embed.js` (Export PDF, 1:1 SVGs, the iframe embed contract) into `/* theme:diagram-embed-js:start */ … end */`. generate-diagram's `template/embed.html` holds both, for diagram-design files.
 - Opt-in shared blocks, each synced into `/* theme:<name>:start */ … end */` only where a page has the marker:
-  - `report.css` (`report`): deploy-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.cmd code`, and the `.disclosure` / `.disclosure-head` card.
+  - `report.css` (`report`): deploy-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.command code`, and the `.disclosure` / `.disclosure-head` card.
   - `scenario.css` (`scenario`): generate-mock-ui and play-scenarios index chrome (use-case rows, scenario list, guide, frame, results).
-  - `page-head.css` (`page-head`): header row, `h1`, `.sub`, `.actions`, `.btn` of the API contracts and ER pages.
+  - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
   - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview and the generate-diagram viewer.
   - `scrollbar.css` (`scrollbar`): thin WebKit scrollbars.
-- `.sc-kind` and `.refs-chip` live in `base.css`; their print rules in `pdf.css`.
+- `.scenario-kind` and `.references-chip` live in `base.css`; their print rules in `pdf.css`.
 - Radii: use `--radius` (6px), `--radius-md` (8px), `--radius-lg` (10px), `--radius-xl` (12px), never a raw px value.
-- Change marks: `theme/diff.css` syncs into `/* theme:diff:start */ … end */`. One class set for every table or message card, HTML and SVG: `.tbl` (+ `.add` / `.drop` / `.change` / `.ext`), `.tbl-head` (name first, then `.tag`), `.row` (+ `.add` / `.change` / `.drop`) with `.col`, `.type`, `.key`. Used by the design-feature overview, the API contracts page and the ER diagram.
+- Change marks: `theme/diff.css` syncs into `/* theme:diff:start */ … end */`. One class set for every table or message card, HTML and SVG: `.table-card` (+ `.add` / `.drop` / `.change` / `.external`), `.table-card-head` (name first, then `.tag`), `.row` (+ `.add` / `.change` / `.drop`) with `.column`, `.type`, `.key`. Used by the design-feature overview, the API contracts page and the ER diagram.
 - Every page with a `.float-bar` gets bottom padding from `theme/pdf.css` (`--float-space`), so the bar never hides the last line. A full-window page sets it back to 0 in its own CSS.
 - Never edit between the markers. Edit `theme/`, then run `node theme/sync.mjs`.
 - design-feature's `template/mock`, `flowchart`, `sequence-diagram` and `database` are preview copies of the generate-mock-ui and generate-diagram templates. Edit the source, then run `node theme/sync.mjs`. Files that differ on purpose are listed in `OWN` in `theme/sync.mjs`.

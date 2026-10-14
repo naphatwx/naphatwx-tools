@@ -89,13 +89,13 @@ else {
         .map(([k, t]) => `<strong>${k}</strong> ${esc(lower(t))}`).join(', ');
     const link = s => `<a href="#sc-${esc(s.id)}" title="${esc(`${s.useCase} · ${s.title}`)}">${esc(s.id)}</a>`;
     const line = ({ k, by }) => by.length
-        ? `<li><span class="ch-tag">${esc(k)}</span><span>${by.map(link).join(' · ')}</span></li>`
-        : `<li><span class="ch-tag gap">${esc(k)}</span><span class="ac-gap">gap: no ${esc(k)} scenario cites it</span></li>`;
-    const naLine = ([k, why]) => `<li><span class="ch-tag">${esc(k)}</span><span class="aside na">n/a: ${esc(why)}</span></li>`;
+        ? `<li><span class="channel-tag">${esc(k)}</span><span>${by.map(link).join(' · ')}</span></li>`
+        : `<li><span class="channel-tag gap">${esc(k)}</span><span class="acceptance-gap">gap: no ${esc(k)} scenario cites it</span></li>`;
+    const naLine = ([k, why]) => `<li><span class="channel-tag">${esc(k)}</span><span class="aside not-applicable">n/a: ${esc(why)}</span></li>`;
     const tr = r => `${I}        <tr id="${slug(r.a.id)}"><td><strong class="nowrap">${esc(r.a.id)}</strong><br>${gwt(r.a)}</td>`
-        + `<td><ul class="ac-cover">${[...r.lines.map(line), ...r.naList.map(naLine)].join('')}</ul></td></tr>`;
+        + `<td><ul class="acceptance-cover">${[...r.lines.map(line), ...r.naList.map(naLine)].join('')}</ul></td></tr>`;
     body = [`${I}<p class="muted">${esc(summary)}</p>`,
-        `${I}<div class="table-wrap"><table class="ac-table">`,
+        `${I}<div class="table-wrap"><table class="acceptance-table">`,
         `${I}    <thead><tr><th>Criterion</th><th>Scenarios that cite it, by channel</th></tr></thead><tbody>`,
         ...rows.map(tr),
         `${I}    </tbody></table></div>`].join('\n');

@@ -115,14 +115,14 @@
         :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
         .label-note { font-weight: 400; }
         /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-        .sc-kind.basic { color: var(--accent); }
-        .sc-kind.exception { color: var(--warn); }
+        .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .scenario-kind.basic { color: var(--accent); }
+        .scenario-kind.exception { color: var(--warn); }
         /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-        .refs-chip:hover { background: var(--hover); }
-        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+        .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .references-chip:hover { background: var(--hover); }
+        .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .references-chip[aria-expanded="false"] + .references-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -144,8 +144,8 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
-            .refs-chip { display: none !important; }
-            .refs-ids { display: inline !important; }
+            .references-chip { display: none !important; }
+            .references-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
@@ -165,10 +165,10 @@
         /* Synced from theme/page-head.css by theme/sync.mjs. Do not edit here. */
         header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
         h1 { font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.015em; }
-        .sub { color: var(--text-3); font-size: var(--fs-meta); margin-top: 2px; }
+        .subtitle { color: var(--text-3); font-size: var(--fs-meta); margin-top: 2px; }
         .actions { display: flex; gap: 8px; }
 
-        .btn {
+        .button {
             font: inherit;
             font-size: var(--fs-body);
             color: var(--text-2);
@@ -180,7 +180,7 @@
             text-decoration: none;
         }
 
-        .btn:hover { color: var(--text); background: var(--hover); }
+        .button:hover { color: var(--text); background: var(--hover); }
         /* theme:page-head:end */
         header { margin-bottom: 12px; }
 
@@ -200,27 +200,27 @@
         /* one block per method: numbered title, route line, then its board */
         .method { margin-bottom: 32px; }
         .method h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; font-size: var(--fs-h2); font-weight: 600; }
-        .method h2 .n { color: var(--text-3); font-family: var(--mono); font-size: var(--fs-h3); }
+        .method h2 .number { color: var(--text-3); font-family: var(--mono); font-size: var(--fs-h3); }
         .method h2 code { font-size: inherit; }
         .method h2 .tag { color: var(--text-3); font-size: var(--fs-tag); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 8px; }
         .method h2 .tag.write { color: var(--add); border-color: var(--add); }
-        .method .sub { margin: 4px 0 10px; }
+        .method .subtitle { margin: 4px 0 10px; }
 
         /* a board: request and response cards side by side, each half the width, no frame around them; a long name or type wraps */
         .board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
-        .c-label { color: var(--text-3); font-size: var(--fs-tag); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+        .card-label { color: var(--text-3); font-size: var(--fs-tag); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 
         /* a card: head with name and tag, then field rows. State marks come from the theme:diff block below */
-        .tbl { border: 1.5px solid var(--line-3); border-radius: var(--radius-md); background: var(--surface-2); overflow: hidden; }
-        .tbl-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 7px 12px; background: var(--surface-3); }
-        .tbl-head .tbl-name { font: 600 var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
-        .tbl-head .tag { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; white-space: nowrap; }
+        .table-card { border: 1.5px solid var(--line-3); border-radius: var(--radius-md); background: var(--surface-2); overflow: hidden; }
+        .table-card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 7px 12px; background: var(--surface-3); }
+        .table-card-head .table-card-name { font: 600 var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
+        .table-card-head .tag { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; white-space: nowrap; }
 
         /* field rows: name | number | type. Rows share the card's columns (subgrid), so numbers and types line up */
         .rows { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, max-content); column-gap: 16px; }
         .row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: baseline; padding: 4px 12px; border-top: 1px solid var(--line); }
         .row:nth-child(odd) { background: var(--neutral-soft); }
-        .row .col { font: var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
+        .row .column { font: var(--fs-dia) var(--mono); overflow-wrap: anywhere; }
         .row .key { color: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 700; }
         .row .type { color: var(--text-3); font-size: var(--fs-dia-sub); text-align: right; overflow-wrap: anywhere; }
         .none { padding: 7px 12px; color: var(--text-3); font-size: var(--fs-dia-sub); font-style: italic; }
@@ -232,61 +232,61 @@
 
         @media print {
             .actions { display: none; }
-            .tbl { break-inside: avoid; }
+            .table-card { break-inside: avoid; }
         }
 
         /* theme:diff:start */
         /* Synced from theme/diff.css by theme/sync.mjs. Do not edit here. */
         /* Card state shows three ways, not by color alone: a gutter bar, a tinted head and a signed pill */
-        .tbl:is(.add, .drop) { position: relative; }
-        .tbl.add { border-color: var(--add); }
-        .tbl.drop { border-color: var(--drop); }
-        .tbl.ext { border-style: dashed; }
-        .tbl:is(.add, .drop)::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--add); }
-        .tbl.drop::before { background: var(--drop); }
-        .tbl:is(.add, .drop) :is(.tbl-head, .row) { padding-left: 16px; }
-        .tbl.add .tbl-head { background: var(--ok-soft); }
-        .tbl.drop .tbl-head { background: var(--bad-soft); }
-        .tbl.drop :is(.tbl-head > :first-child, .tbl-name) { text-decoration: line-through; text-decoration-thickness: 1.5px; }
-        .tbl.drop .row { opacity: 0.55; }
-        .tbl:is(.add, .drop, .change) .tag { align-self: center; padding: 4px 8px; border-radius: 999px; font: 700 var(--fs-tag)/1 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
-        .tbl.add .tag { color: var(--bg); background: var(--add); }
-        .tbl.drop .tag { color: var(--bg); background: var(--drop); }
-        .tbl.change .tag { padding: 3px 7px; border: 1px solid var(--change); color: var(--change); }
-        .tbl.add .tag::before { content: "+ "; }
-        .tbl.drop .tag::before { content: "− "; }
-        .tbl.change .tag::before { content: "~ "; }
+        .table-card:is(.add, .drop) { position: relative; }
+        .table-card.add { border-color: var(--add); }
+        .table-card.drop { border-color: var(--drop); }
+        .table-card.external { border-style: dashed; }
+        .table-card:is(.add, .drop)::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--add); }
+        .table-card.drop::before { background: var(--drop); }
+        .table-card:is(.add, .drop) :is(.table-card-head, .row) { padding-left: 16px; }
+        .table-card.add .table-card-head { background: var(--ok-soft); }
+        .table-card.drop .table-card-head { background: var(--bad-soft); }
+        .table-card.drop :is(.table-card-head > :first-child, .table-card-name) { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+        .table-card.drop .row { opacity: 0.55; }
+        .table-card:is(.add, .drop, .change) .tag { align-self: center; padding: 4px 8px; border-radius: 999px; font: 700 var(--fs-tag)/1 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+        .table-card.add .tag { color: var(--bg); background: var(--add); }
+        .table-card.drop .tag { color: var(--bg); background: var(--drop); }
+        .table-card.change .tag { padding: 3px 7px; border: 1px solid var(--change); color: var(--change); }
+        .table-card.add .tag::before { content: "+ "; }
+        .table-card.drop .tag::before { content: "− "; }
+        .table-card.change .tag::before { content: "~ "; }
         /* Changed rows: tinted, name and key in the mark's color; a dropped row is struck through */
-        .tbl .row.add { background: var(--ok-soft); }
-        .tbl .row.change { background: var(--warn-soft); }
-        .tbl .row.drop { background: var(--bad-soft); }
-        .tbl .row.add :is(.col, .key) { color: var(--add); }
-        .tbl .row.change :is(.col, .key) { color: var(--change); }
-        .tbl .row.drop :is(.col, .type, .key) { color: var(--drop); }
-        .tbl .row.drop :is(.col, .type) { text-decoration: line-through; text-decoration-thickness: 1px; }
+        .table-card .row.add { background: var(--ok-soft); }
+        .table-card .row.change { background: var(--warn-soft); }
+        .table-card .row.drop { background: var(--bad-soft); }
+        .table-card .row.add :is(.column, .key) { color: var(--add); }
+        .table-card .row.change :is(.column, .key) { color: var(--change); }
+        .table-card .row.drop :is(.column, .type, .key) { color: var(--drop); }
+        .table-card .row.drop :is(.column, .type) { text-decoration: line-through; text-decoration-thickness: 1px; }
         /* Legend swatches */
         .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
         .legend i.add { border-color: var(--add); background: var(--ok-soft); box-shadow: inset 3px 0 var(--add); }
         .legend i.drop { border-color: var(--drop); background: var(--bad-soft); box-shadow: inset 3px 0 var(--drop); }
-        .legend i.ext { border-style: dashed; }
+        .legend i.external { border-style: dashed; }
         /* SVG (ER diagram): the same classes. Text fills with currentColor, so the color rules above apply */
-        svg .tbl text { fill: currentColor; }
-        svg .tbl-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
-        svg .tbl:is(.add, .drop) > .tbl-box { stroke: var(--add); stroke-width: 1.6; }
-        svg .tbl.drop > .tbl-box { stroke: var(--drop); }
-        svg .tbl.ext > .tbl-box { stroke-dasharray: 5 4; }
-        svg .tbl-head { fill: var(--surface-3); }
-        svg .tbl.add > .tbl-head { fill: var(--ok-soft); }
-        svg .tbl.drop > .tbl-head { fill: var(--bad-soft); }
-        svg .tbl-bar { fill: var(--add); }
-        svg .tbl.drop .tbl-bar { fill: var(--drop); }
+        svg .table-card text { fill: currentColor; }
+        svg .table-card-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
+        svg .table-card:is(.add, .drop) > .table-card-box { stroke: var(--add); stroke-width: 1.6; }
+        svg .table-card.drop > .table-card-box { stroke: var(--drop); }
+        svg .table-card.external > .table-card-box { stroke-dasharray: 5 4; }
+        svg .table-card-head { fill: var(--surface-3); }
+        svg .table-card.add > .table-card-head { fill: var(--ok-soft); }
+        svg .table-card.drop > .table-card-head { fill: var(--bad-soft); }
+        svg .table-card-bar { fill: var(--add); }
+        svg .table-card.drop .table-card-bar { fill: var(--drop); }
         svg .tag > rect { fill: none; stroke: var(--change); }
-        svg .tbl.add .tag > rect { fill: var(--add); stroke: none; }
-        svg .tbl.drop .tag > rect { fill: var(--drop); stroke: none; }
-        svg .tbl .row > .row-bg { fill: transparent; }
-        svg .tbl .row.add > .row-bg { fill: var(--ok-soft); }
-        svg .tbl .row.change > .row-bg { fill: var(--warn-soft); }
-        svg .tbl .row.drop > .row-bg { fill: var(--bad-soft); }
+        svg .table-card.add .tag > rect { fill: var(--add); stroke: none; }
+        svg .table-card.drop .tag > rect { fill: var(--drop); stroke: none; }
+        svg .table-card .row > .row-background { fill: transparent; }
+        svg .table-card .row.add > .row-background { fill: var(--ok-soft); }
+        svg .table-card .row.change > .row-background { fill: var(--warn-soft); }
+        svg .table-card .row.drop > .row-background { fill: var(--bad-soft); }
         /* theme:diff:end */
     </style>
 </head>
@@ -296,10 +296,10 @@
     <header>
         <div>
             <h1>API contracts · Feature Name</h1>
-            <p class="sub">Every API the feature adds, changes or calls, with its full request and response.</p>
+            <p class="subtitle">Every API the feature adds, changes or calls, with its full request and response.</p>
         </div>
         <div class="actions">
-            <a class="btn" href="../overview.html#api">← Overview</a>
+            <a class="button" href="../overview.html#api">← Overview</a>
         </div>
     </header>
 
@@ -307,7 +307,7 @@
         <span><i class="add"></i>new message or type</span>
         <span><i class="drop"></i>removed message</span>
         <span><i></i>existing message (amber pill when altered)</span>
-        <span><i class="ext"></i>external (another service owns it)</span>
+        <span><i class="external"></i>external (another service owns it)</span>
         <span><b class="add">+ add</b> · <b class="change">~ change</b> · <b class="drop">− drop</b></span>
     </div>
 
@@ -375,23 +375,23 @@
 
             // A card: label above, head with name and tag, then one row per field. No message → one muted line.
             const card = (c, label, ext) => {
-                if (!c) return `<div><div class="c-label">${esc(label)}</div><div class="tbl"><div class="none">no message</div></div></div>`;
-                const cls = ["tbl", kind(c), ext ? "ext" : ""].filter(Boolean).join(" ");
+                if (!c) return `<div><div class="card-label">${esc(label)}</div><div class="table-card"><div class="none">no message</div></div></div>`;
+                const cls = ["table-card", kind(c), ext ? "external" : ""].filter(Boolean).join(" ");
                 const rows = c.fields.map(([name, type, num, mark]) => `<div class="row${mark ? " " + mark : ""}">`
-                    + `<span class="col">${esc(name)}</span><span class="key">${esc(num)}</span><span class="type">${esc(type)}</span></div>`).join("");
-                return `<div><div class="c-label">${esc(label)}</div><div class="${cls}" role="group" aria-label="${esc(label)} ${esc(c.name)}${c.tag ? ", " + esc(c.tag) : ""}">`
-                    + `<div class="tbl-head"><span class="tbl-name">${esc(c.name)}</span><span class="tag">${esc(c.tag || "")}</span></div><div class="rows">${rows}</div></div></div>`;
+                    + `<span class="column">${esc(name)}</span><span class="key">${esc(num)}</span><span class="type">${esc(type)}</span></div>`).join("");
+                return `<div><div class="card-label">${esc(label)}</div><div class="${cls}" role="group" aria-label="${esc(label)} ${esc(c.name)}${c.tag ? ", " + esc(c.tag) : ""}">`
+                    + `<div class="table-card-head"><span class="table-card-name">${esc(c.name)}</span><span class="tag">${esc(c.tag || "")}</span></div><div class="rows">${rows}</div></div></div>`;
             };
             const board = list => `<div class="board">${list.map(l => card(l.c, l.label, l.ext)).join("")}</div>`;
 
             const blocks = apis.map((a, i) => `<section class="method" id="api-${esc(a.id)}">`
-                + `<h2><span class="n">${i + 1}.</span><code>${esc(a.name)}</code><span class="tag${a.tag === "new" ? " write" : ""}">${esc(a.tag)}</span></h2>`
-                + `<p class="sub">${esc(a.route)} · permission ${esc(a.perm)}</p>`
+                + `<h2><span class="number">${i + 1}.</span><code>${esc(a.name)}</code><span class="tag${a.tag === "new" ? " write" : ""}">${esc(a.tag)}</span></h2>`
+                + `<p class="subtitle">${esc(a.route)} · permission ${esc(a.perm)}</p>`
                 + board([{ c: a.req, label: "request", ext: a.ext }, { c: a.res, label: "response", ext: a.ext }])
                 + `</section>`);
             // Shared types: one last block, two cards per line.
             if (types.length) blocks.push(`<section class="method" id="api-shared-types">`
-                + `<h2><span class="n">${apis.length + 1}.</span>Shared types</h2><p class="sub">Enums and nested messages used by more than one API.</p>`
+                + `<h2><span class="number">${apis.length + 1}.</span>Shared types</h2><p class="subtitle">Enums and nested messages used by more than one API.</p>`
                 + board(types.map(t => ({ c: t, label: /enum/.test(t.tag) ? "enum" : "message" }))) + `</section>`);
             document.getElementById("board").innerHTML = blocks.join("");
         })(API);

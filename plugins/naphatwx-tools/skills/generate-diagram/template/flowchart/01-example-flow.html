@@ -114,14 +114,14 @@
     :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
     .label-note { font-weight: 400; }
     /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-    .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-    .sc-kind.basic { color: var(--accent); }
-    .sc-kind.exception { color: var(--warn); }
+    .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+    .scenario-kind.basic { color: var(--accent); }
+    .scenario-kind.exception { color: var(--warn); }
     /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-    .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-    .refs-chip:hover { background: var(--hover); }
-    .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-    .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+    .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+    .references-chip:hover { background: var(--hover); }
+    .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+    .references-chip[aria-expanded="false"] + .references-ids { display: none; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -143,8 +143,8 @@
         body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
         pre, figure, img, svg, tr { break-inside: avoid; }
         h1, h2, h3 { break-after: avoid; }
-        .refs-chip { display: none !important; }
-        .refs-ids { display: inline !important; }
+        .references-chip { display: none !important; }
+        .references-ids { display: inline !important; }
     }
     /* theme:pdf:end */
 
@@ -159,10 +159,10 @@
     .diagram { overflow-x: auto; }
     .diagram svg { display: block; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
     @media (max-width: 640px) { body { padding: 1.5rem 1rem; } }
-    .conn { fill: none; stroke: var(--connector); stroke-width: 1.6; }
-    .ah { fill: var(--connector); }
+    .connector { fill: none; stroke: var(--connector); stroke-width: 1.6; }
+    .arrowhead { fill: var(--connector); }
     .exit { fill: var(--text-3); font-size: var(--fs-dia-sub); }
-    .edge-label-bg { fill: var(--surface); }
+    .edge-label-background { fill: var(--surface); }
     .node text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; text-anchor: middle; }
     .node .detail { fill: var(--text-2); font-family: var(--mono); font-size: var(--fs-dia-sub); font-weight: 400; }
     .pill { fill: var(--bg); stroke: var(--line-3); stroke-width: 1.4; }
@@ -179,10 +179,10 @@
         <title id="example-flow-chart-title">Example flow: flowchart, 7 nodes</title>
         <desc id="example-flow-chart-desc">Open the form, check the thing.edit permission, validate the name, save it with CreateThing as ACTIVE, or show INVALID_ARGUMENT and retry.</desc>
         <defs>
-          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="arrowhead" d="M0,0 L10,5 L0,10 z"/></marker>
         </defs>
         <!-- Connectors first, behind nodes. The retry loop enters "Name valid?" on its own edge, not on the Yes connector. -->
-        <g class="conn" marker-end="url(#ah)">
+        <g class="connector" marker-end="url(#ah)">
           <path d="M380,56 V84"/>
           <path d="M500,134 H578"/>
           <path d="M380,182 V214"/>
@@ -193,11 +193,11 @@
         </g>
         <!-- Exit labels center on their segment's midpoint (data-cx): above a level segment, on a vertical one.
              The page script sizes each box to its text. -->
-        <g class="edge-label" data-cx="539"><rect class="edge-label-bg" x="525" y="114" width="28" height="16" rx="3"/><text class="exit" x="539" y="126" text-anchor="middle">No</text></g>
-        <g class="edge-label" data-cx="380"><rect class="edge-label-bg" x="364" y="190" width="32" height="16" rx="3"/><text class="exit" x="380" y="202" text-anchor="middle">Yes</text></g>
-        <g class="edge-label" data-cx="539"><rect class="edge-label-bg" x="523" y="244" width="32" height="16" rx="3"/><text class="exit" x="539" y="256" text-anchor="middle">Yes</text></g>
-        <g class="edge-label" data-cx="231"><rect class="edge-label-bg" x="217" y="244" width="28" height="16" rx="3"/><text class="exit" x="231" y="256" text-anchor="middle">No</text></g>
-        <g class="edge-label" data-cx="222.5"><rect class="edge-label-bg" x="202" y="180" width="41" height="16" rx="3"/><text class="exit" x="222.5" y="192" text-anchor="middle">Retry</text></g>
+        <g class="edge-label" data-cx="539"><rect class="edge-label-background" x="525" y="114" width="28" height="16" rx="3"/><text class="exit" x="539" y="126" text-anchor="middle">No</text></g>
+        <g class="edge-label" data-cx="380"><rect class="edge-label-background" x="364" y="190" width="32" height="16" rx="3"/><text class="exit" x="380" y="202" text-anchor="middle">Yes</text></g>
+        <g class="edge-label" data-cx="539"><rect class="edge-label-background" x="523" y="244" width="32" height="16" rx="3"/><text class="exit" x="539" y="256" text-anchor="middle">Yes</text></g>
+        <g class="edge-label" data-cx="231"><rect class="edge-label-background" x="217" y="244" width="28" height="16" rx="3"/><text class="exit" x="231" y="256" text-anchor="middle">No</text></g>
+        <g class="edge-label" data-cx="222.5"><rect class="edge-label-background" x="202" y="180" width="41" height="16" rx="3"/><text class="exit" x="222.5" y="192" text-anchor="middle">Retry</text></g>
         <g class="node"><rect class="pill" x="300" y="12" width="160" height="44" rx="22"/><text x="380" y="30">Open the form</text><text class="detail" x="380" y="48">/things/:id</text></g>
         <g class="node"><polygon class="decision" points="380,86 500,134 380,182 260,134"/><text x="380" y="129">Can edit?</text><text class="detail" x="380" y="149">thing.edit</text></g>
         <g class="node"><rect class="pill" x="580" y="112" width="160" height="44" rx="22"/><text x="660" y="130">No Edit button</text><text class="detail" x="660" y="148">read-only view</text></g>
@@ -248,9 +248,9 @@
             text.setAttribute('x', r1(cx));
             text.setAttribute('text-anchor', 'middle');
             const left = cx - w / 2 - PAD;
-            const bg = g.querySelector(':scope > .edge-label-bg');
+            const bg = g.querySelector(':scope > .edge-label-background');
             if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
-            const num = g.querySelector(':scope > .edge-label-num');
+            const num = g.querySelector(':scope > .edge-label-number');
             if (num) {
                 num.removeAttribute('transform');
                 try {

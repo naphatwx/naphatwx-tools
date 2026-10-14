@@ -105,11 +105,11 @@
         body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
         pre, figure, img, svg, tr { break-inside: avoid; }
         h1, h2, h3 { break-after: avoid; }
-        .refs-chip { display: none !important; }
-        .refs-ids { display: inline !important; }
+        .references-chip { display: none !important; }
+        .references-ids { display: inline !important; }
     }
     /* theme:pdf:end */
-    .edge-label-bg { fill: var(--surface); }
+    .edge-label-background { fill: var(--surface); }
 </style>
 <script>
     /* theme:pdf-js:start */
@@ -151,9 +151,9 @@
             text.setAttribute('x', r1(cx));
             text.setAttribute('text-anchor', 'middle');
             const left = cx - w / 2 - PAD;
-            const bg = g.querySelector(':scope > .edge-label-bg');
+            const bg = g.querySelector(':scope > .edge-label-background');
             if (bg) { bg.setAttribute('x', r1(left)); bg.setAttribute('width', r1(w + 2 * PAD)); }
-            const num = g.querySelector(':scope > .edge-label-num');
+            const num = g.querySelector(':scope > .edge-label-number');
             if (num) {
                 num.removeAttribute('transform');
                 try {

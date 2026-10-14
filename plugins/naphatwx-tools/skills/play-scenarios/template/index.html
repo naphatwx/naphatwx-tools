@@ -117,14 +117,14 @@
         :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
         .label-note { font-weight: 400; }
         /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-        .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-        .sc-kind.basic { color: var(--accent); }
-        .sc-kind.exception { color: var(--warn); }
+        .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+        .scenario-kind.basic { color: var(--accent); }
+        .scenario-kind.exception { color: var(--warn); }
         /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-        .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-        .refs-chip:hover { background: var(--hover); }
-        .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-        .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+        .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+        .references-chip:hover { background: var(--hover); }
+        .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+        .references-chip[aria-expanded="false"] + .references-ids { display: none; }
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -146,8 +146,8 @@
             body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
             pre, figure, img, svg, tr { break-inside: avoid; }
             h1, h2, h3 { break-after: avoid; }
-            .refs-chip { display: none !important; }
-            .refs-ids { display: inline !important; }
+            .references-chip { display: none !important; }
+            .references-ids { display: inline !important; }
         }
         /* theme:pdf:end */
 
@@ -168,7 +168,7 @@
         h1 { font-size: var(--fs-h1); line-height: 1.15; }
         h2 { font-size: var(--fs-h2); line-height: 1.25; }
         h3 { font-size: var(--fs-h3); line-height: 1.3; }
-        .t-code { font-size: var(--fs-code); }
+        .code-text { font-size: var(--fs-code); }
         .link { color: var(--accent); text-decoration: none; }
         .link:hover { text-decoration: underline; }
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
@@ -177,8 +177,8 @@
         /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
            the middle column shrinks to the frame's real width (--frame-w, set by fit()) and the side cards fill the rest;
            on mid widths the guide tops the side list: the open scenario matters more than the others */
-        .uc-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: minmax(0, 1fr) var(--frame-w, var(--frame-col)) minmax(0, 1fr); grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
-        .uc-row > .tabs { grid-area: tabs; } .uc-row > .card { grid-area: card; } .uc-row > .guide { grid-area: guide; }
+        .use-case-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: minmax(0, 1fr) var(--frame-w, var(--frame-col)) minmax(0, 1fr); grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
+        .use-case-row > .tabs { grid-area: tabs; } .use-case-row > .card { grid-area: card; } .use-case-row > .guide { grid-area: guide; }
         /* side cards match the frame's top and height (set by fit()); longer content scrolls inside */
         .tabs, .guide { position: sticky; top: 16px; height: var(--frame-h, auto); margin-top: var(--frame-top, 0); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
         .tabs { display: flex; flex-direction: column; overflow-y: hidden; }
@@ -186,26 +186,26 @@
         .tabs-title { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
         .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 4px; }
         /* title, refs chip and plan link share one line; they wrap under the title on narrow screens */
-        .uc-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+        .use-case-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
         /* the result stays on top with its own fill; the guide text below it scrolls on its own */
         .guide { display: flex; flex-direction: column; overflow-y: hidden; }
         .guide-result { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
         .guide-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 12px; }
-        @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .uc-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs, .guide, .guide-body { overflow-y: visible; } }
-        @media (max-width: 900px) { :root { --side-l: 0px; } .uc-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
+        @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .use-case-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs, .guide, .guide-body { overflow-y: visible; } }
+        @media (max-width: 900px) { :root { --side-l: 0px; } .use-case-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
         .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
-        .tab-n, .tab-s { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
-        .tab-t { flex: 1; min-width: 0; }
+        .tab-number, .tab-surface { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
+        .tab-title { flex: 1; min-width: 0; }
         .tab:hover { color: var(--text); background: var(--hover); }
         /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
-        .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-n, .tab[aria-selected="true"] .tab-s { color: var(--bg); }
+        .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-number, .tab[aria-selected="true"] .tab-surface { color: var(--bg); }
         .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
         /* the number is a status disc: outlined until marked, then a solid green check or red cross */
         .tab { align-items: center; }
-        .tab-n svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-        .tab-n.pass, .tab[aria-selected="true"] .tab-n.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
-        .tab-n.fail, .tab[aria-selected="true"] .tab-n.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
-        .tab[aria-selected="true"] .tab-n { border-color: var(--bg); }
+        .tab-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-number.pass, .tab[aria-selected="true"] .tab-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
+        .tab-number.fail, .tab[aria-selected="true"] .tab-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
+        .tab[aria-selected="true"] .tab-number { border-color: var(--bg); }
         .tabs-title { display: flex; flex-direction: column; gap: 2px; }
         /* "Scenarios" and the use case's Clear share the title line */
         .tabs-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -214,28 +214,28 @@
         .tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
         .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
         /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
-        .result-btn { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
-        .result-btn:hover { background: var(--hover); }
-        .result-btn.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
-        .result-btn.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
+        .result-button { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+        .result-button:hover { background: var(--hover); }
+        .result-button.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
+        .result-button.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
         .note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
-        .res-table { width: 100%; border-collapse: collapse; }
-        .res-table th, .res-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
-        .res-table th { border-top: 0; }
-        .st-pass { color: var(--ok); } .st-fail { color: var(--bad); } .st-none { color: var(--text-3); }
+        .result-table { width: 100%; border-collapse: collapse; }
+        .result-table th, .result-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
+        .result-table th { border-top: 0; }
+        .status-pass { color: var(--ok); } .status-fail { color: var(--bad); } .status-none { color: var(--text-3); }
         .frame { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); overflow: hidden; }
         .toolbar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: var(--fs-meta); background: var(--surface-2); border-bottom: 1px solid var(--line); }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); }
         .url { font-family: var(--mono); padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-        .btn-ghost { padding: 4px 8px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
-        .btn-ghost:hover { background: var(--hover); }
+        .button-ghost { padding: 4px 8px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
+        .button-ghost:hover { background: var(--hover); }
         .rows > * + * { border-top: 1px solid var(--line); }
         /* the screen renders at desktop width and is scaled down to the frame */
-        .fit { position: relative; overflow: hidden; }
+        .screen-fit { position: relative; overflow: hidden; }
         /* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
         @media print {
             .page { width: auto; margin: 0; padding: 16px; }
-            .uc-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
+            .use-case-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
             .guide { position: static; height: auto; margin-top: 0; max-height: none; }
             .guide, .guide-body { overflow: visible; }
             .guide-result { display: none; }
@@ -249,13 +249,13 @@
         /* theme:scrollbar:end */
         .role-pill { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: var(--neutral-soft); border-radius: 999px; }
         /* surface tag: ui is played by hand; mcp, api and job by your AI agent */
-        .tab-s { flex: none; text-transform: uppercase; }
+        .tab-surface { flex: none; text-transform: uppercase; }
         /* a skipped scenario keeps its place in the tree, dimmed, with a dash in its disc */
-        .tab.skipped .tab-t { color: var(--text-3); text-decoration: line-through; }
-        .tab-n.skip { border-style: dashed; }
-        .tab[aria-selected="true"].skipped .tab-t { color: var(--bg); }
-        .tab-n { display: grid; place-items: center; flex: none; width: 26px; height: 26px; min-width: 0; border: 1.5px solid var(--line-3); border-radius: 50%; }
-        .fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--bg); }
+        .tab.skipped .tab-title { color: var(--text-3); text-decoration: line-through; }
+        .tab-number.skip { border-style: dashed; }
+        .tab[aria-selected="true"].skipped .tab-title { color: var(--bg); }
+        .tab-number { display: grid; place-items: center; flex: none; width: 26px; height: 26px; min-width: 0; border: 1.5px solid var(--line-3); border-radius: 50%; }
+        .screen-fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--bg); }
         /* covers the frame while a seed runs, when it failed, or before the first play */
         .overlay { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; background: var(--surface); }
         .overlay[hidden] { display: none; }
@@ -274,11 +274,11 @@
         .call > div > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
         .call > div > div:only-child { grid-column: 1 / -1; }
         @media (max-width: 900px) { .call > div { grid-template-columns: minmax(0, 1fr); } }
-        .call .ok { color: var(--ok); } .call .err { color: var(--bad); }
+        .call .ok { color: var(--ok); } .call .error { color: var(--bad); }
         .api-lookup { padding: 8px 12px; color: var(--text-2); border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); }
         .banner { padding: 10px 14px; color: var(--text); background: var(--warn-soft); border: 1px solid var(--warn); border-radius: var(--radius-lg); }
         @media print {
-            .tabs, .btn-ghost, .overlay, .result-ctl { display: none !important; }
+            .tabs, .button-ghost, .overlay, .result-control { display: none !important; }
         }
     </style>
     <script src="../use-cases.js"></script>
@@ -335,9 +335,9 @@
         // trace IDs ("US4 · AC4") as a "2 refs" chip + the hidden IDs; one click handler toggles every chip
         const refsChip = refs => {
             const n = String(refs || '').split(' · ').filter(s => s.trim()).length;
-            return n ? `<button type="button" class="refs-chip" aria-expanded="false" title="Show trace IDs">${n} ref${n > 1 ? 's' : ''}</button><span class="refs-ids t-code font-mono meta">${esc(refs)}</span>` : '';
+            return n ? `<button type="button" class="references-chip" aria-expanded="false" title="Show trace IDs">${n} ref${n > 1 ? 's' : ''}</button><span class="references-ids code-text font-mono meta">${esc(refs)}</span>` : '';
         };
-        document.addEventListener('click', e => { const c = e.target.closest('.refs-chip'); if (c) c.setAttribute('aria-expanded', String(c.getAttribute('aria-expanded') !== 'true')); });
+        document.addEventListener('click', e => { const c = e.target.closest('.references-chip'); if (c) c.setAttribute('aria-expanded', String(c.getAttribute('aria-expanded') !== 'true')); });
         const scsOf = ucId => SCENARIOS.filter(s => s.useCase === ucId);
         const playable = s => !s.skip;
         const SURFACE = { ui: 'Played by hand on the screen', mcp: 'Played by your AI agent over MCP', api: 'Played by your AI agent over the API', job: 'Played by your AI agent: runs the job' };
@@ -394,7 +394,7 @@
         function mark(id, status) {
             setResult(id, { status: results[id]?.status === status ? '' : status });
             const block = document.querySelector(`section[data-use-case="${byId(id).useCase}"]`);
-            block.querySelectorAll('.result-btn').forEach(b => b.setAttribute('aria-pressed', String(results[id].status === b.dataset.status)));
+            block.querySelectorAll('.result-button').forEach(b => b.setAttribute('aria-pressed', String(results[id].status === b.dataset.status)));
         }
 
         // ---------------------------------------------------------------- one block per use case
@@ -402,19 +402,19 @@
         document.getElementById('use-cases').innerHTML = USE_CASES.map(uc => {
             const scs = scsOf(uc.id);
             const head = `
-              <div class="uc-head mb-2">
+              <div class="use-case-head mb-2">
                 <h2 class="font-bold"><span class="meta mr-2">${uc.id}</span>${esc(uc.title)}</h2>
-                ${refsChip(uc.refs)}<a href="../overview.html#uc-${nn(uc.id)}" class="link t-code">plan</a>
+                ${refsChip(uc.refs)}<a href="../overview.html#uc-${nn(uc.id)}" class="link code-text">plan</a>
               </div>`;
             heads[uc.id] = head;
             if (!scs.length) return `<section id="uc-${nn(uc.id)}">${head}<p class="muted">${esc(uc.none || 'No scenario to play.')}</p></section>`;
             return `
               <section id="uc-${nn(uc.id)}" data-use-case="${uc.id}">
-                <div class="uc-row">
+                <div class="use-case-row">
                 <div class="tabs">
                   <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${nn(uc.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${uc.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${uc.id}"></span></div>
                   <div class="tab-list" role="tablist" aria-labelledby="sc-title-${nn(uc.id)}">
-                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab${s.skip ? ' skipped' : ''}" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"${s.skip ? ` title="Skipped: ${esc(s.skip)}"` : ''}>${s.skip ? `<span class="tab-n skip" aria-hidden="true">–</span>` : `<span class="tab-n" data-r="${s.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="tab-t">${esc(s.title)}${s.skip ? '<span class="sr-only"> (skipped)</span>' : ''}</span><span class="tab-s" title="${esc(SURFACE[s.surface] || '')}">${esc(s.surface || '')}</span></button>`).join('')}
+                  ${scs.map((s, i) => `<button type="button" role="tab" class="tab${s.skip ? ' skipped' : ''}" data-sc="${s.id}" aria-selected="false" onclick="pick('${s.id}', true)"${s.skip ? ` title="Skipped: ${esc(s.skip)}"` : ''}>${s.skip ? `<span class="tab-number skip" aria-hidden="true">–</span>` : `<span class="tab-number" data-r="${s.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="tab-title">${esc(s.title)}${s.skip ? '<span class="sr-only"> (skipped)</span>' : ''}</span><span class="tab-surface" title="${esc(SURFACE[s.surface] || '')}">${esc(s.surface || '')}</span></button>`).join('')}
                   </div>
                 </div>
                 <div class="card"></div>
@@ -431,39 +431,39 @@
             if (run) history.replaceState(null, '', '#sc-' + id);
             const r = results[id] || {};
             block.querySelector('.card').innerHTML = `${heads[sc.useCase]}
-              <div class="title-row"><h3 class="font-semibold">${esc(sc.title)}</h3>${sc.kind ? `<span class="sc-kind ${esc(sc.kind)}">${esc(sc.kind)}</span>` : ''}${!sc.skip && LOGIN.type !== 'none' && roleOf(sc) ? `<span class="role-pill" title="Signs in as this role">${esc(roleOf(sc))}</span>` : ''}${refsChip(sc.story)}</div>
+              <div class="title-row"><h3 class="font-semibold">${esc(sc.title)}</h3>${sc.kind ? `<span class="scenario-kind ${esc(sc.kind)}">${esc(sc.kind)}</span>` : ''}${!sc.skip && LOGIN.type !== 'none' && roleOf(sc) ? `<span class="role-pill" title="Signs in as this role">${esc(roleOf(sc))}</span>` : ''}${refsChip(sc.story)}</div>
               <div class="frame mt-2">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
                   <span class="url">${esc(screenUrl(sc))}</span>
                   <a href="${esc(screenSrc(sc))}" target="_blank" rel="noopener" class="link whitespace-nowrap open-link"${sc.skip || (sc.prompt && !sc.seed) ? ' hidden' : ''}>Open ↗</a>
                   <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
-                  <button type="button" onclick="pick('${sc.id}', true)" class="btn-ghost"${sc.skip || (sc.prompt && !sc.seed) ? ' hidden' : ''} title="${sc.seed ? 'Create new data and reload' : 'Reload'}">↻ Restart</button>
+                  <button type="button" onclick="pick('${sc.id}', true)" class="button-ghost"${sc.skip || (sc.prompt && !sc.seed) ? ' hidden' : ''} title="${sc.seed ? 'Create new data and reload' : 'Reload'}">↻ Restart</button>
                 </div>
-                <div class="fit"><div class="overlay" hidden></div>${sc.skip ? '' : sc.prompt ? `<div class="api">${apiBody(sc)}</div>` : `<iframe title="${esc(sc.title)} — running app" width="${SCREEN_W}" height="${SCREEN_H}"></iframe>`}</div>
+                <div class="screen-fit"><div class="overlay" hidden></div>${sc.skip ? '' : sc.prompt ? `<div class="api">${apiBody(sc)}</div>` : `<iframe title="${esc(sc.title)} — running app" width="${SCREEN_W}" height="${SCREEN_H}"></iframe>`}</div>
               </div>`;
             block.querySelector('.guide').innerHTML = `
               <div class="guide-result">
               <div class="label mb-1">Result</div>
               ${sc.skip ? `<p class="meta">Skipped: not played live. ${esc(sc.skip)}</p>` : `
-              <div class="result-ctl flex gap-2 mb-2">
-                <button type="button" class="result-btn pass" data-status="pass" aria-pressed="${r.status === 'pass'}" onclick="mark('${sc.id}', 'pass')">✓ Pass</button>
-                <button type="button" class="result-btn fail" data-status="fail" aria-pressed="${r.status === 'fail'}" onclick="mark('${sc.id}', 'fail')">✗ Fail</button>
+              <div class="result-control flex gap-2 mb-2">
+                <button type="button" class="result-button pass" data-status="pass" aria-pressed="${r.status === 'pass'}" onclick="mark('${sc.id}', 'pass')">✓ Pass</button>
+                <button type="button" class="result-button fail" data-status="fail" aria-pressed="${r.status === 'fail'}" onclick="mark('${sc.id}', 'fail')">✗ Fail</button>
               </div>
-              <textarea class="note result-ctl" aria-label="Note for ${esc(sc.title)}" placeholder="What you saw, if it differs" oninput="setResult('${sc.id}', { note: this.value })">${esc(r.note)}</textarea>`}
+              <textarea class="note result-control" aria-label="Note for ${esc(sc.title)}" placeholder="What you saw, if it differs" oninput="setResult('${sc.id}', { note: this.value })">${esc(r.note)}</textarea>`}
               </div>
               <div class="guide-body">
               ${sc.skip ? '' : `<div class="label mt-4 mb-1">How to play</div>
               <ol class="list-decimal pl-5 space-y-1 muted steps">${list((sc.steps || []).map(t => fill(sc, t)))}</ol>`}
               <div class="label mt-4 mb-1">What you should see</div>
               <ul class="list-disc pl-5 space-y-1 muted">${list(sc.expect)}</ul>
-              ${sc.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="t-code meta break-words">${esc(sc.seed)}</code>` : ''}
+              ${sc.seed ? `<div class="label mt-4 mb-1">Seed</div><code class="code-text meta break-words">${esc(sc.seed)}</code>` : ''}
               </div>`;
             fit(block);
             if (sc.skip) return overlay(block, `<p class="muted">Not played live</p><p>${esc(sc.skip)}</p>`);
             if (sc.prompt) { if (run) load(sc, block); return; }
             if (run || !needsServer(sc)) load(sc, block);
-            else overlay(block, `<p class="muted">${sc.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${esc(roleOf(sc))} first.`}</p><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">▶ Open</button>`);
+            else overlay(block, `<p class="muted">${sc.seed ? 'Opening this scenario creates new data for it first.' : `Opening this scenario signs in as ${esc(roleOf(sc))} first.`}</p><button type="button" class="button-ghost" onclick="pick('${sc.id}', true)">▶ Open</button>`);
         }
 
         function overlay(block, html) {
@@ -476,11 +476,11 @@
             if (sc.prompt) return loadApi(sc, block, token);
             const frame = block.querySelector('iframe');
             frame.src = 'about:blank';
-            if (needsServer(sc)) overlay(block, sc.seed ? `<p class="muted">Creating data…</p><code class="t-code meta">${esc(sc.seed)}</code>` : `<p class="muted">Signing in as ${esc(roleOf(sc))}…</p>`);
+            if (needsServer(sc)) overlay(block, sc.seed ? `<p class="muted">Creating data…</p><code class="code-text meta">${esc(sc.seed)}</code>` : `<p class="muted">Signing in as ${esc(roleOf(sc))}…</p>`);
             const r = await play(sc);
             if (loads[sc.useCase] !== token) return;
             if (!r.ok) {
-                overlay(block, `<p class="bad">${sc.seed ? 'Seed' : 'Sign-in'} failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</p><pre>${esc(r.output)}</pre><button type="button" class="btn-ghost" onclick="pick('${sc.id}', true)">↻ Try again</button>`);
+                overlay(block, `<p class="bad">${sc.seed ? 'Seed' : 'Sign-in'} failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</p><pre>${esc(r.output)}</pre><button type="button" class="button-ghost" onclick="pick('${sc.id}', true)">↻ Try again</button>`);
                 return;
             }
             seeded(sc, block, r);
@@ -501,11 +501,11 @@
         const pretty = v => typeof v === 'string' ? v : JSON.stringify(v, null, 2);
         /** One recorded call: an MCP tools/call, a command (a job), or a lookup note. */
         function callHtml(c, i) {
-            if (c.lookup) return `<div class="api-lookup t-code">${esc(c.lookup)}</div>`;
+            if (c.lookup) return `<div class="api-lookup code-text">${esc(c.lookup)}</div>`;
             c = c.arguments || c.command ? c : { ...c, arguments: { operation: c.operation, params: c.params } }; // older shape
             const what = c.command ? '$ ' + c.command : [c.tool, c.arguments?.operation].filter(Boolean).join(' · ');
             const req = c.command ? '' : `<div><div class="label">Request · tools/call</div><pre>${esc(pretty({ name: c.tool, arguments: c.arguments }))}</pre></div>`;
-            return `<details class="call"><summary><span class="meta">${i + 1}</span><span>${esc(what)}</span>${c.role ? `<span class="meta">as ${esc(c.role)}</span>` : ''}<span class="${c.isError ? 'err' : 'ok'}">${c.isError ? '✗ error' : '✓ answer'}</span></summary>
+            return `<details class="call"><summary><span class="meta">${i + 1}</span><span>${esc(what)}</span>${c.role ? `<span class="meta">as ${esc(c.role)}</span>` : ''}<span class="${c.isError ? 'error' : 'ok'}">${c.isError ? '✗ error' : '✓ answer'}</span></summary>
               <div>${req}<div><div class="label">${c.command ? 'Output' : 'Response'}${c.isError ? ' · isError true' : ''}</div><pre>${esc(pretty(c.response))}</pre></div></div></details>`;
         }
         function apiBody(sc) {
@@ -514,9 +514,9 @@
             let n = 0;
             return `<section class="space-y-2">
                 <div class="flex items-center gap-2 flex-wrap"><span class="label">Prompt for your AI agent</span>
-                  ${sc.seed ? `<button type="button" class="btn-ghost result-ctl" onclick="pick('${sc.id}', true)">▶ Seed</button>` : ''}
+                  ${sc.seed ? `<button type="button" class="button-ghost result-control" onclick="pick('${sc.id}', true)">▶ Seed</button>` : ''}
                   ${slotsOf(sc).map(k => `<label class="meta">${esc(k)} <input class="slot" data-slot="${esc(k)}" value="${esc(values[sc.id]?.[k] || '')}" oninput="setValue('${sc.id}', this.dataset.slot, this.value)"></label>`).join('')}
-                  <button type="button" class="btn-ghost result-ctl ml-auto" onclick="navigator.clipboard.writeText(promptText(byId('${sc.id}'))).then(() => { this.textContent = 'Copied'; setTimeout(() => { this.textContent = 'Copy prompt'; }, 1500); })">Copy prompt</button>
+                  <button type="button" class="button-ghost result-control ml-auto" onclick="navigator.clipboard.writeText(promptText(byId('${sc.id}'))).then(() => { this.textContent = 'Copied'; setTimeout(() => { this.textContent = 'Copy prompt'; }, 1500); })">Copy prompt</button>
                   <span class="api-status meta w-full"></span></div>
                 <div class="prompt">${esc(promptText(sc))}</div></section>
               <section class="space-y-2"><div class="label">Recorded calls${calls.length ? `<span class="label-note"> · ${calls.filter(c => !c.lookup).length} calls${run.by ? ', ' + esc(run.by) : ''}${run.at ? ', ' + esc(run.at) : ''}</span>` : ''}</div>
@@ -525,10 +525,10 @@
         async function loadApi(sc, block, token) {
             const status = t => { const el = block.querySelector('.api-status'); if (el) el.innerHTML = t; };
             if (!needsServer(sc)) return;
-            status(`Creating data… <code class="t-code">${esc(sc.seed)}</code>`);
+            status(`Creating data… <code class="code-text">${esc(sc.seed)}</code>`);
             const r = await play(sc);
             if (loads[sc.useCase] !== token) return;
-            if (!r.ok) { status(`<span class="st-fail">Seed failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</span><pre>${esc(r.output)}</pre>`); return; }
+            if (!r.ok) { status(`<span class="status-fail">Seed failed${r.code != null ? ` (exit ${esc(r.code)})` : ''}</span><pre>${esc(r.output)}</pre>`); return; }
             seeded(sc, block, r);
             block.querySelector('.prompt').textContent = promptText(sc);
             const got = Object.entries(r.values || {}).map(([k, v]) => `${labelOf(k)} ${v}`).join(', ');
@@ -536,9 +536,9 @@
         }
 
         function fit(block) {
-            const box = block.querySelector('.fit'); if (!box) return;
+            const box = block.querySelector('.screen-fit'); if (!box) return;
             // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
-            const row = block.querySelector('.uc-row');
+            const row = block.querySelector('.use-case-row');
             row.style.removeProperty('--frame-w'); // the full column, not the last fit's frame
             const s = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_W);
             const ifr = box.querySelector('iframe'); if (ifr) ifr.style.transform = `scale(${s})`;
@@ -549,7 +549,7 @@
             row.style.setProperty('--frame-h', frame.offsetHeight + 'px');
             row.style.setProperty('--frame-top', frame.getBoundingClientRect().top - row.getBoundingClientRect().top + 'px');
             // the text column (page title, results) takes the frame's real width, so all of it lines up
-            const ws = [...document.querySelectorAll('.uc-row')].map(r => parseFloat(r.style.getPropertyValue('--frame-w'))).filter(Boolean);
+            const ws = [...document.querySelectorAll('.use-case-row')].map(r => parseFloat(r.style.getPropertyValue('--frame-w'))).filter(Boolean);
             document.documentElement.style.setProperty('--text-w', Math.max(...ws) + 'px');
             block.querySelector('.scale-label').textContent = ifr ? `${Math.round(s * 100)}% of ${SCREEN_W} px` : '';
         }
@@ -563,9 +563,9 @@
             fail: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
         };
         function renderResults() {
-            document.querySelectorAll('.tab-n[data-r]').forEach(el => {
+            document.querySelectorAll('.tab-number[data-r]').forEach(el => {
                 const st = results[el.dataset.r]?.status || '';
-                el.className = 'tab-n ' + st;
+                el.className = 'tab-number ' + st;
                 el.innerHTML = st ? `${ICON[st]}<span class="sr-only">${el.dataset.n}, ${STATUS[st]}</span>` : el.dataset.n;
             });
             document.querySelectorAll('[data-count]').forEach(el => {
@@ -576,11 +576,11 @@
             const rows = SCENARIOS.map(s => ({ s, st: s.skip ? 'skip' : results[s.id]?.status || '', note: s.skip || results[s.id]?.note || '' }));
             const n = st => rows.filter(r => r.st === st).length;
             document.getElementById('results').innerHTML = `
-              <p class="mb-2"><span class="st-pass">${n('pass')} pass</span> · <span class="st-fail">${n('fail')} fail</span> · <span class="st-none">${n('')} not played</span> · ${n('skip')} skipped
-                <button type="button" class="btn-ghost ml-2 result-ctl" onclick="copyResults(this)">Copy as Markdown</button></p>
-              <div class="panel overflow-x-auto"><table class="res-table">
+              <p class="mb-2"><span class="status-pass">${n('pass')} pass</span> · <span class="status-fail">${n('fail')} fail</span> · <span class="status-none">${n('')} not played</span> · ${n('skip')} skipped
+                <button type="button" class="button-ghost ml-2 result-control" onclick="copyResults(this)">Copy as Markdown</button></p>
+              <div class="panel overflow-x-auto"><table class="result-table">
                 <tr><th>Use case</th><th>Scenario</th><th>Surface</th><th>Result</th><th>Note</th></tr>
-                ${rows.map(r => `<tr><td class="font-mono t-code meta">${r.s.useCase}</td><td><a class="link" href="#sc-${r.s.id}">${esc(r.s.title)}</a></td><td class="font-mono t-code meta">${esc(r.s.surface || '')}</td><td class="st-${r.st === 'skip' ? 'none' : r.st || 'none'} whitespace-nowrap">${STATUS[r.st]}</td><td class="muted">${esc(r.note)}</td></tr>`).join('')}
+                ${rows.map(r => `<tr><td class="font-mono code-text meta">${r.s.useCase}</td><td><a class="link" href="#sc-${r.s.id}">${esc(r.s.title)}</a></td><td class="font-mono code-text meta">${esc(r.s.surface || '')}</td><td class="status-${r.st === 'skip' ? 'none' : r.st || 'none'} whitespace-nowrap">${STATUS[r.st]}</td><td class="muted">${esc(r.note)}</td></tr>`).join('')}
               </table></div>`;
         }
         /** Clear: drop the Pass / Fail and notes of these scenarios, to test again. A cleared one does not take the AI's result back. */
@@ -593,7 +593,7 @@
             document.querySelectorAll('section[data-use-case]').forEach(b => {
                 const open = b.querySelector('[role=tab][aria-selected=true]');
                 if (!open || !ids.includes(open.dataset.sc)) return;
-                b.querySelectorAll('.result-btn').forEach(x => x.setAttribute('aria-pressed', 'false'));
+                b.querySelectorAll('.result-button').forEach(x => x.setAttribute('aria-pressed', 'false'));
                 const note = b.querySelector('.note'); if (note) note.value = '';
             });
         }

@@ -114,14 +114,14 @@
   :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
   .label-note { font-weight: 400; }
   /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-  .sc-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-  .sc-kind.basic { color: var(--accent); }
-  .sc-kind.exception { color: var(--warn); }
+  .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
+  .scenario-kind.basic { color: var(--accent); }
+  .scenario-kind.exception { color: var(--warn); }
   /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-  .refs-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
-  .refs-chip:hover { background: var(--hover); }
-  .refs-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
-  .refs-chip[aria-expanded="false"] + .refs-ids { display: none; }
+  .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+  .references-chip:hover { background: var(--hover); }
+  .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+  .references-chip[aria-expanded="false"] + .references-ids { display: none; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
@@ -143,8 +143,8 @@
       body:has(.float-bar) { --float-space: 0px; padding-bottom: 0; }
       pre, figure, img, svg, tr { break-inside: avoid; }
       h1, h2, h3 { break-after: avoid; }
-      .refs-chip { display: none !important; }
-      .refs-ids { display: inline !important; }
+      .references-chip { display: none !important; }
+      .references-ids { display: inline !important; }
   }
   /* theme:pdf:end */
 
@@ -166,12 +166,12 @@
 
   .summary-line .lead { font-weight: 600; }
   .summary-line .meta { font-size: var(--fs-meta); }
-  .summary-line .c-bad { color: var(--bad); }
+  .summary-line .color-bad { color: var(--bad); }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; }
   .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .empty-filter { margin-top: 16px; font-size: var(--fs-meta); }
   .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
-  .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+  .command code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
 
   /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
   .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
@@ -223,24 +223,24 @@
   .step { display: grid; grid-template-columns: 22px 2.5ch minmax(0, 1fr); gap: 4px 10px; padding: 8px 14px; cursor: pointer; transition: background-color .15s var(--ease); }
   .step:hover { background: var(--hover); }
   .step input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ok); cursor: pointer; }
-  .step .n { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
+  .step .number { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
   .step .body { display: grid; gap: 4px; min-width: 0; }
   /* Title line: status pills, then the step title. Detail, command and source sit below. */
   .step .line { display: flex; flex-direction: row; gap: 8px; align-items: center; }
   .step .line .pill { flex: none; }
   .step label { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; min-width: 0; }
   .step .detail { color: var(--text-2); overflow-wrap: anywhere; }
-  .step .cmd { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-  .step .cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+  .step .command { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .step .command code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
   .step.is-done { background: var(--ok-soft); }
   .step.is-done label { color: var(--text-3); text-decoration: line-through; font-weight: 500; }
-  .step.is-done .detail, .step.is-done .cmd { opacity: .7; }
+  .step.is-done .detail, .step.is-done .command { opacity: .7; }
   .empty { padding: 10px 14px; color: var(--text-3); }
 
   /* PDF: show every step, drop the buttons. */
   @media print {
     main { padding: 16px; max-width: none; }
-    .tools, .cmd button { display: none !important; }
+    .tools, .command button { display: none !important; }
     .steps > li[hidden] { display: block !important; }
     .step { break-inside: avoid; }
     .phase-head { break-after: avoid; }
@@ -248,7 +248,7 @@
 
   @media (max-width: 600px) {
     .step { grid-template-columns: 22px minmax(0, 1fr); }
-    .step .n { display: none; }
+    .step .number { display: none; }
   }
 </style>
 </head>
@@ -400,7 +400,7 @@ function render() {
       box.addEventListener('change', () => { state[id] = box.checked; save(state); update(); say((box.checked ? 'Done: ' : 'Not done: ') + s.text); });
       const row = el('div', { class: 'step' },
         box,
-        el('span', { class: 'n', 'aria-hidden': 'true' }, i + 1),
+        el('span', { class: 'number', 'aria-hidden': 'true' }, i + 1),
         el('div', { class: 'body' },
           el('div', { class: 'line' },
             s.risk === 'high' ? el('span', { class: 'pill tone-bad' }, el('span', { 'aria-hidden': 'true' }, '!'), 'high risk') : null,
@@ -408,7 +408,7 @@ function render() {
             s.tag ? el('span', { class: 'pill tone-neutral' }, TAGS[s.tag] || s.tag) : null,
             el('label', { for: boxId }, s.text)),
           s.detail ? el('div', { class: 'detail' }, s.detail) : null,
-          s.cmd ? el('div', { class: 'cmd' }, el('code', {}, s.cmd), copyBtn(s.cmd, 'command')) : null,
+          s.cmd ? el('div', { class: 'command' }, el('code', {}, s.cmd), copyBtn(s.cmd, 'command')) : null,
           s.source ? el('div', { class: 'meta' }, 'From ', el('code', {}, s.source)) : null));
       row.addEventListener('click', (e) => {
         if (e.target.closest('input, label, button, a, code')) return;

@@ -12,7 +12,7 @@ A flowchart shows one flow's logic: its steps, yes / no decisions, loops and end
 | Pill | Start, end, exit | `rect.pill rx="22"`: outlined, `--bg` fill, `--line-3` stroke |
 | Box | A step the user or system does | `rect.box rx="8"`: `--surface-3` fill, `--line-strong` stroke |
 | Diamond | A yes / no question | `polygon.decision`: `--accent-fill` fill, `--accent` stroke |
-| Arrow | Next step, loop back (retry, reset) | `.conn` path in `--connector` grey, with arrowhead |
+| Arrow | Next step, loop back (retry, reset) | `.connector` path in `--connector` grey, with arrowhead |
 
 - Shape carries the meaning; the diamond's blue is the only colour. Label text is `--text`, detail lines `--text-2` (mono), exit labels `--text-3`. Labels are 14px; detail lines and exit labels 12px.
 - Exit labels (`Yes`, `No`, `Retry`) are `.edge-label` groups (SKILL.md step 3), centered on the midpoint of the segment they label: just above a level segment, on a vertical one (the box hides the line behind the text).

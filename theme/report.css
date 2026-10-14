@@ -16,12 +16,12 @@ code { font-size: var(--fs-code); overflow-wrap: anywhere; }
 
 .summary-line .lead { font-weight: 600; }
 .summary-line .meta { font-size: var(--fs-meta); }
-.summary-line .c-bad { color: var(--bad); }
+.summary-line .color-bad { color: var(--bad); }
 .tools { display: flex; gap: 6px; flex-wrap: wrap; }
 .tools button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 .empty-filter { margin-top: 16px; font-size: var(--fs-meta); }
 .head-row { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
-.cmd code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
+.command code { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 8px; color: var(--text); }
 
 /* Disclosure is h2 > button, not <summary>: a summary flattens any heading inside it for screen readers. */
 .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
