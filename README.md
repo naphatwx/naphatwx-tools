@@ -94,7 +94,7 @@ Add `-g` to install for your user instead of the current project. Drop the `-a` 
 
 ## 🧩 Response Rules Hook
 
-The plugin ships a hook that injects chat formatting rules (lists only, `&nbsp;` between blocks). It is **on by default** and works in Claude Code only.
+The plugin ships a hook that injects chat formatting rules (plain language, `&nbsp;` between blocks). It is **on by default** and works in Claude Code only.
 
 To disable it, add this to your `~/.claude/settings.json` and start a new session:
 
@@ -107,4 +107,5 @@ To disable it, add this to your `~/.claude/settings.json` and start a new sessio
 ```
 
 - Full rules: `plugins/naphatwx-tools/hooks/response-rules.md` (loaded once at session start).
+- Parked rules (not loaded): `plugins/naphatwx-tools/hooks/response-rules-parked.md`.
 - A short reminder is added to every prompt.
