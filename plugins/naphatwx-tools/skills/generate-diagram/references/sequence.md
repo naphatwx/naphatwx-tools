@@ -48,7 +48,7 @@ SeqDiagrams.define("01-cut-new-version", {
 
 - `title` names the flow in the SVG's accessible name (`<title>: sequence diagram, N participants, M steps`); missing → the file id.
 - A step whose `from` and `to` are the same participant draws a self-call loop.
-- Actor names and message labels are 14px; actor subtitles, step numbers, notes, phase and frame labels are 12px. `render.js` spreads the participants until their boxes and message labels fit (`gap` is the minimum), and gives the SVG its own `width` / `height`: hosts draw it at 1:1, never scaled, and a box narrower than it scrolls sideways.
+- Actor names, message labels, actor subtitles, step numbers, notes, phase and frame labels are all 12px. `render.js` spreads the participants until their boxes and message labels fit (`gap` is the minimum), and gives the SVG its own `width` / `height`: hosts draw it at 1:1, never scaled, and a box narrower than it scrolls sideways.
 
 | Step | Meaning |
 |------|---------|

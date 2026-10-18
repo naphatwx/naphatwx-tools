@@ -7,9 +7,9 @@ var SeqDiagrams = (function () {
     const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const define = (id, spec) => { flows[id] = spec; };
     const MAX_LABEL_LENGTH = 40;
-    // Widths are estimated per character for 14px text (mono, sans, bold sans), on the wide side, for layout only;
+    // Widths are estimated per character for 12px text (mono, sans, bold sans), on the wide side, for layout only;
     // fitDiagramLabels then sizes each label box to its rendered text. NUMBER_WIDTH: room for the step number left of the box.
-    const MONO_CHAR_WIDTH = 8.6, SANS_CHAR_WIDTH = 7.9, BOLD_CHAR_WIDTH = 8.8, NUMBER_WIDTH = 24, LABEL_PADDING = 6, NUMBER_GAP = 4, LOOP_WIDTH = 36;
+    const MONO_CHAR_WIDTH = 7.4, SANS_CHAR_WIDTH = 6.8, BOLD_CHAR_WIDTH = 7.6, NUMBER_WIDTH = 24, LABEL_PADDING = 6, NUMBER_GAP = 4, LOOP_WIDTH = 36;
 
     function buildSvg(id, { title = id, actors, steps, gap = 160 }) {
         const TOP_MARGIN = 16, HEAD_HEIGHT = 52;
@@ -85,7 +85,7 @@ var SeqDiagrams = (function () {
             }
         }
         const height = y;
-        // width / height are the 1:1 size: hosts never scale it, so 14px labels render at 14px; a wider box scrolls.
+        // width / height are the 1:1 size: hosts never scale it, so 12px labels render at 12px; a wider box scrolls.
         const ariaName = `${title}: sequence diagram, ${actors.length} participants, ${stepNumber} steps`;
         const svgParts = [`<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="${escapeHtml(ariaName)}">`];
         actors.forEach(([actorId]) => svgParts.push(`<line class="lifeline" x1="${actorX[actorId]}" x2="${actorX[actorId]}" y1="${TOP_MARGIN + HEAD_HEIGHT}" y2="${height - 4}"/>`));

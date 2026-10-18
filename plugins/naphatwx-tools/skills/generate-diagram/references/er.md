@@ -23,7 +23,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
 - The `← Overview` link points at `../overview.html#database` for design-feature. No such page → remove the link.
 - It draws any number of tables; split by area only when one page gets hard to read (more than about 12 tables).
 - Each cardinality label (`N`, `1`) centers on the level stub it labels, from the table edge to the line's lane.
-- Table names and columns are 14px, tags, types, keys and cardinality 12px; tables share one width that fits their longest name, key and type. The diagram draws at 1:1, never scaled, and scrolls sideways when wider than the window; hovering or tabbing to a table traces its relations.
+- Table names, columns, tags, types, keys and cardinality are all 12px; tables share one width that fits their longest name, key and type. The diagram draws at 1:1, never scaled, and scrolls sideways when wider than the window; hovering or tabbing to a table traces its relations.
 
 ## Checks
 
