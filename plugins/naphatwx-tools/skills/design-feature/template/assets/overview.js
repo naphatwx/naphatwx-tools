@@ -221,7 +221,7 @@ const steps = slides.flatMap(slide => {
 let current = 0;
 const presenting = () => root.getAttribute("data-present") === "on";
 // ===== Present fit: the step's diagram box ends at the room above the bar. Diagrams draw at 1:1
-// (every label 12px), never scaled: a taller one scrolls in its box with a cue, a wider one sideways.
+// (every label 14px), never scaled: a taller one scrolls in its box with a cue, a wider one sideways.
 const fitted = new Set();
 function updateCue(box) {
     const cue = box.querySelector(":scope > .more-cue");

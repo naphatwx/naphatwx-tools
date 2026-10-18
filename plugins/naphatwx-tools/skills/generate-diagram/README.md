@@ -75,7 +75,7 @@ Rules the diagrams don't show:
 
 - Every name (RPC, endpoint, table, column, job, screen) comes from the source. Unknown → `TBD`.
 - Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split and say so.
-- Dark only, in the shared theme. All labels are 12px. Manual-mode files load nothing from the network.
+- Dark only, in the shared theme. Main labels are 14px, secondary lines 12px. Manual-mode files load nothing from the network.
 - It writes only the diagram files. It never edits the caller's page; it gives the embed snippet instead.
 - An ER diagram is its own page, opened by a link, not embedded.
 - Every diagram file has one Export PDF button, the same everywhere. It prints only that diagram, fitted to the page width. The page keeps room under its last line, so the button never covers the drawing.

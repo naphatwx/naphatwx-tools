@@ -14,7 +14,7 @@ A flowchart shows one flow's logic: its steps, yes / no decisions, loops and end
 | Diamond | A yes / no question | `polygon.decision`: `--accent-fill` fill, `--accent` stroke |
 | Arrow | Next step, loop back (retry, reset) | `.connector` path in `--connector` grey, with arrowhead |
 
-- Shape carries the meaning; the diamond's blue is the only colour. Label text is `--text`, detail lines `--text-2` (mono), exit labels `--text-3`. Labels, detail lines and exit labels are all 12px.
+- Shape carries the meaning; the diamond's blue is the only colour. Label text is `--text`, detail lines `--text-2` (mono), exit labels `--text-3`. Labels are 14px; detail lines and exit labels 12px.
 - Exit labels (`Yes`, `No`, `Retry`) are `.edge-label` groups (SKILL.md step 3), centered on the midpoint of the segment they label: just above a level segment, on a vertical one (the box hides the line behind the text).
 - Labels are sentence case: `Yes`, `No`, `Retry`.
 
