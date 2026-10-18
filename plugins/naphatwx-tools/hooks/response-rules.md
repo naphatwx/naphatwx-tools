@@ -18,3 +18,19 @@ Rule 1 also applies to files you write. Rule 2 is chat only.
    - Never between bullets of one list.
    - Never nest a header, table, or code block inside a bullet.
    - Check before sending: every block boundary has an `&nbsp;` line.
+
+## Target shape
+
+Shows only where `&nbsp;` goes. A block can be any format.
+
+```markdown
+Block
+
+&nbsp;
+
+Block
+
+&nbsp;
+
+Block
+```
