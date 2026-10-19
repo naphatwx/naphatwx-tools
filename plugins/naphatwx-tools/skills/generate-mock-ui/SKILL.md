@@ -162,7 +162,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 - One block per use case, in plan order. Head, one line: `UC<n> <use case name>`, a `N refs` chip (click shows the trace IDs on the same line; Export PDF prints them) and a `plan` link (`../overview.html#uc-NN`). With scenarios, the head tops the scenario list.
 - Every scenario of the use case gets a row in the list, in `use-cases.js` order. An `mcp`, `api` or `job` row is greyed (dashed disc). Opening it shows the frame with no screen: "No mock" and one line naming its surface ("MCP scenario — play it with play-scenarios or test it with e2e-test"); its details show only "What it should do" (`expect`), with no Pass / Fail. A use case with no scenario shows its `none` sentence.
 - Per use case, one row breaks out of the text column (`.use-case-row`, `100vw − 2 × gutter − 12px`, centered) with two columns:
-    - Right: the `.frame`, at `min(1920px, 80% of the row, row − 20rem − 24px)`, so the list never drops under 20rem.
+    - Right: the `.frame`, at `min(1920px, 70% of the row, row − 20rem − 24px)`, so the list never drops under 20rem.
     - Left: the sticky `.scenarios` card fills the rest. It matches the frame's height (`--frame-h`, set by `fit()`); a long list scrolls inside.
     - Under 1000px the list stacks above the frame, at its full height.
 - The list is an accordion of disclosure cards, the same design and slide as the deploy-plan, smoke-test and e2e-test rows (synced `theme:disclosure` and `theme:slide-js` blocks). Each `.scenario.disclosure` holds a `.disclosure-head` and a `.scenario-details` panel:
