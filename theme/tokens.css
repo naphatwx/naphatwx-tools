@@ -62,10 +62,9 @@
     --fs-meta: var(--fs-sm);
     --fs-code: var(--fs-sm);
     --fs-tag: var(--fs-xs);
-    /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12.
-       px, not rem, so the text size picker never outgrows the shapes */
-    --fs-dia: 14px;
-    --fs-dia-sub: 12px;
+    /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
+    --fs-dia: var(--fs-sm);
+    --fs-dia-sub: var(--fs-xs);
 
     /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px, 6xl 1152px, 7xl 1280px). Use these, not raw px */
     --max-w-md: 28rem;

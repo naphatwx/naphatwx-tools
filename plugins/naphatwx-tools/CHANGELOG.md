@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.234
+
+**Text size picker removed**
+
+- No page has a text size picker any more, html-document included. Export PDF stays.
+- theme: `addExportPdf(target, prepare)` takes no options; `base.css` and `pdf.css` drop the picker rules. Diagram text sizes use the `--fs-sm` / `--fs-xs` tokens again.
+
 ## 1.9.231
 
 **Text size picker: small and medium only**

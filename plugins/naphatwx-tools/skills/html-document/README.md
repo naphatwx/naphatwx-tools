@@ -1,6 +1,6 @@
 # html-document
 
-Generates one self-contained HTML docs page, dark only, with a sidebar, section search and a text size picker, from files or a topic.
+Generates one self-contained HTML docs page, dark only, with a sidebar and section search, from files or a topic.
 
 ## When to use it
 
@@ -39,7 +39,7 @@ Rules the diagram doesn't show:
 
 - One file. No external CSS, JS, fonts or images.
 - Dark only. No light theme, no toggle.
-- The text size picker (small 14px, normal 16px, big 18px) stays; default is normal. Text uses the `--fs-*` tokens, never fixed `px`.
+- Text uses the `--fs-*` tokens, never fixed `px`.
 - Colors use the theme tokens, never new hex values. Never edit between the `theme:` markers.
 - The Export PDF button stays: it opens the print dialog, pick "Save as PDF".
 
@@ -54,10 +54,9 @@ Output:
 
 ```
 <project root>/
-└── <topic>.html     the docs page: sidebar nav with search, active-section highlight, A / A / A text size, Export PDF
+└── <topic>.html     the docs page: sidebar nav with search, active-section highlight, Export PDF
 ```
 
-The page remembers the picked text size in the browser.
 
 ## Files in the skill folder
 

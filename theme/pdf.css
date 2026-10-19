@@ -3,14 +3,6 @@
 .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
 .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
 .float-bar button:hover { background: var(--hover); color: var(--text); }
-/* Text size picker: three A's in px, so the picker never resizes itself. A line splits it from Export PDF */
-.font-size-picker { display: inline-flex; align-items: center; gap: 2px; }
-.float-bar .font-size-picker { padding-right: 2px; margin-right: 2px; border-right: 1px solid var(--line); }
-.font-size-picker .font-size-button { display: inline-grid; place-items: center; min-width: 32px; height: 32px; padding: 0 6px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font-family: var(--sans); font-weight: 600; line-height: 1; cursor: pointer; }
-.font-size-picker .font-size-button:hover { background: var(--hover); color: var(--text); }
-.font-size-picker .font-size-button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
-.font-size-picker .font-size-button[data-size="small"] { font-size: 12px; }
-.font-size-picker .font-size-button[data-size="medium"] { font-size: 15px; }
 /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
    An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
 body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }

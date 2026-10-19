@@ -1,8 +1,6 @@
 /* Element defaults shared by every page. Page CSS sets its own type scale and layout. */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-/* Text size from the picker (theme/pdf.js). Small shrinks body, meta and code; headings and tags stay as medium */
-html[data-font-size="small"] { --fs-body: 0.875rem; --fs-meta: 0.75rem; --fs-code: 0.75rem; }
 body {
     margin: 0;
     background: var(--bg);

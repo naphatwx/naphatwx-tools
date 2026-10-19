@@ -22,7 +22,7 @@
         svg.before(box);
         box.append(svg);
     });
-    addExportPdf(null, null, { fontSize: false });
+    addExportPdf();
     // height: the body's box, padding included, not documentElement, whose scrollHeight never drops below the frame's height;
     // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled
     const postSize = () => {
