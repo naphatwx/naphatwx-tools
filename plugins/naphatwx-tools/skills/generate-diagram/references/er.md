@@ -17,7 +17,7 @@ An ER diagram is its own page: tables with their columns, types and keys, and fo
 ## Manual mode
 
 - Copy `template/er/er-diagram.html` to `er-diagram.html` in the output folder. Change only the `<title>`, the `<h1>`, the `.subtitle` line and the `ER` object:
-    - `tables`: `{ id, name, tag, at: [col, row], cols: [[name, type, key, mark?]] }`. `key` is `PK`, `FK`, `UQ`, `NN` or empty; `mark` is `add`, `change` or `drop`, with `+ add` / `~ type` / `− drop` as the key.
+    - `tables`: `{ id, name, tag, at: [col, row], cols: [[name, type, key, mark?]] }`. `key` is `PK`, `FK`, `UQ`, `NN` or empty; `mark` is `add`, `change` or `drop`, with `+ add` / `~ type` / `− drop` as the key. `type` is the type only (`integer[]`, `text not null`): no notes, no ` · `, no SQL comments.
     - `rels`: `[from "table.col", to "table.col", fromCard, toCard, isNew?]`, from the FK column to the column it references.
     - Layout: at most 4 grid columns; put a child next to its parent; keep FK lines short and avoid lines that cross a table.
 - The `← Overview` link points at `../overview.html#database` for design-feature. No such page → remove the link.
