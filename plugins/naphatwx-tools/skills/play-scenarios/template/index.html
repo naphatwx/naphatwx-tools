@@ -72,9 +72,10 @@
             --fs-meta: var(--fs-sm);
             --fs-code: var(--fs-sm);
             --fs-tag: var(--fs-xs);
-            /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
-            --fs-dia: var(--fs-sm);
-            --fs-dia-sub: var(--fs-xs);
+            /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12.
+               px, not rem, so the text size picker never outgrows the shapes */
+            --fs-dia: 14px;
+            --fs-dia-sub: 12px;
 
             /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px, 6xl 1152px, 7xl 1280px). Use these, not raw px */
             --max-w-md: 28rem;
@@ -99,6 +100,10 @@
         /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
         *, *::before, *::after { box-sizing: border-box; }
         html { -webkit-text-size-adjust: 100%; }
+        /* Text size from the picker (theme/pdf.js). Every rem token scales from the root; diagram text is px */
+        html[data-font-size="small"] { font-size: 14px; }
+        html[data-font-size="medium"] { font-size: 16px; }
+        html[data-font-size="large"] { font-size: 18px; }
         body {
             margin: 0;
             background: var(--bg);
@@ -139,6 +144,15 @@
         .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
         .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
         .float-bar button:hover { background: var(--hover); color: var(--text); }
+        /* Text size picker: three A's in px, so the picker never resizes itself. A line splits it from Export PDF */
+        .font-size-picker { display: inline-flex; align-items: center; gap: 2px; }
+        .float-bar .font-size-picker { padding-right: 2px; margin-right: 2px; border-right: 1px solid var(--line); }
+        .font-size-picker .font-size-button { display: inline-grid; place-items: center; min-width: 32px; height: 32px; padding: 0 6px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font-family: var(--sans); font-weight: 600; line-height: 1; cursor: pointer; }
+        .font-size-picker .font-size-button:hover { background: var(--hover); color: var(--text); }
+        .font-size-picker .font-size-button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+        .font-size-picker .font-size-button[data-size="small"] { font-size: 12px; }
+        .font-size-picker .font-size-button[data-size="medium"] { font-size: 15px; }
+        .font-size-picker .font-size-button[data-size="large"] { font-size: 18px; }
         /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
            An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
         body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }
@@ -364,7 +378,42 @@
     <script>
         /* theme:pdf-js:start */
         /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
-        function addExportPdf(target, prepare) {
+        const FONT_SIZES = { small: '14px', medium: '16px', large: '18px' };
+        const FONT_SIZE_KEY = 'naphatwx-font-size';
+        // The px values live in base.css (html[data-font-size]); every rem token scales from the root size.
+        function setFontSize(size) {
+            if (!FONT_SIZES[size]) size = 'medium';
+            document.documentElement.dataset.fontSize = size;
+            document.querySelectorAll('.font-size-button').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.size === size)));
+        }
+        function addFontSizePicker(target) {
+            const group = document.createElement('div');
+            group.className = 'font-size-picker no-print';
+            group.setAttribute('role', 'group');
+            group.setAttribute('aria-label', 'Text size');
+            for (const [size, px] of Object.entries(FONT_SIZES)) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'font-size-button';
+                button.dataset.size = size;
+                button.textContent = 'A';
+                button.title = `${size[0].toUpperCase()}${size.slice(1)} text (${px})`;
+                button.setAttribute('aria-label', button.title);
+                button.addEventListener('click', () => {
+                    setFontSize(size);
+                    try { localStorage.setItem(FONT_SIZE_KEY, size); } catch { /* kept for this visit only */ }
+                });
+                group.append(button);
+            }
+            target.append(group);
+            let saved = null;
+            try { saved = localStorage.getItem(FONT_SIZE_KEY); } catch {}
+            setFontSize(saved);
+            // Another open page (or a framed mock) changed the size: follow it.
+            window.addEventListener('storage', (event) => { if (event.key === FONT_SIZE_KEY) setFontSize(event.newValue); });
+            return group;
+        }
+        function addExportPdf(target, prepare, options = {}) {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'export-pdf no-print';
@@ -372,6 +421,7 @@
                 target = document.querySelector('.float-bar');
                 if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
             }
+            if (options.fontSize !== false && !document.querySelector('.font-size-picker')) addFontSizePicker(target);
             button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
             button.textContent = 'Export PDF';
             button.addEventListener('click', async () => {

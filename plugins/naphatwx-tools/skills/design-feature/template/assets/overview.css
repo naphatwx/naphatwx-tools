@@ -65,9 +65,10 @@
     --fs-meta: var(--fs-sm);
     --fs-code: var(--fs-sm);
     --fs-tag: var(--fs-xs);
-    /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12 */
-    --fs-dia: var(--fs-sm);
-    --fs-dia-sub: var(--fs-xs);
+    /* Diagrams draw at 1:1 with shapes sized for 14px: main labels 14, secondary lines (detail, sub, note, type) 12.
+       px, not rem, so the text size picker never outgrows the shapes */
+    --fs-dia: 14px;
+    --fs-dia-sub: 12px;
 
     /* Max widths: Tailwind max-w steps (md 448px, 3xl 768px, 4xl 896px, 5xl 1024px, 6xl 1152px, 7xl 1280px). Use these, not raw px */
     --max-w-md: 28rem;
@@ -92,6 +93,10 @@
 /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* Text size from the picker (theme/pdf.js). Every rem token scales from the root; diagram text is px */
+html[data-font-size="small"] { font-size: 14px; }
+html[data-font-size="medium"] { font-size: 16px; }
+html[data-font-size="large"] { font-size: 18px; }
 body {
     margin: 0;
     background: var(--bg);
@@ -132,6 +137,15 @@ code, kbd, pre, samp { font-family: var(--mono); }
 .float-bar { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); }
 .float-bar button { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font: 500 var(--fs-body) var(--sans); white-space: nowrap; cursor: pointer; }
 .float-bar button:hover { background: var(--hover); color: var(--text); }
+/* Text size picker: three A's in px, so the picker never resizes itself. A line splits it from Export PDF */
+.font-size-picker { display: inline-flex; align-items: center; gap: 2px; }
+.float-bar .font-size-picker { padding-right: 2px; margin-right: 2px; border-right: 1px solid var(--line); }
+.font-size-picker .font-size-button { display: inline-grid; place-items: center; min-width: 32px; height: 32px; padding: 0 6px; border: 0; border-radius: var(--radius-md); background: none; color: var(--text-2); font-family: var(--sans); font-weight: 600; line-height: 1; cursor: pointer; }
+.font-size-picker .font-size-button:hover { background: var(--hover); color: var(--text); }
+.font-size-picker .font-size-button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.font-size-picker .font-size-button[data-size="small"] { font-size: 12px; }
+.font-size-picker .font-size-button[data-size="medium"] { font-size: 15px; }
+.font-size-picker .font-size-button[data-size="large"] { font-size: 18px; }
 /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
    An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
 body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }
@@ -602,6 +616,8 @@ td .aside.not-applicable { color: var(--text-3); }
 }
 .tools button:hover, .present-bar button:hover { background: var(--hover); color: var(--text); }
 .tools button[aria-pressed="true"] { background: var(--accent); color: var(--bg); font-weight: 600; }
+/* Text size picker (theme:pdf-js): lines split it from the view toggles and Export PDF */
+.tools .font-size-picker { padding: 0 2px; margin: 0 2px; border-inline: 1px solid var(--line); }
 .tools kbd { font-size: var(--fs-tag); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--text-3); }
 .present-bar { left: 50%; right: auto; transform: translateX(-50%); align-items: center; }
 .present-bar[hidden] { display: none; }

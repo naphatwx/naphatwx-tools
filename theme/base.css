@@ -1,6 +1,10 @@
 /* Element defaults shared by every page. Page CSS sets its own type scale and layout. */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* Text size from the picker (theme/pdf.js). Every rem token scales from the root; diagram text is px */
+html[data-font-size="small"] { font-size: 14px; }
+html[data-font-size="medium"] { font-size: 16px; }
+html[data-font-size="large"] { font-size: 18px; }
 body {
     margin: 0;
     background: var(--bg);

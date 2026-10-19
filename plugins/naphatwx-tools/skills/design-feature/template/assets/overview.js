@@ -1,6 +1,41 @@
 /* theme:pdf-js:start */
 /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
-function addExportPdf(target, prepare) {
+const FONT_SIZES = { small: '14px', medium: '16px', large: '18px' };
+const FONT_SIZE_KEY = 'naphatwx-font-size';
+// The px values live in base.css (html[data-font-size]); every rem token scales from the root size.
+function setFontSize(size) {
+    if (!FONT_SIZES[size]) size = 'medium';
+    document.documentElement.dataset.fontSize = size;
+    document.querySelectorAll('.font-size-button').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.size === size)));
+}
+function addFontSizePicker(target) {
+    const group = document.createElement('div');
+    group.className = 'font-size-picker no-print';
+    group.setAttribute('role', 'group');
+    group.setAttribute('aria-label', 'Text size');
+    for (const [size, px] of Object.entries(FONT_SIZES)) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'font-size-button';
+        button.dataset.size = size;
+        button.textContent = 'A';
+        button.title = `${size[0].toUpperCase()}${size.slice(1)} text (${px})`;
+        button.setAttribute('aria-label', button.title);
+        button.addEventListener('click', () => {
+            setFontSize(size);
+            try { localStorage.setItem(FONT_SIZE_KEY, size); } catch { /* kept for this visit only */ }
+        });
+        group.append(button);
+    }
+    target.append(group);
+    let saved = null;
+    try { saved = localStorage.getItem(FONT_SIZE_KEY); } catch {}
+    setFontSize(saved);
+    // Another open page (or a framed mock) changed the size: follow it.
+    window.addEventListener('storage', (event) => { if (event.key === FONT_SIZE_KEY) setFontSize(event.newValue); });
+    return group;
+}
+function addExportPdf(target, prepare, options = {}) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'export-pdf no-print';
@@ -8,6 +43,7 @@ function addExportPdf(target, prepare) {
         target = document.querySelector('.float-bar');
         if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
     }
+    if (options.fontSize !== false && !document.querySelector('.font-size-picker')) addFontSizePicker(target);
     button.title = 'Export PDF (pick "Save as PDF" in the print dialog)';
     button.textContent = 'Export PDF';
     button.addEventListener('click', async () => {
@@ -274,7 +310,8 @@ const loadFrames = () => Promise.all(frames.filter(f => !f.dataset.loaded).map(f
     setTimeout(done, 2000);
     frame.loading = "eager";
 })));
-document.getElementById("keysBtn").before(addExportPdf(document.querySelector(".tools"), loadFrames));
+const exportPdfButton = addExportPdf(document.querySelector(".tools"), loadFrames);
+document.getElementById("keysBtn").before(document.querySelector(".tools .font-size-picker"), exportPdfButton);
 
 // ===== Present: one step per screen. A use case gives one step per view; an API section one per RPC.
 // Long steps scroll down; nothing scrolls sideways. ← → or Space step, Esc leaves.

@@ -7,7 +7,7 @@ description: Generate a styled single-file HTML docs page with sidebar navigatio
 
 Generate a single-file HTML documentation page from a bundled template.
 
-The template is a dark-only docs layout with a left sidebar, search box, and a base font size picker (small 14px / normal 16px / big 18px, default normal). The style is inspired by the Clerk docs.
+The template is a dark-only docs layout with a left sidebar, search box, and a text size picker (small 14px / medium 16px / large 18px, default medium). The style is inspired by the Clerk docs.
 
 Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
 The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
@@ -37,7 +37,7 @@ The output **must** keep all of these:
 
 1. Single self-contained file. No external CSS, JS, fonts, or images.
 2. Dark only. Add no light theme, theme toggle, or other palette.
-3. The base font size picker stays and works. Default is normal (16px).
+3. The text size picker stays and works. Default is medium (16px). `addExportPdf()` adds it to the top bar.
 4. The sidebar nav, search box, and active-section highlight stay and work.
 5. Every `nav-link` `href` matches a real heading `id` in the content.
 
@@ -76,7 +76,7 @@ The output **must** keep all of these:
 | Code block      | `<pre><code>…</code></pre>`                       |
 | Table           | `<div class="table-wrap"><table>…</table></div>`  |
 
-- Keep the font size picker. Color with the theme tokens (`var(--accent)`, `var(--text-2)` …), never new hex values.
+- Keep the text size picker. Color with the theme tokens (`var(--accent)`, `var(--text-2)` …), never new hex values.
 - Size text with the `--fs-*` tokens, never hard-coded `px`. They are `rem`, so they follow the picker.
 
 ### 4. Write the file

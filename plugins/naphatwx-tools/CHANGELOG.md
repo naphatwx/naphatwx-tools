@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.230
+
+**Text size picker on every page**
+
+- Every HTML page gets a small / medium / large text size picker next to Export PDF: 14px, 16px or 18px root size. All text sizes are `rem`, so they scale together.
+    - The choice is saved in `localStorage` (`naphatwx-font-size`). It is shared by every page and follows changes made in another open page.
+    - html-document's own picker (small / normal / big) is replaced by the shared one.
+    - Diagram text stays in px (`--fs-dia` 14px, `--fs-dia-sub` 12px), so labels never outgrow their shapes. Diagram pages and slides have no picker.
+- theme: `pdf.js` adds the picker (`addExportPdf(target, prepare, { fontSize })`), `base.css` holds the sizes, `pdf.css` the picker style.
+
 ## 1.9.209
 
 **Every diagram: one Export PDF button, centered labels, room under the button**
