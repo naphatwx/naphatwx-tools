@@ -637,7 +637,7 @@
             document.querySelectorAll('[data-count]').forEach(element => {
                 const statuses = playableOf(element.dataset.count).map(s => results[s.id]?.status || '');
                 const countOf = status => statuses.filter(x => x === status).length;
-                element.innerHTML = countOf('') === statuses.length ? '' : `<span class="pass">${countOf('pass')} pass</span> · <span class="fail">${countOf('fail')} fail</span> · ${countOf('')} left`;
+                element.innerHTML = !statuses.length ? '' : `<span class="pass">${countOf('pass')} pass</span> · <span class="fail">${countOf('fail')} fail</span> · ${countOf('')} left`;
             });
             const rows = SCENARIOS.filter(isPlayable).map(s => ({ scenario: s, status: results[s.id]?.status || '', note: results[s.id]?.note || '' }));
             const countOf = status => rows.filter(row => row.status === status).length;
