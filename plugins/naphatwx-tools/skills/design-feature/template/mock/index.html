@@ -195,9 +195,9 @@
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
         a.panel { color: inherit; text-decoration: none; transition: background .15s var(--ease); }
         a.panel:hover { background: var(--hover); }
-        /* Use-case row: the frame takes 70% of the row (up to 1920px) but leaves the list at least 20rem; the list fills the rest.
+        /* Use-case row: the frame takes 75% of the row (up to 1920px) but leaves the list at least 20rem; the list fills the rest.
            12px is the page scrollbar, so the row never makes the page scroll sideways */
-        .use-case-row { --row-w: calc(100vw - 2 * var(--gutter) - 12px); width: var(--row-w); margin-left: calc((100% - var(--row-w)) / 2); display: grid; grid-template-columns: minmax(0, 1fr) min(1920px, 70%, 100% - 20rem - 24px); gap: 24px; align-items: start; }
+        .use-case-row { --row-w: calc(100vw - 2 * var(--gutter) - 12px); width: var(--row-w); margin-left: calc((100% - var(--row-w)) / 2); display: grid; grid-template-columns: minmax(0, 1fr) min(1920px, 75%, 100% - 20rem - 24px); gap: 24px; align-items: start; }
         /* the list card is as tall as the frame (--frame-h, set by fit()); a long list scrolls inside */
         .scenarios { position: sticky; top: 16px; height: var(--frame-h, auto); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); }
         .scenarios-head { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
@@ -220,8 +220,9 @@
         .scenario-title { min-width: 0; overflow-wrap: anywhere; }
         /* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
         .scenario .mark { display: none; }
-        /* the second line lines up under the title: past the disc (24px) and its 12px gap */
-        .scenario .info { align-items: center; gap: 4px 6px; padding-left: calc(24px + 12px); }
+        /* one line: disc, title, then the kind, Core and surface pills; a long title pushes the pills to the next line */
+        .scenario > .disclosure-head { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+        .scenario .info { align-items: center; gap: 4px 6px; }
         .scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
         /* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
         .scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }
@@ -531,6 +532,15 @@
               </section>`;
         }).join('');
         addScenarioFilter(document.getElementById('scenario-filter'), { rows: '.scenario[data-sc]', groups: '.scenario-list', storageKey: 'mock-filter:' + FakeApi.STORE });
+        /** Scroll the scenario list so this card sits at its top, or as near as the list's end allows; the page does not move.
+            Waits for the card's slide, so the list is already as tall as it will be. */
+        function scrollToTop(item) {
+            const list = item.closest('.scenario-list');
+            if (getComputedStyle(list).overflowY !== 'auto') return; // narrow window: the list is not a scroll box
+            const scroll = () => list.scrollTo({ top: list.scrollTop + item.getBoundingClientRect().top - list.getBoundingClientRect().top - 8, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+            const slides = item.querySelector('.scenario-details').getAnimations().map(animation => animation.finished.catch(() => { }));
+            slides.length ? Promise.all(slides).then(scroll) : scroll();
+        }
         /** Same disclosure as deploy-plan: the open card's panel slides; instant skips the slide. */
         function setOpen(item, open, instant) {
             item.classList.toggle('open', open);
@@ -561,14 +571,14 @@
             const scenario = SCENARIOS.find(s => s.id === id);
             const block = document.querySelector(`section[data-use-case="${scenario.useCase}"]`);
             const item = block.querySelector(`.scenario[data-sc="${id}"]`);
-            if (fromClick && item.classList.contains('picked')) { setOpen(item, !item.classList.contains('open')); return; }
-            // one scenario open per use case; the last one shuts at once, so the new one can be scrolled into view
+            if (fromClick && item.classList.contains('picked')) { const open = !item.classList.contains('open'); setOpen(item, open); if (open) scrollToTop(item); return; }
+            // one scenario open per use case; the last one shuts at once, so the new one can scroll to the top of the list
             const previous = block.querySelector('.scenario.picked');
             if (previous && previous !== item) { previous.classList.remove('picked'); setOpen(previous, false, true); previous.querySelector('.scenario-details').innerHTML = ''; }
             item.classList.add('picked');
             item.querySelector('.scenario-details').innerHTML = detailsHtml(scenario);
             if (previous !== item || !item.classList.contains('open')) setOpen(item, true, !fromClick);
-            if (fromClick && previous && previous !== item) item.scrollIntoView({ block: 'nearest' });
+            if (fromClick) scrollToTop(item);
             if (fromClick) { clearStore(); history.replaceState(null, '', '#sc-' + id); }
             const hasScreen = isPlayable(scenario);
             const screen = hasScreen
