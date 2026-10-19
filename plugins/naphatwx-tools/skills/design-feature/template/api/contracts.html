@@ -390,6 +390,7 @@
 
         // Renders one numbered block per method: its title, route and permission, then a board with its request and response cards.
         // fields: [name, type, number, mark?] · mark: add | change | drop. Shared types get one last block.
+        // type: the type only ("int32", "repeated ThingResponse"); no notes or proto comments, rules go in the overview's Behaviour bullets.
         // tag: "new" / "changed" / "behaviour" / "called, unchanged" on an API; "new message" / "altered" / "removed message" / "unchanged" on a message.
         const API = {
             apis: [

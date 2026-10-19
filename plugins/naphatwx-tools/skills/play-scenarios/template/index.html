@@ -233,9 +233,8 @@
         .scenario-title { min-width: 0; overflow-wrap: anywhere; }
         /* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
         .scenario .mark { display: none; }
-        /* one line: disc and title, then each pill on its own; a pill that does not fit wraps alone, not the whole group */
-        .scenario > .disclosure-head { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
-        .scenario > .disclosure-head > h3 { margin-right: 4px; }
+        /* the pills sit inside the title's text, so they follow its last word and wrap one by one like words */
+        .scenario-title > :is(.scenario-kind, .core-pill, .scenario-surface) { display: inline-flex; vertical-align: 1px; margin-left: 2px; }
         .scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
         /* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
         .scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }
@@ -613,8 +612,7 @@
                   <div class="scenario-list">
                   ${scenarios.map((scenario, i) => `<div class="scenario disclosure${scenario.skip ? ' skipped' : ''}" data-sc="${scenario.id}" data-kind="${escapeHtml(scenario.kind || '')}" data-core="${isCore(scenario)}">
                     <div class="disclosure-head">
-                      <h3><button type="button" aria-expanded="false" aria-controls="details-${scenario.id}" onclick="pick('${scenario.id}', true)"${scenario.skip ? ` title="Skipped: ${escapeHtml(scenario.skip)}"` : ''}><span class="mark" aria-hidden="true"></span>${scenario.skip ? `<span class="scenario-number skip" aria-hidden="true">–</span>` : `<span class="scenario-number" data-r="${scenario.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="scenario-title">${escapeHtml(scenario.title)}${scenario.skip ? '<span class="sr-only"> (skipped)</span>' : ''}</span></button></h3>
-                      ${kindPill(scenario)}${corePill(scenario)}<span class="scenario-surface" title="${escapeHtml(SURFACE[scenario.surface] || '')}">${escapeHtml(scenario.surface || '')}</span>
+                      <h3><button type="button" aria-expanded="false" aria-controls="details-${scenario.id}" onclick="pick('${scenario.id}', true)"${scenario.skip ? ` title="Skipped: ${escapeHtml(scenario.skip)}"` : ''}><span class="mark" aria-hidden="true"></span>${scenario.skip ? `<span class="scenario-number skip" aria-hidden="true">–</span>` : `<span class="scenario-number" data-r="${scenario.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="scenario-title">${escapeHtml(scenario.title)}${scenario.skip ? '<span class="sr-only"> (skipped)</span>' : ''}${[kindPill(scenario), corePill(scenario), `<span class="scenario-surface" title="${escapeHtml(SURFACE[scenario.surface] || '')}">${escapeHtml(scenario.surface || '')}</span>`].filter(Boolean).map(pill => ' ' + pill).join('')}</span></button></h3>
                     </div>
                     <div class="scenario-details" id="details-${scenario.id}" hidden></div>
                   </div>`).join('')}

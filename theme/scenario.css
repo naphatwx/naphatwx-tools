@@ -43,9 +43,8 @@ a.panel:hover { background: var(--hover); }
 .scenario-title { min-width: 0; overflow-wrap: anywhere; }
 /* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
 .scenario .mark { display: none; }
-/* one line: disc and title, then each pill on its own; a pill that does not fit wraps alone, not the whole group */
-.scenario > .disclosure-head { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
-.scenario > .disclosure-head > h3 { margin-right: 4px; }
+/* the pills sit inside the title's text, so they follow its last word and wrap one by one like words */
+.scenario-title > :is(.scenario-kind, .core-pill, .scenario-surface) { display: inline-flex; vertical-align: 1px; margin-left: 2px; }
 .scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
 /* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
 .scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }
