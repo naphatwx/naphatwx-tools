@@ -573,8 +573,6 @@ tr:target > td { background: var(--accent-soft); }
 /* a row the filter hides; rows keep their place and number */
 [data-kind][hidden] { display: none !important; }
 /* theme:scenario-filter:end */
-.scenario-legend { margin: 4px 0 8px; color: var(--text-2); font-size: var(--fs-meta); }
-.scenario-legend .core-pill { margin-right: 6px; }
 /* title, kind pill and Core pill sit 6px apart in the Scenarios views */
 td .scenario-kind, td .core-pill { margin-left: 6px; vertical-align: 1px; }
 #scenario-filter { margin-bottom: 12px; }

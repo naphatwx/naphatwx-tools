@@ -48,6 +48,7 @@ Why: a plan that looks right but names the wrong table or the wrong order fails 
 - **Steps are actions.** Start each with a verb: "Run", "Set", "Check", "Tell". One action per step.
 - **Secrets never appear in plain text.** Name the env var, never its value.
 - **One HTML file per plan.**
+- **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## 1. Find the MR that deploys to the env
 

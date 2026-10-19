@@ -8,6 +8,7 @@
 - Keep skill bodies agent-neutral: name a Claude-only tool as an option ("use AskUserQuestion when the agent has it"), and give a fallback for `$ARGUMENTS`.
 - Refer to other skills by bare name, e.g. the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code).
 - `skills/<name>/README.md` is for people; agents follow `SKILL.md` only. `template/README.md` ships inside the generated folder.
+- No filler text in any skill or template. Add no intro line, subtitle, legend or note that repeats a heading or explains what the page shows, and no section or example block the user did not ask for. Every page-making `SKILL.md` repeats this as a rule, because agents read only `SKILL.md`.
 - `plugins/naphatwx-tools/hooks/` holds the response-rules hook. It is Claude Code only, wired inline in the Claude `plugin.json`. Don't add a `hooks/hooks.json`: Claude auto-loads it too, and the hook would run twice.
 
 ## Theme

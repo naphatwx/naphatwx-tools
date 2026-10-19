@@ -82,6 +82,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 12. **Every count you report is computed** (by `scripts/check-live.js`), never estimated.
 13. **Ask before you change the app.** A dev login route or a dev-only frame header is a change to the user's repo: list it and get a yes first. Seeds live in `<plan>/live/seeds/` and change nothing in the app.
 14. No absolute local paths in any file (`appDir` is relative to `live/`). Code comments max 3 lines. Wrap every `localStorage` call in `try/catch`.
+15. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 

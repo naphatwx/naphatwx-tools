@@ -311,7 +311,6 @@
     <header>
         <div>
             <h1>API contracts · Feature Name</h1>
-            <p class="subtitle">Every API the feature adds, changes or calls, with its full request and response.</p>
         </div>
         <div class="actions">
             <a class="button" href="../overview.html#api">← Overview</a>
@@ -443,7 +442,7 @@
                 + `</section>`);
             // Shared types: one last block, two cards per line.
             if (types.length) blocks.push(`<section class="method" id="api-shared-types">`
-                + `<h2><span class="number">${apis.length + 1}.</span>Shared types</h2><p class="subtitle">Enums and nested messages used by more than one API.</p>`
+                + `<h2><span class="number">${apis.length + 1}.</span>Shared types</h2>`
                 + board(types.map(t => ({ message: t, label: /enum/.test(t.tag) ? "enum" : "message" }))) + `</section>`);
             document.getElementById("board").innerHTML = blocks.join("");
         })(API);

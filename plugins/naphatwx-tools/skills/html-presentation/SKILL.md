@@ -36,6 +36,7 @@ The output **must** keep all of these:
 5. Last slide → cannot go to next.
 6. Single self-contained file. No external CSS, JS, or images.
 7. Dark only. Add no light theme, theme toggle, or other palette.
+8. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 

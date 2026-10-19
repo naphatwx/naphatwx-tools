@@ -39,6 +39,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - **Own your data.** Each test creates its own data through the app's API, prefixed `__e2e_<uc>_`, deletes it after and checks it is gone. Never touch records you did not create. No play-scenarios seeds.
 - **One HTML report per run**, built from the run folder. Raw Playwright output is not a substitute.
 - Never run against production unless the user named it for this run.
+- **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ---
 

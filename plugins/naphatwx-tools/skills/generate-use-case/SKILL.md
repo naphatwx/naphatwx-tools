@@ -72,6 +72,7 @@ Where the file goes (`<plan>`):
 9. **Fewest scenarios that cover every rule.** Each scenario costs a reviewer time to play and a test to keep up. One scenario per rule or outcome, never one per click, view or value (step 2, "Split and merge").
 10. **One scenario = one screen = one result.** A scenario plays as one start state on one screen. Never split it into parts. A path that needs another screen, seed or data setup is its own scenario.
 11. **Core is the only priority.** Mark the scenarios to play first with `"core": true`. No other priority field (no frequency, impact, priority or P0 / P1 / P2).
+12. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 

@@ -45,6 +45,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
         - Fonts: the OS font, never a web font. Delete the Google Fonts `<link>` (and any `preconnect`) and swap the font stacks: Geist and Instrument Serif → `-apple-system, "Segoe UI", system-ui, sans-serif`; Geist Mono → `ui-monospace, "SF Mono", Menlo, Consolas, monospace` (single quotes inside SVG `font-family="…"` attributes).
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
 6. A diagram file never holds a step details list. The caller's page shows it (see the sequence reference).
+7. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 

@@ -76,6 +76,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 13. **Controls follow the spec, then the real app.**
     - No permission → do what the real app does: a control the app hides is **hidden** in the mock too.
     - Shown unavailable with a reason only where the spec says so (e.g. an ineligible repository, a frozen environment). Show the reason where the spec puts it: a line under the control, or a tooltip. Use `aria-disabled="true"`, not native `disabled`: a disabled button gets no hover or focus, so its tooltip never shows.
+14. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow (standalone)
 
@@ -159,7 +160,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 
 Keep the template's layout; only change the header text and `screenUrl()`. What it does, so you keep it working:
 
-- One block per use case, in plan order. Head, one line: `UC<n> <use case name>`, a `N refs` chip (click shows the trace IDs on the same line; Export PDF prints them) and a `plan` link (`../overview.html#uc-NN`). With scenarios, the head tops the scenario list.
+- One block per use case, in plan order. Head, one line: `UC<n> <use case name>`, a `N refs` chip (click shows the trace IDs on the same line; Export PDF prints them) and a `plan` link (`../overview.html#uc-NN`). The head sits in the centered text column, above its use case row (not inside the list).
 - Every scenario of the use case gets a row in the list, in `use-cases.js` order. An `mcp`, `api` or `job` row is greyed (dashed disc). Opening it shows the frame with no screen: "No mock" and one line naming its surface ("MCP scenario — play it with play-scenarios or test it with e2e-test"); its details show only "What it should do" (`expect`), with no Pass / Fail. A use case with no scenario shows its `none` sentence.
 - Per use case, one row breaks out of the text column (`.use-case-row`, `100vw − 2 × gutter − 12px`, centered) with two columns:
     - Right: the `.frame`, at `min(1920px, 75% of the row, row − 20rem − 24px)`, so the list never drops under 20rem.
@@ -167,7 +168,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
     - Under 1000px the list stacks above the frame, at its full height.
 - The list is an accordion of disclosure cards, the same design and slide as the deploy-plan, smoke-test and e2e-test rows (synced `theme:disclosure` and `theme:slide-js` blocks). Each `.scenario.disclosure` holds a `.disclosure-head` and a `.scenario-details` panel:
     - Head, one line: an `h3 > button` (`aria-expanded`, `aria-controls`) with a status disc and the full title (no `+` / `−` mark; wraps, never cut), then, inside the title's text after its last word (inline, so each pill wraps on its own like a word, also after a 2-line title): the kind pill (`.scenario-kind`: outlined, tinted `--ok` basic / `--neutral` alternate / `--bad` exception), a **Core** pill when `core` is true (solid `--accent`, tooltip "Core: play first") and the `surface` tag. The whole head is a mouse target.
-    - The disc shows the number in an outline until the reviewer marks the scenario, then a solid `--ok` check or `--bad` cross (SVG, with the number and result in `sr-only` text). The list heading shows `N pass · N fail · N left` once anything is marked.
+    - The disc shows the number in an outline until the reviewer marks the scenario, then a solid `--ok` check or `--bad` cross (SVG, with the number and result in `sr-only` text). The list heading shows `N pass · N fail · N left` (at `--fs-meta`, the label's size) once anything is marked.
     - Clicking a card picks it and opens it: `.picked` gets a 2px accent ring, a blue head (22% `--accent` over `--surface`), an `--accent-fill` panel and a bold title, folded or open. Its panel slides open and its screen loads in the frame. The last picked card shuts at once. Only one card is picked per use case. The list then scrolls (smoothly, only the list, not the page) so the picked card sits at its top; `--tail` room under the last card lets any card get there, trimmed once the card has slid open.
     - Clicking the picked card slides its panel shut or open; the screen stays.
 - **Filter bar** under the page title (`#scenario-filter`, filled by `addScenarioFilter()` from the synced `theme:scenario-filter-js` block): "Kind: All | Basic | Alternate | Exception" (multi-select; All clears the others), a "Core only" toggle and a live "n of N" count. Buttons are 32px high (`padding: 6px 14px`), in bordered segmented controls, with the label and count centred on them. Kind and Core only combine with AND. Hidden rows keep their order and number; a use case with nothing left shows "No scenario matches the filter". The choice is kept in `localStorage` (`mock-filter:<STORE>`). Keep the call and the `data-kind` / `data-core` attributes on each `.scenario` row.

@@ -40,6 +40,7 @@ The output **must** keep all of these:
 3. The text size picker stays and works. Default is medium. `addExportPdf()` adds it to the top bar.
 4. The sidebar nav, search box, and active-section highlight stay and work.
 5. Every `nav-link` `href` matches a real heading `id` in the content.
+6. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 

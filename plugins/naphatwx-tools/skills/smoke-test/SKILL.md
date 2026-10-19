@@ -39,6 +39,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - **Secrets never appear in plain text**, not in code, flow files, reports or chat. Only env var names and `sha256:<8 hex>` are shown.
 - **One HTML report per run.** Never hand over raw logs instead of it.
 - Never run `run` against a production environment unless the user named it for this run.
+- **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ---
 
