@@ -1,6 +1,6 @@
 ---
 name: generate-use-case
-description: Write a feature's use cases (one per user goal), their scenarios (one per acceptance scenario, edge case and refusal, on every channel users reach it: UI, MCP, API, job) and the spec's acceptance criteria to one use-cases.js file, from a spec or idea. Use when the user says "use cases for spec 127" or "list the use cases". Data only; design-feature, generate-mock-ui, play-scenarios and e2e-test read the file.
+description: Write a feature's use cases (one per user goal), their scenarios (one per rule or outcome, not per click or value, on every channel users reach it: UI, MCP, API, job) and the spec's acceptance criteria to one use-cases.js file, from a spec or idea. Use when the user says "use cases for spec 127" or "list the use cases". Data only; design-feature, generate-mock-ui, play-scenarios and e2e-test read the file.
 argument-hint: <spec-folder | plan-folder | feature description> [output-folder]
 ---
 
@@ -26,7 +26,7 @@ The words, used the same way in every skill:
 |------|---------|----------|---------|
 | Feature | what the spec delivers | a noun | Legacy new version |
 | Use case | one goal a user wants to reach, with every path to it | verb + object | Cut a new version |
-| Scenario | one path through a use case, with one result, on one channel | the condition or the result | Merge request already released |
+| Scenario | one rule or outcome of a use case, on one channel; other values, clicks or views of the same rule are its examples, not more scenarios | the condition or the result | Merge request already released |
 | Kind | how a scenario ends: `basic` (the main path to the goal, one per use case and channel), `alternate` (another path that still reaches the goal), `exception` (the goal is not reached: refusal, error, timeout) | the `kind` value | exception |
 | Channel | where a user reaches it: `ui` (a screen), `mcp` (an AI agent calling MCP tools), `api` (REST / gRPC called directly), `job` (a script or scheduled job) | the `surface` value | mcp |
 | Acceptance criterion | one Given / When / Then from the spec | `US<n> · AC<m>` | US1 · AC3 |
@@ -53,7 +53,7 @@ Where the file goes (`<plan>`):
 | spec folder or spec number (`specs/<n>-*`) | `<spec-folder>/plan/` (where design-feature writes its plan) |
 | feature description | `plans/<feature-slug>/` at the project root |
 
-- `<plan>/use-cases.js` already exists → read it and update it in place. Keep every existing scenario `id` that still matches, so links from the mock, the plan and test files keep working.
+- `<plan>/use-cases.js` already exists → read it and update it in place. Keep every existing scenario `id` that still matches, so links from the mock, the plan and test files keep working. When the merge pass (step 2b) folds scenarios together, the merged one keeps the first id; list every removed id in the reply.
 - The file is in the old format (`USE_CASE_FLOWS` + `USE_CASES`, grouped by flow `3.N`) → rewrite it in the new one: each flow that is a user goal becomes a use case, each old use case becomes a scenario with the same `id`. Move the scenarios of a flow that is not a goal (step 1).
 - A file with no `channels`, no `ACCEPTANCE`, no `kind`, or MCP scenarios marked `surface: "api"` → update it in place: set `mcp`, add `channels`, `ACCEPTANCE` and `kind`, then add the missing twins. Keep every id.
 - Run by design-feature → it passes `<plan>` and `.parts/brief.md`; read the brief instead of the spec. Step 1b still applies to any message, permission or example value the brief lacks.
@@ -67,7 +67,8 @@ Where the file goes (`<plan>`):
 5. **Ids are stable.** Use cases are `UC1`, `UC2`, … Scenarios are kebab-case and unique. Never reuse an id for another meaning. Other files link to `#sc-<scenario id>`.
 6. Every count you report comes from `scripts/check.js`, never an estimate.
 7. No absolute local paths in the file.
-8. **Every channel is covered.** A use case lists every channel users reach it on (`channels`). Each outcome (acceptance scenario, edge case, refusal) gets one scenario per channel of its use case, citing the same story ref. When a channel truly can't reach an outcome, the scenario says why in `na` instead (e.g. `"na": { "mcp": "ListThings has no status filter." }`). Never drop the MCP side because the UI side exists.
+8. **Every channel is covered.** A use case lists every channel users reach it on (`channels`). Each rule or outcome (acceptance scenario, edge case, refusal) gets one scenario per channel of its use case, citing the same story ref. When a channel truly can't reach an outcome, the scenario says why in `na` instead (e.g. `"na": { "mcp": "ListThings has no status filter." }`). Never drop the MCP side because the UI side exists.
+9. **Fewest scenarios that cover every rule.** Each scenario costs a reviewer time to play and a test to keep up. One scenario per rule or outcome, never one per click, view or value (step 2, "Split and merge").
 
 ## Workflow
 
@@ -109,7 +110,7 @@ Start from `template/use-cases.js`.
 | `channels` | every channel users reach it on: `["ui", "mcp"]`, `["job"]`, … |
 | `none` | only for a use case with no scenario: one sentence saying why |
 
-- `SCENARIOS`: one entry per acceptance scenario, edge case and refusal row **on each channel of its use case**, grouped by use case, in use case order. A requirement no scenario covers gets its own scenario. Inside a use case, keep a channel's twins next to each other or keep all ui first, then mcp; every skill shows them in this order.
+- `SCENARIOS`: one entry per rule or outcome (an acceptance scenario, edge case or refusal row) **on each channel of its use case**, grouped by use case, in use case order. A requirement no scenario covers gets its own scenario. Inside a use case, keep a channel's twins next to each other or keep all ui first, then mcp; every skill shows them in this order.
 
 | Field | What |
 |-------|------|
@@ -158,13 +159,30 @@ Before and after, from a real plan:
     - On the main path, with nothing special → `basic`. Exactly one per use case and channel.
     - Another way: another option, a filter, empty data, a retry that works → `alternate`.
     - No: a refusal, a validation error, an unreachable service → `exception`.
-- One scenario = one outcome. A spec scenario with two different outcomes is two scenarios.
-- A title with "and" or "or" usually covers two paths. Split it ("No changelog", "No previous version").
+**Split and merge.** A scenario is one rule or outcome, not one interaction. Other values of the same rule are examples inside it, like the rows of a Gherkin examples table.
+
+- Merge into one scenario, listing each variation with its example in `expect`:
+    - the same rule with other values (another version, another count, another refused role with the same message)
+    - another click, view, tab or sort from the same start state, with the same kind of result
+    - exceptions with the same error code and message, whatever the trigger: name each trigger in `when` ("e.g. an empty name, or one over 64 characters")
+- Keep apart only when one of these changes:
+    - the rule (another AC, FR or decision)
+    - the kind (`basic`, `alternate`, `exception`)
+    - the error code or the user-facing message
+- A spec scenario with two different outcomes is two scenarios. A title with "and" or "or" that joins two rules is two scenarios ("No changelog", "No previous version"); one that joins two values of one rule is fine.
+- Each channel merges by these rules on its own. MCP may keep apart two refusals the screen shows with one message, or the other way round.
+
+### 2b. Merge pass
+
+- Group each use case's scenarios by channel, kind and story ref; for exceptions, also by error code and message.
+- A group with more than one scenario becomes one: keep the first id, name the rule in `title`, and list each variation with its example in `when` and `expect`. Keep the union of `given` and `story`.
+- More than 12 scenarios on one channel of a use case means missed merges or too many rules for one goal. Merge again; if it stays above 12, say so in the reply and suggest splitting the use case.
 
 ### 3. Check
 
 - `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `kind` with at most one `basic` per use case and channel, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, the count per kind, and the acceptance coverage.
 - It warns when a scenario has no `kind`, or a channel of a use case has no `basic` scenario. Add the kind.
+- It warns when two scenarios share use case, channel, kind and story ref (and, for exceptions, the first quoted message), and when a use case has more than 12 scenarios on one channel. Merge them (step 2b), or say in the reply why they stay apart.
 - It warns when a scenario has no twin (same story ref) on another channel of its use case and no `na` reason, when an `api` scenario talks about MCP, and when an acceptance criterion skips a channel of its use case with no `na`. Add the twin, or the reason.
 - It also warns (exit code stays 0) when a scenario's `expect` has no quoted message, number or identifier, and when a scenario that talks about a role, a permission or "not allowed" names no permission string. Fix each warning by adding the example from step 1b; leave one only when the scenario truly has no value to show, and say why in the reply.
 - Fix every error and re-run until it exits 0.
@@ -174,6 +192,7 @@ Before and after, from a real plan:
 
 - Output: `✅ Use cases written at: {path}`.
 - The totals, the scenario count per use case and channel, and the acceptance coverage, copied from `check.js` output, and any warning left with its reason.
+- **Merged**: each removed scenario id and the id it merged into, when an existing file was updated. Mock and test files that linked to a removed id need its new id.
 - **Channel gaps**: every `na` reason, one line each, so the user can disagree.
 - **Spec vs code**: each scenario where the spec's text differs from the code's, with both texts and the code's `file:line`. Say "none found" when there are none, or "no code yet: messages from the spec".
 - Next steps, one line each: design-feature shows the acceptance criteria and each use case's scenarios, generate-mock-ui mocks the `ui` scenarios, play-scenarios plays every scenario on the running app, e2e-test runs every scenario as an automated test.

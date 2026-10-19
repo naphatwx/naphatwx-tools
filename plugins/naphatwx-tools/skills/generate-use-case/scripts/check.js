@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Checks a use-cases.js file (USE_CASES + SCENARIOS + ACCEPTANCE): fields, channel coverage, acceptance coverage.
 // Usage: node check.js <use-cases.js> [--json]
-// Exit 1 on any error; warnings (no example, a scenario with no twin on another channel) keep exit 0.
+// Exit 1 on any error; warnings (no example, no twin on another channel, likely duplicates, over budget) keep exit 0.
 
 const fs = require('fs');
 
@@ -108,6 +108,21 @@ for (const c of UCS) {
             if (!twin) warnings.push(`${s.id} (${s.surface}, ${s.story}): no ${k} scenario for the same story ref; add one, or set "na": { "${k}": "<why>" }`);
         }
     }
+}
+
+// Merge: one scenario per rule. Same use case, channel, kind and story ref (exceptions: and message) is likely one rule.
+const BUDGET = 12;
+const groups = new Map();
+for (const s of SCS) {
+    if (!s.useCase || !s.surface || !s.kind || s.kind === 'basic') continue;
+    const msg = s.kind === 'exception' ? ((Array.isArray(s.expect) ? s.expect.join(' ') : '').match(/"[^"]+"/) || [''])[0] : '';
+    const key = [s.useCase, s.surface, s.kind, [...storyTokens(s.story)].sort().join('|'), msg].join('\n');
+    groups.set(key, [...(groups.get(key) || []), s.id]);
+}
+for (const list of groups.values()) if (list.length > 1) warnings.push(`${list.join(', ')}: same use case, channel, kind and story ref; merge into one scenario (SKILL.md step 2b) unless the rule or message differs`);
+for (const c of UCS) for (const k of c.channels || []) {
+    const n = SCS.filter(s => s.useCase === c.id && s.surface === k).length;
+    if (n > BUDGET) warnings.push(`use case ${c.id}: ${n} ${k} scenarios (budget ${BUDGET}); merge variations of one rule, or split the use case`);
 }
 
 // Acceptance criteria: every channel an AC applies to has a scenario that cites it.

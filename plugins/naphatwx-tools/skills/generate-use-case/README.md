@@ -1,6 +1,6 @@
 # generate-use-case
 
-Writes a feature's use cases (one per user goal), their scenarios (one per path and result, on every channel: UI, MCP, API, job) and the spec's acceptance criteria to one `use-cases.js` file. Every skill that plays or tests the feature reads it and shows the same tree: use case → scenarios.
+Writes a feature's use cases (one per user goal), their scenarios (one per rule or outcome, not per click or value, on every channel: UI, MCP, API, job) and the spec's acceptance criteria to one `use-cases.js` file. Every skill that plays or tests the feature reads it and shows the same tree: use case → scenarios.
 
 ## When to use it
 
