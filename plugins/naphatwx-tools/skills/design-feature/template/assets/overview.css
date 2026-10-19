@@ -93,10 +93,8 @@
 /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-/* Text size from the picker (theme/pdf.js). Every rem token scales from the root; diagram text is px */
-html[data-font-size="small"] { font-size: 14px; }
-html[data-font-size="medium"] { font-size: 16px; }
-html[data-font-size="large"] { font-size: 18px; }
+/* Text size from the picker (theme/pdf.js). Small shrinks body, meta and code; headings and tags stay as medium */
+html[data-font-size="small"] { --fs-body: 0.875rem; --fs-meta: 0.75rem; --fs-code: 0.75rem; }
 body {
     margin: 0;
     background: var(--bg);
@@ -145,7 +143,6 @@ code, kbd, pre, samp { font-family: var(--mono); }
 .font-size-picker .font-size-button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
 .font-size-picker .font-size-button[data-size="small"] { font-size: 12px; }
 .font-size-picker .font-size-button[data-size="medium"] { font-size: 15px; }
-.font-size-picker .font-size-button[data-size="large"] { font-size: 18px; }
 /* Room under the last line so the bar never hides it: bar 42px + its 20px offset + a 14px gap.
    An embedded diagram posts its body height with this padding, so the host frame keeps the room too. */
 body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); }

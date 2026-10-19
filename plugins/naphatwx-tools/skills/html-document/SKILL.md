@@ -7,7 +7,7 @@ description: Generate a styled single-file HTML docs page with sidebar navigatio
 
 Generate a single-file HTML documentation page from a bundled template.
 
-The template is a dark-only docs layout with a left sidebar, search box, and a text size picker (small 14px / medium 16px / large 18px, default medium). The style is inspired by the Clerk docs.
+The template is a dark-only docs layout with a left sidebar, search box, and a text size picker (small: body 14px, meta and code 12px / medium: body 16px, meta and code 14px; default medium). The style is inspired by the Clerk docs.
 
 Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
 The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
@@ -37,7 +37,7 @@ The output **must** keep all of these:
 
 1. Single self-contained file. No external CSS, JS, fonts, or images.
 2. Dark only. Add no light theme, theme toggle, or other palette.
-3. The text size picker stays and works. Default is medium (16px). `addExportPdf()` adds it to the top bar.
+3. The text size picker stays and works. Default is medium. `addExportPdf()` adds it to the top bar.
 4. The sidebar nav, search box, and active-section highlight stay and work.
 5. Every `nav-link` `href` matches a real heading `id` in the content.
 

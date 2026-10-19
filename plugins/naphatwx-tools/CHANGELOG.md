@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.231
+
+**Text size picker: small and medium only**
+
+- The Large option is gone. A saved "large" falls back to medium.
+- Small no longer shrinks the whole page. It sets body text to 14px, and meta text (hints, labels, captions) and code to 12px. Headings and tags stay as medium.
+
 ## 1.9.230
 
 **Text size picker on every page**

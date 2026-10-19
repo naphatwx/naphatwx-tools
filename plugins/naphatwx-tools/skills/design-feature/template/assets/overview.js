@@ -1,8 +1,8 @@
 /* theme:pdf-js:start */
 /* Synced from theme/pdf.js by theme/sync.mjs. Do not edit here. */
-const FONT_SIZES = { small: '14px', medium: '16px', large: '18px' };
+const FONT_SIZES = { small: 'body 14px, meta and code 12px', medium: 'body 16px, meta and code 14px' };
 const FONT_SIZE_KEY = 'naphatwx-font-size';
-// The px values live in base.css (html[data-font-size]); every rem token scales from the root size.
+// The sizes live in base.css (html[data-font-size]): small overrides --fs-body, --fs-meta and --fs-code.
 function setFontSize(size) {
     if (!FONT_SIZES[size]) size = 'medium';
     document.documentElement.dataset.fontSize = size;
@@ -13,13 +13,13 @@ function addFontSizePicker(target) {
     group.className = 'font-size-picker no-print';
     group.setAttribute('role', 'group');
     group.setAttribute('aria-label', 'Text size');
-    for (const [size, px] of Object.entries(FONT_SIZES)) {
+    for (const [size, sizes] of Object.entries(FONT_SIZES)) {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'font-size-button';
         button.dataset.size = size;
         button.textContent = 'A';
-        button.title = `${size[0].toUpperCase()}${size.slice(1)} text (${px})`;
+        button.title = `${size[0].toUpperCase()}${size.slice(1)} text (${sizes})`;
         button.setAttribute('aria-label', button.title);
         button.addEventListener('click', () => {
             setFontSize(size);
