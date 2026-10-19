@@ -43,14 +43,14 @@ a.panel:hover { background: var(--hover); }
 .scenario .mark { display: none; }
 /* the second line lines up under the title: past the disc (24px) and its 12px gap */
 .scenario .info { align-items: center; gap: 4px 6px; padding-left: calc(24px + 12px); }
-.scenario-surface { font-family: var(--mono); font-size: var(--fs-tag); text-transform: uppercase; color: var(--text-3); }
+.scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
 /* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
 .scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }
 .scenario.picked > .disclosure-head, .scenario.picked > .disclosure-head:hover { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); }
 .scenario.picked.open > .disclosure-head { border-bottom-color: var(--accent); }
 .scenario.picked .scenario-title { color: var(--text); font-weight: 600; }
 .scenario.picked .scenario-number:not(.pass, .fail) { color: var(--accent); border-color: var(--accent); }
-.scenario.picked .scenario-surface { color: var(--text-2); }
+.scenario.picked .scenario-surface { color: var(--text); }
 .scenario-details { padding: 12px 14px 14px; }
 .scenario-details > * + * { margin-top: 14px; }
 .scenario-details ol, .scenario-details ul { margin: 4px 0 0; padding-left: 20px; color: var(--text-2); }

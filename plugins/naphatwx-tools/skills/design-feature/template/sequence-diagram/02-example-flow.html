@@ -119,9 +119,9 @@
     .scenario-kind.basic { color: var(--ok); background: var(--ok-soft); }
     .scenario-kind.exception { color: var(--bad); background: var(--bad-soft); }
     /* Core scenario ("core": true in use-cases.js): play it first. Solid accent so it reads in a long list */
-    .core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
+    .core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); text-transform: uppercase; background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
     /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-    .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+    .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); text-transform: uppercase; background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
     .references-chip:hover { background: var(--hover); }
     .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
     .references-chip[aria-expanded="false"] + .references-ids { display: none; }

@@ -115,9 +115,9 @@ code, kbd, pre, samp { font-family: var(--mono); }
 .scenario-kind.basic { color: var(--ok); background: var(--ok-soft); }
 .scenario-kind.exception { color: var(--bad); background: var(--bad-soft); }
 /* Core scenario ("core": true in use-cases.js): play it first. Solid accent so it reads in a long list */
-.core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
+.core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); text-transform: uppercase; background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
 /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-.references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+.references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); text-transform: uppercase; background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
 .references-chip:hover { background: var(--hover); }
 .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
 .references-chip[aria-expanded="false"] + .references-ids { display: none; }
@@ -519,7 +519,7 @@ svg .table-card .row.drop > .row-background { fill: var(--bad-soft); }
 .api h3 code, .references, .facts dd, .relation { overflow-wrap: anywhere; }
 .api .references { margin: 2px 0 8px; }
 .api h3 + .tables { margin-top: 8px; }
-.pill { font: 500 var(--fs-code)/1 var(--sans); padding: 4px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pill { font: 500 var(--fs-code)/1 var(--sans); text-transform: uppercase; padding: 4px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
 .pill.quiet { background: var(--surface-2); color: var(--text-2); }
 
 details.more { margin-top: 20px; border-top: 1px solid var(--line); }

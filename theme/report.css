@@ -7,7 +7,7 @@ main { max-width: min(80%, var(--max-w-4xl)); margin: 0 auto; padding: 16px var(
 h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
 code { font-size: var(--fs-code); overflow-wrap: anywhere; }
 
-.pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-tag); white-space: nowrap; }
+.pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-tag); text-transform: uppercase; white-space: nowrap; }
 .tone-ok { color: var(--ok); background: var(--ok-soft); }
 .tone-warn { color: var(--warn); background: var(--warn-soft); }
 .tone-bad { color: var(--bad); background: var(--bad-soft); }

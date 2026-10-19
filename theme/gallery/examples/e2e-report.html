@@ -119,9 +119,9 @@
   .scenario-kind.basic { color: var(--ok); background: var(--ok-soft); }
   .scenario-kind.exception { color: var(--bad); background: var(--bad-soft); }
   /* Core scenario ("core": true in use-cases.js): play it first. Solid accent so it reads in a long list */
-  .core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
+  .core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); text-transform: uppercase; background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
   /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
-  .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+  .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); text-transform: uppercase; background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
   .references-chip:hover { background: var(--hover); }
   .references-chip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
   .references-chip[aria-expanded="false"] + .references-ids { display: none; }
@@ -164,7 +164,7 @@
   h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
   code { font-size: var(--fs-code); overflow-wrap: anywhere; }
 
-  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-tag); white-space: nowrap; }
+  .pill { display: inline-flex; gap: 5px; align-items: center; padding: 1px 9px; border-radius: 999px; font-weight: 600; font-size: var(--fs-tag); text-transform: uppercase; white-space: nowrap; }
   .tone-ok { color: var(--ok); background: var(--ok-soft); }
   .tone-warn { color: var(--warn); background: var(--warn-soft); }
   .tone-bad { color: var(--bad); background: var(--bad-soft); }
@@ -295,7 +295,7 @@
 
   /* Surface tag (ui / mcp / api / job): the runner that played the scenario. */
   .scenario-kind { flex: none; }
-  .surface { flex: none; font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 0 6px; }
+  .surface { flex: none; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 600; line-height: 1.5; text-transform: uppercase; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; padding: 1px 8px; }
   .tools .separator { width: 1px; align-self: stretch; background: var(--line-strong); margin: 0 4px; }
   .viewer-body > .messages { grid-area: err; display: grid; gap: 10px; min-width: 0; }
   .review { display: grid; gap: 4px; padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); }
