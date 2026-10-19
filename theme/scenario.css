@@ -1,11 +1,8 @@
-/* Index chrome shared by generate-mock-ui and play-scenarios: use-case rows, scenario list, guide, frame and results. */
+/* Index chrome shared by generate-mock-ui and play-scenarios: use-case rows, scenario list, frame and results. */
 html { scroll-padding-top: 24px; }
 body { line-height: 1.55; overflow-x: clip; }
-/* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
-/* the frame column takes 70% of the row (up to 1920px) but leaves each side card at least 13rem;
-   the side cards split what is left evenly */
-:root { --row-w: calc(100vw - 2 * var(--gutter) - 12px); --frame-col: min(1920px, 0.7 * var(--row-w), var(--row-w) - 26rem - 48px); --text-w: var(--frame-col); --side-l: calc((var(--row-w) - var(--text-w)) / 2); --side-r: var(--side-l); }
-.page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
+/* Text (title, filter, results) sits in the plan's centered column; each use-case row breaks out to the window */
+.page { width: var(--page-w); margin: 0 auto; }
 .muted { color: var(--text-2); }
 .meta { color: var(--text-3); }
 /* Headings use the shared theme steps; other text uses the theme's role tokens (--fs-body / meta / code / tag). */
@@ -19,60 +16,56 @@ h3 { font-size: var(--fs-h3); line-height: 1.3; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
 a.panel { color: inherit; text-decoration: none; transition: background .15s var(--ease); }
 a.panel:hover { background: var(--hover); }
-/* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
-   the middle column shrinks to the frame's real width (--frame-w, set by fit()) and the side cards fill the rest;
-   on mid widths the guide tops the side list: the open scenario matters more than the others */
-.use-case-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: minmax(0, 1fr) var(--frame-w, var(--frame-col)) minmax(0, 1fr); grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
-.use-case-row > .tabs { grid-area: tabs; } .use-case-row > .card { grid-area: card; } .use-case-row > .guide { grid-area: guide; }
-/* side cards match the frame's top and height (set by fit()); longer content scrolls inside */
-.tabs, .guide { position: sticky; top: 16px; height: var(--frame-h, auto); margin-top: var(--frame-top, 0); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
-.tabs { display: flex; flex-direction: column; overflow-y: hidden; }
-/* same fill and rule as the guide's result block, so both side cards read as one pair */
-.tabs-title { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-.tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 4px; }
-/* title, refs chip and plan link share one line; they wrap under the title on narrow screens */
-.use-case-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-/* title, kind pill and Core pill sit 6px apart */
-.title-row { column-gap: 6px; }
-/* the result stays on top with its own fill; the guide text below it scrolls on its own */
-.guide { display: flex; flex-direction: column; overflow-y: hidden; }
-.guide-result { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-.guide-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 12px; }
-@media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .use-case-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs, .guide, .guide-body { overflow-y: visible; } }
-@media (max-width: 900px) { :root { --side-l: 0px; } .use-case-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
-.tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
-.tab-number, .tab-surface { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
-.tab-title { flex: 1; min-width: 0; }
-.tab:hover { color: var(--text); background: var(--hover); }
-/* solid accent fill: the picked scenario reads at a glance among 8+ rows */
-.tab[aria-selected="true"], .tab[aria-selected="true"] .tab-number, .tab[aria-selected="true"] .tab-surface { color: var(--bg); }
-.tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
-.tab[aria-selected="true"] .core-pill { color: var(--accent); background: var(--bg); border-color: var(--bg); }
-.tab[aria-selected="true"] .scenario-kind { color: var(--bg); background: none; }
-/* kind and Core pills on their own line under the chip's title; inline pills, so a skipped title's line-through skips them */
-.tab-tags { display: block; margin-top: 4px; }
-.tab-tags > * + * { margin-left: 6px; }
-/* the number is a status disc: outlined until marked, then a solid green check or red cross */
-.tab { align-items: center; }
-.tab-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.tab-number.pass, .tab[aria-selected="true"] .tab-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
-.tab-number.fail, .tab[aria-selected="true"] .tab-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
-.tab[aria-selected="true"] .tab-number { border-color: var(--bg); }
-.tabs-title { display: flex; flex-direction: column; gap: 2px; }
-/* "Scenarios" and the use case's Clear share the title line */
-.tabs-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.tabs-clear { padding: 0 8px; font: inherit; font-size: var(--fs-tag); font-weight: 400; color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
-.tabs-clear:hover { color: var(--text); background: var(--hover); }
-.tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
-.tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
+/* Use-case row: the frame takes 80% of the row (up to 1920px) but leaves the list at least 20rem; the list fills the rest.
+   12px is the page scrollbar, so the row never makes the page scroll sideways */
+.use-case-row { --row-w: calc(100vw - 2 * var(--gutter) - 12px); width: var(--row-w); margin-left: calc((100% - var(--row-w)) / 2); display: grid; grid-template-columns: minmax(0, 1fr) min(1920px, 80%, 100% - 20rem - 24px); gap: 24px; align-items: start; }
+/* the list card is as tall as the frame (--frame-h, set by fit()); a long list scrolls inside */
+.scenarios { position: sticky; top: 16px; height: var(--frame-h, auto); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.scenarios-head { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+/* title, refs chip and plan link share one line; they wrap under the title on narrow lists */
+.use-case-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.use-case-head h2 { font-size: var(--fs-h3); }
+/* "Scenarios", the pass / fail count and the use case's Clear share one line */
+.scenarios-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.scenarios-count { font-size: var(--fs-tag); white-space: nowrap; }
+.scenarios-count .pass { color: var(--ok); font-weight: 600; } .scenarios-count .fail { color: var(--bad); font-weight: 600; }
+.scenarios-clear { padding: 0 8px; font: inherit; font-size: var(--fs-tag); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+.scenarios-clear:hover { color: var(--text); background: var(--hover); }
+.scenario-list { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 8px 8px; }
+/* One scenario: a disclosure card (disclosure.css), the same as deploy-plan, smoke-test and e2e-test rows.
+   Line one: mark, status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
+.scenario-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 400; color: var(--text-3); border: 1.5px solid var(--line-3); border-radius: 50%; }
+.scenario-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.scenario-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
+.scenario-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
+.scenario-title { min-width: 0; overflow-wrap: anywhere; }
+/* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
+.scenario .mark { display: none; }
+/* the second line lines up under the title: past the disc (24px) and its 12px gap */
+.scenario .info { align-items: center; gap: 4px 6px; padding-left: calc(24px + 12px); }
+.scenario-surface { font-family: var(--mono); font-size: var(--fs-tag); text-transform: uppercase; color: var(--text-3); }
+/* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
+.scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }
+.scenario.picked > .disclosure-head, .scenario.picked > .disclosure-head:hover { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); }
+.scenario.picked.open > .disclosure-head { border-bottom-color: var(--accent); }
+.scenario.picked .scenario-title { color: var(--text); font-weight: 600; }
+.scenario.picked .scenario-number:not(.pass, .fail) { color: var(--accent); border-color: var(--accent); }
+.scenario.picked .scenario-surface { color: var(--text-2); }
+.scenario-details { padding: 12px 14px 14px; }
+.scenario-details > * + * { margin-top: 14px; }
+.scenario-details ol, .scenario-details ul { margin: 4px 0 0; padding-left: 20px; color: var(--text-2); }
+.scenario-details li + li { margin-top: 4px; }
+/* refs chip, state or role, on one line at the top of the details */
+.scenario-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 /* the Kind + Core-only filter sits under the page title, over every use case */
 .filter-row { padding: 4px 0; }
 /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
-.result-button { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+.result-control { display: flex; gap: 8px; margin: 4px 0 8px; }
+.result-button { padding: 4px 12px; font: inherit; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
 .result-button:hover { background: var(--hover); }
 .result-button.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
 .result-button.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
-.note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
+.note { display: block; width: 100%; min-height: 4rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
 .result-table { width: 100%; border-collapse: collapse; }
 .result-table th, .result-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
 .result-table th { border-top: 0; }
@@ -86,11 +79,18 @@ a.panel:hover { background: var(--hover); }
 .rows > * + * { border-top: 1px solid var(--line); }
 /* the screen renders at desktop width and is scaled down to the frame */
 .screen-fit { position: relative; overflow: hidden; }
-/* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
+/* Narrow windows: the list above the frame, at its full height */
+@media (max-width: 1000px) {
+    .use-case-row { grid-template-columns: minmax(0, 1fr); }
+    .scenarios { position: static; height: auto; }
+    .scenario-list { overflow-y: visible; }
+}
+/* PDF: one column, the open scenario of each use case with its steps, then its frame; no other rows, marks or restart. */
 @media print {
     .page { width: auto; margin: 0; padding: 16px; }
-    .use-case-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
-    .guide { position: static; height: auto; margin-top: 0; max-height: none; }
-    .guide, .guide-body { overflow: visible; }
-    .guide-result { display: none; }
+    .use-case-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); }
+    .scenarios { position: static; height: auto; }
+    .scenario-list { overflow: visible; }
+    .scenario:not(.picked), .scenario-result, .scenarios-clear { display: none !important; }
+    .scenario.picked .scenario-details { display: block !important; }
 }

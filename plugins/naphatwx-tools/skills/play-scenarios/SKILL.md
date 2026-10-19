@@ -6,7 +6,7 @@ argument-hint: <plan-folder | spec-folder> [base-url] [app-repo-path]
 
 # Play Scenarios
 
-Play each scenario of a feature on the running app, by hand. The page looks like the mock UI's index: one block per **use case**, a side list of its **scenarios**, the picked one in a 16:9 frame, and a guide beside it (Result, How to play, What you should see). The difference: the frame is the real app, and each pick first **seeds** new data for that scenario by calling the app's API.
+Play each scenario of a feature on the running app, by hand. The page looks like the mock UI's index: one block per **use case**: a list of its **scenarios** on the left, the picked one in a 16:9 frame on the right. The picked scenario opens in the list and shows its details (Result, How to play, What you should see). The difference: the frame is the real app, and each pick first **seeds** new data for that scenario by calling the app's API.
 
 The page shows the same tree as every skill that reads `use-cases.js`: use cases in `USE_CASES` order, each with its scenarios in `SCENARIOS` order, same ids. The picked scenario's title shows its kind (`basic`, `alternate`, `exception`). Each scenario has a small surface tag:
 
@@ -31,7 +31,7 @@ It is generic: it needs a way to start the app, a health URL and an HTTP API. It
 <plan>/use-cases.js        USE_CASES + SCENARIOS (generate-use-case); read-only here
 live/
 ├── README.md              how to run the page, for teammates; copied from template/ as is
-├── index.html             one block per use case: side list, framed app, guide with Pass / Fail; results table
+├── index.html             one block per use case: scenario list (open one shows Pass / Fail and steps), framed app; results table
 ├── live.js                LIVE_CONFIG (app, API, pre-test, login) + LIVE_PLAY (seed, url, role, steps, prompt per scenario)
 ├── results.js             PLAYED_RESULTS: what the AI recorded for the no-screen scenarios (status, note, calls)
 ├── ai-results.md          the AI's report on those scenarios: how it ran, results table, FAILs

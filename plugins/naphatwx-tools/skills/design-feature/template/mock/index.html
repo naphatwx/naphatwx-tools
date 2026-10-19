@@ -155,15 +155,33 @@
         /* theme:pdf:end */
 
         /* Index chrome only. The screens inside the frames use the target app's own design system. */
+        /* theme:disclosure:start */
+        /* Synced from theme/disclosure.css by theme/sync.mjs. Do not edit here. */
+        /* Disclosure is h2 (or h3) > button, not <summary>: a summary flattens any heading inside it for screen readers. */
+        .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
+        .disclosure-head { padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background-color .15s var(--ease); }
+        .disclosure-head:hover { background: var(--hover); }
+        .disclosure.open { border-color: var(--accent); }
+        /* the open row matches the pressed filter button, so it reads as selected */
+        .disclosure.open > .disclosure-head, .disclosure.open > .disclosure-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
+        .disclosure.open > .disclosure-head .mark { color: var(--accent); }
+        .disclosure.open > .disclosure-head :is(h2, h3) { font-weight: 600; }
+        /* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
+        .disclosure-head :is(h2, h3) { min-width: 0; font-size: var(--fs-body); }
+        .disclosure-head :is(h2, h3) button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
+        .disclosure-head :is(h2, h3) .pill { flex: none; }
+        .disclosure-head :is(h2, h3) button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+        .disclosure-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
+        .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
+        .mark::before { content: "+"; }
+        .disclosure.open > .disclosure-head .mark::before { content: "\2212"; }
+        /* theme:disclosure:end */
         /* theme:scenario:start */
         /* Synced from theme/scenario.css by theme/sync.mjs. Do not edit here. */
         html { scroll-padding-top: 24px; }
         body { line-height: 1.55; overflow-x: clip; }
-        /* the text column is as wide as the frame (--text-w, set by fit()), so title, topic and frame line up */
-        /* the frame column takes 70% of the row (up to 1920px) but leaves each side card at least 13rem;
-           the side cards split what is left evenly */
-        :root { --row-w: calc(100vw - 2 * var(--gutter) - 12px); --frame-col: min(1920px, 0.7 * var(--row-w), var(--row-w) - 26rem - 48px); --text-w: var(--frame-col); --side-l: calc((var(--row-w) - var(--text-w)) / 2); --side-r: var(--side-l); }
-        .page { width: calc(var(--row-w) - var(--side-l) - var(--side-r)); margin-left: calc((100vw - 12px - var(--row-w)) / 2 + var(--side-l)); }
+        /* Text (title, filter, results) sits in the plan's centered column; each use-case row breaks out to the window */
+        .page { width: var(--page-w); margin: 0 auto; }
         .muted { color: var(--text-2); }
         .meta { color: var(--text-3); }
         /* Headings use the shared theme steps; other text uses the theme's role tokens (--fs-body / meta / code / tag). */
@@ -177,60 +195,56 @@
         .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
         a.panel { color: inherit; text-decoration: none; transition: background .15s var(--ease); }
         a.panel:hover { background: var(--hover); }
-        /* the use-case row (side list, frame, guide) breaks out of the text column so the frame gets the width;
-           the middle column shrinks to the frame's real width (--frame-w, set by fit()) and the side cards fill the rest;
-           on mid widths the guide tops the side list: the open scenario matters more than the others */
-        .use-case-row { width: var(--row-w); margin-left: calc(-1 * var(--side-l)); display: grid; grid-template-columns: minmax(0, 1fr) var(--frame-w, var(--frame-col)) minmax(0, 1fr); grid-template-areas: "tabs card guide"; gap: 24px; align-items: start; }
-        .use-case-row > .tabs { grid-area: tabs; } .use-case-row > .card { grid-area: card; } .use-case-row > .guide { grid-area: guide; }
-        /* side cards match the frame's top and height (set by fit()); longer content scrolls inside */
-        .tabs, .guide { position: sticky; top: 16px; height: var(--frame-h, auto); margin-top: var(--frame-top, 0); overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
-        .tabs { display: flex; flex-direction: column; overflow-y: hidden; }
-        /* same fill and rule as the guide's result block, so both side cards read as one pair */
-        .tabs-title { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-        .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 4px; }
-        /* title, refs chip and plan link share one line; they wrap under the title on narrow screens */
-        .use-case-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-        /* title, kind pill and Core pill sit 6px apart */
-        .title-row { column-gap: 6px; }
-        /* the result stays on top with its own fill; the guide text below it scrolls on its own */
-        .guide { display: flex; flex-direction: column; overflow-y: hidden; }
-        .guide-result { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-        .guide-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 12px; }
-        @media (max-width: 1400px) { :root { --side-l: calc(17rem + 24px); --side-r: 0px; } .use-case-row { grid-template-columns: 17rem minmax(0, 1fr); grid-template-areas: "guide card" "tabs card"; grid-template-rows: auto 1fr; } .tabs, .guide { position: static; height: auto; margin-top: 0; max-height: none; } .tabs, .guide, .guide-body { overflow-y: visible; } }
-        @media (max-width: 900px) { :root { --side-l: 0px; } .use-case-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "guide" "card"; grid-template-rows: none; } }
-        .tab { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 10px; text-align: left; line-height: 1.35; color: var(--text-2); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
-        .tab-number, .tab-surface { font-family: var(--mono); font-size: var(--fs-tag); color: var(--text-3); }
-        .tab-title { flex: 1; min-width: 0; }
-        .tab:hover { color: var(--text); background: var(--hover); }
-        /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
-        .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-number, .tab[aria-selected="true"] .tab-surface { color: var(--bg); }
-        .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
-        .tab[aria-selected="true"] .core-pill { color: var(--accent); background: var(--bg); border-color: var(--bg); }
-        .tab[aria-selected="true"] .scenario-kind { color: var(--bg); background: none; }
-        /* kind and Core pills on their own line under the chip's title; inline pills, so a skipped title's line-through skips them */
-        .tab-tags { display: block; margin-top: 4px; }
-        .tab-tags > * + * { margin-left: 6px; }
-        /* the number is a status disc: outlined until marked, then a solid green check or red cross */
-        .tab { align-items: center; }
-        .tab-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-        .tab-number.pass, .tab[aria-selected="true"] .tab-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
-        .tab-number.fail, .tab[aria-selected="true"] .tab-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
-        .tab[aria-selected="true"] .tab-number { border-color: var(--bg); }
-        .tabs-title { display: flex; flex-direction: column; gap: 2px; }
-        /* "Scenarios" and the use case's Clear share the title line */
-        .tabs-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .tabs-clear { padding: 0 8px; font: inherit; font-size: var(--fs-tag); font-weight: 400; color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
-        .tabs-clear:hover { color: var(--text); background: var(--hover); }
-        .tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
-        .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
+        /* Use-case row: the frame takes 80% of the row (up to 1920px) but leaves the list at least 20rem; the list fills the rest.
+           12px is the page scrollbar, so the row never makes the page scroll sideways */
+        .use-case-row { --row-w: calc(100vw - 2 * var(--gutter) - 12px); width: var(--row-w); margin-left: calc((100% - var(--row-w)) / 2); display: grid; grid-template-columns: minmax(0, 1fr) min(1920px, 80%, 100% - 20rem - 24px); gap: 24px; align-items: start; }
+        /* the list card is as tall as the frame (--frame-h, set by fit()); a long list scrolls inside */
+        .scenarios { position: sticky; top: 16px; height: var(--frame-h, auto); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        .scenarios-head { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+        /* title, refs chip and plan link share one line; they wrap under the title on narrow lists */
+        .use-case-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+        .use-case-head h2 { font-size: var(--fs-h3); }
+        /* "Scenarios", the pass / fail count and the use case's Clear share one line */
+        .scenarios-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
+        .scenarios-count { font-size: var(--fs-tag); white-space: nowrap; }
+        .scenarios-count .pass { color: var(--ok); font-weight: 600; } .scenarios-count .fail { color: var(--bad); font-weight: 600; }
+        .scenarios-clear { padding: 0 8px; font: inherit; font-size: var(--fs-tag); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+        .scenarios-clear:hover { color: var(--text); background: var(--hover); }
+        .scenario-list { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 8px 8px; }
+        /* One scenario: a disclosure card (disclosure.css), the same as deploy-plan, smoke-test and e2e-test rows.
+           Line one: mark, status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
+        .scenario-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 400; color: var(--text-3); border: 1.5px solid var(--line-3); border-radius: 50%; }
+        .scenario-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        .scenario-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
+        .scenario-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
+        .scenario-title { min-width: 0; overflow-wrap: anywhere; }
+        /* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
+        .scenario .mark { display: none; }
+        /* the second line lines up under the title: past the disc (24px) and its 12px gap */
+        .scenario .info { align-items: center; gap: 4px 6px; padding-left: calc(24px + 12px); }
+        .scenario-surface { font-family: var(--mono); font-size: var(--fs-tag); text-transform: uppercase; color: var(--text-3); }
+        /* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
+        .scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }
+        .scenario.picked > .disclosure-head, .scenario.picked > .disclosure-head:hover { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); }
+        .scenario.picked.open > .disclosure-head { border-bottom-color: var(--accent); }
+        .scenario.picked .scenario-title { color: var(--text); font-weight: 600; }
+        .scenario.picked .scenario-number:not(.pass, .fail) { color: var(--accent); border-color: var(--accent); }
+        .scenario.picked .scenario-surface { color: var(--text-2); }
+        .scenario-details { padding: 12px 14px 14px; }
+        .scenario-details > * + * { margin-top: 14px; }
+        .scenario-details ol, .scenario-details ul { margin: 4px 0 0; padding-left: 20px; color: var(--text-2); }
+        .scenario-details li + li { margin-top: 4px; }
+        /* refs chip, state or role, on one line at the top of the details */
+        .scenario-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
         /* the Kind + Core-only filter sits under the page title, over every use case */
         .filter-row { padding: 4px 0; }
         /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
-        .result-button { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
+        .result-control { display: flex; gap: 8px; margin: 4px 0 8px; }
+        .result-button { padding: 4px 12px; font: inherit; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
         .result-button:hover { background: var(--hover); }
         .result-button.pass[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
         .result-button.fail[aria-pressed="true"] { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
-        .note { width: 100%; min-height: 4.5rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
+        .note { display: block; width: 100%; min-height: 4rem; padding: 6px 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius); resize: vertical; }
         .result-table { width: 100%; border-collapse: collapse; }
         .result-table th, .result-table td { padding: 6px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
         .result-table th { border-top: 0; }
@@ -244,13 +258,20 @@
         .rows > * + * { border-top: 1px solid var(--line); }
         /* the screen renders at desktop width and is scaled down to the frame */
         .screen-fit { position: relative; overflow: hidden; }
-        /* PDF: one column, the open scenario of each use case with its guide; no scenario list or restart. */
+        /* Narrow windows: the list above the frame, at its full height */
+        @media (max-width: 1000px) {
+            .use-case-row { grid-template-columns: minmax(0, 1fr); }
+            .scenarios { position: static; height: auto; }
+            .scenario-list { overflow-y: visible; }
+        }
+        /* PDF: one column, the open scenario of each use case with its steps, then its frame; no other rows, marks or restart. */
         @media print {
             .page { width: auto; margin: 0; padding: 16px; }
-            .use-case-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "card"; }
-            .guide { position: static; height: auto; margin-top: 0; max-height: none; }
-            .guide, .guide-body { overflow: visible; }
-            .guide-result { display: none; }
+            .use-case-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); }
+            .scenarios { position: static; height: auto; }
+            .scenario-list { overflow: visible; }
+            .scenario:not(.picked), .scenario-result, .scenarios-clear { display: none !important; }
+            .scenario.picked .scenario-details { display: block !important; }
         }
         /* theme:scenario:end */
         /* theme:scrollbar:start */
@@ -278,15 +299,13 @@
         /* a row the filter hides; rows keep their place and number */
         [data-kind][hidden] { display: none !important; }
         /* theme:scenario-filter:end */
-        .tab-surface { text-transform: uppercase; }
-        /* mcp / api / job scenarios: in the tree like every skill's, greyed, "No mock" when picked */
-        .tab.off:not([aria-selected="true"]) .tab-title, .tab.off:not([aria-selected="true"]) .tab-surface { color: var(--text-3); }
-        .tab.off .tab-number { border-style: dashed; }
-        .tab-number { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border: 1.5px solid var(--line-3); border-radius: 50%; }
+        /* mcp / api / job scenarios: in the list like every skill's, greyed, "No mock" when picked */
+        .scenario.off:not(.picked) :is(.scenario-title, .scenario-surface) { color: var(--text-3); }
+        .scenario.off .scenario-number { border-style: dashed; }
         .screen-fit iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
         .no-mock { position: absolute; inset: 0; display: grid; place-content: center; gap: 4px; padding: 24px; text-align: center; background: var(--bg); }
         @media print {
-            .tabs, .button-ghost, .result-control { display: none !important; }
+            .button-ghost, .result-control { display: none !important; }
         }
     </style>
     <script src="contract/rules.js"></script>
@@ -427,6 +446,25 @@
         }
         /* theme:scenario-filter-js:end */
         addExportPdf();
+        /* theme:slide-js:start */
+        /* Synced from theme/slide.js by theme/sync.mjs. Do not edit here. */
+        const EASE = getComputedStyle(document.documentElement).getPropertyValue('--ease').trim() || 'ease';
+        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+        function slide(panel, open, instant) {
+          const from = panel.hidden ? 0 : panel.getBoundingClientRect().height;
+          panel.getAnimations().forEach((a) => a.cancel());
+          panel.style.overflow = '';
+          panel.hidden = false;
+          const to = open ? panel.getBoundingClientRect().height : 0;
+          if (instant || reducedMotion.matches || from === to) { panel.hidden = !open; return; }
+          const computedStyle = getComputedStyle(panel);
+          const keyframe = (height) => height ? { height: height + 'px', paddingTop: computedStyle.paddingTop, paddingBottom: computedStyle.paddingBottom, opacity: 1 }
+            : { height: '0px', paddingTop: '0px', paddingBottom: '0px', opacity: 0 };
+          panel.style.overflow = 'hidden';
+          const animation = panel.animate([keyframe(from), keyframe(to)], { duration: 220, easing: EASE, fill: 'forwards' });
+          animation.onfinish = () => { panel.hidden = !open; panel.style.overflow = ''; animation.cancel(); };
+        }
+        /* theme:slide-js:end */
         const SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080; // 16:9; the frame scales to the column width and keeps this ratio
         const list = items => items.map(item => `<li>${UI.esc(item)}</li>`).join('');
         const twoDigitNumber = useCaseId => useCaseId.slice(2).padStart(2, '0');
@@ -461,97 +499,101 @@
         }
 
         // ---------------------------------------------------------------- one block per use case
-        const headings = {}; // use case heading, drawn above the frame by pick() so it is exactly as wide
         document.getElementById('use-cases').innerHTML = USE_CASES.map(useCase => {
             const scenarios = scenariosOf(useCase.id);
             const heading = `
-              <div class="use-case-head mb-2">
-                <h2 class="font-bold"><span class="meta mr-2">${useCase.id}</span>${UI.esc(useCase.title)}</h2>
-                ${referencesChip(useCase.refs)}<a href="../overview.html#uc-${twoDigitNumber(useCase.id)}" class="link code-text">plan</a>
-              </div>`;
-            headings[useCase.id] = heading;
+                  <div class="use-case-head">
+                    <h2 class="font-bold"><span class="meta mr-2">${useCase.id}</span>${UI.esc(useCase.title)}</h2>
+                    ${referencesChip(useCase.refs)}<a href="../overview.html#uc-${twoDigitNumber(useCase.id)}" class="link code-text">plan</a>
+                  </div>`;
             if (!scenarios.length) return `<section id="uc-${twoDigitNumber(useCase.id)}">${heading}<p class="muted">${UI.esc(useCase.none || 'No scenario.')}</p></section>`;
             return `
               <section id="uc-${twoDigitNumber(useCase.id)}" data-use-case="${useCase.id}">
                 <div class="use-case-row">
-                <div class="tabs">
-                  <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${twoDigitNumber(useCase.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${useCase.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${useCase.id}"></span></div>
-                  <div class="tab-list" role="tablist" aria-labelledby="sc-title-${twoDigitNumber(useCase.id)}">
-                  ${scenarios.map((scenario, i) => `<button type="button" role="tab" class="tab${isPlayable(scenario) ? '' : ' off'}" data-sc="${scenario.id}" data-kind="${UI.esc(scenario.kind || '')}" data-core="${isCore(scenario)}" aria-selected="false" onclick="pick('${scenario.id}', true)"><span class="tab-number"${isPlayable(scenario) ? ` data-r="${scenario.id}"` : ''} data-n="${i + 1}">${i + 1}</span><span class="tab-title">${UI.esc(scenario.title)}${isPlayable(scenario) ? '' : '<span class="sr-only"> (no mock)</span>'}<span class="tab-tags">${kindPill(scenario)}${corePill(scenario)}</span></span><span class="tab-surface">${UI.esc(scenario.surface || '')}</span></button>`).join('')}
+                <div class="scenarios">
+                  <div class="scenarios-head">${heading}
+                    <div class="scenarios-meta"><span class="label">Scenarios <span class="scenarios-count label-note" data-count="${useCase.id}"></span></span><button type="button" class="scenarios-clear" onclick="clearUseCase('${useCase.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></div>
+                  </div>
+                  <div class="scenario-list">
+                  ${scenarios.map((scenario, i) => `<div class="scenario disclosure${isPlayable(scenario) ? '' : ' off'}" data-sc="${scenario.id}" data-kind="${UI.esc(scenario.kind || '')}" data-core="${isCore(scenario)}">
+                    <div class="disclosure-head">
+                      <h3><button type="button" aria-expanded="false" aria-controls="details-${scenario.id}" onclick="pick('${scenario.id}', true)"><span class="mark" aria-hidden="true"></span><span class="scenario-number"${isPlayable(scenario) ? ` data-r="${scenario.id}"` : ''} data-n="${i + 1}">${i + 1}</span><span class="scenario-title">${UI.esc(scenario.title)}${isPlayable(scenario) ? '' : '<span class="sr-only"> (no mock)</span>'}</span></button></h3>
+                      <div class="info">${kindPill(scenario)}${corePill(scenario)}<span class="scenario-surface">${UI.esc(scenario.surface || '')}</span></div>
+                    </div>
+                    <div class="scenario-details" id="details-${scenario.id}" hidden></div>
+                  </div>`).join('')}
                   </div>
                 </div>
-                <div class="card"></div>
-                <aside class="guide" aria-label="How to play and what you should see"></aside>
+                <div class="frame"></div>
                 </div>
               </section>`;
         }).join('');
-        addScenarioFilter(document.getElementById('scenario-filter'), { rows: '.tab[data-sc]', groups: '.tab-list', storageKey: 'mock-filter:' + FakeApi.STORE });
-
+        addScenarioFilter(document.getElementById('scenario-filter'), { rows: '.scenario[data-sc]', groups: '.scenario-list', storageKey: 'mock-filter:' + FakeApi.STORE });
+        /** Same disclosure as deploy-plan: the open card's panel slides; instant skips the slide. */
+        function setOpen(item, open, instant) {
+            item.classList.toggle('open', open);
+            item.querySelector('.disclosure-head button').setAttribute('aria-expanded', String(open));
+            slide(item.querySelector('.scenario-details'), open, instant);
+        }
+        // the whole head is a mouse target; its button serves keyboards
+        document.addEventListener('click', e => { const head = e.target.closest('.scenario .disclosure-head'); if (head && !e.target.closest('button')) head.querySelector('button').click(); });
+        function detailsHtml(scenario) {
+            const hasScreen = isPlayable(scenario), result = results[scenario.id] || {};
+            const facts = `${referencesChip(scenario.story)}<span class="code-text font-mono meta">${UI.esc(hasScreen ? stateOf(scenario).label : 'no mock')}</span>`;
+            if (!hasScreen) return `<div class="scenario-facts">${facts}</div>
+              <div><div class="label">What it should do</div><ul class="list-disc">${list(scenario.expect)}</ul></div>`;
+            return `<div class="scenario-facts">${facts}</div>
+              <div class="scenario-result">
+              <div class="label">Result</div>
+              <div class="result-control">
+                <button type="button" class="result-button pass" data-status="pass" aria-pressed="${result.status === 'pass'}" onclick="mark('${scenario.id}', 'pass')">✓ Pass</button>
+                <button type="button" class="result-button fail" data-status="fail" aria-pressed="${result.status === 'fail'}" onclick="mark('${scenario.id}', 'fail')">✗ Fail</button>
+              </div>
+              <textarea class="note result-control" aria-label="Note for ${UI.esc(scenario.title)}" placeholder="What you saw, if it differs" oninput="setResult('${scenario.id}', { note: this.value })">${UI.esc(result.note || '')}</textarea>
+              </div>
+              <div><div class="label">How to play</div><ol class="list-decimal">${list(scenario.steps)}</ol></div>
+              <div><div class="label">What you should see</div><ul class="list-disc">${list(scenario.expect)}</ul></div>`;
+        }
+        /** Open a scenario: its details unfold and its screen loads. Clicking the open one folds or unfolds its details only. */
         function pick(id, fromClick) {
             const scenario = SCENARIOS.find(s => s.id === id);
             const block = document.querySelector(`section[data-use-case="${scenario.useCase}"]`);
-            block.querySelectorAll('[role=tab]').forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.sc === id)));
+            const item = block.querySelector(`.scenario[data-sc="${id}"]`);
+            if (fromClick && item.classList.contains('picked')) { setOpen(item, !item.classList.contains('open')); return; }
+            // one scenario open per use case; the last one shuts at once, so the new one can be scrolled into view
+            const previous = block.querySelector('.scenario.picked');
+            if (previous && previous !== item) { previous.classList.remove('picked'); setOpen(previous, false, true); previous.querySelector('.scenario-details').innerHTML = ''; }
+            item.classList.add('picked');
+            item.querySelector('.scenario-details').innerHTML = detailsHtml(scenario);
+            if (previous !== item || !item.classList.contains('open')) setOpen(item, true, !fromClick);
+            if (fromClick && previous && previous !== item) item.scrollIntoView({ block: 'nearest' });
             if (fromClick) { clearStore(); history.replaceState(null, '', '#sc-' + id); }
             const hasScreen = isPlayable(scenario);
             const screen = hasScreen
                 ? `<iframe title="${UI.esc(scenario.title)} — interactive mock" src="${screenSource(scenario)}" width="${SCREEN_WIDTH}" height="${SCREEN_HEIGHT}"></iframe>`
                 : `<div class="no-mock"><div class="font-semibold">No mock</div><p class="muted">${UI.esc(SURFACE[scenario.surface] || scenario.surface)} scenario — play it with play-scenarios or test it with e2e-test.</p></div>`;
-            block.querySelector('.card').innerHTML = `${headings[scenario.useCase]}
-              <div class="title-row"><h3 class="font-semibold">${UI.esc(scenario.title)}</h3>${kindPill(scenario)}${corePill(scenario)}${referencesChip(scenario.story)}<span class="code-text font-mono meta">${UI.esc(hasScreen ? stateOf(scenario).label : 'no mock')}</span></div>
-              <div class="frame mt-2">
+            block.querySelector('.frame').innerHTML = `
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
                   <span class="url">${UI.esc(screenUrl(scenario))}</span>
                   <span class="ml-auto font-mono meta whitespace-nowrap scale-label"></span>
                   ${hasScreen ? `<button type="button" onclick="restart('${scenario.id}')" class="button-ghost">↻ Restart</button>` : ''}
                 </div>
-                <div class="screen-fit">${screen}</div>
-              </div>`;
-            const result = results[id] || {};
-            block.querySelector('.guide').innerHTML = !hasScreen ? `
-              <div class="guide-body">
-              <div class="label mt-4 mb-1">What it should do</div>
-              <ul class="list-disc pl-5 space-y-1 muted">${list(scenario.expect)}</ul>
-              </div>` : `
-              <div class="guide-result">
-              <div class="label mb-1">Result</div>
-              <div class="result-control flex gap-2 mb-2">
-                <button type="button" class="result-button pass" data-status="pass" aria-pressed="${result.status === 'pass'}" onclick="mark('${scenario.id}', 'pass')">✓ Pass</button>
-                <button type="button" class="result-button fail" data-status="fail" aria-pressed="${result.status === 'fail'}" onclick="mark('${scenario.id}', 'fail')">✗ Fail</button>
-              </div>
-              <textarea class="note result-control" aria-label="Note for ${UI.esc(scenario.title)}" placeholder="What you saw, if it differs" oninput="setResult('${scenario.id}', { note: this.value })">${UI.esc(result.note || '')}</textarea>
-              </div>
-              <div class="guide-body">
-              <div class="label mt-4 mb-1">How to play</div>
-              <ol class="list-decimal pl-5 space-y-1 muted">${list(scenario.steps)}</ol>
-              <div class="label mt-4 mb-1">What you should see</div>
-              <ul class="list-disc pl-5 space-y-1 muted">${list(scenario.expect)}</ul>
-              </div>`;
+                <div class="screen-fit">${screen}</div>`;
             fit(block);
         }
         function restart(id) { clearStore(); pick(id); }
-
         function fit(block) {
-            const box = block.querySelector('.screen-fit'); if (!box) return;
-            // fit the card's width only; the height follows at 16:9, so a short window scrolls the page
-            const row = block.querySelector('.use-case-row');
-            row.style.removeProperty('--frame-w'); // the full column, not the last fit's frame
-            const scale = Math.min(1, (block.querySelector('.card').clientWidth - 2) / SCREEN_WIDTH);
+            const frame = block.querySelector('.frame'), box = block.querySelector('.screen-fit'); if (!box) return;
+            // fit the frame's width only; the height follows at 16:9, so a short window scrolls the page
+            const scale = Math.min(1, (frame.clientWidth) / SCREEN_WIDTH);
             const iframe = box.querySelector('iframe'); if (iframe) iframe.style.transform = `scale(${scale})`;
             box.style.height = Math.round(SCREEN_HEIGHT * scale) + 'px';
-            const frame = box.closest('.frame');
-            frame.style.width = Math.round(SCREEN_WIDTH * scale) + 2 + 'px';
-            row.style.setProperty('--frame-w', frame.style.width);
-            row.style.setProperty('--frame-h', frame.offsetHeight + 'px');
-            row.style.setProperty('--frame-top', frame.getBoundingClientRect().top - row.getBoundingClientRect().top + 'px');
-            // the text column (page title, audit log) takes the frame's real width, so all of it lines up
-            const frameWidths = [...document.querySelectorAll('.use-case-row')].map(useCaseRow => parseFloat(useCaseRow.style.getPropertyValue('--frame-w'))).filter(Boolean);
-            document.documentElement.style.setProperty('--text-w', Math.max(...frameWidths) + 'px');
+            block.querySelector('.use-case-row').style.setProperty('--frame-h', frame.offsetHeight + 'px');
             block.querySelector('.scale-label').textContent = iframe ? `${Math.round(scale * 100)}% of ${SCREEN_WIDTH} px` : '';
         }
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
         addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer
-
         // ---------------------------------------------------------------- results, per reviewer (kept apart from the mock's store)
         const RESULTS_KEY = 'mock-results:' + FakeApi.STORE;
         const STATUS = { pass: '✓ Pass', fail: '✗ Fail', '': 'Not played' };
@@ -572,9 +614,9 @@
             block.querySelectorAll('.result-button').forEach(button => button.setAttribute('aria-pressed', String(results[id].status === button.dataset.status)));
         }
         function renderResults() {
-            document.querySelectorAll('.tab-number[data-r]').forEach(element => {
+            document.querySelectorAll('.scenario-number[data-r]').forEach(element => {
                 const status = results[element.dataset.r]?.status || '';
-                element.className = 'tab-number ' + status;
+                element.className = 'scenario-number ' + status;
                 element.innerHTML = status ? `${ICON[status]}<span class="sr-only">${element.dataset.n}, ${STATUS[status]}</span>` : element.dataset.n;
             });
             document.querySelectorAll('[data-count]').forEach(element => {
@@ -600,12 +642,11 @@
             ids.forEach(id => delete results[id]);
             try { localStorage.setItem(RESULTS_KEY, JSON.stringify(results)); } catch { }
             renderResults();
-            // the open guides show the cleared marks; the screens and their data stay as they are
-            document.querySelectorAll('section[data-use-case]').forEach(block => {
-                const open = block.querySelector('[role=tab][aria-selected=true]');
-                if (!open || !ids.includes(open.dataset.sc)) return;
-                block.querySelectorAll('.result-button').forEach(button => button.setAttribute('aria-pressed', 'false'));
-                const note = block.querySelector('.note'); if (note) note.value = '';
+            // the open details show the cleared marks; the screens and their data stay as they are
+            document.querySelectorAll('.scenario.picked').forEach(open => {
+                if (!ids.includes(open.dataset.sc)) return;
+                open.querySelectorAll('.result-button').forEach(button => button.setAttribute('aria-pressed', 'false'));
+                const note = open.querySelector('.note'); if (note) note.value = '';
             });
         }
         const clearUseCase = useCaseId => clearResults(playableOf(useCaseId).map(s => s.id), `Clear the Pass / Fail and notes of ${useCaseId}?`);

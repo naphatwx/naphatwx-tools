@@ -18,8 +18,9 @@
 - Export PDF: `theme/pdf.css` (print rules, `.no-print`) syncs into `/* theme:pdf:start */ … end */`; `theme/pdf.js` (`addExportPdf(target, prepare)`) syncs into `/* theme:pdf-js:start */ … end */` inside a `<script>` or `.js` file. Every HTML template has both and calls `addExportPdf` once. With no target, Export PDF goes into the bottom-right `.float-bar` (one long box); put page tools in a `<div class="float-bar no-print">` before it. Page-specific print layout goes in its own `@media print`, outside the markers.
 - Diagrams: `theme/diagram-labels.js` (`fitDiagramLabels`: each `.edge-label` box fits its rendered text) syncs into `/* theme:diagram-labels-js:start */ … end */`; `theme/diagram-embed.js` (Export PDF, 1:1 SVGs, the iframe embed contract) into `/* theme:diagram-embed-js:start */ … end */`. generate-diagram's `template/embed.html` holds both, for diagram-design files.
 - Opt-in shared blocks, each synced into `/* theme:<name>:start */ … end */` only where a page has the marker:
-  - `report.css` (`report`): deploy-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.command code`, and the `.disclosure` / `.disclosure-head` card.
-  - `scenario.css` (`scenario`): generate-mock-ui and play-scenarios index chrome (use-case rows, scenario list, guide, frame, results).
+  - `report.css` (`report`): deploy-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.command code`.
+  - `disclosure.css` (`disclosure`) + `slide.js` (`slide-js`, `slide(panel, open, instant)`): the `.disclosure` / `.disclosure-head` card and its 220ms slide. Used by the report pages and the mock and play scenario lists.
+  - `scenario.css` (`scenario`): generate-mock-ui and play-scenarios index chrome (use-case rows, collapsible scenario list, frame, results).
   - `scenario-filter.css` (`scenario-filter`) + `scenario-filter.js` (`scenario-filter-js`, `addScenarioFilter(bar, { rows, groups, storageKey })`): the Kind + Core only filter bar of the mock and play players and the design-feature overview.
   - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
   - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview and the generate-diagram viewer.

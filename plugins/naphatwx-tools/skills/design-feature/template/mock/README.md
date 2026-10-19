@@ -54,7 +54,7 @@ graph TD
 
 | File | What |
 |------|------|
-| `index.html` | The play page: one block per use case, framed screen, guide, Results, audit log, contract links |
+| `index.html` | The play page: one block per use case (scenario list with the open one's steps, framed screen), Results, audit log, contract links |
 | `page/<screen>.html` | One screen; its state comes from `?state=` and the params a scenario needs |
 | `contract/types.ts` | The real request, response and error shapes to implement |
 | `contract/rules.js` | The spec's rules and screen texts; the screens and their data run them |

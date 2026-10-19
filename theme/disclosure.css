@@ -1,0 +1,20 @@
+/* Heading-plus-button disclosure card (.disclosure / .disclosure-head, .open when expanded): deploy-plan, smoke-test and
+   e2e-test rows, and the mock and play scenario lists. slide.js animates its panel. */
+/* Disclosure is h2 (or h3) > button, not <summary>: a summary flattens any heading inside it for screen readers. */
+.disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }
+.disclosure-head { padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; transition: background-color .15s var(--ease); }
+.disclosure-head:hover { background: var(--hover); }
+.disclosure.open { border-color: var(--accent); }
+/* the open row matches the pressed filter button, so it reads as selected */
+.disclosure.open > .disclosure-head, .disclosure.open > .disclosure-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
+.disclosure.open > .disclosure-head .mark { color: var(--accent); }
+.disclosure.open > .disclosure-head :is(h2, h3) { font-weight: 600; }
+/* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
+.disclosure-head :is(h2, h3) { min-width: 0; font-size: var(--fs-body); }
+.disclosure-head :is(h2, h3) button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
+.disclosure-head :is(h2, h3) .pill { flex: none; }
+.disclosure-head :is(h2, h3) button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.disclosure-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
+.mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
+.mark::before { content: "+"; }
+.disclosure.open > .disclosure-head .mark::before { content: "\2212"; }

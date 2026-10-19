@@ -70,7 +70,7 @@ sequenceDiagram
     participant SS as sessionStorage
     participant F as Frame: page/screen.html
     participant A as FakeApi
-    U->>I: pick a scenario chip
+    U->>I: open a scenario in the list
     Note over I: mcp, api or job scenario: an empty frame with "No mock", and stop here
     I->>SS: clear every FakeApi.STORE key
     I->>F: load with state, sc, embed=1 and the scenario's params
@@ -121,7 +121,7 @@ Output, standalone:
 ├── overview.html           when it exists: Scenarios views get Play links
 └── mock/
     ├── README.md           how to open and use the mock, for teammates
-    ├── index.html          one block per use case: scenario list, framed screen, guide, results, audit log
+    ├── index.html          one block per use case: scenario list (open one shows its steps), framed screen; results, audit log
     ├── contract/
     │   ├── types.ts        real shapes to implement; never loaded by pages
     │   ├── rules.js        spec rules as pure functions
