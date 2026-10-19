@@ -22,7 +22,7 @@
   - `scenario.css` (`scenario`): generate-mock-ui and play-scenarios index chrome (use-case rows, scenario list, guide, frame, results).
   - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
   - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview and the generate-diagram viewer.
-  - `scrollbar.css` (`scrollbar`): thin WebKit scrollbars.
+  - `scrollbar.css` (`scrollbar`): wide, light WebKit scrollbars.
 - `.scenario-kind` and `.references-chip` live in `base.css`; their print rules in `pdf.css`.
 - Radii: use `--radius` (6px), `--radius-md` (8px), `--radius-lg` (10px), `--radius-xl` (12px), never a raw px value.
 - Change marks: `theme/diff.css` syncs into `/* theme:diff:start */ … end */`. One class set for every table or message card, HTML and SVG: `.table-card` (+ `.add` / `.drop` / `.change` / `.external`), `.table-card-head` (name first, then `.tag`), `.row` (+ `.add` / `.change` / `.drop`) with `.column`, `.type`, `.key`. Used by the design-feature overview, the API contracts page and the ER diagram.

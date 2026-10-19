@@ -16,9 +16,9 @@
             --surface: #18191d;
             --surface-2: #1f2025;
             --surface-3: #24262c;
-            --line: #26282e;
-            --line-strong: #363940;
-            --line-3: #4a4d55;
+            --line: #4a4d55;
+            --line-strong: #5c6069;
+            --line-3: #70737d;
             /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
             --hover: #33353b;
 
@@ -105,7 +105,7 @@
             -webkit-font-smoothing: antialiased;
         }
         ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
-        * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+        * { scrollbar-width: auto; scrollbar-color: var(--line-3) transparent; }
         a { color: var(--accent); }
         :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         code, kbd, pre, samp { font-family: var(--mono); }
@@ -152,9 +152,10 @@
         * { margin: 0; padding: 0; }
         /* theme:scrollbar:start */
         /* Synced from theme/scrollbar.css by theme/sync.mjs. Do not edit here. */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--radius-md); }
+        ::-webkit-scrollbar-thumb { background: var(--line-3); border-radius: var(--radius-md); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
         /* theme:scrollbar:end */
 
         body { padding: 20px 0 32px; }

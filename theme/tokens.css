@@ -8,9 +8,9 @@
     --surface: #18191d;
     --surface-2: #1f2025;
     --surface-3: #24262c;
-    --line: #26282e;
-    --line-strong: #363940;
-    --line-3: #4a4d55;
+    --line: #4a4d55;
+    --line-strong: #5c6069;
+    --line-3: #70737d;
     /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
     --hover: #33353b;
 

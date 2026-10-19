@@ -15,9 +15,9 @@
       --surface: #18191d;
       --surface-2: #1f2025;
       --surface-3: #24262c;
-      --line: #26282e;
-      --line-strong: #363940;
-      --line-3: #4a4d55;
+      --line: #4a4d55;
+      --line-strong: #5c6069;
+      --line-3: #70737d;
       /* Hover fill for every control: a clear step up from any surface. Hover never changes the border */
       --hover: #33353b;
 
@@ -104,7 +104,7 @@
       -webkit-font-smoothing: antialiased;
   }
   ::selection { background: rgba(138, 176, 255, 0.35); color: #fff; }
-  * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+  * { scrollbar-width: auto; scrollbar-color: var(--line-3) transparent; }
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   code, kbd, pre, samp { font-family: var(--mono); }
@@ -403,8 +403,8 @@ document.getElementById('zoom-close').onclick = () => zoom.close();
 zoom.onclick = (e) => { if (e.target === zoom || e.target === zoomImage) zoom.close(); };
 // Stand-in for a step without a screenshot, so every step shows a frame you can click through.
 const NO_SHOT = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">'
-  + '<rect width="1280" height="720" fill="#18191d"/><rect x="560" y="250" width="160" height="120" rx="12" fill="none" stroke="#4a4d55" stroke-width="6"/>'
-  + '<circle cx="640" cy="310" r="26" fill="none" stroke="#4a4d55" stroke-width="6"/><path d="M548 238 L732 382" stroke="#4a4d55" stroke-width="6"/>'
+  + '<rect width="1280" height="720" fill="#18191d"/><rect x="560" y="250" width="160" height="120" rx="12" fill="none" stroke="#70737d" stroke-width="6"/>'
+  + '<circle cx="640" cy="310" r="26" fill="none" stroke="#70737d" stroke-width="6"/><path d="M548 238 L732 382" stroke="#70737d" stroke-width="6"/>'
   + '<text x="640" y="440" fill="#a3a6b0" font-family="-apple-system, Segoe UI, system-ui, sans-serif" font-size="32" text-anchor="middle">No screenshot for this step</text></svg>');
 const isTall = (image) => image.naturalWidth > 0 && image.naturalHeight / image.naturalWidth > 1.5;
 

@@ -17,7 +17,7 @@ const REPORTS = [
 const screen = (title) => 'data:image/svg+xml,' + encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
 <rect width="1280" height="720" fill="#18191d"/><rect width="64" height="720" fill="#1f2025"/>
-<rect x="96" y="40" width="420" height="28" rx="6" fill="#26282e"/>
+<rect x="96" y="40" width="420" height="28" rx="6" fill="#4a4d55"/>
 <rect x="96" y="100" width="1144" height="48" rx="8" fill="#1f2025"/>
 ${Array.from({ length: 8 }, (_, i) => `<rect x="96" y="${172 + i * 56}" width="1144" height="40" rx="6" fill="${i % 2 ? '#1f2025' : '#24262c'}"/>`).join('')}
 <text x="640" y="690" fill="#a3a6b0" font-family="system-ui" font-size="22" text-anchor="middle">${title.replace(/[<&]/g, '')}</text></svg>`);

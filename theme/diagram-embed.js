@@ -6,7 +6,7 @@
     const style = document.createElement('style');
     // Embedded, the bottom padding stays: the fixed Export PDF bar sits in it, under the drawing.
     // Print: each drawing shrinks to the page width instead of being cut off.
-    style.textContent = `* { scrollbar-width: thin; scrollbar-color: #363940 transparent; }
+    style.textContent = `* { scrollbar-width: thin; scrollbar-color: #5c6069 transparent; }
         .embedded body { padding: 1rem 1rem var(--float-space, 1rem); }
         .embedded .eyebrow, .embedded h1 { display: none; }
         @media print { svg[viewBox]:not(svg svg) { max-width: 100% !important; height: auto !important; } }`;
