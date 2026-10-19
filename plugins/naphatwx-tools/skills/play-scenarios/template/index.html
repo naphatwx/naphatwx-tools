@@ -211,6 +211,8 @@
         .scenarios-clear { padding: 0 8px; font: inherit; font-size: var(--fs-tag); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
         .scenarios-clear:hover { color: var(--text); background: var(--hover); }
         .scenario-list { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 8px 8px; }
+        /* room under the last card, so a picked card can scroll to the top of the list (--tail, set by scrollToTop()) */
+        .scenario-list::after { content: ""; display: block; height: var(--tail, 0px); }
         /* One scenario: a disclosure card (disclosure.css), the same as deploy-plan, smoke-test and e2e-test rows.
            Line one: mark, status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
         .scenario-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 400; color: var(--text-3); border: 1.5px solid var(--line-3); border-radius: 50%; }
@@ -220,9 +222,9 @@
         .scenario-title { min-width: 0; overflow-wrap: anywhere; }
         /* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
         .scenario .mark { display: none; }
-        /* one line: disc, title, then the kind, Core and surface pills; a long title pushes the pills to the next line */
-        .scenario > .disclosure-head { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-        .scenario .info { align-items: center; gap: 4px 6px; }
+        /* one line: disc and title, then each pill on its own; a pill that does not fit wraps alone, not the whole group */
+        .scenario > .disclosure-head { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+        .scenario > .disclosure-head > h3 { margin-right: 4px; }
         .scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
         /* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
         .scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }
@@ -565,7 +567,7 @@
                   ${scenarios.map((scenario, i) => `<div class="scenario disclosure${scenario.skip ? ' skipped' : ''}" data-sc="${scenario.id}" data-kind="${escapeHtml(scenario.kind || '')}" data-core="${isCore(scenario)}">
                     <div class="disclosure-head">
                       <h3><button type="button" aria-expanded="false" aria-controls="details-${scenario.id}" onclick="pick('${scenario.id}', true)"${scenario.skip ? ` title="Skipped: ${escapeHtml(scenario.skip)}"` : ''}><span class="mark" aria-hidden="true"></span>${scenario.skip ? `<span class="scenario-number skip" aria-hidden="true">–</span>` : `<span class="scenario-number" data-r="${scenario.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="scenario-title">${escapeHtml(scenario.title)}${scenario.skip ? '<span class="sr-only"> (skipped)</span>' : ''}</span></button></h3>
-                      <div class="info">${kindPill(scenario)}${corePill(scenario)}<span class="scenario-surface" title="${escapeHtml(SURFACE[scenario.surface] || '')}">${escapeHtml(scenario.surface || '')}</span></div>
+                      ${kindPill(scenario)}${corePill(scenario)}<span class="scenario-surface" title="${escapeHtml(SURFACE[scenario.surface] || '')}">${escapeHtml(scenario.surface || '')}</span>
                     </div>
                     <div class="scenario-details" id="details-${scenario.id}" hidden></div>
                   </div>`).join('')}
@@ -576,14 +578,17 @@
               </section>`;
         }).join('');
         addScenarioFilter(document.getElementById('scenario-filter'), { rows: '.scenario[data-sc]', groups: '.scenario-list', storageKey: `play:${LIVE_CONFIG.slug}:filter` });
-        /** Scroll the scenario list so this card sits at its top, or as near as the list's end allows; the page does not move.
-            Waits for the card's slide, so the list is already as tall as it will be. */
+        /** Scroll the scenario list so this card sits at its top; the page itself does not move.
+            Room under the last card (--tail) lets any card reach the top; it is trimmed once the card has slid open. */
         function scrollToTop(item) {
             const list = item.closest('.scenario-list');
             if (getComputedStyle(list).overflowY !== 'auto') return; // narrow window: the list is not a scroll box
-            const scroll = () => list.scrollTo({ top: list.scrollTop + item.getBoundingClientRect().top - list.getBoundingClientRect().top - 8, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
-            const slides = item.querySelector('.scenario-details').getAnimations().map(animation => animation.finished.catch(() => { }));
-            slides.length ? Promise.all(slides).then(scroll) : scroll();
+            const top = list.scrollTop + item.getBoundingClientRect().top - list.getBoundingClientRect().top - 8;
+            const tail = () => parseFloat(list.style.getPropertyValue('--tail')) || 0;
+            list.style.setProperty('--tail', list.clientHeight + 'px');
+            list.scrollTo({ top, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+            clearTimeout(list.trimTail);
+            list.trimTail = setTimeout(() => list.style.setProperty('--tail', Math.max(0, top + list.clientHeight - (list.scrollHeight - tail())) + 'px'), 600);
         }
         /** Same disclosure as deploy-plan: the open card's panel slides; instant skips the slide. */
         function setOpen(item, open, instant) {
