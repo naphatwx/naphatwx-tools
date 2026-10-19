@@ -116,10 +116,13 @@
         /* Data inside a label (counts, names, notes, controls) keeps its own case */
         :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
         .label-note { font-weight: 400; }
-        /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-        .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-        .scenario-kind.basic { color: var(--accent); }
-        .scenario-kind.exception { color: var(--warn); }
+        /* Scenario kind pill: basic (the main path), alternate (another path to the goal), exception (goal not reached).
+           Outlined and tinted, so it never reads like the solid Core pill */
+        .scenario-kind { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--neutral); background: var(--neutral-soft); border: 1px solid currentColor; border-radius: 999px; }
+        .scenario-kind.basic { color: var(--ok); background: var(--ok-soft); }
+        .scenario-kind.exception { color: var(--bad); background: var(--bad-soft); }
+        /* Core scenario ("core": true in use-cases.js): play it first. Solid accent so it reads in a long list */
+        .core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
         /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
         .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
         .references-chip:hover { background: var(--hover); }
@@ -187,6 +190,8 @@
         .tab-list { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 4px; }
         /* title, refs chip and plan link share one line; they wrap under the title on narrow screens */
         .use-case-head, .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+        /* title, kind pill and Core pill sit 6px apart */
+        .title-row { column-gap: 6px; }
         /* the result stays on top with its own fill; the guide text below it scrolls on its own */
         .guide { display: flex; flex-direction: column; overflow-y: hidden; }
         .guide-result { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
@@ -200,6 +205,11 @@
         /* solid accent fill: the picked scenario reads at a glance among 8+ rows */
         .tab[aria-selected="true"], .tab[aria-selected="true"] .tab-number, .tab[aria-selected="true"] .tab-surface { color: var(--bg); }
         .tab[aria-selected="true"] { background: var(--accent); font-weight: 600; }
+        .tab[aria-selected="true"] .core-pill { color: var(--accent); background: var(--bg); border-color: var(--bg); }
+        .tab[aria-selected="true"] .scenario-kind { color: var(--bg); background: none; }
+        /* kind and Core pills on their own line under the chip's title; inline pills, so a skipped title's line-through skips them */
+        .tab-tags { display: block; margin-top: 4px; }
+        .tab-tags > * + * { margin-left: 6px; }
         /* the number is a status disc: outlined until marked, then a solid green check or red cross */
         .tab { align-items: center; }
         .tab-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
@@ -213,6 +223,8 @@
         .tabs-clear:hover { color: var(--text); background: var(--hover); }
         .tabs-count { font-size: var(--fs-tag); font-weight: 400; white-space: nowrap; }
         .tabs-count .pass { color: var(--ok); font-weight: 600; } .tabs-count .fail { color: var(--bad); font-weight: 600; }
+        /* the Kind + Core-only filter sits under the page title, over every use case */
+        .filter-row { padding: 4px 0; }
         /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
         .result-button { padding: 4px 12px; color: var(--text); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
         .result-button:hover { background: var(--hover); }
@@ -248,6 +260,24 @@
         ::-webkit-scrollbar-thumb { background: var(--line-3); border-radius: var(--radius-md); }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
         /* theme:scrollbar:end */
+        /* theme:scenario-filter:start */
+        /* Synced from theme/scenario-filter.css by theme/sync.mjs. Do not edit here. */
+        .scenario-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: var(--fs-meta); }
+        .filter-group { display: inline-flex; align-items: center; gap: 12px; }
+        .filter-group-label { color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        /* one bordered segmented control; buttons are 32px, so the control is about 34–36px with its border */
+        .scenario-filter .filter-buttons { display: inline-flex; align-items: stretch; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; }
+        .scenario-filter .filter-button { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 14px; font: inherit; line-height: 1.2; color: var(--text-2); background: none; border: 0; border-radius: 0; cursor: pointer; }
+        .scenario-filter .filter-button + .filter-button { border-left: 1px solid var(--line-strong); }
+        .scenario-filter .filter-button:hover { color: var(--text); background: var(--hover); }
+        .scenario-filter .filter-button[aria-pressed="true"] { color: var(--bg); background: var(--accent); font-weight: 600; }
+        /* inset ring: the group clips an outside outline, and the pressed fill is the accent */
+        .scenario-filter .filter-button:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
+        .filter-count { font-family: var(--mono); color: var(--text-2); }
+        .filter-empty { padding: 6px 10px; color: var(--text-2); }
+        /* a row the filter hides; rows keep their place and number */
+        [data-kind][hidden] { display: none !important; }
+        /* theme:scenario-filter:end */
         .tab-surface { text-transform: uppercase; }
         /* mcp / api / job scenarios: in the tree like every skill's, greyed, "No mock" when picked */
         .tab.off:not([aria-selected="true"]) .tab-title, .tab.off:not([aria-selected="true"]) .tab-surface { color: var(--text-3); }
@@ -275,6 +305,8 @@
             <a href="../overview.html#use-cases" class="link">← Feature plan</a>
             <h1 class="font-bold mt-2">Mock UI · Feature name</h1>
         </header>
+
+        <div id="scenario-filter" class="filter-row no-print"></div>
 
         <div id="use-cases" class="space-y-8"></div>
 
@@ -321,6 +353,79 @@
             return button;
         }
         /* theme:pdf-js:end */
+        /* theme:scenario-filter-js:start */
+        /* Synced from theme/scenario-filter.js by theme/sync.mjs. Do not edit here. */
+        function addScenarioFilter(bar, options) {
+            const KINDS = [['basic', 'Basic'], ['alternate', 'Alternate'], ['exception', 'Exception']];
+            let state = { kinds: [], core: false };
+            try {
+                const saved = JSON.parse(localStorage.getItem(options.storageKey));
+                if (saved) state = { kinds: (saved.kinds || []).filter(kind => KINDS.some(([id]) => id === kind)), core: !!saved.core };
+            } catch { /* storage blocked: the filter starts open */ }
+            const button = (label, value, title) => {
+                const element = document.createElement('button');
+                element.type = 'button';
+                element.className = 'filter-button';
+                element.textContent = label;
+                element.dataset.value = value;
+                if (title) element.title = title;
+                return element;
+            };
+            const all = button('All', '');
+            const kindButtons = KINDS.map(([id, label]) => button(label, id));
+            const core = button('Core only', 'core', 'Core: play first');
+            const kindGroup = document.createElement('div');
+            kindGroup.className = 'filter-group';
+            kindGroup.setAttribute('role', 'group');
+            kindGroup.setAttribute('aria-label', 'Kind');
+            kindGroup.innerHTML = '<span class="filter-group-label" aria-hidden="true">Kind</span><span class="filter-buttons"></span>';
+            kindGroup.lastChild.append(all, ...kindButtons);
+            const coreGroup = document.createElement('div');
+            coreGroup.className = 'filter-group';
+            coreGroup.innerHTML = '<span class="filter-buttons"></span>';
+            coreGroup.lastChild.append(core);
+            const count = document.createElement('span');
+            count.className = 'filter-count';
+            count.setAttribute('aria-live', 'polite');
+            bar.classList.add('scenario-filter');
+            bar.setAttribute('role', 'group');
+            bar.setAttribute('aria-label', 'Filter scenarios');
+            bar.replaceChildren(kindGroup, coreGroup, count);
+
+            function apply() {
+                if (state.kinds.length === KINDS.length) state.kinds = [];
+                all.setAttribute('aria-pressed', String(!state.kinds.length));
+                kindButtons.forEach(element => element.setAttribute('aria-pressed', String(state.kinds.includes(element.dataset.value))));
+                core.setAttribute('aria-pressed', String(state.core));
+                const rows = [...document.querySelectorAll(options.rows)];
+                rows.forEach(row => {
+                    row.hidden = (state.kinds.length > 0 && !state.kinds.includes(row.dataset.kind)) || (state.core && row.dataset.core !== 'true');
+                });
+                count.textContent = `${rows.filter(row => !row.hidden).length} of ${rows.length}`;
+                if (options.groups) document.querySelectorAll(options.groups).forEach(group => {
+                    const mine = rows.filter(row => group.contains(row));
+                    let empty = group.querySelector('.filter-empty');
+                    if (!empty) {
+                        empty = document.createElement('p');
+                        empty.className = 'filter-empty';
+                        empty.textContent = 'No scenario matches the filter';
+                        group.append(empty);
+                    }
+                    empty.hidden = !mine.length || mine.some(row => !row.hidden);
+                });
+                try { localStorage.setItem(options.storageKey, JSON.stringify(state)); } catch { /* kept for this visit only */ }
+            }
+            all.addEventListener('click', () => { state.kinds = []; apply(); });
+            kindButtons.forEach(element => element.addEventListener('click', () => {
+                const kind = element.dataset.value;
+                state.kinds = state.kinds.includes(kind) ? state.kinds.filter(other => other !== kind) : [...state.kinds, kind];
+                apply();
+            }));
+            core.addEventListener('click', () => { state.core = !state.core; apply(); });
+            apply();
+            return { apply };
+        }
+        /* theme:scenario-filter-js:end */
         addExportPdf();
         const SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080; // 16:9; the frame scales to the column width and keeps this ratio
         const list = items => items.map(item => `<li>${UI.esc(item)}</li>`).join('');
@@ -335,6 +440,9 @@
         const playableOf = useCaseId => scenariosOf(useCaseId).filter(isPlayable);
         const SURFACE = { mcp: 'MCP', api: 'API', job: 'Job' };
         const stateOf = scenario => States.LIST.find(s => s.id === scenario.state);
+        const isCore = scenario => scenario.core === true;
+        const kindPill = scenario => scenario.kind ? `<span class="scenario-kind ${UI.esc(scenario.kind)}">${UI.esc(scenario.kind)}</span>` : '';
+        const corePill = scenario => isCore(scenario) ? '<span class="core-pill" title="Core: play first">Core</span>' : '';
 
         function screenSource(scenario) {
             const query = new URLSearchParams({ state: scenario.state, sc: scenario.id, embed: '1', ...(scenario.params || {}) });
@@ -369,7 +477,7 @@
                 <div class="tabs">
                   <div class="label tabs-title"><span class="tabs-head"><span id="sc-title-${twoDigitNumber(useCase.id)}">Scenarios</span><button type="button" class="tabs-clear" onclick="clearUseCase('${useCase.id}')" title="Clear the Pass / Fail and notes of this use case">Clear</button></span><span class="tabs-count label-note" data-count="${useCase.id}"></span></div>
                   <div class="tab-list" role="tablist" aria-labelledby="sc-title-${twoDigitNumber(useCase.id)}">
-                  ${scenarios.map((scenario, i) => `<button type="button" role="tab" class="tab${isPlayable(scenario) ? '' : ' off'}" data-sc="${scenario.id}" aria-selected="false" onclick="pick('${scenario.id}', true)"><span class="tab-number"${isPlayable(scenario) ? ` data-r="${scenario.id}"` : ''} data-n="${i + 1}">${i + 1}</span><span class="tab-title">${UI.esc(scenario.title)}${isPlayable(scenario) ? '' : '<span class="sr-only"> (no mock)</span>'}</span><span class="tab-surface">${UI.esc(scenario.surface || '')}</span></button>`).join('')}
+                  ${scenarios.map((scenario, i) => `<button type="button" role="tab" class="tab${isPlayable(scenario) ? '' : ' off'}" data-sc="${scenario.id}" data-kind="${UI.esc(scenario.kind || '')}" data-core="${isCore(scenario)}" aria-selected="false" onclick="pick('${scenario.id}', true)"><span class="tab-number"${isPlayable(scenario) ? ` data-r="${scenario.id}"` : ''} data-n="${i + 1}">${i + 1}</span><span class="tab-title">${UI.esc(scenario.title)}${isPlayable(scenario) ? '' : '<span class="sr-only"> (no mock)</span>'}<span class="tab-tags">${kindPill(scenario)}${corePill(scenario)}</span></span><span class="tab-surface">${UI.esc(scenario.surface || '')}</span></button>`).join('')}
                   </div>
                 </div>
                 <div class="card"></div>
@@ -377,6 +485,7 @@
                 </div>
               </section>`;
         }).join('');
+        addScenarioFilter(document.getElementById('scenario-filter'), { rows: '.tab[data-sc]', groups: '.tab-list', storageKey: 'mock-filter:' + FakeApi.STORE });
 
         function pick(id, fromClick) {
             const scenario = SCENARIOS.find(s => s.id === id);
@@ -388,7 +497,7 @@
                 ? `<iframe title="${UI.esc(scenario.title)} — interactive mock" src="${screenSource(scenario)}" width="${SCREEN_WIDTH}" height="${SCREEN_HEIGHT}"></iframe>`
                 : `<div class="no-mock"><div class="font-semibold">No mock</div><p class="muted">${UI.esc(SURFACE[scenario.surface] || scenario.surface)} scenario — play it with play-scenarios or test it with e2e-test.</p></div>`;
             block.querySelector('.card').innerHTML = `${headings[scenario.useCase]}
-              <div class="title-row"><h3 class="font-semibold">${UI.esc(scenario.title)}</h3>${scenario.kind ? `<span class="scenario-kind ${UI.esc(scenario.kind)}">${UI.esc(scenario.kind)}</span>` : ''}${referencesChip(scenario.story)}<span class="code-text font-mono meta">${UI.esc(hasScreen ? stateOf(scenario).label : 'no mock')}</span></div>
+              <div class="title-row"><h3 class="font-semibold">${UI.esc(scenario.title)}</h3>${kindPill(scenario)}${corePill(scenario)}${referencesChip(scenario.story)}<span class="code-text font-mono meta">${UI.esc(hasScreen ? stateOf(scenario).label : 'no mock')}</span></div>
               <div class="frame mt-2">
                 <div class="toolbar">
                   <span class="flex gap-1.5 shrink-0" aria-hidden="true"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>
@@ -475,12 +584,14 @@
             });
             const rows = SCENARIOS.filter(isPlayable).map(s => ({ scenario: s, status: results[s.id]?.status || '', note: results[s.id]?.note || '' }));
             const countOf = status => rows.filter(row => row.status === status).length;
+            const coreRows = rows.filter(row => isCore(row.scenario));
             document.getElementById('results').innerHTML = `
               <p class="mb-2"><span class="status-pass">${countOf('pass')} pass</span> · <span class="status-fail">${countOf('fail')} fail</span> · <span class="status-none">${countOf('')} not played</span>
+                ${coreRows.length ? ` · <span title="Core: play first">Core: ${coreRows.filter(row => row.status === 'pass').length}/${coreRows.length} pass</span>` : ''}
                 <button type="button" class="button-ghost ml-2 result-control" onclick="copyResults(this)">Copy as Markdown</button></p>
               <div class="panel overflow-x-auto"><table class="result-table">
                 <tr><th>Use case</th><th>Scenario</th><th>Result</th><th>Note</th></tr>
-                ${rows.map(row => `<tr><td class="font-mono code-text meta">${row.scenario.useCase}</td><td><a class="link" href="#sc-${row.scenario.id}">${UI.esc(row.scenario.title)}</a></td><td class="status-${row.status || 'none'} whitespace-nowrap">${STATUS[row.status]}</td><td class="muted">${UI.esc(row.note)}</td></tr>`).join('')}
+                ${rows.map(row => `<tr><td class="font-mono code-text meta">${row.scenario.useCase}</td><td><a class="link" href="#sc-${row.scenario.id}">${UI.esc(row.scenario.title)}</a> ${corePill(row.scenario)}</td><td class="status-${row.status || 'none'} whitespace-nowrap">${STATUS[row.status]}</td><td class="muted">${UI.esc(row.note)}</td></tr>`).join('')}
               </table></div>`;
         }
         /** Clear: drop the Pass / Fail and notes of these scenarios, to test again. */
@@ -501,8 +612,8 @@
         const clearAll = () => clearResults(SCENARIOS.filter(isPlayable).map(s => s.id), 'Clear every Pass / Fail and note on this page?');
         function copyResults(button) {
             const cell = value => String(value).replace(/\|/g, '\\|').replace(/\n/g, ' ');
-            const markdown = ['| Use case | Scenario | Result | Note |', '|---|---|---|---|']
-                .concat(SCENARIOS.filter(isPlayable).map(s => `| ${s.useCase} | ${cell(s.title)} | ${STATUS[results[s.id]?.status || '']} | ${cell(results[s.id]?.note || '')} |`)).join('\n');
+            const markdown = ['| Use case | Scenario | Core | Result | Note |', '|---|---|---|---|---|']
+                .concat(SCENARIOS.filter(isPlayable).map(s => `| ${s.useCase} | ${cell(s.title)} | ${isCore(s) ? 'core' : ''} | ${STATUS[results[s.id]?.status || '']} | ${cell(results[s.id]?.note || '')} |`)).join('\n');
             navigator.clipboard.writeText(markdown).then(() => { button.textContent = 'Copied'; setTimeout(() => { button.textContent = 'Copy as Markdown'; }, 1500); });
         }
 

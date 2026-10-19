@@ -109,10 +109,13 @@ code, kbd, pre, samp { font-family: var(--mono); }
 /* Data inside a label (counts, names, notes, controls) keeps its own case */
 :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
 .label-note { font-weight: 400; }
-/* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-.scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-.scenario-kind.basic { color: var(--accent); }
-.scenario-kind.exception { color: var(--warn); }
+/* Scenario kind pill: basic (the main path), alternate (another path to the goal), exception (goal not reached).
+   Outlined and tinted, so it never reads like the solid Core pill */
+.scenario-kind { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--neutral); background: var(--neutral-soft); border: 1px solid currentColor; border-radius: 999px; }
+.scenario-kind.basic { color: var(--ok); background: var(--ok-soft); }
+.scenario-kind.exception { color: var(--bad); background: var(--bad-soft); }
+/* Core scenario ("core": true in use-cases.js): play it first. Solid accent so it reads in a long list */
+.core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
 /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
 .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
 .references-chip:hover { background: var(--hover); }
@@ -540,6 +543,30 @@ th { text-align: left; padding: 0 16px 6px 0; border-bottom: 1px solid var(--lin
 td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
 tr { scroll-margin-top: 32px; }
 tr:target > td { background: var(--accent-soft); }
+
+/* theme:scenario-filter:start */
+/* Synced from theme/scenario-filter.css by theme/sync.mjs. Do not edit here. */
+.scenario-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: var(--fs-meta); }
+.filter-group { display: inline-flex; align-items: center; gap: 12px; }
+.filter-group-label { color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+/* one bordered segmented control; buttons are 32px, so the control is about 34–36px with its border */
+.scenario-filter .filter-buttons { display: inline-flex; align-items: stretch; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; }
+.scenario-filter .filter-button { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 14px; font: inherit; line-height: 1.2; color: var(--text-2); background: none; border: 0; border-radius: 0; cursor: pointer; }
+.scenario-filter .filter-button + .filter-button { border-left: 1px solid var(--line-strong); }
+.scenario-filter .filter-button:hover { color: var(--text); background: var(--hover); }
+.scenario-filter .filter-button[aria-pressed="true"] { color: var(--bg); background: var(--accent); font-weight: 600; }
+/* inset ring: the group clips an outside outline, and the pressed fill is the accent */
+.scenario-filter .filter-button:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
+.filter-count { font-family: var(--mono); color: var(--text-2); }
+.filter-empty { padding: 6px 10px; color: var(--text-2); }
+/* a row the filter hides; rows keep their place and number */
+[data-kind][hidden] { display: none !important; }
+/* theme:scenario-filter:end */
+.scenario-legend { margin: 4px 0 8px; color: var(--text-2); font-size: var(--fs-meta); }
+.scenario-legend .core-pill { margin-right: 6px; }
+/* title, kind pill and Core pill sit 6px apart in the Scenarios views */
+td .scenario-kind, td .core-pill { margin-left: 6px; vertical-align: 1px; }
+#scenario-filter { margin-bottom: 12px; }
 
 /* Channel tag (ui / mcp / api / job) in the Scenarios views and Acceptance criteria; .gap = no scenario on it */
 .channel-tag { display: inline-block; min-width: 3.4em; margin-right: 6px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 999px; font: 500 var(--fs-tag)/1.5 var(--mono); color: var(--text-2); text-align: center; text-transform: uppercase; vertical-align: 1px; }

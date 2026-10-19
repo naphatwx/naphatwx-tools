@@ -87,6 +87,10 @@ for (const p of PLAY) {
     if (playIds.has(p.id)) errors.push(`duplicate play entry: ${p.id}`);
     playIds.add(p.id);
     if (!ids.has(p.id)) errors.push(`play entry ${p.id} matches no scenario in use-cases.js`);
+    // one scenario = one screen = one result: a path that needs another state or data is its own scenario
+    if ('parts' in p) errors.push(`play entry ${p.id}: "parts" is not allowed; one entry plays one state. Split each part into its own scenario with the generate-use-case skill`);
+    if (p.state != null && typeof p.state !== 'string') errors.push(`play entry ${p.id}: state must be one state id`);
+    if (p.params != null && (typeof p.params !== 'object' || Array.isArray(p.params))) errors.push(`play entry ${p.id}: params must be one object of query params`);
 }
 for (const s of SCS) {
     if (s.surface !== 'ui') {

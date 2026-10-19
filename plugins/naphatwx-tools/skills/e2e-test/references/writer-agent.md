@@ -9,7 +9,7 @@ Write the e2e tests for ONE use case. Do not run them. Do not edit any other fil
 
 Repo: <repo-root>   Guide files to follow: <paths>
 Use cases file: <plan>/use-cases.js   Your use case: <UC id> <title>
-Your scenarios, in file order: <id (surface), id (surface), …>
+Your scenarios, in file order: <id (surface[, core]), id (surface[, core]), …>
 E2E folder: <e2e-dir>
   - ui + api scenarios  → <e2e-dir>/<uc-slug>.e2e.spec.ts      (skip when there are none)
   - mcp + job scenarios → <e2e-dir>/<uc-slug>.ai-tests.json    (skip when there are none)
@@ -34,7 +34,8 @@ ui scenarios (Playwright browser test)
 5. Read the real page code for every control you touch. Selectors, in this order:
    data-testid → getByRole with accessible name → getByLabel → getByText with the exact copy from the code.
    Never invent a selector. A control with no stable selector is a finding.
-6. test('<id> <title>', { annotation: [{ type: 'use case', description: '<UC id>' },
+6. test('<id> <title>', { tag: <'@core' when the scenario has "core": true, else leave tag out>,
+     annotation: [{ type: 'use case', description: '<UC id>' },
      { type: 'scenario', description: '<id>' }] }, async ({ page }) => { ... })
 7. EVERY user action or check is its own `await step(page, '<plain sentence>', async () => { ... })`,
    so each gets a screenshot. Name steps as the user sees them: "Open the Versions tab",
@@ -45,7 +46,7 @@ ui scenarios (Playwright browser test)
 9. For a write, also read it back through the API (page.request shares the session) inside a step.
 
 api scenarios (Playwright request test)
-10. Same annotations. Use the `request` fixture signed in as the scenario's role.
+10. Same tag and annotations. Use the `request` fixture signed in as the scenario's role.
 11. Every call is its own `await apiStep(request, '<plain sentence>', { method, url, data }, (res, body) => { expect... })`.
     It records the masked request and response. Never put a token in `data` or a step title.
 12. Read the route and its request / response shape from the code (handler, proto, OpenAPI). A route that

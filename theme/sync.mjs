@@ -23,6 +23,7 @@ const stripHeader = (css) => css.replace(/\r\n/g, '\n').replace(/^\/\*[\s\S]*?\*
 const SOURCES = {
     tokens: 'tokens.css', base: 'base.css', pdf: 'pdf.css', 'pdf-js': 'pdf.js', diff: 'diff.css', report: 'report.css', scenario: 'scenario.css', scrollbar: 'scrollbar.css', 'page-head': 'page-head.css', seq: 'seq.css',
     'diagram-labels-js': 'diagram-labels.js', 'diagram-embed-js': 'diagram-embed.js',
+    'scenario-filter': 'scenario-filter.css', 'scenario-filter-js': 'scenario-filter.js',
 };
 const BLOCKS = Object.fromEntries(Object.entries(SOURCES)
     .map(([name, file]) => [name, stripHeader(readFileSync(join(ROOT, 'theme', file), 'utf8'))]));

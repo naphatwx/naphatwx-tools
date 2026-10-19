@@ -19,6 +19,8 @@ The page shows the same tree as every skill that reads `use-cases.js`: use cases
 
 A skipped scenario stays in its place in the tree, struck through, with its reason in the frame and the Results table.
 
+A **core** scenario (`"core": true` in `use-cases.js`: play it first) shows a solid **Core** pill in the list and in its heading. One filter bar under the title narrows every list: "Kind: All | Basic | Alternate | Exception" (multi-select; All clears the others), a "Core only" toggle and a live "n of N" count, combined with AND. Hidden rows keep their order and number; a use case with nothing left says "No scenario matches the filter". The choice is kept in this browser. The Results line shows core results apart ("Core: 18/20 pass").
+
 A scenario with **no screen** (surface `mcp`, `api` or `job`) is played by an AI agent, not by hand. Its frame shows a **prompt** for the agent (▶ Seed fills in the ids of new data) and the **recorded calls** of the agent's last run: each request and the response as returned. The agent writes its Pass / Fail to `results.js`, which the page reads, and a report to `ai-results.md`.
 
 The use cases and scenarios are not written here. They live in `<plan>/use-cases.js`, written by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code). This skill reads that file directly, never another skill's output, and only adds how to play each one on the real app.
@@ -162,6 +164,7 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 | `prompt` | AI scenarios only: the text a viewer pastes into an AI agent, below. `{key}` tokens are filled from the seed's `values`; with no seed, the viewer types them |
 | `skip` | instead of the fields above, for a scenario you can't play live: one sentence saying why and where to play it instead |
 
+- **One scenario = one screen = one result.** An entry opens one screen from one seed or url. Never `parts`, part buttons or a list of seeds; `check-live.js` errors on a `parts` field. A scenario that needs a second seed or screen is two scenarios: report it for the `generate-use-case` skill.
 - `title`, `story`, `surface` and `expect` come from `use-cases.js`; the file's last lines merge both lists. Keep those lines as the template has them: they keep every scenario in file order, skipped ones included.
 - The reviewer compares the screen with "What you should see", so the steps must lead to those exact values:
     - A scenario that signs in as a role other than the default starts with that role and its relevant permissions: "You are signed in as DEV: has repositories.versions.read, not repositories.versions.create." Add any upstream rule the scenario depends on ("Your linked Groot user is in the BA group, whose page 7 is not writable").
@@ -199,7 +202,7 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 
 ### 7. Verify
 
-- `node <this skill dir>/scripts/check-live.js <plan>/live`: syntax of `live.js`, `server.mjs` and every seed; `live.js` as strict JSON; one entry per scenario in order; every surface is `ui`, `mcp`, `api` or `job`; `ui` entries have a seed or a url and steps, no prompt; `mcp` / `api` / `job` entries have a prompt; login and roles consistent.
+- `node <this skill dir>/scripts/check-live.js <plan>/live`: syntax of `live.js`, `server.mjs` and every seed; `live.js` as strict JSON; one entry per scenario in order; every surface is `ui`, `mcp`, `api` or `job`; no `parts`; `ui` entries have a seed or a url and steps, no prompt; `mcp` / `api` / `job` entries have a prompt; login and roles consistent.
 - It warns (`WARN`, exit 0) when a step says "tooltip", "hover" or "point at" (confirm the control still has one, then keep it), and when an entry with a `role` has no step naming its permissions.
 - It also warns when a step or prompt uses a `{key}` its seed doesn't return in `done({ values })` (it scans the seed file), and on vague names (`that merge request`, `the newest …`, `<…>` that is not a secret, `pluto-…`). Fix each one.
 - Pre-test: `node <plan>/live/server.mjs --up`. It runs `pretest.up`, waits for `health`, warns about framing headers, and prints the page URL.

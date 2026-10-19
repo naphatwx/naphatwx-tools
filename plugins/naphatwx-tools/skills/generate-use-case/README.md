@@ -21,6 +21,7 @@ Writes a feature's use cases (one per user goal), their scenarios (one per rule 
 | Use case | One goal a user wants to reach, verb + object | Cut a new version |
 | Scenario | One path through a use case, with one result, on one channel | Merge request already released |
 | Kind | How a scenario ends: `basic` (the main path), `alternate` (another path to the goal), `exception` (the goal is not reached) | exception |
+| Core | Play it first: every `basic`, plus the main alternates and the errors users hit most (about 15–25% of all) | `"core": true` |
 | Channel | Where a user reaches it: `ui`, `mcp` (an AI agent), `api` (REST / gRPC), `job` | mcp |
 | Acceptance criterion | One Given / When / Then from the spec | US1 · AC3 |
 

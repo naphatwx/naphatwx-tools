@@ -1,7 +1,7 @@
 ---
 name: e2e-test
 description: Write and run automated tests for every scenario in a feature's use-cases.js, on every surface (ui in the browser with a screenshot per step, api calls with request and response, mcp and job scenarios played by an AI tester), then a fresh reviewer checks every step and one HTML report shows it all. Use when the user says "e2e test spec 127" or "test this end to end". Playing by hand is play-scenarios; service checks after a deploy are smoke-test.
-argument-hint: "<plan folder | spec folder | spec number> [--env <name>] [--base-url <url>]"
+argument-hint: "<plan folder | spec folder | spec number> [--core] [--env <name>] [--base-url <url>]"
 ---
 
 # E2E Test
@@ -27,6 +27,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - **Source**: a plan folder, a spec folder or a spec number. If none is given, ask once.
 - `--env <name>` / `--base-url <url>`: where to run. If neither is given, use the repo's local dev URL and say which one.
+- `--core`: run only the core scenarios (`"core": true` in `use-cases.js`: every basic, the main alternates and the errors users hit most). A quick check before the full run.
 
 ## Rules
 
@@ -53,6 +54,7 @@ Find `use-cases.js`:
 
 - Check it: `node <generate-use-case skill dir>/scripts/check.js <plan>/use-cases.js`. Errors → fix them through `generate-use-case` first.
 - Read `USE_CASES` and `SCENARIOS`. Keep the order: UC1 → its scenarios in file order, UC2 → …
+- `--core` → keep only the scenarios with `"core": true` for steps 3–6. The others are not written, run or listed as not run.
 - Runner per scenario, from its `surface`:
 
 | surface | Runner | Proof per step |
@@ -105,7 +107,7 @@ workers: <number of spec files, max 4>,
 
 The report keeps these features; keep them when you touch the template:
 
-- Tree: use cases in `use-cases.js` order, then each scenario in file order with a surface tag and its kind (`basic`, `alternate`, `exception`), then its steps. Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
+- Tree: use cases in `use-cases.js` order, then each scenario with a surface tag, its kind (`basic`, `alternate`, `exception`) and a Core pill on core scenarios, then its steps. Core scenarios come first in each use case, then the rest, each group in file order. The header shows "Core: N/M passed". Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
 - Steps paged like slides: Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot (works on scrolling full-page shots too). A `ui` step without a screenshot shows a "No screenshot for this step" image. A full-page shot (taller than 1.5× its width) scrolls inside the viewer.
 - `api`, `mcp`, `job` steps show the call target, the request and the response in place of the screenshot.
 - A step the reviewer flagged shows ⚑ in the step list and the reviewer's note above the screenshot. Header count and a "Review flags" filter.
@@ -118,7 +120,7 @@ The report keeps these features; keep them when you touch the template:
 
 ## 3. Write: one writer agent per use case, in parallel
 
-Spawn one agent per use case **in one message**, with the prompt in `references/writer-agent.md`. Each writes, for its use case only:
+Spawn one agent per use case **in one message**, with the prompt in `references/writer-agent.md` (with `--core`, list only its core scenarios). Each writes, for its use case only:
 
 - `<e2e-dir>/<uc-slug>.e2e.spec.ts`: one `test()` per `ui` and `api` scenario, in file order. Skip the file when the use case has none.
 - `<e2e-dir>/<uc-slug>.ai-tests.json`: the ordered calls or commands for each `mcp` and `job` scenario. Skip it when the use case has none.
@@ -139,6 +141,8 @@ Start both runners at the same time, into one run folder `<run>` = `<e2e-dir>/e2
 ```bash
 E2E_RUN_DIR=<run> PW_BASE_URL=<url> E2E_REPORT_NAME=<feature> npx playwright test <e2e-dir>/<feature spec files>
 ```
+
+- `--core` → add `--grep @core` (writers tag every core test `@core`), and give each AI tester only its core scenarios.
 
 - Run it the way the repo's guide says to run tools (for example in its Docker service). Spec files run on parallel workers; tests inside a file run in order.
 - At the same time, spawn one **AI tester** per use case that has a `.ai-tests.json`, **in one message**, with the prompt in `references/ai-tester-agent.md`. Each writes `<run>/ai-results-<UC>.json`. The tester needs the MCP server of the app under test (local, not production) and a shell for `job` steps.
@@ -163,14 +167,16 @@ Agents with no sub-agents do the review themselves, step by step, against the sa
 ## 6. Report
 
 ```bash
-node <e2e-dir>/reporters/build-report.mjs <run> --use-cases <plan>/use-cases.js
+node <e2e-dir>/reporters/build-report.mjs <run> --use-cases <plan>/use-cases.js [--core]
 ```
+
+- `--core` → the report keeps only the core scenarios; a core one with no result shows as "not run".
 
 It merges the run folder into `<run>/e2e-report-<run name>.html` (screenshots embedded), prints one line per use case and `E2E report: <path>`. Open the file and check: the tree matches `use-cases.js`, every `ui` step has a screenshot, every other step has a request and response, flagged steps show the note.
 
 Reply with:
 - the spec files and `.ai-tests.json` files written
-- per use case: passed / total, and the scenario ids failed or not run (from the build output)
+- per use case: passed / total, core passed / core total, and the scenario ids failed or not run (from the build output); say when it was a `--core` run
 - each failure: scenario id, step, and likely cause (product bug, missing selector, wrong scenario, environment)
 - review flags: `product` and `unsure` flags with their notes; `test` flags you fixed
 - findings for the app owner: missing selectors, routes or tools, code / scenario mismatches, scenarios to fix with `generate-use-case`

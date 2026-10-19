@@ -1,0 +1,16 @@
+/* Kind + Core-only filter bar over a scenario list (mock and play players, design-feature overview). scenario-filter.js fills it. */
+.scenario-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: var(--fs-meta); }
+.filter-group { display: inline-flex; align-items: center; gap: 12px; }
+.filter-group-label { color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+/* one bordered segmented control; buttons are 32px, so the control is about 34–36px with its border */
+.scenario-filter .filter-buttons { display: inline-flex; align-items: stretch; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; }
+.scenario-filter .filter-button { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 14px; font: inherit; line-height: 1.2; color: var(--text-2); background: none; border: 0; border-radius: 0; cursor: pointer; }
+.scenario-filter .filter-button + .filter-button { border-left: 1px solid var(--line-strong); }
+.scenario-filter .filter-button:hover { color: var(--text); background: var(--hover); }
+.scenario-filter .filter-button[aria-pressed="true"] { color: var(--bg); background: var(--accent); font-weight: 600; }
+/* inset ring: the group clips an outside outline, and the pressed fill is the accent */
+.scenario-filter .filter-button:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
+.filter-count { font-family: var(--mono); color: var(--text-2); }
+.filter-empty { padding: 6px 10px; color: var(--text-2); }
+/* a row the filter hides; rows keep their place and number */
+[data-kind][hidden] { display: none !important; }

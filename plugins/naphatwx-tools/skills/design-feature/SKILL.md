@@ -34,7 +34,7 @@ Scripts in this skill's `scripts/` (Node, no install):
 
 | Script | Does |
 |--------|------|
-| `scenarios-panels.js <output>` | writes every use case's "Scenarios (N)" view from `use-cases.js`, with Play links from `mock/shared/scenario-play.js` when a mock exists; prints the counts |
+| `scenarios-panels.js <output>` | writes every use case's "Scenarios (N)" view from `use-cases.js`, with Play links from `mock/shared/scenario-play.js` when a mock exists, plus the Core legend and the Kind + Core only filter bar; prints the counts |
 | `acceptance-section.js <output>` | writes the Acceptance criteria section from `use-cases.js`: each criterion with the scenarios that cite it, per channel, and every gap; prints the coverage |
 | `publish-copy.js <output> <copy-dir>` | builds a copy that works as a claude.ai Artifact (step 8) and prints the publish arguments |
 
@@ -88,7 +88,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - `scripts/scenarios-panels.js`: each use case's Scenarios button and panel.
     - `scripts/acceptance-section.js`: the Acceptance criteria section, between its `acceptance:start` / `acceptance:end` markers.
     - Every count you report (scenarios per use case, total, acceptance coverage) comes from a script's output, never an estimate.
-10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. The generated views use its classes: `.channel-tag` (channel tag), `.scenario-kind` (scenario kind), `.aside.not-applicable` (n/a reason), `.acceptance-table` / `.acceptance-cover` / `.acceptance-gap` (Acceptance criteria) and `.nowrap` (Play cells).
+10. `overview.css` stays a template copy: add no class to it and no inline `style=` to `overview.html`. The generated views use its classes: `.channel-tag` (channel tag), `.scenario-kind` (scenario kind), `.core-pill` (core scenario), `.scenario-legend` + `#scenario-filter` (Core legend and filter bar), `.aside.not-applicable` (n/a reason), `.acceptance-table` / `.acceptance-cover` / `.acceptance-gap` (Acceptance criteria) and `.nowrap` (Play cells).
 
 ## Workflow
 
@@ -163,9 +163,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
             - Scenarios button and panel (`.panel`, not wide, always last in the block): leave them out of the fragment. `node <this skill dir>/scripts/scenarios-panels.js <output>`, run once the use case blocks are in, writes them from `use-cases.js`:
                 - Button `Scenarios (K)`, K = the use case's scenario count.
-                - A `.table-wrap` table, one row per scenario with `id="sc-<id>"`: Scenario (its channel as a `.channel-tag` — ui, mcp, api or job — the title, its story as a `N refs` chip, the first expect line in `.aside`, then one muted `.aside.not-applicable` line per `na` reason) | with a mock, `Play ↗` → `mock/index.html#sc-<id>` (new tab) for a ui scenario in the mock, "not in the mock" for a ui one it skips, "No mock" for mcp / api / job. A use case with no scenario → one `.muted` line with its `none` sentence.
+                - A `.table-wrap` table, one row per scenario with `id="sc-<id>"`: Scenario (its channel as a `.channel-tag` — ui, mcp, api or job — the title, its kind, a solid `.core-pill` "Core" (tooltip "Core: play first") when `core` is true, its story as a `N refs` chip, the first expect line in `.aside`, then one muted `.aside.not-applicable` line per `na` reason) | with a mock, `Play ↗` → `mock/index.html#sc-<id>` (new tab) for a ui scenario in the mock, "not in the mock" for a ui one it skips, "No mock" for mcp / api / job. A use case with no scenario → one `.muted` line with its `none` sentence.
                 - The first expect line carries the scenario's example (generate-use-case writes it so), so the panel shows real values with no extra work. Re-run the script after `use-cases.js` changes.
                 - With a mock, it also adds `.side-link` "Open the mock ↗" (new tab) to the Use cases `<h2>`.
+                - Under the Use cases `<h2>`: a one-line legend ("Core = play first: every basic path, plus the main variations and the errors users hit most") and `#scenario-filter`. `overview.js` fills it from the synced `theme:scenario-filter-js` block: "Kind: All | Basic | Alternate | Exception" (multi-select; All clears the others), "Core only" and a live "n of N" count, AND between them, over every Scenarios view. Hidden rows keep their order; a view with nothing left says "No scenario matches the filter". The choice is kept in `localStorage`.
     5. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
         - **ER diagram ↗** link, inside the `<h2 id="database">` right after its text: `<a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one link per page (`ER diagram · catalog ↗`). No related table → no page and no link.
         - **Facts** (`dl.facts`): `Migration`, `Changed` (each table + `new` / `altered`), `Left alone` (tables read but not changed, each with why). Name indexes and constraints here too.

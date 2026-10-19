@@ -107,6 +107,8 @@ PLAY.forEach((p, i) => {
     if (!sc) { errors.push(`${where}: no scenario with this id in use-cases.js`); return; }
     if (CORE.indexOf(sc) !== i) errors.push(`${where}: out of order (use-cases.js has it at ${CORE.indexOf(sc) + 1})`);
     if (!SURFACES.includes(sc.surface)) errors.push(`scenario ${sc.id}: surface must be ${SURFACES.join(', ')} (got "${sc.surface}"); fix it with the generate-use-case skill`);
+    // one scenario = one screen = one result: a path that needs another seed or screen is its own scenario
+    if ('parts' in p) errors.push(`${where}: "parts" is not allowed; one entry plays one screen. Split each part into its own scenario with the generate-use-case skill`);
     if (p.skip) return;
     // ui is played by hand in the frame; mcp, api and job have no screen, so the AI plays them from a prompt
     if (sc.surface === 'ui' && p.prompt) errors.push(`${where}: surface ui is played by hand in the frame; drop the prompt`);

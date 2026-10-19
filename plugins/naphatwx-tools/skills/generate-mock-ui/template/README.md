@@ -47,6 +47,7 @@ graph TD
 - Each pick and each Restart starts clean. The audit log shows what the real service would write.
 - To test again, **Clear** in a use case's scenario list drops its Pass / Fail and notes. **Clear all** (bottom right) drops them for the whole page.
 - Pass / Fail marks and notes stay in this browser only. Copy them before you switch browsers.
+- **Core** marks a scenario to play first. The filter bar under the title shows only some kinds (Basic, Alternate, Exception) or only core scenarios; "n of N" counts what is shown. The Results line shows core results apart.
 - `#sc-<id>` at the end of the URL opens that scenario. The plan's Play links use it.
 
 ## Files

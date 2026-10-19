@@ -47,7 +47,8 @@ graph TD
 ```
 
 - The report is one file with the screenshots inside. Share it as-is, or use Export PDF.
-- Use cases and scenarios come in `use-cases.js` order; each scenario shows its id, a surface tag (`ui`, `api`, `mcp`, `job`) and its kind (`basic`, `alternate`, `exception`). "Failed first" lifts failures to the top.
+- Use cases and scenarios come in `use-cases.js` order; each scenario shows its id, a surface tag (`ui`, `api`, `mcp`, `job`) its kind (`basic`, `alternate`, `exception`) and a Core pill on core scenarios. Core scenarios come first in each use case. "Failed first" lifts failures to the top.
+- A core-only run (`--grep @core`, report built with `--core`) shows only the core scenarios.
 - ⚑ marks a step a reviewer flagged: "Test problem" (fix the test), "Product problem" (a bug), "Check by hand".
 
 ## Files

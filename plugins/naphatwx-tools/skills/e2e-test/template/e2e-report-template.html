@@ -113,10 +113,13 @@
   /* Data inside a label (counts, names, notes, controls) keeps its own case */
   :is(.label, th, dt) :is(.label-note, button, input, kbd, code) { text-transform: none; letter-spacing: normal; }
   .label-note { font-weight: 400; }
-  /* Scenario kind: basic (the main path), alternate (another path to the goal), exception (goal not reached) */
-  .scenario-kind { font: 500 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; color: var(--text-2); }
-  .scenario-kind.basic { color: var(--accent); }
-  .scenario-kind.exception { color: var(--warn); }
+  /* Scenario kind pill: basic (the main path), alternate (another path to the goal), exception (goal not reached).
+     Outlined and tinted, so it never reads like the solid Core pill */
+  .scenario-kind { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--neutral); background: var(--neutral-soft); border: 1px solid currentColor; border-radius: 999px; }
+  .scenario-kind.basic { color: var(--ok); background: var(--ok-soft); }
+  .scenario-kind.exception { color: var(--bad); background: var(--bad-soft); }
+  /* Core scenario ("core": true in use-cases.js): play it first. Solid accent so it reads in a long list */
+  .core-pill { display: inline-flex; align-items: center; flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: 999px; white-space: nowrap; }
   /* trace IDs hide behind a "N refs" chip; a click shows them on the same line */
   .references-chip { flex: none; padding: 1px 8px; font: var(--fs-tag)/1.5 var(--mono); color: var(--text-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
   .references-chip:hover { background: var(--hover); }
@@ -569,7 +572,8 @@ function testBox(test) {
   const toggle = createElement('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
     createElement('span', { class: 'mark', 'aria-hidden': 'true' }), pill(testKind === 'failed' && statusOf(test.status).tone === 'bad' ? test.status : testKind),
     test.surface ? createElement('span', { class: 'surface', title: 'Surface: ' + test.surface }, test.surface) : null, createElement('span', { class: 'title' }, test.title),
-    test.scKind ? createElement('span', { class: 'scenario-kind ' + test.scKind, title: 'Scenario kind' }, test.scKind) : null);
+    test.scKind ? createElement('span', { class: 'scenario-kind ' + test.scKind, title: 'Scenario kind' }, test.scKind) : null,
+    test.core ? createElement('span', { class: 'core-pill', title: 'Core: play first' }, 'Core') : null);
   const attempts = test.attempts || [];
   const runs = attempts.length ? ' · ' + (attempts.length + 1) + ' attempts' : test.retry ? ' · retry ' + test.retry : '';
   const where = test.runner === 'ai' ? 'AI tester' + (test.role ? ' as ' + test.role : '') : test.file;
@@ -669,12 +673,14 @@ function render() {
   tools.append(...buttons, createElement('span', { class: 'separator', 'aria-hidden': 'true' }), sortButton);
   // Same buckets and order as the filters; a count is colored only when it is not zero.
   const count = (total, word, tone) => createElement('span', { class: 'lead' + (total && tone ? ' color-' + tone : '') }, total + ' ' + word);
+  const coreTests = DATA.tests.filter((t) => t.core);
   app.append(createElement('header', {},
     createElement('div', {}, createElement('h1', {}, 'E2E report · ' + DATA.name, pill(DATA.status)),
       createElement('div', { class: 'summary-line' },
         count(counts.failed, 'failed', 'bad'), count(counts.flaky, 'flaky', 'warn'), count(counts.passed, 'passed'), count(counts.skipped, 'skipped'),
         counts.notrun ? count(counts.notrun, 'not run') : null, count(flagCount, 'review flag' + (flagCount === 1 ? '' : 's'), 'warn'),
-        createElement('span', { class: 'meta' }, DATA.tests.length + ' scenarios · ' + formatDuration(DATA.ms)),
+        coreTests.length ? createElement('span', { class: 'meta', title: 'Core: play first' }, 'Core: ' + coreTests.filter((t) => kind(t) === 'passed').length + '/' + coreTests.length + ' passed') : null,
+        createElement('span', { class: 'meta' }, DATA.tests.length + (DATA.coreOnly ? ' core scenarios' : ' scenarios') + ' · ' + formatDuration(DATA.ms)),
         createElement('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
         DATA.baseURL ? createElement('span', { class: 'meta' }, DATA.baseURL) : null)),
     createElement('div', { class: 'head-row' }, tools)));

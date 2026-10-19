@@ -28,6 +28,7 @@ The words, used the same way in every skill:
 | Use case | one goal a user wants to reach, with every path to it | verb + object | Cut a new version |
 | Scenario | one rule or outcome of a use case, on one channel; other values, clicks or views of the same rule are its examples, not more scenarios | the condition or the result | Merge request already released |
 | Kind | how a scenario ends: `basic` (the main path to the goal, one per use case and channel), `alternate` (another path that still reaches the goal), `exception` (the goal is not reached: refusal, error, timeout) | the `kind` value | exception |
+| Core | a scenario to play first: every `basic`, plus the main alternates and the errors users hit most | `"core": true` | Core |
 | Channel | where a user reaches it: `ui` (a screen), `mcp` (an AI agent calling MCP tools), `api` (REST / gRPC called directly), `job` (a script or scheduled job) | the `surface` value | mcp |
 | Acceptance criterion | one Given / When / Then from the spec | `US<n> · AC<m>` | US1 · AC3 |
 | Flow diagram | the steps of a use case, drawn as its flowchart and sequence diagram (not a "flow" in the basic / alternate flow sense: that is a scenario) | a diagram, not a list item | the flowchart of Cut a new version |
@@ -69,6 +70,8 @@ Where the file goes (`<plan>`):
 7. No absolute local paths in the file.
 8. **Every channel is covered.** A use case lists every channel users reach it on (`channels`). Each rule or outcome (acceptance scenario, edge case, refusal) gets one scenario per channel of its use case, citing the same story ref. When a channel truly can't reach an outcome, the scenario says why in `na` instead (e.g. `"na": { "mcp": "ListThings has no status filter." }`). Never drop the MCP side because the UI side exists.
 9. **Fewest scenarios that cover every rule.** Each scenario costs a reviewer time to play and a test to keep up. One scenario per rule or outcome, never one per click, view or value (step 2, "Split and merge").
+10. **One scenario = one screen = one result.** A scenario plays as one start state on one screen. Never split it into parts. A path that needs another screen, seed or data setup is its own scenario.
+11. **Core is the only priority.** Mark the scenarios to play first with `"core": true`. No other priority field (no frequency, impact, priority or P0 / P1 / P2).
 
 ## Workflow
 
@@ -118,6 +121,7 @@ Start from `template/use-cases.js`.
 | `useCase` | a `USE_CASES` id |
 | `title` | short, the path or its result ("From a merged merge request", "Merge request already released"); never the use case title again |
 | `kind` | `"basic"`, `"alternate"` or `"exception"` (see below). Twins on other channels share it |
+| `core` | optional: `true` marks a scenario to play first (see below). Leave it out for the rest |
 | `story` | user story + acceptance ids (`"US1 · AC2–4"`), or the FR / decision id. Twins on other channels cite the same ref |
 | `surface` | the channel: `"ui"` (a screen), `"mcp"` (an AI agent calling an MCP tool), `"api"` (REST / gRPC called directly), `"job"` (a scheduled job, script or event). Must be in its use case's `channels` |
 | `na` | optional: `{ "<channel>": "<why>" }` for each channel of the use case that has no twin of this scenario |
@@ -159,28 +163,39 @@ Before and after, from a real plan:
     - On the main path, with nothing special → `basic`. Exactly one per use case and channel.
     - Another way: another option, a filter, empty data, a retry that works → `alternate`.
     - No: a refusal, a validation error, an unreachable service → `exception`.
-**Split and merge.** A scenario is one rule or outcome, not one interaction. Other values of the same rule are examples inside it, like the rows of a Gherkin examples table.
 
-- Merge into one scenario, listing each variation with its example in `expect`:
+- **Core.** Set `"core": true` on the scenarios a reviewer plays first:
+    - every `basic` scenario (`check.js` errors when one lacks it)
+    - the main alternates: the other paths most users take (e.g. the empty state, the most used filter)
+    - the errors users hit most (e.g. a missing permission, the most common validation error), not rare outages
+    - Aim for about 15–25% of all scenarios. Twins on other channels usually share it.
+
+**Split and merge.** One scenario = one outcome = one screen. A scenario is one rule or outcome, not one interaction, and it plays as one start state on one screen. Other values of the same rule are examples inside it, like the rows of a Gherkin examples table.
+
+- Merge into one scenario only when the variations share the same screen and the same data, and differ by a click or a value on that screen. List each variation with its example in `expect`:
     - the same rule with other values (another version, another count, another refused role with the same message)
-    - another click, view, tab or sort from the same start state, with the same kind of result
-    - exceptions with the same error code and message, whatever the trigger: name each trigger in `when` ("e.g. an empty name, or one over 64 characters")
-- Keep apart only when one of these changes:
+    - another click, view, tab or sort from the same start state, with the same kind of result (e.g. open tab A or tab B of one form)
+    - exceptions with the same error code and message from the same start state: name each trigger in `when` ("e.g. an empty name, or one over 64 characters")
+- Keep apart when one of these changes:
     - the rule (another AC, FR or decision)
     - the kind (`basic`, `alternate`, `exception`)
     - the error code or the user-facing message
+    - the screen, the seed or the data setup (`given`): a path that needs any of them is its own scenario, with its own id, title, `given`, `when` and `expect`
+- Never write parts. An `expect` line never starts with "Part 1", "Part 2", …; `check.js` warns when one does. Split it into scenarios instead.
 - A spec scenario with two different outcomes is two scenarios. A title with "and" or "or" that joins two rules is two scenarios ("No changelog", "No previous version"); one that joins two values of one rule is fine.
 - Each channel merges by these rules on its own. MCP may keep apart two refusals the screen shows with one message, or the other way round.
 
 ### 2b. Merge pass
 
 - Group each use case's scenarios by channel, kind and story ref; for exceptions, also by error code and message.
-- A group with more than one scenario becomes one: keep the first id, name the rule in `title`, and list each variation with its example in `when` and `expect`. Keep the union of `given` and `story`.
+- A group with more than one scenario becomes one only when its scenarios share one screen and one data setup: keep the first id, name the rule in `title`, and list each variation with its example in `when` and `expect`. Keep the union of `story`. A group whose `given` differs stays apart.
 - More than 12 scenarios on one channel of a use case means missed merges or too many rules for one goal. Merge again; if it stays above 12, say so in the reply and suggest splitting the use case.
 
 ### 3. Check
 
-- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `kind` with at most one `basic` per use case and channel, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, the count per kind, and the acceptance coverage.
+- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `kind` with at most one `basic` per use case and channel, every `basic` marked `"core": true`, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `parts`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, the count per kind, the core count per use case and channel, and the acceptance coverage.
+- It warns when more than 30% of the scenarios are core. Keep core for every basic, the main alternates and the errors users hit most.
+- It warns when an `expect` line starts with "Part 1", "Part 2", …. Split each part into its own scenario.
 - It warns when a scenario has no `kind`, or a channel of a use case has no `basic` scenario. Add the kind.
 - It warns when two scenarios share use case, channel, kind and story ref (and, for exceptions, the first quoted message), and when a use case has more than 12 scenarios on one channel. Merge them (step 2b), or say in the reply why they stay apart.
 - It warns when a scenario has no twin (same story ref) on another channel of its use case and no `na` reason, when an `api` scenario talks about MCP, and when an acceptance criterion skips a channel of its use case with no `na`. Add the twin, or the reason.
@@ -191,7 +206,8 @@ Before and after, from a real plan:
 ### 4. Confirm
 
 - Output: `✅ Use cases written at: {path}`.
-- The totals, the scenario count per use case and channel, and the acceptance coverage, copied from `check.js` output, and any warning left with its reason.
+- The totals, the scenario count per use case and channel, the core count, and the acceptance coverage, copied from `check.js` output, and any warning left with its reason.
+- **Core**: each core scenario, one line each (`UC1 · read-list (ui, basic)`), so the user can add or drop one.
 - **Merged**: each removed scenario id and the id it merged into, when an existing file was updated. Mock and test files that linked to a removed id need its new id.
 - **Channel gaps**: every `na` reason, one line each, so the user can disagree.
 - **Spec vs code**: each scenario where the spec's text differs from the code's, with both texts and the code's `file:line`. Say "none found" when there are none, or "no code yet: messages from the spec".
