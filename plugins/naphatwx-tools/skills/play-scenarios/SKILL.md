@@ -8,7 +8,7 @@ argument-hint: <plan-folder | spec-folder> [base-url] [app-repo-path]
 
 Play each scenario of a feature on the running app, by hand. The page looks like the mock UI's index: one block per **use case**: a list of its **scenarios** on the left, the picked one in a 16:9 frame on the right. The picked scenario opens in the list and shows its details (Result, How to play, What you should see). The difference: the frame is the real app, and each pick first **seeds** new data for that scenario by calling the app's API.
 
-The page shows the same tree as every skill that reads `use-cases.js`: use cases in `USE_CASES` order, each with its scenarios in `SCENARIOS` order, same ids. The picked scenario's title shows its kind (`basic`, `alternate`, `exception`). Each scenario has a small surface tag:
+The page shows the same tree as every skill that reads `use-cases.js`: use cases in `USE_CASES` order, each with its scenarios in `SCENARIOS` order, same ids. The picked scenario's title shows its kind (`basic`, `alternate`, `exception`). Badge order in a scenario row: status → surface → title → kind → core → refs. Each scenario has a small surface tag:
 
 | Surface | Who plays it | How |
 |---------|--------------|-----|

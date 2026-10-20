@@ -40,8 +40,9 @@ a.panel:hover { background: var(--hover); }
 .scenario-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
 .scenario-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
 .scenario-title { min-width: 0; overflow-wrap: anywhere; }
-/* the pills sit inside the title's text, so they follow its last word and wrap one by one like words */
+/* the pills sit inside the title's text and wrap one by one like words: the surface tag before it, kind and core after its last word */
 .scenario-title > :is(.scenario-kind, .core-pill, .scenario-surface) { display: inline-flex; vertical-align: 1px; margin-left: 2px; }
+.scenario-title > .scenario-surface { margin: 0 2px 0 0; }
 .scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
 /* the scenario on screen: an accent ring, a blue head and a tinted panel, folded or open */
 .scenario.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-fill); }

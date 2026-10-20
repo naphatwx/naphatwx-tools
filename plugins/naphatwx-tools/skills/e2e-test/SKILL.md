@@ -108,7 +108,7 @@ workers: <number of spec files, max 4>,
 
 The report keeps these features; keep them when you touch the template:
 
-- Tree: use cases in `use-cases.js` order, then each scenario with a surface tag, its kind (`basic`, `alternate`, `exception`) and a Core pill on core scenarios, then its steps. Core scenarios come first in each use case, then the rest, each group in file order. The header shows "Core: N/M passed". Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
+- Tree: use cases in `use-cases.js` order, then each scenario with a surface tag, its kind (`basic`, `alternate`, `exception`) and a Core pill on core scenarios, then its steps. Badge order: status → surface → title → kind → core. Core scenarios come first in each use case, then the rest, each group in file order. The header shows "Core: N/M passed". Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
 - Steps paged like slides: Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot (works on scrolling full-page shots too). A `ui` step without a screenshot shows a "No screenshot for this step" image. A full-page shot (taller than 1.5× its width) scrolls inside the viewer.
 - `api`, `mcp`, `job` steps show the call target, the request and the response in place of the screenshot.
 - A step the reviewer flagged shows ⚑ in the step list and the reviewer's note above the screenshot. Header count and a "Review flags" filter.
