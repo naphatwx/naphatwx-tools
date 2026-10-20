@@ -203,7 +203,7 @@
     details::details-content { height: 0; overflow: hidden; transition: height .2s var(--ease), content-visibility .2s allow-discrete; }
     details[open]::details-content { height: auto; }
   }
-  /* Title, one summary line at one size, then the status filter on the left above the rows. */
+  /* Title and one summary line at one size; the sticky filter bar sits under them, above the rows. */
   header { display: grid; gap: 8px; justify-items: start; margin-bottom: 8px; }
   /* Headings use the shared theme steps (--fs-h1/h2/h3); other text uses the role tokens (--fs-body / meta / code / tag). */
   h2 { font-size: var(--fs-h2); line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
@@ -291,7 +291,6 @@
   /* Surface tag (ui / mcp / api / job): the runner that played the scenario. */
   .scenario-kind { flex: none; }
   .surface { flex: none; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 600; line-height: 1.5; text-transform: uppercase; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; padding: 1px 8px; }
-  .tools .separator { width: 1px; align-self: stretch; background: var(--line-strong); margin: 0 4px; }
   .viewer-body > .messages { grid-area: err; display: grid; gap: 10px; min-width: 0; }
   .review { display: grid; gap: 4px; padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); }
   .review-label { color: var(--warn); font-weight: 600; }
@@ -303,6 +302,55 @@
   .callview .target { font-family: var(--mono); font-size: var(--fs-code); color: var(--text); overflow-wrap: anywhere; }
   .callview pre { margin: 0; max-height: 40vh; }
 
+  /* theme:scenario-filter:start */
+  /* Synced from theme/scenario-filter.css by theme/sync.mjs. Do not edit here. */
+  .scenario-filter { position: sticky; top: 12px; z-index: 40; height: 42px; margin: 8px 0 16px; pointer-events: none; }
+  .filter-dock { position: absolute; top: 0; left: 50%; translate: -50% 0; width: max-content; max-width: min(calc(100vw - 32px), 1100px); font-size: var(--fs-meta); pointer-events: auto; background: var(--surface-3); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); box-shadow: 0 10px 30px rgb(0 0 0 / 45%); }
+  .filter-dock svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .filter-bar { display: flex; align-items: center; gap: 4px; min-height: 40px; padding: 4px; }
+  .filter-search { display: flex; align-items: center; gap: 8px; width: min(560px, calc(100vw - 48px)); padding: 0 8px 0 12px; color: var(--text-3); cursor: text; }
+  .filter-search input { flex: 1; min-width: 6rem; padding: 8px 0; font: inherit; font-size: var(--fs-body); color: var(--text); background: none; border: 0; outline: none; }
+  .filter-search input::placeholder { color: var(--text-3); }
+  .filter-search input::-webkit-search-cancel-button { display: none; }
+  .filter-dock:focus-within { border-color: var(--accent); }
+  .filter-chips { display: flex; align-items: center; gap: 4px; }
+  .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px 3px 10px; font: inherit; color: var(--accent); white-space: nowrap; background: var(--accent-fill); border: 1px solid var(--accent); border-radius: 999px; cursor: pointer; }
+  .filter-chip:hover { background: var(--hover); }
+  .filter-chip svg { width: 12px; height: 12px; }
+  .filter-key { padding: 0 6px; font: var(--fs-tag)/18px var(--mono); color: var(--text-3); border: 1px solid var(--line-strong); border-radius: var(--radius); }
+  .filter-sep { width: 1px; height: 20px; flex: none; background: var(--line-strong); }
+  .filter-count { padding: 0 10px; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text-2); white-space: nowrap; }
+  .filter-action { padding: 6px 12px; font: inherit; color: var(--text-2); white-space: nowrap; background: none; border: 0; border-radius: 999px; cursor: pointer; }
+  .filter-action:hover { color: var(--text); background: var(--hover); }
+  .filter-action[aria-pressed="true"] { color: var(--accent); background: var(--accent-fill); }
+  .filter-clear { color: var(--accent); }
+  .filter-clear[hidden] { display: none; }
+  /* the groups slide open under the bar when the field has focus */
+  .filter-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s var(--ease); }
+  .filter-dock.open .filter-panel { grid-template-rows: 1fr; }
+  .filter-panel > div { overflow: hidden; }
+  .filter-dock:not(.open) .filter-groups { position: absolute; visibility: hidden; }
+  .filter-groups { display: grid; gap: 10px; padding: 10px 16px 14px; border-top: 1px solid var(--line); }
+  .filter-group { display: flex; align-items: center; gap: 12px; }
+  .filter-group-label { width: 56px; flex: none; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .filter-options { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filter-option { padding: 3px 12px; font: inherit; color: var(--text-2); white-space: nowrap; background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+  .filter-option:hover { color: var(--text); background: var(--hover); }
+  .filter-option[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .filter-option .n { margin-left: 4px; font-family: var(--mono); opacity: 0.75; }
+  .filter-option.zero:not([aria-pressed="true"]) { opacity: 0.45; }
+  .filter-mark { color: var(--accent); background: none; font-weight: 700; }
+  .filter-empty { padding: 6px 10px; color: var(--text-2); }
+  /* a row the filter hides; rows keep their place and number */
+  .filter-target[hidden] { display: none !important; }
+  @media (max-width: 720px) {
+      .filter-bar { flex-wrap: wrap; }
+      .filter-group { align-items: flex-start; }
+      .filter-group-label { width: auto; min-width: 48px; padding-top: 4px; }
+      .filter-key { display: none; }
+  }
+  @media print { .scenario-filter { display: none; } }
+  /* theme:scenario-filter:end */
   /* PDF: the tests as filtered and opened on screen, full height, no controls. */
   @media print {
     main { max-width: none; padding: 16px; }
@@ -540,6 +588,144 @@ function viewer(slides, surface) {
 
 const NOTE = { skip: 'Skipped', fixme: 'Fixme', fail: 'Expected to fail' };
 let uniqueId = 0;
+/* theme:scenario-filter-js:start */
+/* Synced from theme/scenario-filter.js by theme/sync.mjs. Do not edit here. */
+function addScenarioFilter(anchor, options) {
+    const TYPES = [['ui', 'UI'], ['api', 'API'], ['mcp', 'MCP'], ['job', 'JOB']];
+    const KINDS = [['basic', 'Basic'], ['alternate', 'Alternate'], ['exception', 'Exception']];
+    const ICON_SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+    const ICON_X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+    const make = (html) => { const template = document.createElement('template'); template.innerHTML = html.trim(); return template.content.firstChild; };
+    const titleOf = (row) => (options.title && row.querySelector(options.title)) || row.querySelector('.scenario-name, .title') || row;
+    const read = (row) => ({
+        status: options.status ? options.status(row) : row.dataset.status,
+        type: row.dataset.surface, kind: row.dataset.kind, core: row.dataset.core === 'true',
+        flag: options.flag && options.flag(row) ? 'yes' : 'no',
+        text: titleOf(row).textContent.toLowerCase(),
+    });
+    const data = new Map();
+    const readAll = () => document.querySelectorAll(options.rows).forEach((row) => { row.classList.add('filter-target'); data.set(row, read(row)); });
+    readAll();
+    const present = (key, list) => list.filter(([value]) => [...data.values()].some((row) => row[key] === value));
+    const groups = [options.statuses && ['status', 'Status', options.statuses], ['type', 'Type', present('type', TYPES)], ['kind', 'Kind', present('kind', KINDS)]]
+        .filter((group) => group && group[2].length > 1);
+    if (options.flag) groups.push(['flag', 'Review', [['yes', 'Has review flags']]]);
+    const hasCore = [...data.values()].some((row) => row.core);
+
+    let state = { status: [], type: [], kind: [], flag: [], core: false, q: '' };
+    try {
+        const saved = JSON.parse(localStorage.getItem(options.storageKey));
+        if (saved) groups.forEach(([key, , items]) => { state[key] = (saved[key] || []).filter((value) => items.some(([id]) => id === value)); });
+        if (saved) { state.core = hasCore && !!saved.core; state.q = typeof saved.q === 'string' ? saved.q : ''; }
+    } catch { /* storage blocked: the filter starts open */ }
+
+    const match = (row, skip) => groups.every(([key]) => key === skip || !state[key].length || state[key].includes(row[key]))
+        && (skip === 'core' || !state.core || row.core) && (!state.q || row.text.includes(state.q));
+    // a count is what you would get by picking it, with the other choices kept
+    const countOf = (key, value) => [...data.values()].filter((row) => match(row, key) && (key === 'core' ? row.core : row[key] === value)).length;
+    const active = () => [...groups.flatMap(([key, , items]) => state[key].map((value) => ({ key, value, label: items.find(([id]) => id === value)[1] }))),
+        ...(state.core ? [{ key: 'core', label: 'Core only' }] : [])];
+    const toggle = (key, value) => {
+        if (key === 'core') state.core = !state.core;
+        else state[key] = state[key].includes(value) ? state[key].filter((other) => other !== value) : [...state[key], value];
+        apply();
+    };
+
+    const wrap = make('<div class="scenario-filter no-print"></div>');
+    const dock = make('<div class="filter-dock" role="search" aria-label="Filter scenarios"></div>');
+    wrap.append(dock);
+    anchor.replaceWith(wrap);
+    const bar = make('<div class="filter-bar"></div>');
+    const field = make(`<label class="filter-search">${ICON_SEARCH}<span class="filter-chips"></span><input type="search" placeholder="Filter scenarios" aria-label="Filter scenarios by title"><kbd class="filter-key" title="Press / to search">/</kbd></label>`);
+    const input = field.querySelector('input');
+    const chips = field.querySelector('.filter-chips');
+    const count = make('<span class="filter-count" aria-live="polite"></span>');
+    const clear = make('<button type="button" class="filter-action filter-clear" hidden>Clear</button>');
+    bar.append(field, make('<span class="filter-sep"></span>'), count, clear);
+    if (options.sort) {
+        const sort = make(`<button type="button" class="filter-action" aria-pressed="false">${options.sort.label}</button>`);
+        sort.onclick = () => { const on = sort.getAttribute('aria-pressed') !== 'true'; sort.setAttribute('aria-pressed', String(on)); options.sort.run(on); };
+        bar.append(make('<span class="filter-sep"></span>'), sort);
+    }
+    const panel = make('<div class="filter-panel"><div><div class="filter-groups"></div></div></div>');
+    const list = panel.querySelector('.filter-groups');
+    const buttons = [];
+    const addGroup = (key, label, items) => {
+        const group = make(`<div class="filter-group" role="group" aria-label="${label}"><span class="filter-group-label" aria-hidden="true">${label}</span><div class="filter-options"></div></div>`);
+        items.forEach(([value, text]) => {
+            const button = make(`<button type="button" class="filter-option">${text}<span class="n"></span></button>`);
+            button.onclick = () => toggle(key, value);
+            group.lastChild.append(button);
+            buttons.push([key, value, button]);
+        });
+        list.append(group);
+    };
+    groups.forEach(([key, label, items]) => addGroup(key, label, items));
+    if (hasCore) addGroup('core', 'Core', [['', 'Core only']]);
+    dock.append(bar, panel);
+
+    input.value = state.q;
+    input.addEventListener('input', () => { state.q = input.value.trim().toLowerCase(); apply(); });
+    input.addEventListener('focus', () => dock.classList.add('open'));
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Backspace' && !input.value) { const last = active().pop(); if (last) toggle(last.key, last.value); }
+    });
+    clear.onclick = () => { groups.forEach(([key]) => { state[key] = []; }); state.core = false; state.q = ''; input.value = ''; apply(); };
+    // the panel floats over the rows, so a click outside or Escape closes it
+    document.addEventListener('click', (event) => { if (!dock.contains(event.target)) dock.classList.remove('open'); });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && dock.classList.contains('open')) { dock.classList.remove('open'); input.blur(); }
+        if (event.key === '/' && !/^(input|textarea|select)$/i.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) { event.preventDefault(); input.focus(); }
+    });
+
+    function mark(row) {
+        const title = titleOf(row);
+        title.querySelectorAll('mark.filter-mark').forEach((old) => old.replaceWith(old.textContent));
+        title.normalize();
+        if (!state.q) return;
+        const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+        const hits = [];
+        while (walker.nextNode()) { const at = walker.currentNode.data.toLowerCase().indexOf(state.q); if (at >= 0) hits.push([walker.currentNode, at]); }
+        hits.forEach(([node, at]) => {
+            const hit = node.splitText(at);
+            hit.splitText(state.q.length);
+            const element = document.createElement('mark');
+            element.className = 'filter-mark';
+            element.textContent = hit.data;
+            hit.replaceWith(element);
+        });
+    }
+
+    function apply() {
+        readAll();
+        let shown = 0;
+        data.forEach((row, element) => { element.hidden = !match(row); if (!element.hidden) shown++; mark(element); });
+        count.textContent = `${shown} of ${data.size}`;
+        buttons.forEach(([key, value, button]) => {
+            const total = countOf(key, value);
+            button.setAttribute('aria-pressed', String(key === 'core' ? state.core : state[key].includes(value)));
+            button.querySelector('.n').textContent = total;
+            button.classList.toggle('zero', !total);
+        });
+        chips.replaceChildren(...active().map(({ key, value, label }) => {
+            const chip = make(`<button type="button" class="filter-chip" aria-label="Remove ${label}">${label}${ICON_X}</button>`);
+            chip.onclick = (event) => { event.preventDefault(); toggle(key, value); };
+            return chip;
+        }));
+        clear.hidden = !active().length && !state.q;
+        if (options.groups) document.querySelectorAll(options.groups).forEach((group) => {
+            const mine = [...data.keys()].filter((element) => group.contains(element));
+            let empty = group.querySelector(':scope > .filter-empty');
+            if (!empty) { empty = make('<p class="filter-empty">No scenario matches the filter</p>'); group.append(empty); }
+            empty.hidden = !mine.length || mine.some((element) => !element.hidden);
+        });
+        if (options.after) options.after();
+        try { localStorage.setItem(options.storageKey, JSON.stringify(state)); } catch { /* kept for this visit only */ }
+    }
+    apply();
+    return { apply };
+}
+/* theme:scenario-filter-js:end */
 /* theme:slide-js:start */
 /* Synced from theme/slide.js by theme/sync.mjs. Do not edit here. */
 const EASE = getComputedStyle(document.documentElement).getPropertyValue('--ease').trim() || 'ease';
@@ -566,7 +752,7 @@ function testBox(test) {
   const testKind = kind(test);
   const id = 'test-' + (++uniqueId);
   const box = createElement('section', { class: 'test disclosure', 'aria-labelledby': id + '-h' });
-  box.dataset.kind = testKind;
+  Object.assign(box.dataset, { status: testKind, surface: test.surface || '', kind: test.scKind || '', core: String(!!test.core) });
   const flags = test.steps.filter(flagged).length;
   box.dataset.flags = String(flags);
   const toggle = createElement('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
@@ -627,7 +813,6 @@ function render() {
   if (!DATA) { app.append(createElement('p', {}, 'No data in this report.')); return; }
   const counts = { failed: 0, flaky: 0, passed: 0, skipped: 0, notrun: 0 };
   for (const test of DATA.tests) counts[kind(test)]++;
-  const tools = createElement('div', { class: 'tools', role: 'group', 'aria-label': 'Show tests' });
   const boxes = DATA.tests.map(testBox);
   const flaggedTests = boxes.filter((b) => +b.dataset.flags > 0).length;
   const flagCount = boxes.reduce((c, b) => c + +b.dataset.flags, 0);
@@ -640,37 +825,18 @@ function render() {
     const passed = tests.filter((t) => kind(t) === 'passed').length;
     return [useCase.id, createElement('h2', { class: 'use-case-title' }, (useCase.id ? useCase.id + ' ' : '') + useCase.title, createElement('span', { class: 'meta' }, passed + ' / ' + tests.length + ' passed'))];
   }));
-  const none = createElement('p', { class: 'meta empty-filter', hidden: '' }, 'No tests match this filter.');
-  const FILTERS = [['all', 'All', DATA.tests.length], ['failed', 'Failed', counts.failed], ['flaky', 'Flaky', counts.flaky], ['passed', 'Passed', counts.passed],
-    ['skipped', 'Skipped', counts.skipped], ['notrun', 'Not run', counts.notrun], ['review', 'Review flags', flaggedTests]].filter(([key, , total]) => total || ['all', 'failed', 'passed'].includes(key));
+  const none = createElement('p', { class: 'meta empty-filter', hidden: '' }, 'No scenario matches the filter');
+  const STATUSES = [['failed', 'Failed'], ['flaky', 'Flaky'], ['passed', 'Passed'], ['skipped', 'Skipped'], ['notrun', 'Not run']].filter(([key]) => counts[key] || ['failed', 'passed'].includes(key));
   let failedFirst = false;
   const order = { failed: 0, flaky: 1, passed: 2, skipped: 3, notrun: 4 };
   const place = () => {
-    const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => (failedFirst ? order[a[0].dataset.kind] - order[b[0].dataset.kind] : 0) || a[1] - b[1]);
+    const sorted = boxes.map((b, i) => [b, i]).sort((a, b) => (failedFirst ? order[a[0].dataset.status] - order[b[0].dataset.status] : 0) || a[1] - b[1]);
     for (const useCase of useCases) {
       app.append(heads.get(useCase.id));
       sorted.filter(([, i]) => useCaseOf(DATA.tests[i]) === useCase.id).forEach(([b]) => app.append(b));
     }
     app.append(none);
   };
-  const buttons = FILTERS.map(([key, label, total]) => {
-    const button = createElement('button', { type: 'button', 'aria-pressed': String(key === 'all') }, label + ' ' + total);
-    button.onclick = () => {
-      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === button)));
-      let shown = 0;
-      for (const box of boxes) {
-        box.hidden = key !== 'all' && (key === 'review' ? box.dataset.flags === '0' : box.dataset.kind !== key);
-        if (!box.hidden) shown++;
-      }
-      for (const [useCaseId, heading] of heads) heading.hidden = !boxes.some((box, i) => !box.hidden && useCaseOf(DATA.tests[i]) === useCaseId);
-      none.hidden = shown > 0;
-    };
-    return button;
-  });
-  // Default order is use-cases.js order, the same tree every skill shows; this toggle lifts failures to the top of each use case.
-  const sortButton = createElement('button', { type: 'button', 'aria-pressed': 'false' }, 'Failed first');
-  sortButton.onclick = () => { failedFirst = !failedFirst; sortButton.setAttribute('aria-pressed', String(failedFirst)); place(); };
-  tools.append(...buttons, createElement('span', { class: 'separator', 'aria-hidden': 'true' }), sortButton);
   // Same buckets and order as the filters; a count is colored only when it is not zero.
   const count = (total, word, tone) => createElement('span', { class: 'lead' + (total && tone ? ' color-' + tone : '') }, total + ' ' + word);
   const coreTests = DATA.tests.filter((t) => t.core);
@@ -683,9 +849,21 @@ function render() {
         createElement('span', { class: 'meta' }, DATA.tests.length + (DATA.coreOnly ? ' core scenarios' : ' scenarios') + ' · ' + formatDuration(DATA.ms)),
         createElement('time', { class: 'meta', datetime: DATA.startedAt }, isoLocal(DATA.startedAt)),
         DATA.baseURL ? createElement('span', { class: 'meta' }, DATA.baseURL) : null)),
-    createElement('div', { class: 'head-row' }, tools)));
+    ));
+  const filterSlot = createElement('div');
+  app.append(filterSlot);
   addExportPdf();
   place();
+  // Default order is use-cases.js order, the same tree every skill shows; Failed first lifts failures to the top of each use case.
+  addScenarioFilter(filterSlot, {
+    rows: 'section.test', storageKey: 'e2e-filter:' + DATA.name, statuses: STATUSES,
+    flag: flaggedTests ? (box) => box.dataset.flags !== '0' : null,
+    sort: { label: 'Failed first', run: (on) => { failedFirst = on; place(); } },
+    after() {
+      for (const [useCaseId, heading] of heads) heading.hidden = !boxes.some((box, i) => !box.hidden && useCaseOf(DATA.tests[i]) === useCaseId);
+      none.hidden = boxes.some((box) => !box.hidden);
+    },
+  });
 }
 render();
 </script>

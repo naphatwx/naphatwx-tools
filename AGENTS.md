@@ -22,7 +22,7 @@
   - `report.css` (`report`): deploy-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.command code`.
   - `disclosure.css` (`disclosure`) + `slide.js` (`slide-js`, `slide(panel, open, instant)`): the `.disclosure` / `.disclosure-head` card and its 220ms slide. Used by the report pages and the mock and play scenario lists.
   - `scenario.css` (`scenario`): generate-mock-ui and play-scenarios index chrome (use-case rows, collapsible scenario list, frame, results).
-  - `scenario-filter.css` (`scenario-filter`) + `scenario-filter.js` (`scenario-filter-js`, `addScenarioFilter(bar, { rows, groups, storageKey })`): the Kind + Core only filter bar of the mock and play players and the design-feature overview.
+  - `scenario-filter.css` (`scenario-filter`) + `scenario-filter.js` (`scenario-filter-js`, `addScenarioFilter(anchor, { rows, groups, storageKey, statuses, status, flag, title, sort, after })`): the sticky search + Status / Type / Kind / Core filter bar of the e2e report, the mock and play players and the design-feature overview. Rows carry `data-surface`, `data-kind`, `data-core`.
   - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
   - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview and the generate-diagram viewer.
   - `scrollbar.css` (`scrollbar`): wide, light WebKit scrollbars.

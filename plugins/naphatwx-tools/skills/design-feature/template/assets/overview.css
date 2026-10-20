@@ -546,25 +546,55 @@ tr:target > td { background: var(--accent-soft); }
 
 /* theme:scenario-filter:start */
 /* Synced from theme/scenario-filter.css by theme/sync.mjs. Do not edit here. */
-.scenario-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: var(--fs-meta); }
-.filter-group { display: inline-flex; align-items: center; gap: 12px; }
-.filter-group-label { color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-/* one bordered segmented control; buttons are 32px, so the control is about 34–36px with its border */
-.scenario-filter .filter-buttons { display: inline-flex; align-items: stretch; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; }
-.scenario-filter .filter-button { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 14px; font: inherit; line-height: 1.2; color: var(--text-2); background: none; border: 0; border-radius: 0; cursor: pointer; }
-.scenario-filter .filter-button + .filter-button { border-left: 1px solid var(--line-strong); }
-.scenario-filter .filter-button:hover { color: var(--text); background: var(--hover); }
-.scenario-filter .filter-button[aria-pressed="true"] { color: var(--bg); background: var(--accent); font-weight: 600; }
-/* inset ring: the group clips an outside outline, and the pressed fill is the accent */
-.scenario-filter .filter-button:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
-.filter-count { font-family: var(--mono); color: var(--text-2); }
+.scenario-filter { position: sticky; top: 12px; z-index: 40; height: 42px; margin: 8px 0 16px; pointer-events: none; }
+.filter-dock { position: absolute; top: 0; left: 50%; translate: -50% 0; width: max-content; max-width: min(calc(100vw - 32px), 1100px); font-size: var(--fs-meta); pointer-events: auto; background: var(--surface-3); border: 1px solid var(--line-strong); border-radius: var(--radius-xl); box-shadow: 0 10px 30px rgb(0 0 0 / 45%); }
+.filter-dock svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.filter-bar { display: flex; align-items: center; gap: 4px; min-height: 40px; padding: 4px; }
+.filter-search { display: flex; align-items: center; gap: 8px; width: min(560px, calc(100vw - 48px)); padding: 0 8px 0 12px; color: var(--text-3); cursor: text; }
+.filter-search input { flex: 1; min-width: 6rem; padding: 8px 0; font: inherit; font-size: var(--fs-body); color: var(--text); background: none; border: 0; outline: none; }
+.filter-search input::placeholder { color: var(--text-3); }
+.filter-search input::-webkit-search-cancel-button { display: none; }
+.filter-dock:focus-within { border-color: var(--accent); }
+.filter-chips { display: flex; align-items: center; gap: 4px; }
+.filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px 3px 10px; font: inherit; color: var(--accent); white-space: nowrap; background: var(--accent-fill); border: 1px solid var(--accent); border-radius: 999px; cursor: pointer; }
+.filter-chip:hover { background: var(--hover); }
+.filter-chip svg { width: 12px; height: 12px; }
+.filter-key { padding: 0 6px; font: var(--fs-tag)/18px var(--mono); color: var(--text-3); border: 1px solid var(--line-strong); border-radius: var(--radius); }
+.filter-sep { width: 1px; height: 20px; flex: none; background: var(--line-strong); }
+.filter-count { padding: 0 10px; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text-2); white-space: nowrap; }
+.filter-action { padding: 6px 12px; font: inherit; color: var(--text-2); white-space: nowrap; background: none; border: 0; border-radius: 999px; cursor: pointer; }
+.filter-action:hover { color: var(--text); background: var(--hover); }
+.filter-action[aria-pressed="true"] { color: var(--accent); background: var(--accent-fill); }
+.filter-clear { color: var(--accent); }
+.filter-clear[hidden] { display: none; }
+/* the groups slide open under the bar when the field has focus */
+.filter-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s var(--ease); }
+.filter-dock.open .filter-panel { grid-template-rows: 1fr; }
+.filter-panel > div { overflow: hidden; }
+.filter-dock:not(.open) .filter-groups { position: absolute; visibility: hidden; }
+.filter-groups { display: grid; gap: 10px; padding: 10px 16px 14px; border-top: 1px solid var(--line); }
+.filter-group { display: flex; align-items: center; gap: 12px; }
+.filter-group-label { width: 56px; flex: none; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.filter-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-option { padding: 3px 12px; font: inherit; color: var(--text-2); white-space: nowrap; background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
+.filter-option:hover { color: var(--text); background: var(--hover); }
+.filter-option[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.filter-option .n { margin-left: 4px; font-family: var(--mono); opacity: 0.75; }
+.filter-option.zero:not([aria-pressed="true"]) { opacity: 0.45; }
+.filter-mark { color: var(--accent); background: none; font-weight: 700; }
 .filter-empty { padding: 6px 10px; color: var(--text-2); }
 /* a row the filter hides; rows keep their place and number */
-[data-kind][hidden] { display: none !important; }
+.filter-target[hidden] { display: none !important; }
+@media (max-width: 720px) {
+    .filter-bar { flex-wrap: wrap; }
+    .filter-group { align-items: flex-start; }
+    .filter-group-label { width: auto; min-width: 48px; padding-top: 4px; }
+    .filter-key { display: none; }
+}
+@media print { .scenario-filter { display: none; } }
 /* theme:scenario-filter:end */
 /* title, kind pill and Core pill sit 6px apart in the Scenarios views */
 td .scenario-kind, td .core-pill { margin-left: 6px; vertical-align: 1px; }
-#scenario-filter { margin-bottom: 12px; }
 
 /* Channel tag (ui / mcp / api / job) in the Scenarios views and Acceptance criteria; .gap = no scenario on it */
 .channel-tag { display: inline-block; min-width: 3.4em; margin-right: 6px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 999px; font: 500 var(--fs-tag)/1.5 var(--mono); color: var(--text-2); text-align: center; text-transform: uppercase; vertical-align: 1px; }

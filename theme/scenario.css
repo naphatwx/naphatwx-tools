@@ -57,8 +57,6 @@ a.panel:hover { background: var(--hover); }
 .scenario-details li + li { margin-top: 4px; }
 /* refs chip, state or role, on one line at the top of the details */
 .scenario-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
-/* the Kind + Core-only filter sits under the page title, over every use case */
-.filter-row { padding: 4px 0; }
 /* Result: the reviewer's own pass / fail and note per scenario, kept in this browser */
 /* the Result label and its Pass / Fail buttons share one line; the note goes under them */
 .result-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; }
