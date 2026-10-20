@@ -185,17 +185,13 @@
   .disclosure.open { border-color: var(--accent); }
   /* the open row matches the pressed filter button, so it reads as selected */
   .disclosure.open > .disclosure-head, .disclosure.open > .disclosure-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
-  .disclosure.open > .disclosure-head .mark { color: var(--accent); }
   .disclosure.open > .disclosure-head :is(h2, h3) { font-weight: 600; }
-  /* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
+  /* Two lines: status and title, then the facts below. Title at body size keeps rows compact. */
   .disclosure-head :is(h2, h3) { min-width: 0; font-size: var(--fs-body); }
   .disclosure-head :is(h2, h3) button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
   .disclosure-head :is(h2, h3) .pill { flex: none; }
   .disclosure-head :is(h2, h3) button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   .disclosure-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
-  .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
-  .mark::before { content: "+"; }
-  .disclosure.open > .disclosure-head .mark::before { content: "\2212"; }
   /* theme:disclosure:end */
   /* Native <details> slide too where the browser can animate to auto height. */
   @supports (interpolate-size: allow-keywords) {
@@ -217,13 +213,11 @@
   /* Flow boxes use the heading-plus-button disclosure, so the flow name stays a real heading. */
   .flow { scroll-margin-top: 12px; }
   .flow-head h2 button > span:last-child { overflow-wrap: anywhere; min-width: 0; }
-  .flow.open .flow-head .mark::before { content: "\2212"; }
 
   summary { cursor: pointer; list-style: none; transition: background-color .15s var(--ease); }
   summary::-webkit-details-marker { display: none; }
   summary:hover { background: var(--hover); }
   summary:focus-visible { outline-offset: -2px; }
-  details[open] > summary .mark::before { content: "\2212"; }
 
 
   .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 14px 8px; margin: 0; list-style: none; }
@@ -240,16 +234,15 @@
   .hops-label { padding: 0 14px 4px; }
   .hops { list-style: none; margin: 0 14px 12px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
   .hops > li + li { border-top: 1px solid var(--line); }
-  .hop-row { display: grid; grid-template-columns: 1ch 2ch 8.5em minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 5px 12px; }
+  .hop-row { display: grid; grid-template-columns: 2ch 8.5em minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 5px 12px; }
   .hop-row .pill { justify-self: start; }
   .hop-row .number { color: var(--text-3); font-variant-numeric: tabular-nums; text-align: right; }
   .hop-row .route { overflow-wrap: anywhere; min-width: 0; }
   .hop-row .via { color: var(--text-3); }
   .hop-row .meta { text-align: right; white-space: nowrap; }
   .hop.skipped .route { color: var(--text-3); }
-  .hop.skipped .mark { visibility: hidden; }
   .hop[open] > .hop-row { background: var(--surface-2); }
-  .hop-body { padding: 8px 12px 10px calc(1ch + 2ch + 36px); border-top: 1px solid var(--line); display: grid; gap: 8px; min-width: 0; }
+  .hop-body { padding: 8px 12px 10px calc(2ch + 24px); border-top: 1px solid var(--line); display: grid; gap: 8px; min-width: 0; }
   .hop-body .why { color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
   .hop-body .why.bad { color: var(--bad); }
   .polled { margin-top: 4px; color: var(--text-2); overflow-wrap: anywhere; }
@@ -394,7 +387,7 @@ function evidence(label, record, what) {
   if (entry) {
     box.append(createElement('div', { class: 'meta' }, 'This hop’s entry, ', createElement('code', {}, record.entryPath || 'hops[]'), ':'), createElement('pre', {}, entry));
     if (body) {
-      const full = createElement('details', { class: 'full' }, createElement('summary', {}, createElement('span', { class: 'mark', 'aria-hidden': 'true' }), 'Show full response'),
+      const full = createElement('details', { class: 'full' }, createElement('summary', {}, 'Show full response'),
         createElement('div', { class: 'full-head' }, copyButton(body, 'full response for ' + what)), createElement('pre', {}, body));
       if (record.truncated) full.append(createElement('div', { class: 'note' }, 'Truncated: only the first 2,000 characters were kept.'));
       box.append(full);
@@ -414,7 +407,7 @@ function polled(polling) {
 
 // One numbered row per hop; a closed row is a single line, the cause and evidence open below it.
 function hopShell(tag, number, status, from, to, via, time) {
-  return createElement(tag, { class: 'hop-row' }, createElement('span', { class: 'mark', 'aria-hidden': 'true' }), createElement('span', { class: 'number' }, number), pill(status),
+  return createElement(tag, { class: 'hop-row' }, createElement('span', { class: 'number' }, number), pill(status),
     createElement('span', { class: 'route' }, (from ? from + ' → ' : '') + to, via ? createElement('span', { class: 'via' }, '  via ' + via) : null),
     createElement('span', { class: 'meta' }, time));
 }
@@ -471,7 +464,7 @@ function flowBox(flow) {
   const panel = createElement('div', { id: id + '-panel' });
   box.dataset.kind = failed ? 'failed' : 'passed';
   const toggle = createElement('button', { type: 'button', 'aria-controls': id + '-panel' },
-    createElement('span', { class: 'mark', 'aria-hidden': 'true' }), pill(flow.status), createElement('span', { id: id + '-name' }, flow.flow));
+    pill(flow.status), createElement('span', { id: id + '-name' }, flow.flow));
   const head = createElement('div', { class: 'flow-head disclosure-head' }, createElement('h2', {}, toggle),
     createElement('div', { class: 'info' }, flow.description ? createElement('span', { class: 'meta' }, flow.description) : null, createElement('span', { class: 'meta' }, formatDuration(flow.ms))));
   // Same disclosure as the e2e report: the whole row is a mouse target, the heading's button serves keyboards.

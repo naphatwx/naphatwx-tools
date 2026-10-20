@@ -34,14 +34,12 @@ a.panel:hover { background: var(--hover); }
 /* room under the last card, so a picked card can scroll to the top of the list (--tail, set by scrollToTop()) */
 .scenario-list::after { content: ""; display: block; height: var(--tail, 0px); }
 /* One scenario: a disclosure card (disclosure.css), the same as deploy-plan, smoke-test and e2e-test rows.
-   Line one: mark, status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
+   Line one: status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
 .scenario-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 400; color: var(--text-3); border: 1.5px solid var(--line-3); border-radius: 50%; }
 .scenario-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .scenario-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
 .scenario-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
 .scenario-title { min-width: 0; overflow-wrap: anywhere; }
-/* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
-.scenario .mark { display: none; }
 /* the pills sit inside the title's text, so they follow its last word and wrap one by one like words */
 .scenario-title > :is(.scenario-kind, .core-pill, .scenario-surface) { display: inline-flex; vertical-align: 1px; margin-left: 2px; }
 .scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
@@ -88,7 +86,7 @@ a.panel:hover { background: var(--hover); }
     .scenarios { position: static; height: auto; }
     .scenario-list { overflow-y: visible; }
 }
-/* PDF: one column, the open scenario of each use case with its steps, then its frame; no other rows, marks or restart. */
+/* PDF: one column, the open scenario of each use case with its steps, then its frame; no other rows or restart. */
 @media print {
     .page { width: auto; margin: 0; padding: 16px; }
     .use-case-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); }

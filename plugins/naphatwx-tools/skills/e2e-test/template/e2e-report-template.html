@@ -189,17 +189,13 @@
   .disclosure.open { border-color: var(--accent); }
   /* the open row matches the pressed filter button, so it reads as selected */
   .disclosure.open > .disclosure-head, .disclosure.open > .disclosure-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
-  .disclosure.open > .disclosure-head .mark { color: var(--accent); }
   .disclosure.open > .disclosure-head :is(h2, h3) { font-weight: 600; }
-  /* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
+  /* Two lines: status and title, then the facts below. Title at body size keeps rows compact. */
   .disclosure-head :is(h2, h3) { min-width: 0; font-size: var(--fs-body); }
   .disclosure-head :is(h2, h3) button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
   .disclosure-head :is(h2, h3) .pill { flex: none; }
   .disclosure-head :is(h2, h3) button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   .disclosure-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
-  .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
-  .mark::before { content: "+"; }
-  .disclosure.open > .disclosure-head .mark::before { content: "\2212"; }
   /* theme:disclosure:end */
   /* Native <details> slide too where the browser can animate to auto height. */
   @supports (interpolate-size: allow-keywords) {
@@ -224,7 +220,6 @@
   .test.open { margin-inline: min(0px, calc((100% - min(96vw, var(--max-w-7xl))) / 2)); }
   .test-head h2 button:hover { background: transparent; }
   .test-head .title { overflow-wrap: anywhere; min-width: 0; }
-  .test.open .mark::before { content: "\2212"; }
   .test-body { padding: 10px 14px 12px; display: grid; gap: 10px; min-width: 0; }
 
 
@@ -575,7 +570,7 @@ function testBox(test) {
   const flags = test.steps.filter(flagged).length;
   box.dataset.flags = String(flags);
   const toggle = createElement('button', { type: 'button', 'aria-expanded': 'false', 'aria-controls': id + '-b' },
-    createElement('span', { class: 'mark', 'aria-hidden': 'true' }), pill(testKind === 'failed' && statusOf(test.status).tone === 'bad' ? test.status : testKind),
+    pill(testKind === 'failed' && statusOf(test.status).tone === 'bad' ? test.status : testKind),
     test.surface ? createElement('span', { class: 'surface', title: 'Surface: ' + test.surface }, test.surface) : null, createElement('span', { class: 'title' }, test.title),
     test.scKind ? createElement('span', { class: 'scenario-kind ' + test.scKind, title: 'Scenario kind' }, test.scKind) : null,
     test.core ? createElement('span', { class: 'core-pill', title: 'Core: play first' }, 'Core') : null);

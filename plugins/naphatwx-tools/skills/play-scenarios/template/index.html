@@ -164,17 +164,13 @@
         .disclosure.open { border-color: var(--accent); }
         /* the open row matches the pressed filter button, so it reads as selected */
         .disclosure.open > .disclosure-head, .disclosure.open > .disclosure-head:hover { background: var(--accent-fill); border-bottom: 1px solid var(--line-strong); }
-        .disclosure.open > .disclosure-head .mark { color: var(--accent); }
         .disclosure.open > .disclosure-head :is(h2, h3) { font-weight: 600; }
-        /* Two lines: mark, status and title, then the facts below. Title at body size keeps rows compact. */
+        /* Two lines: status and title, then the facts below. Title at body size keeps rows compact. */
         .disclosure-head :is(h2, h3) { min-width: 0; font-size: var(--fs-body); }
         .disclosure-head :is(h2, h3) button { all: unset; display: flex; flex-direction: row; gap: 12px; align-items: center; cursor: pointer; border-radius: var(--radius); }
         .disclosure-head :is(h2, h3) .pill { flex: none; }
         .disclosure-head :is(h2, h3) button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
         .disclosure-head .info { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 12px; }
-        .mark { font-family: var(--mono); color: var(--text-3); width: 1ch; flex: none; }
-        .mark::before { content: "+"; }
-        .disclosure.open > .disclosure-head .mark::before { content: "\2212"; }
         /* theme:disclosure:end */
         /* theme:scenario:start */
         /* Synced from theme/scenario.css by theme/sync.mjs. Do not edit here. */
@@ -213,14 +209,12 @@
         /* room under the last card, so a picked card can scroll to the top of the list (--tail, set by scrollToTop()) */
         .scenario-list::after { content: ""; display: block; height: var(--tail, 0px); }
         /* One scenario: a disclosure card (disclosure.css), the same as deploy-plan, smoke-test and e2e-test rows.
-           Line one: mark, status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
+           Line one: status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
         .scenario-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 400; color: var(--text-3); border: 1.5px solid var(--line-3); border-radius: 50%; }
         .scenario-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
         .scenario-number.pass { color: var(--bg); background: var(--ok); border-color: var(--ok); }
         .scenario-number.fail { color: var(--bg); background: var(--bad); border-color: var(--bad); }
         .scenario-title { min-width: 0; overflow-wrap: anywhere; }
-        /* no +/− mark: the disc leads the row, and the blue picked card already shows which one is open */
-        .scenario .mark { display: none; }
         /* the pills sit inside the title's text, so they follow its last word and wrap one by one like words */
         .scenario-title > :is(.scenario-kind, .core-pill, .scenario-surface) { display: inline-flex; vertical-align: 1px; margin-left: 2px; }
         .scenario-surface { flex: none; padding: 1px 8px; font: 600 var(--fs-tag)/1.5 var(--mono); text-transform: uppercase; white-space: nowrap; color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px; }
@@ -267,7 +261,7 @@
             .scenarios { position: static; height: auto; }
             .scenario-list { overflow-y: visible; }
         }
-        /* PDF: one column, the open scenario of each use case with its steps, then its frame; no other rows, marks or restart. */
+        /* PDF: one column, the open scenario of each use case with its steps, then its frame; no other rows or restart. */
         @media print {
             .page { width: auto; margin: 0; padding: 16px; }
             .use-case-row { width: auto; margin-left: 0; grid-template-columns: minmax(0, 1fr); }
@@ -565,7 +559,7 @@
                   <div class="scenario-list">
                   ${scenarios.map((scenario, i) => `<div class="scenario disclosure${scenario.skip ? ' skipped' : ''}" data-sc="${scenario.id}" data-kind="${escapeHtml(scenario.kind || '')}" data-core="${isCore(scenario)}">
                     <div class="disclosure-head">
-                      <h3><button type="button" aria-expanded="false" aria-controls="details-${scenario.id}" onclick="pick('${scenario.id}', true)"${scenario.skip ? ` title="Skipped: ${escapeHtml(scenario.skip)}"` : ''}><span class="mark" aria-hidden="true"></span>${scenario.skip ? `<span class="scenario-number skip" aria-hidden="true">–</span>` : `<span class="scenario-number" data-r="${scenario.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="scenario-title">${escapeHtml(scenario.title)}${scenario.skip ? '<span class="sr-only"> (skipped)</span>' : ''}${[kindPill(scenario), corePill(scenario), `<span class="scenario-surface" title="${escapeHtml(SURFACE[scenario.surface] || '')}">${escapeHtml(scenario.surface || '')}</span>`].filter(Boolean).map(pill => ' ' + pill).join('')}</span></button></h3>
+                      <h3><button type="button" aria-expanded="false" aria-controls="details-${scenario.id}" onclick="pick('${scenario.id}', true)"${scenario.skip ? ` title="Skipped: ${escapeHtml(scenario.skip)}"` : ''}>${scenario.skip ? `<span class="scenario-number skip" aria-hidden="true">–</span>` : `<span class="scenario-number" data-r="${scenario.id}" data-n="${i + 1}">${i + 1}</span>`}<span class="scenario-title">${escapeHtml(scenario.title)}${scenario.skip ? '<span class="sr-only"> (skipped)</span>' : ''}${[kindPill(scenario), corePill(scenario), `<span class="scenario-surface" title="${escapeHtml(SURFACE[scenario.surface] || '')}">${escapeHtml(scenario.surface || '')}</span>`].filter(Boolean).map(pill => ' ' + pill).join('')}</span></button></h3>
                     </div>
                     <div class="scenario-details" id="details-${scenario.id}" hidden></div>
                   </div>`).join('')}
