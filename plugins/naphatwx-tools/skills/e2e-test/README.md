@@ -18,7 +18,7 @@ Writes and runs automated tests for every scenario in a feature's `use-cases.js`
 
 ## How it works
 
-Six phases. The harness is added once per repo; the rest runs per feature.
+Six phases, plus the data helper. The harness is added once per repo; the rest runs per feature.
 
 ```mermaid
 graph TD
@@ -30,16 +30,18 @@ graph TD
     C -->|nothing| C2["add @playwright/test, a config, a login setup"]
     C1 --> D["2 harness: copy step.ts, reporters/ unchanged"]
     C2 --> D
-    D --> E["3 write: one writer agent per use case, in parallel"]
+    D --> D2["2b data helper: helpers/feature.ts, seed copies + sweep, proved once"]
+    D2 --> E["3 write: one writer agent per use case, in parallel"]
     E --> E1["uc.e2e.spec.ts: ui + api scenarios"]
     E --> E2["uc.ai-tests.json: mcp + job scenarios"]
-    E1 --> F1["4 run: Playwright → run-data.json + shots/"]
-    E2 --> F2["4 run: one AI tester per use case → ai-results-UC.json"]
-    F1 --> G["5 review: a fresh reviewer checks every step → review.json"]
-    F2 --> G
+    E1 --> F1["4 run, core first: Playwright → run-data.json + shots/"]
+    E2 --> F2["4 run: AI testers one after another → ai-results-UC.json"]
+    F1 --> F2
+    F2 --> G["5 review: a fresh reviewer checks every step → review.json"]
     G -->|test problem| H[fix the test, re-run those files once, review again]
     H --> G
     G -->|product problem| I[keep as a finding]
+    G -->|core pass done| F1
     G --> J["6 report: build-report.mjs → one HTML"]
     I --> J
     J --> K[reply: counts per use case, failures with cause, review flags, findings, report path]
@@ -64,8 +66,8 @@ sequenceDiagram
     participant R as Fresh reviewer
     participant B as build-report.mjs
     S->>P: npx playwright test (ui + api), E2E_RUN_DIR=run
-    S->>A: play uc.ai-tests.json (mcp + job), at the same time
     P-->>S: run/run-data.json + run/shots/
+    S->>A: play uc.ai-tests.json (mcp + job), one use case after another
     A-->>S: run/ai-results-UC.json
     S->>R: review every step against use-cases.js
     R-->>S: run/review.json (ok / test / product / unsure)
@@ -89,7 +91,7 @@ Rules the diagrams don't show:
 
 - `use-cases.js` is the one source. It never writes its own test cases; a wrong scenario is fixed in `generate-use-case`.
 - Tests only. It never changes app code to make a test pass; a missing selector or a bug is a finding.
-- Each test creates its own data through the app's API: records prefixed `__e2e_`, deleted after, checked gone.
+- Each test works on its own copies of the seed records its scenario names (`<seed name>-e2e<N>-<tag>`), deleted after, checked gone.
 - No tokens, cookies or passwords in any recorded call.
 - Never against production unless named for this run.
 - The repo's own guide (where tests live, how to run tools) wins over the skill.
@@ -107,13 +109,15 @@ Output, in the target repo:
 <plan>/use-cases.js                       read only (from generate-use-case)
 <e2e-dir>/
 ├── README.md                             how to run the tests, for teammates
-├── step.ts                               step() screenshot per step, apiStep() request + response per step
+├── step.ts                               step() screenshot per step, apiStep() request + response per step, reveal()
+├── helpers/<feature>.ts                  seed copies, name map, sweep()
 ├── reporters/
 │   ├── run-data-reporter.ts              writes the run folder, no HTML
 │   ├── build-report.mjs                  run folder → one HTML
 │   └── e2e-report-template.html          the report page, dark theme, Export PDF
 ├── <uc-slug>.e2e.spec.ts                 ui + api scenarios of one use case
 ├── <uc-slug>.ai-tests.json               mcp + job scenarios of one use case
+├── <uc-slug>.data.mts                    setup / cleanup command for the AI tester (one pattern for all)
 └── e2e-results/                          gitignored
     └── <feature>-<stamp>/
         ├── run-data.json                 Playwright results
@@ -130,10 +134,11 @@ Plus a `playwright.config.*` and login setup when the repo had none.
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions and the file formats |
+| [references/data-helper-agent.md](references/data-helper-agent.md) | Prompt for the data helper agent: seed copies, naming, sweep, runner |
 | [references/writer-agent.md](references/writer-agent.md) | Prompt for each writer agent: per-surface rules, selectors, data, waits |
 | [references/ai-tester-agent.md](references/ai-tester-agent.md) | Prompt for the AI tester: plays mcp and job scenarios, records each call |
 | [references/reviewer-agent.md](references/reviewer-agent.md) | Prompt for the fresh reviewer: the per-step checklist and flags |
-| [template/step.ts](template/step.ts) | `step()` and `apiStep()` |
+| [template/step.ts](template/step.ts) | `step()`, `apiStep()` and `reveal()` |
 | [template/run-data-reporter.ts](template/run-data-reporter.ts) | Playwright reporter: writes `run-data.json` + `shots/` |
 | [template/build-report.mjs](template/build-report.mjs) | Merges the run folder into one HTML |
 | [template/e2e-report-template.html](template/e2e-report-template.html) | The report page the build fills in |

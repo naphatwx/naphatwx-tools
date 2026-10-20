@@ -62,7 +62,7 @@ Where the file goes (`<plan>`):
 ## Hard Rules
 
 1. **Strict JSON inside a script.** The file sets three globals, `var USE_CASES = [...]`, `var SCENARIOS = [...]` and `var ACCEPTANCE = [...]`. Each array is strict JSON (double quotes, no trailing commas, no comments inside), so a script can parse it after `var NAME = `, and a page opened from `file://` can load it with `<script src>`.
-2. **Behaviour from the spec, words and values from the code.** Every scenario comes from an acceptance scenario, edge case, refusal row or functional requirement in the source. Never invent behaviour. The messages, permission strings and values in it are read from the code and seed when they exist (step 1b), because the spec drifts. Unknown copy → `TBD`.
+2. **Behaviour from the spec, words and values from the code.** Every scenario comes from an acceptance scenario, edge case, refusal row or functional requirement in the source. Never invent behaviour. The messages, permission strings and values in it are read from the code and seed when they exist (step 1b), or from an e2e run, because the spec drifts. Unknown copy → `TBD`.
 3. **Every scenario carries a concrete, true example** (step 2, "Examples"). A reviewer playing it must be able to tell pass from fail by comparing the screen with the text. Prose alone ("The user is not allowed", "the tooltip explains why") is not enough.
 4. **No mock or test details.** No mock state ids, pages, query params or selectors. Example values (versions, counts, ids, names the seed creates) are welcome; mock wiring is not. It belongs to the mock (`scenario-play.js`) and the test file.
 5. **Ids are stable.** Use cases are `UC1`, `UC2`, … Scenarios are kebab-case and unique. Never reuse an id for another meaning. Other files link to `#sc-<scenario id>`.
@@ -98,6 +98,7 @@ The spec says what should happen; the code says what the user really sees. Deleg
 - **Channels**: the page and route of each use case, the MCP tool and operation for it (and whether the tool shares the RPC's validation and messages), and any direct REST / gRPC call or job. An MCP refusal often carries a different code and text than the screen: copy both.
 - **Controls**: for each control a scenario points at, read the component as it is now. A tooltip replaced by inline text is inline text; never write "tooltip" or "hover" without seeing it in the component.
 - **Spec vs code**: every place the spec's text and the code's text differ. Use the code's text in the scenario and list each difference in the reply (step 4).
+- **e2e run vs scenario**: when an e2e-test run shows the code's message, status or list differs from a scenario (e.g. 200 vs 201, an RBAC refusal string, a first-deploy list), update the scenario to the code's text.
 - No code yet (planning before the build) → take the values from the spec's own examples, contracts and data model, and say in the reply that the messages come from the spec.
 
 ### 2. Write `<plan>/use-cases.js`
@@ -212,4 +213,5 @@ Before and after, from a real plan:
 - **Merged**: each removed scenario id and the id it merged into, when an existing file was updated. Mock and test files that linked to a removed id need its new id.
 - **Channel gaps**: every `na` reason, one line each, so the user can disagree.
 - **Spec vs code**: each scenario where the spec's text differs from the code's, with both texts and the code's `file:line`. Say "none found" when there are none, or "no code yet: messages from the spec".
+- "Scenarios name seed records; e2e-test runs them on copies named `<seed name>-e2e<N>-<tag>`.
 - Next steps, one line each: design-feature shows the acceptance criteria and each use case's scenarios, generate-mock-ui mocks the `ui` scenarios, play-scenarios plays every scenario on the running app, e2e-test runs every scenario as an automated test.

@@ -1,6 +1,6 @@
 // step(): one ui step + a screenshot of how it ended. apiStep(): one api call + its masked request and response.
 // The run-data reporter pairs them with the step by the "step: <title>" / "call: <title>" attachment names.
-import { test, type APIRequestContext, type APIResponse, type Page } from '@playwright/test'
+import { test, type APIRequestContext, type APIResponse, type Locator, type Page } from '@playwright/test'
 
 export async function step(page: Page, title: string, body: () => Promise<void>): Promise<void> {
   await test.step(title, async () => {
@@ -13,6 +13,37 @@ export async function step(page: Page, title: string, body: () => Promise<void>)
     const shot = await page.screenshot({ type: 'jpeg', quality: 60, animations: 'disabled' }).catch(() => null)
     if (shot) await test.info().attach(`step: ${title}`, { body: shot, contentType: 'image/jpeg' })
     if (failure) throw failure
+  })
+}
+
+// Scrolls target into view below any sticky header and above any sticky footer, so the step's shot shows it.
+// Apps often scroll a main pane, not the window: scroll each scrollable ancestor first, then the window.
+export async function reveal(target: Locator): Promise<void> {
+  await target.waitFor({ state: 'visible' })
+  await target.evaluate((element) => {
+    const pinned = (node: Element | null) => {
+      for (let n = node as HTMLElement | null; n && n !== document.body; n = n.parentElement) {
+        const position = getComputedStyle(n).position
+        if ((position === 'fixed' || position === 'sticky') && n.offsetHeight < window.innerHeight / 3) return n.contains(element) ? null : n
+      }
+      return null
+    }
+    const middle = window.innerWidth / 2
+    const head = pinned(document.elementFromPoint(middle, 1))
+    const foot = pinned(document.elementFromPoint(middle, window.innerHeight - 2))
+    const top = (head?.getBoundingClientRect().bottom ?? 0) + 8
+    const bottom = (foot?.getBoundingClientRect().top ?? window.innerHeight) - 8
+    const offset = () => {
+      const box = element.getBoundingClientRect()
+      if (box.top < top) return box.top - top
+      if (box.bottom > bottom) return Math.min(box.bottom - bottom, box.top - top)
+      return 0
+    }
+    for (let n = element.parentElement; n && offset(); n = n.parentElement) {
+      const overflow = getComputedStyle(n).overflowY
+      if ((overflow === 'auto' || overflow === 'scroll') && n.scrollHeight > n.clientHeight) n.scrollTop += offset()
+    }
+    if (offset()) window.scrollBy(0, offset())
   })
 }
 

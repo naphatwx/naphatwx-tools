@@ -6,14 +6,15 @@ Automated tests for this feature's scenarios, one test per scenario in the featu
 
 1. Start the app, or pick the environment to test. Never production unless that is the plan for this run.
 
-2. Run the Playwright tests (ui + api scenarios), from the folder that holds the Playwright config:
+2. Run the Playwright tests (ui + api scenarios), from the repo root or the folder that holds the Playwright config:
 
     ```bash
     E2E_RUN_DIR=e2e-results/<feature>-<stamp> PW_BASE_URL=http://localhost:3000 E2E_REPORT_NAME=<feature> npx playwright test <e2e-dir>
     ```
 
-    - `E2E_RUN_DIR` is the run folder. Left out → `e2e-results/<name>-<stamp>/`. A re-run into the same folder replaces only the tests it ran.
+    - `E2E_RUN_DIR` is the run folder, a path inside `<e2e-dir>/e2e-results/` given from the repo root or the config folder. Any other path stops the run. Left out → `e2e-results/<name>-<stamp>/`. A re-run into the same folder replaces only the tests it ran.
     - `PW_BASE_URL` is the app to test. Left out → the config's local URL.
+    - From the repo root, add `--config <path to playwright.config.*>`.
     - Add a spec file path to run one use case only.
     - The repo's guide may say to run tools another way (for example inside Docker). Follow it.
 
@@ -34,7 +35,7 @@ graph TD
     A[run npx playwright test] --> B[sign in once, every test reuses the session]
     B --> C[each spec file on its own worker, tests in order inside it]
     C --> D["each step: action or call, then a screenshot or the request + response"]
-    D --> E[test data prefixed __e2e_, deleted after]
+    D --> E["test data: copies of seed records, named seed-e2eN-tag, deleted after"]
     E --> F["run folder: run-data.json + shots/"]
     F --> G[optional: AI tester adds ai-results, reviewer adds review.json]
     G --> H["build-report.mjs → E2E report: path"]
@@ -57,7 +58,9 @@ graph TD
 |------|------|
 | `<uc-slug>.e2e.spec.ts` | ui + api scenarios of one use case; one `test()` per scenario |
 | `<uc-slug>.ai-tests.json` | mcp + job scenarios of one use case, as ordered calls or commands for the AI tester |
-| `step.ts` | `step()` (screenshot per step) and `apiStep()` (request + response per step) |
+| `<uc-slug>.data.mts` | Setup / cleanup command the AI tester runs for one use case |
+| `step.ts` | `step()` (screenshot per step), `apiStep()` (request + response per step) and `reveal()` (scroll into view) |
+| `helpers/<feature>.ts` | Copies the seed records a scenario names (`<seed name>-e2e<N>-<tag>`), deletes them, `sweep()` clears leftovers |
 | `reporters/run-data-reporter.ts` | Writes the run folder: `run-data.json` + `shots/` |
 | `reporters/build-report.mjs` | Merges the run folder into one HTML |
 | `reporters/e2e-report-template.html` | The report page; dark theme, Export PDF |

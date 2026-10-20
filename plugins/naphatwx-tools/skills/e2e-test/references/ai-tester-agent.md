@@ -1,6 +1,6 @@
 # AI tester agent prompt (mcp and job scenarios, one agent per use case)
 
-Spawn one agent per use case that has a `.ai-tests.json`, **all in one message**, at the same time as the Playwright run. Each needs the MCP tools of the app under test and a shell. A fresh agent, not a writer.
+Spawn one agent per use case that has a `.ai-tests.json`, when SKILL.md step 4 says. Each needs the MCP tools of the app under test and a shell. A fresh agent, not a writer.
 
 ```text
 Play the mcp and job scenarios of ONE use case on the app under test, and record every call.
@@ -27,11 +27,13 @@ For each scenario in the test file, in order
      only the scenario's calls.
    - job: run the command from the repo root. Record the command, exit code and the output lines that
      matter (the summary line, the error), at most about 40 lines.
-   - setup / cleanup steps run like the others. Run cleanup even when an earlier step failed.
+   - setup / cleanup steps run like the others, with the commands in the test file's `runner` block.
+     Run cleanup even when an earlier step failed.
+   - Each step's `call.response` comes from that step's own call or command output, never another step's.
 5. Compare each response with the step's `expect` and the scenario's `expect`, exactly: quoted
    messages word for word, numbers, statuses, error codes. A step fails when it does not match.
    Never mark an error as passed unless the scenario expects that error.
-6. After cleanup, check every `__e2e_` record you made is gone. Leftovers fail the scenario.
+6. After cleanup, check every copy you made (`-e2e<N>-` in its name) is gone. Leftovers fail the scenario.
 
 Record
 7. Mask secrets: replace the value of any key named like token, secret, password, cookie,
@@ -43,6 +45,8 @@ Record
                     "call": { "target": "<Service> · <Operation>" | "$ <command>",
                               "request": <params object, or the command string>,
                               "response": <response object, or "exit <code>\n<output>"> } } ] } ] }
+9. Before you return, re-read the results file: it holds only your use case, and every step's
+   `call.target` matches its title. Fix any that don't.
 
 Return:
 - the results file path

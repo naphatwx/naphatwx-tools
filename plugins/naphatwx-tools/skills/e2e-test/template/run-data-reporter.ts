@@ -1,8 +1,8 @@
-// Playwright reporter that writes the run as data, not HTML: <run dir>/run-data.json + shots/*.jpg.
-// build-report.mjs later merges it with the AI tester's results and the review into one HTML.
-// Options: { name?, outputDir? } (outputDir is relative to the Playwright config folder). E2E_RUN_DIR picks the run dir.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, relative } from 'node:path'
+// Playwright reporter: writes <run dir>/run-data.json + shots/*.jpg; build-report.mjs turns them into one HTML.
+// Run dir: E2E_RUN_DIR (read from the cwd, else from the config folder) must sit inside outputDir
+// (default e2e-results/, next to the config), or onBegin throws. Unset → <outputDir>/<name>-<stamp>.
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import type { FullConfig, FullResult, Reporter, Suite, TestCase, TestResult, TestStep } from '@playwright/test/reporter'
 
 type Options = { name?: string; outputDir?: string }
@@ -35,6 +35,10 @@ type RunData = { name: string; stamp: string; startedAt: string; ms: number; bas
 const pad = (number: number) => String(number).padStart(2, '0')
 const stripAnsi = (text = '') => text.replace(/\u001b\[[0-9;]*m/g, '')
 const safe = (text: string) => text.replace(/[^\w.-]+/g, '_').slice(0, 80)
+const inside = (root: string, path: string) => {
+  const rest = relative(root, path)
+  return rest !== '' && !rest.startsWith('..') && !isAbsolute(rest)
+}
 
 export default class RunDataReporter implements Reporter {
   private options: Options
@@ -58,10 +62,22 @@ export default class RunDataReporter implements Reporter {
     const date = this.started
     this.stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
     this.name = process.env.E2E_REPORT_NAME ?? this.options.name ?? 'e2e'
+    // Real paths, so a symlinked checkout (e.g. /var vs /private/var) still compares equal.
+    const configDir = realpathSync(this.configDir)
+    const cwd = realpathSync(process.cwd())
+    const resultsRoot = resolve(configDir, this.options.outputDir ?? 'e2e-results')
     const fixed = process.env.E2E_RUN_DIR
-    this.runDir = fixed
-      ? (isAbsolute(fixed) ? fixed : join(this.configDir, fixed))
-      : join(this.configDir, this.options.outputDir ?? 'e2e-results', `${this.name}-${this.stamp}`)
+    if (fixed) {
+      const tries = isAbsolute(fixed) ? [fixed] : [resolve(cwd, fixed), resolve(configDir, fixed)]
+      const found = tries.find((path) => inside(resultsRoot, path))
+      if (!found) {
+        const root = relative(cwd, resultsRoot) || '.'
+        throw new Error(`E2E_RUN_DIR must be a folder inside ${root}/ (got "${fixed}"). Use e.g. E2E_RUN_DIR=${root}/<feature>-<stamp>, or leave it unset.`)
+      }
+      this.runDir = found
+    } else {
+      this.runDir = join(resultsRoot, `${this.name}-${this.stamp}`)
+    }
     mkdirSync(join(this.runDir, 'shots'), { recursive: true })
   }
 
