@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Copies the theme/ blocks (tokens, base, pdf, diff, report, disclosure, slide.js, scenario, page-head, seq, scrollbar, pdf.js, diagram scripts) into skill templates between marker comments,
 // so each skill folder stays self-contained (`npx skills add` installs one folder only).
-// Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS).
+// Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS) and the use-cases.js type (TYPES_COPIES).
 // Usage: node theme/sync.mjs          write the blocks and preview copies
 //        node theme/sync.mjs --check  fail on drift, stale previews, off-palette hex colors, or low contrast
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
@@ -130,6 +130,20 @@ for (const [preview, source] of PREVIEWS) {
             if (!inSource && !OWN.has(previewName)) problems.push(`preview: ${previewName} has no source in ${source} (delete it, or list it in OWN)`);
         }
     }
+}
+
+// ---- whole-file copies: the use-cases.js type, next to every use-cases.js a skill ships or reads ----
+const TYPES_HEADER = '// Synced from theme/use-cases.d.ts by theme/sync.mjs. Do not edit here.\n';
+const TYPES = TYPES_HEADER + readFileSync(join(ROOT, 'theme/use-cases.d.ts'), 'utf8').replace(/\r\n/g, '\n');
+const TYPES_COPIES = ['generate-use-case/template', 'generate-mock-ui', 'play-scenarios', 'design-feature/template', 'e2e-test/template']
+    .map((dir) => `${dir}/use-cases.types.d.ts`);
+for (const copy of TYPES_COPIES) {
+    let have = null;
+    try { have = readFileSync(join(SKILLS, copy), 'utf8'); } catch {}
+    if (have === TYPES) continue;
+    copied++;
+    if (CHECK) problems.push(`types: ${copy} differs from theme/use-cases.d.ts (run node theme/sync.mjs)`);
+    else writeFileSync(join(SKILLS, copy), TYPES);
 }
 
 if (!CHECK) print(`theme: ${synced} file(s) updated, ${copied} preview copy(ies) refreshed`);

@@ -38,7 +38,9 @@ const source = fs.readFileSync(useCasesFile, 'utf8');
 // Plans made before the use case / scenario split group "use cases" under flows (3.N); they need a rebuild, not a patch.
 if (/\bUSE_CASE_FLOWS\s*=/.test(source) || /id="flows"/.test(html))
     fail('Old plan layout (flows 3.N). Re-run the generate-use-case skill, then rebuild overview.html from the template.');
+/** @type {import('../template/use-cases.types').UseCase[]} */
 const USE_CASES = parseVariable(source, 'USE_CASES', useCasesFile);
+/** @type {import('../template/use-cases.types').Scenario[]} */
 const CORE = parseVariable(source, 'SCENARIOS', useCasesFile);
 const hasMock = fs.existsSync(playFile);
 const PLAY = hasMock ? parseVariable(fs.readFileSync(playFile, 'utf8'), 'SCENARIO_PLAY', playFile) : [];

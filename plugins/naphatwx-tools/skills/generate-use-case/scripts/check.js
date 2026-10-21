@@ -4,6 +4,7 @@
 // Exit 1 on any error; warnings (no example, no twin on another channel, likely duplicates, over budget, too many core) keep exit 0.
 
 const fs = require('fs');
+const path = require('path');
 
 const file = process.argv[2];
 if (!file) { process.stderr.write('usage: node check.js <use-cases.js> [--json]\n'); process.exit(2); }
@@ -28,7 +29,12 @@ function parseVar(src, name) {
     throw new Error(`${name}: unclosed array`);
 }
 
-let UCS = [], SCS = [], ACS = null;
+/** @type {import('../template/use-cases.types').UseCase[]} */
+let UCS = [];
+/** @type {import('../template/use-cases.types').Scenario[]} */
+let SCS = [];
+/** @type {import('../template/use-cases.types').Acceptance[] | null} */
+let ACS = null;
 try {
     const src = fs.readFileSync(file, 'utf8');
     if (/\bUSE_CASE_FLOWS\s*=/.test(src)) errors.push(`${file} is in the old format (USE_CASE_FLOWS); rewrite it as USE_CASES + SCENARIOS (SKILL.md, User Input)`);
@@ -37,6 +43,20 @@ try {
         if (/\bACCEPTANCE\s*=/.test(src)) ACS = parseVar(src, 'ACCEPTANCE');
     }
 } catch (e) { errors.push(`${file} is missing or not strict JSON: ${e.message}`); }
+
+/** Field names of one interface in template/use-cases.types.d.ts, the one source for which fields exist. */
+const TYPES = fs.readFileSync(path.join(__dirname, '../template/use-cases.types.d.ts'), 'utf8');
+function fieldsOf(name) {
+    const body = TYPES.match(new RegExp(`interface ${name} \\{([\\s\\S]*?)\\n\\}`));
+    if (!body) throw new Error(`use-cases.types.d.ts has no interface ${name}`);
+    return new Set([...body[1].matchAll(/^\s+(\w+)\??:/gm)].map(m => m[1]));
+}
+const FIELDS = { USE_CASES: fieldsOf('UseCase'), SCENARIOS: fieldsOf('ScenarioFields'), ACCEPTANCE: fieldsOf('Acceptance') };
+// mock fields get their own message below
+const MOCK_FIELDS = ['state', 'scenario', 'page', 'params', 'steps', 'op', 'req', 'parts'];
+for (const [list, entries] of [['USE_CASES', UCS], ['SCENARIOS', SCS], ['ACCEPTANCE', ACS || []]])
+    for (const e of entries) for (const k of Object.keys(e))
+        if (!FIELDS[list].has(k) && !(list === 'SCENARIOS' && MOCK_FIELDS.includes(k))) errors.push(`${e.id || '(no id)'}: unknown field "${k}" in ${list}; allowed: ${[...FIELDS[list]].join(', ')} (use-cases.types.d.ts)`);
 
 const SURFACES = ['ui', 'mcp', 'api', 'job'];
 // basic: the main path to the goal; alternate: another path that still reaches it; exception: the goal is not reached

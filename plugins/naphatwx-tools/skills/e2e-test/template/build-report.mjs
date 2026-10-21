@@ -39,7 +39,9 @@ function parseArray(source, name) {
 const useCasesFile = option('--use-cases');
 const useCasesSource = useCasesFile ? readFileSync(useCasesFile, 'utf8') : '';
 if (!useCasesFile) process.stderr.write('warning: no --use-cases file; the report cannot show the use case tree or not-run scenarios\n');
+/** @type {import('./use-cases.types').UseCase[]} */
 const USE_CASES = parseArray(useCasesSource, 'USE_CASES');
+/** @type {import('./use-cases.types').Scenario[]} */
 const SCENARIOS = parseArray(useCasesSource, 'SCENARIOS');
 const scenarioById = new Map(SCENARIOS.map((s, i) => [s.id, { ...s, order: i }]));
 const useCaseId = (value) => (/^UC\d+/.exec(String(value ?? '')) || [''])[0];

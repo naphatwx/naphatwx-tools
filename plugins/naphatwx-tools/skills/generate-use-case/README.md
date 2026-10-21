@@ -118,11 +118,12 @@ Input: `<spec-folder | plan-folder | feature description> [output-folder]`
 | Spec folder or number | `<spec-folder>/plan/` |
 | Feature description | `plans/<feature-slug>/` at the project root |
 
-Output: one file.
+Output: the data file and its type.
 
 ```
 <plan>/
-└── use-cases.js       var USE_CASES = [...]; var SCENARIOS = [...]; var ACCEPTANCE = [...]
+├── use-cases.js            var USE_CASES = [...]; var SCENARIOS = [...]; var ACCEPTANCE = [...]
+└── use-cases.types.d.ts    the type of every field (copied from template/)
 ```
 
 ## Files in the skill folder
@@ -131,7 +132,8 @@ Output: one file.
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
 | [template/use-cases.js](template/use-cases.js) | Example file: 3 use cases, 18 scenarios across `ui`, `mcp` and `job`, 6 acceptance criteria |
-| [scripts/check.js](scripts/check.js) | Checks the file; prints the scenario count per use case and channel and the acceptance coverage; errors on a channel or acceptance criterion with no scenario; warns on a scenario with no twin on another channel, no example, or a role with no permission string; `--json` for machine output; exit 1 on any error |
+| [template/use-cases.types.d.ts](template/use-cases.types.d.ts) | The type of every field; synced from `theme/use-cases.d.ts`, never edited here |
+| [scripts/check.js](scripts/check.js) | Checks the file; prints the scenario count per use case and channel and the acceptance coverage; errors on a field the type does not have, and on a channel or acceptance criterion with no scenario; warns on a scenario with no twin on another channel, no example, or a role with no permission string; `--json` for machine output; exit 1 on any error |
 
 ## Related skills
 

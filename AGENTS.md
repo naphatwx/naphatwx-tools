@@ -26,6 +26,7 @@
   - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
   - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview and the generate-diagram viewer.
   - `scrollbar.css` (`scrollbar`): wide, light WebKit scrollbars.
+- `theme/use-cases.d.ts` is the type of `use-cases.js` (`UseCase`, `Scenario`, `Acceptance`). `node theme/sync.mjs` copies it whole, as `use-cases.types.d.ts`, next to every `use-cases.js` a skill ships or reads (`TYPES_COPIES`). generate-use-case's `check.js` reads its field names and rejects any other field. Add or rename a field there first.
 - `.scenario-kind`, `.core-pill` and `.references-chip` live in `base.css`; their print rules in `pdf.css`.
 - Scenario badge order, on every page that lists scenarios: status → surface (channel) tag → title → kind → core → refs chip. Skip a badge the page does not show; never reorder.
   - Before the title: badges about the whole row (did it pass, which channel).

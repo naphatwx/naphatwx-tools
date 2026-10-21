@@ -89,6 +89,7 @@ Reuse the repo's own copies of these files wherever they already are (search `<e
     - `reveal(locator)` scrolls the element into view below any sticky header or footer, in the page's own scroll container too.
 - `<e2e-dir>/reporters/run-data-reporter.ts`: writes the run folder (`run-data.json` + `shots/`), not HTML.
 - `<e2e-dir>/reporters/build-report.mjs` and `reporters/e2e-report-template.html`: build the one HTML (step 6). Node only, no dependencies.
+- `<e2e-dir>/reporters/use-cases.types.d.ts`: the type of `use-cases.js`, for `build-report.mjs`. Replace it with this skill's copy on every run, so it matches the plan's file.
 - `<e2e-dir>/README.md` from `template/README.md`: how teammates run the tests and read the report. Skip it when the e2e folder already has a README.
 
 Wire the config:

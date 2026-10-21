@@ -1,11 +1,14 @@
+// @ts-check
 // The feature's use cases (user goals), each with its scenarios (one path, one result), and the spec's acceptance criteria.
 // Written by the generate-use-case skill. All values are strict JSON (double quotes, no trailing commas) so a script can parse them after `var NAME = `.
 // Preview data: US2 · AC4 has no api scenario on purpose, so the Acceptance criteria section shows a gap.
 
+/** @type {import("./use-cases.types").UseCase[]} */
 var USE_CASES = [
   { "id": "UC1", "title": "Create a thing", "refs": "US2 · FR-002 · FR-003", "channels": ["ui", "mcp", "api"] }
 ];
 
+/** @type {import("./use-cases.types").Scenario[]} */
 var SCENARIOS = [
   { "id": "create-read-only", "useCase": "UC1", "kind": "exception", "title": "Read-only user", "story": "FR-003", "surface": "ui",
     "given": "The user has things.read but not things.create (e.g. VIEWER).",
@@ -45,6 +48,7 @@ var SCENARIOS = [
     "na": { "ui": "The preview mock has no Create dialog." } }
 ];
 
+/** @type {import("./use-cases.types").Acceptance[]} */
 var ACCEPTANCE = [
   { "id": "US2 · AC1", "given": "A user who may create things", "when": "they create one with a valid name", "then": "it is created as PENDING and an audit row records it.", "channels": ["mcp", "api"], "na": { "ui": "The preview mock has no Create dialog." } },
   { "id": "US2 · AC3", "given": "A user who may create things", "when": "they create one with an empty name", "then": "it is refused with \"name is required\" and nothing is created.", "channels": ["mcp", "api"], "na": { "ui": "The preview mock has no Create dialog." } },

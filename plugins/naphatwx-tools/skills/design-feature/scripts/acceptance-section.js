@@ -49,7 +49,10 @@ let html = fs.readFileSync(overviewPath, 'utf8');
 const MARK = /(<!-- acceptance:start[^>]*-->)[\s\S]*?([ \t]*<!-- acceptance:end -->)/;
 if (!MARK.test(html)) fail('No <!-- acceptance:start --> … <!-- acceptance:end --> markers in overview.html. Copy the Acceptance criteria section from the template (section 03).');
 
-let SCENARIOS = [], ACCEPTANCE = null;
+/** @type {import('../template/use-cases.types').Scenario[]} */
+let SCENARIOS = [];
+/** @type {import('../template/use-cases.types').Acceptance[] | null} */
+let ACCEPTANCE = null;
 try {
     const source = fs.readFileSync(useCasesFile, 'utf8');
     SCENARIOS = parseVariable(source, 'SCENARIOS', useCasesFile);

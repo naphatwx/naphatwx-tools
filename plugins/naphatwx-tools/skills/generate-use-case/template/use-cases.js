@@ -1,14 +1,17 @@
+// @ts-check
 // The feature's use cases (user goals), each with its scenarios (one path, one result), and the spec's acceptance criteria.
 // One scenario = one screen = one result. "core": true marks the ones to play first: every basic, plus the main alternates and the errors users hit most.
 // Written by the generate-use-case skill. All values are strict JSON (double quotes, no trailing commas) so a script can parse them after `var NAME = `.
 // Every skill that plays or tests the feature (mock, play, e2e) reads this file and shows the same tree: use case → scenarios, in this order.
 
+/** @type {import("./use-cases.types").UseCase[]} */
 var USE_CASES = [
   { "id": "UC1", "title": "Read things", "refs": "US1 · FR-001", "channels": ["ui", "mcp"] },
   { "id": "UC2", "title": "Create a thing", "refs": "US2 · FR-002 · FR-003", "channels": ["ui", "mcp"] },
   { "id": "UC3", "title": "Backfill old things", "refs": "FR-009", "channels": ["job"] }
 ];
 
+/** @type {import("./use-cases.types").Scenario[]} */
 var SCENARIOS = [
   { "id": "read-list", "useCase": "UC1", "kind": "basic", "core": true, "title": "Newest first", "story": "US1 · AC1", "surface": "ui",
     "given": "The owner has 2 things (e.g. pluto: Second thing from 24 Sep, First thing from 20 Sep). The user holds things.read.",
@@ -83,6 +86,7 @@ var SCENARIOS = [
     "expect": ["Nothing changes; the script prints \"backfill: updated=0 skipped=3\"."] }
 ];
 
+/** @type {import("./use-cases.types").Acceptance[]} */
 var ACCEPTANCE = [
   { "id": "US1 · AC1", "given": "An owner with things", "when": "a user with read permission opens its things", "then": "they are listed newest first, each with its status.", "channels": ["ui", "mcp"] },
   { "id": "US1 · AC2", "given": "An owner with no things", "when": "its things are opened", "then": "an empty state says none were created; it is not an error.", "channels": ["ui", "mcp"] },

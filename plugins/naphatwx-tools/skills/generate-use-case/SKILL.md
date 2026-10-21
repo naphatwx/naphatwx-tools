@@ -104,7 +104,10 @@ The spec says what should happen; the code says what the user really sees. Deleg
 
 ### 2. Write `<plan>/use-cases.js`
 
-Start from `template/use-cases.js`.
+Start from `template/use-cases.js`. Copy `template/use-cases.types.d.ts` next to it, unchanged: it is the type of every field below.
+
+- Keep the `// @ts-check` line and the `/** @type {import("./use-cases.types").…[]} */` line above each list. An editor then flags a wrong field or value.
+- Never add a field the type does not have. `check.js` rejects it.
 
 - `USE_CASES`: one entry per use case, in order.
 
@@ -196,7 +199,7 @@ Before and after, from a real plan:
 
 ### 3. Check
 
-- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `kind` with at most one `basic` per use case and channel, every `basic` marked `"core": true`, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `parts`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, the count per kind, the core count per use case and channel, and the acceptance coverage.
+- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, no field outside `use-cases.types.d.ts`, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `kind` with at most one `basic` per use case and channel, every `basic` marked `"core": true`, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `parts`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, the count per kind, the core count per use case and channel, and the acceptance coverage.
 - It warns when more than 30% of the scenarios are core. Keep core for every basic, the main alternates and the errors users hit most.
 - It warns when an `expect` line starts with "Part 1", "Part 2", …. Split each part into its own scenario.
 - It warns when a scenario has no `kind`, or a channel of a use case has no `basic` scenario. Add the kind.

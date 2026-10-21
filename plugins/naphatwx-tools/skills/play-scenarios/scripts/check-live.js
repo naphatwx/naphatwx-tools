@@ -41,7 +41,9 @@ for (const f of ['live.js', 'server.mjs', ...seedFiles]) {
 }
 
 // ---------------------------------------------------------------- structure
-let CORE = [], PLAY = [], CFG = {};
+/** @type {import('../use-cases.types').Scenario[]} */
+let CORE = [];
+let PLAY = [], CFG = {};
 try { CORE = parseVar(fs.readFileSync(ucFile, 'utf8'), 'SCENARIOS'); }
 catch (e) { errors.push(`${ucFile} is missing or not strict JSON (write it with the generate-use-case skill): ${e.message}`); }
 try { const src = fs.readFileSync(path.join(dir, 'live.js'), 'utf8'); CFG = parseVar(src, 'LIVE_CONFIG'); PLAY = parseVar(src, 'LIVE_PLAY'); }

@@ -51,7 +51,11 @@ for (const f of walk(dir)) {
 }
 
 // ---------------------------------------------------------------- structure
-let USE_CASES = [], CORE = [], PLAY = [];
+/** @type {import('../use-cases.types').UseCase[]} */
+let USE_CASES = [];
+/** @type {import('../use-cases.types').Scenario[]} */
+let CORE = [];
+let PLAY = [];
 try { const src = fs.readFileSync(ucFile, 'utf8'); USE_CASES = parseVar(src, 'USE_CASES'); CORE = parseVar(src, 'SCENARIOS'); }
 catch (e) { errors.push(`${ucFile} is missing, not strict JSON or in the old format (write it with the generate-use-case skill): ${e.message}`); }
 try { PLAY = parseVar(read('shared/scenario-play.js'), 'SCENARIO_PLAY'); }
