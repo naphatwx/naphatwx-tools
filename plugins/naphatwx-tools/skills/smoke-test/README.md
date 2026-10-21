@@ -95,10 +95,10 @@ Rules the diagrams don't show:
 
 ## Input → output
 
-Input: `setup [flow ...] | run <env> [flow ...]`
+Input: `setup [flow ...] | run [<env>] [flow ...] [--spec <NNN-slug>]`
 
 - `setup`: build the probe for the named flows, or ask which ones.
-- `run <env>`: `<env>` is a key in `scripts/smoke/envs.json`. Flows left out means all.
+- `run <env>`: `<env>` is a key in `scripts/smoke/envs.json` (or `SMOKE_ENV` in `scripts/smoke/.env`). Flows left out means all. `--spec` (or `SMOKE_SPEC`) picks the report folder.
 
 Output of `setup`, in the target repo:
 
@@ -106,12 +106,13 @@ Output of `setup`, in the target repo:
 <repo>/
 ├── <each service in the flow>    probe code: smoke/probes endpoints, marker, hop report
 ├── README or contributor guide   a short "how to run the smoke test" section
-├── .gitignore                    adds scripts/smoke/results/
+├── .gitignore                    adds scripts/smoke/results/ and scripts/smoke/.env
 └── scripts/smoke/
     ├── README.md                 how to run it, for teammates
     ├── run.mjs                   the runner, copied unchanged
     ├── report-template.html      the report page, copied unchanged
     ├── envs.json                 base URLs per env, no tokens
+    ├── .env.example              SMOKE_ENV / SMOKE_SPEC keys; copy to .env (git-ignored)
     └── flows/
         └── <flow>.json           trigger, store and hops for one flow
 ```
@@ -120,7 +121,8 @@ Output of `run`:
 
 ```
 scripts/smoke/results/
-└── smoke-report-<env>-<YYYYMMDD-HHMMSS>.html
+└── <spec or _adhoc>/               one folder per spec
+    └── smoke-report-<env>.html   one per env, replaced by that env's next run
 ```
 
 Plus a chat summary: overall status, one line per flow, every failed hop with its likely cause, the report path.

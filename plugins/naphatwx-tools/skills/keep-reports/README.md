@@ -24,5 +24,6 @@ Moves report output from a git worktree into the main checkout, so it is not los
 ## Safety
 
 - Copies first, checks the copy with `diff -r`, then deletes the worktree copy.
-- Never overwrites. A name already taken in main with other content is saved as `<name>-wt-<branch>`.
+- One report per spec: a spec folder (or `_adhoc/`) under `e2e-results/` or `scripts/smoke/results/` that main already has → the newer copy wins. A newer worktree copy replaces main's after the copy check; a newer main copy is kept and the worktree copy left in place. Use `--dry-run` to see which side wins.
+- Anything else never overwrites: a name already taken in main with other content is saved as `<name>-wt-<branch>`.
 - Skips files tracked by git and folders that are symlinks.

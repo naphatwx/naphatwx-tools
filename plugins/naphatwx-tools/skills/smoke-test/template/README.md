@@ -16,9 +16,10 @@ A runner that checks, after a deploy, that every service in each flow still reac
     node scripts/smoke/run.mjs <env>
     ```
 
-    - `<env>` is a key in `envs.json`, e.g. `local` or `dev`.
+    - `<env>` is a key in `envs.json`, e.g. `local` or `dev`. Leave it out when `SMOKE_ENV` is set in `scripts/smoke/.env` (copy `.env.example`; git-ignored). Set `SMOKE_ENV` to a non-production env; smoke on production is optional.
     - Add flow names to run only those: `node scripts/smoke/run.mjs dev deploy-ticket`.
-    - `--out <dir>` writes the report somewhere else (default `scripts/smoke/results/`).
+    - `--spec <NNN-slug>` (or `SMOKE_SPEC`) files the report under the spec: `results/<NNN-slug>/smoke-report-<env>.html`. No spec → `results/_adhoc/`. Each env keeps one report; its next run replaces it.
+    - `--out <dir>` writes the report somewhere else.
 
 3. Open the HTML file on the last line of the output: `report: <path>`.
 
@@ -52,7 +53,8 @@ graph TD
 | `report-template.html` | The report page; `run.mjs` fills in the data |
 | `envs.json` | Base URLs per env, plus optional `hopTimeoutMs` and `requestTimeoutMs`. No tokens |
 | `flows/<flow>.json` | One flow: the trigger call, the shared store, and each hop with the env vars it must use |
-| `results/` | The reports; git-ignored |
+| `.env.example` | `SMOKE_ENV` / `SMOKE_SPEC` keys; copy to `.env`, which is git-ignored |
+| `results/<spec>/` | One folder per spec (`_adhoc/` without one), one `smoke-report-<env>.html` per env; git-ignored |
 
 ## When it fails
 

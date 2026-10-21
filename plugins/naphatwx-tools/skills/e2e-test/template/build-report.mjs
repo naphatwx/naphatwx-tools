@@ -108,7 +108,7 @@ const data = {
   name, status, coreOnly, startedAt: run.startedAt ?? new Date().toISOString(), ms: (run.ms ?? 0) + aiDurationMs, baseURL: run.baseURL ?? '',
   useCases: USE_CASES.map((u) => ({ id: u.id, title: u.title })), tests: orderedTests,
 };
-const file = resolve(option('--out') ?? join(runDir, `e2e-report-${basename(runDir)}.html`));
+const file = resolve(option('--out') ?? join(runDir, 'e2e-report.html'));
 writeFileSync(file, template.replace(MARKER, () => JSON.stringify(data).replace(/</g, '\\u003c')));
 
 // Summary for the agent's reply: per use case, passed / total, failed and not-run ids, review flags.

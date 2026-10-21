@@ -8,7 +8,7 @@ Write the shared test-data helper for ONE feature's e2e tests and prove it works
 Repo: <repo-root>   Guide files to follow: <paths>
 Use cases file: <plan>/use-cases.js   Feature: <feature>
 E2E folder: <e2e-dir>   Login: <storageState path / fixture name>
-Write: <e2e-dir>/helpers/<feature>.ts
+Write: <e2e-dir>/<domain>/helpers/<feature>.ts   (exists → add only what the new scenarios need)
 
 Naming
 1. Each test copies the seed records its scenario names. A copy is named `<seed name>-e2e<N>-<tag>`:

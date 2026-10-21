@@ -1,6 +1,6 @@
 # E2E tests
 
-Automated tests for this feature's scenarios, one test per scenario in the feature's `use-cases.js`. Browser steps take a screenshot; API steps record the request and response. MCP and job scenarios are played by an AI agent. Every run ends in one HTML report.
+Automated tests for the app's scenarios, one test per scenario in a spec's `use-cases.js`. Tests are kept by domain (`<domain>/`) and always match the latest code: a later spec updates them in place. Reports are kept by spec: one folder, `e2e-results/<spec>/`, updated by every run. Browser steps take a screenshot; API steps record the request and response. MCP and job scenarios are played by an AI agent. Every run ends in one HTML report.
 
 ## How to run it
 
@@ -9,13 +9,13 @@ Automated tests for this feature's scenarios, one test per scenario in the featu
 2. Run the Playwright tests (ui + api scenarios), from the repo root or the folder that holds the Playwright config:
 
     ```bash
-    E2E_RUN_DIR=e2e-results/<feature>-<stamp> PW_BASE_URL=http://localhost:3000 E2E_REPORT_NAME=<feature> npx playwright test <e2e-dir>
+    E2E_SPEC=<NNN-slug> PW_BASE_URL=http://localhost:3000 npx playwright test <e2e-dir>/<domain>/
     ```
 
-    - `E2E_RUN_DIR` is the run folder, a path inside `<e2e-dir>/e2e-results/` given from the repo root or the config folder. Any other path stops the run. Left out → `e2e-results/<name>-<stamp>/`. A re-run into the same folder replaces only the tests it ran.
+    - `E2E_SPEC` is the spec folder name. Every run goes to `e2e-results/<NNN-slug>/`; left out → `e2e-results/_adhoc/`. A run replaces the tests it ran and keeps the rest, so the folder always holds the latest result of each test. Delete it for a clean start.
     - `PW_BASE_URL` is the app to test. Left out → the config's local URL.
     - From the repo root, add `--config <path to playwright.config.*>`.
-    - Add a spec file path to run one use case only.
+    - Add a file path to run one use case only, or `--grep " (<scenario id>|…) "` to run only one spec's scenarios.
     - The repo's guide may say to run tools another way (for example inside Docker). Follow it.
 
 3. MCP and job scenarios (`*.ai-tests.json`): ask your AI agent to run the `e2e-test` skill, or to play the file with the skill's AI tester prompt. It writes `ai-results-<UC>.json` into the same run folder. Skip this step when you only need the browser and API tests.
@@ -23,10 +23,10 @@ Automated tests for this feature's scenarios, one test per scenario in the featu
 4. Build the report:
 
     ```bash
-    node <e2e-dir>/reporters/build-report.mjs <run folder> --use-cases <plan>/use-cases.js
+    node <e2e-dir>/reporters/build-report.mjs e2e-results/<NNN-slug> --use-cases <plan>/use-cases.js
     ```
 
-    It prints one line per use case and `E2E report: <path>`. Open that file.
+    It writes `e2e-results/<NNN-slug>/e2e-report.html`, prints one line per use case and `E2E report: <path>`. Open that file.
 
 ## Using it
 
@@ -56,15 +56,15 @@ graph TD
 
 | File | What |
 |------|------|
-| `<uc-slug>.e2e.spec.ts` | ui + api scenarios of one use case; one `test()` per scenario |
-| `<uc-slug>.ai-tests.json` | mcp + job scenarios of one use case, as ordered calls or commands for the AI tester |
-| `<uc-slug>.data.mts` | Setup / cleanup command the AI tester runs for one use case |
-| `step.ts` | `step()` (screenshot per step), `apiStep()` (request + response per step) and `reveal()` (scroll into view) |
-| `helpers/<feature>.ts` | Copies the seed records a scenario names (`<seed name>-e2e<N>-<tag>`), deletes them, `sweep()` clears leftovers |
+| `<domain>/<goal>.e2e.spec.ts` | ui + api scenarios of one use case (named by its goal, no UC number); one `test()` per scenario |
+| `<domain>/<goal>.ai-tests.json` | mcp + job scenarios of one use case, as ordered calls or commands for the AI tester |
+| `<domain>/<goal>.data.mts` | Setup / cleanup command the AI tester runs for one use case |
+| `support/step.ts` | `step()` (screenshot per step), `apiStep()` (request + response per step) and `reveal()` (scroll into view) |
+| `<domain>/helpers/<feature>.ts` | Copies the seed records a scenario names (`<seed name>-e2e<N>-<tag>`), deletes them, `sweep()` clears leftovers |
 | `reporters/run-data-reporter.ts` | Writes the run folder: `run-data.json` + `shots/` |
 | `reporters/build-report.mjs` | Merges the run folder into one HTML |
 | `reporters/e2e-report-template.html` | The report page; dark theme, Export PDF |
-| `e2e-results/` | One folder per run; gitignored |
+| `e2e-results/<spec>/` | One folder per spec (`_adhoc/` when none) with the latest result of each test and `e2e-report.html`; gitignored |
 | `playwright.config.*` | Base URL, viewport, workers, reporters, login state |
 
 ## When it fails

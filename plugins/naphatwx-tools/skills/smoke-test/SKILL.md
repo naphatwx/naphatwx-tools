@@ -1,7 +1,7 @@
 ---
 name: smoke-test
 description: Check after a deploy that every service in a real flow still reaches the next one, using a no-op probe. Use when the user says "smoke test staging" or "set up a smoke test". Checks service links and env vars, not the UI; for browser tests use e2e-test.
-argument-hint: "setup [flow ...] | run <env> [flow ...]"
+argument-hint: "setup [flow ...] | run [<env>] [flow ...] [--spec <NNN-slug>]"
 ---
 
 # Smoke Test
@@ -29,8 +29,9 @@ $ARGUMENTS
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
 - `setup [flow ...]`: build the probe for these flows, or ask which flows.
-- `run <env> [flow ...]`: run the probe on `<env>` for all flows, or only for the named ones.
-- No mode given: if `scripts/smoke/flows/` exists in the repo, use `run` and ask for the env. Otherwise use `setup`.
+- `run [<env>] [flow ...] [--spec <NNN-slug>]`: run the probe on `<env>` for all flows, or only for the named ones. `<env>` and the spec may come from `scripts/smoke/.env` (`SMOKE_ENV`, `SMOKE_SPEC`); an argument wins.
+- `--spec`: the spec this deploy check belongs to (its `specs/NNN-*` folder name). Give it when the request names a spec or the work belongs to one.
+- No mode given: if `scripts/smoke/flows/` exists in the repo, use `run` on the default non-production env (R1). Otherwise use `setup`.
 
 ## Rules
 
@@ -93,7 +94,7 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
    - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
    - Write `envs.json`, using the base URLs the repo's config files show for each env. Ask for any you cannot find.
    - Write one `flows/<flow>.json` per flow, filled from the hop table, with `mapVersion`.
-   - Add `scripts/smoke/results/` to `.gitignore`.
+   - Add `scripts/smoke/results/` and `scripts/smoke/.env` to `.gitignore`. Write `scripts/smoke/.env.example` with `SMOKE_ENV=` and `SMOKE_SPEC=`, no values.
 3. **How to run**: add a short section to the repo's README or contributor guide. It names the command, the env vars the runner needs (`SMOKE_TOKEN` and others, names only) and the one-time manual steps, and links `scripts/smoke/README.md`.
 4. Run the repo's normal build and lint for each changed service, the same way its guide says to run them.
 
@@ -115,15 +116,18 @@ Report:
 ### R1. Preconditions
 
 - `scripts/smoke/run.mjs`, `report-template.html`, `envs.json` and `flows/*.json` exist. If not, say "run `smoke-test setup` first" and stop.
-- `<env>` is a key in `envs.json`. If not, list the known envs and ask.
+- `<env>` (argument, else `SMOKE_ENV`) is a key in `envs.json`. If not, list the known envs and ask.
+- No env given anywhere → use the repo's shared non-production env from `envs.json` (a dev or staging key), and say which. Never pick a production env on your own: a production smoke is never required, so run one only when the user names it.
 - The auth env vars named in the flow files are set. Check the names only, never print values. If any are missing, list them and stop.
 - **Deployed?** If the services expose a version or health endpoint, read it and say which version is under test.
 
 ### R2. Run
 
 ```bash
-node scripts/smoke/run.mjs <env> [flow ...] --out scripts/smoke/results
+node scripts/smoke/run.mjs <env> [flow ...] [--spec <NNN-slug>]
 ```
+
+- One report folder per spec, no timestamps: `scripts/smoke/results/<NNN-slug>/smoke-report-<env>.html`, or `results/_adhoc/` with no spec. Each env keeps one report there; its next run replaces it. `--out <dir>` overrides the folder.
 
 All flows run in parallel. In each flow the hops are checked in order, and each hop is polled until its own timeout. A hop that is never observed is `timed-out`. After the first failed or timed-out hop, the rest of that flow are `not-reached`, never red.
 

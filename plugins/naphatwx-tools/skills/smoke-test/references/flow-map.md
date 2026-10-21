@@ -14,10 +14,11 @@ scripts/smoke/
 ├── run.mjs                 # copied from template/run.mjs
 ├── report-template.html    # copied from template/report-template.html
 ├── envs.json               # base URLs per env
+├── .env.example            # SMOKE_ENV / SMOKE_SPEC; copy to .env (git-ignored)
 ├── flows/
 │   ├── <flow-a>.json
 │   └── <flow-b>.json
-└── results/                # reports land here — add to .gitignore
+└── results/<spec>/         # smoke-report-<env>.html per env (_adhoc/ without a spec) — add results/ to .gitignore
 ```
 
 ## `envs.json`

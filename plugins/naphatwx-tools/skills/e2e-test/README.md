@@ -28,12 +28,13 @@ graph TD
     B --> C{Playwright set up?}
     C -->|config + login exist| C1[reuse them]
     C -->|nothing| C2["add @playwright/test, a config, a login setup"]
-    C1 --> D["2 harness: copy step.ts, reporters/ unchanged"]
+    C1 --> D["2 harness: reuse or copy step.ts, reporters/ unchanged"]
     C2 --> D
-    D --> D2["2b data helper: helpers/feature.ts, seed copies + sweep, proved once"]
-    D2 --> E["3 write: one writer agent per use case, in parallel"]
-    E --> E1["uc.e2e.spec.ts: ui + api scenarios"]
-    E --> E2["uc.ai-tests.json: mcp + job scenarios"]
+    D --> D2["2b data helper: domain/helpers/feature.ts, seed copies + sweep, proved once"]
+    D2 --> D3["2c match: existing tests by scenario id, update / add / ask before removing"]
+    D3 --> E["3 write: one writer agent per use case, in parallel"]
+    E --> E1["domain/goal.e2e.spec.ts: ui + api scenarios"]
+    E --> E2["domain/goal.ai-tests.json: mcp + job scenarios"]
     E1 --> F1["4 run, core first: Playwright → run-data.json + shots/"]
     E2 --> F2["4 run: AI testers one after another → ai-results-UC.json"]
     F1 --> F2
@@ -65,14 +66,14 @@ sequenceDiagram
     participant A as AI tester
     participant R as Fresh reviewer
     participant B as build-report.mjs
-    S->>P: npx playwright test (ui + api), E2E_RUN_DIR=run
+    S->>P: npx playwright test domain/ --grep spec ids (ui + api), E2E_SPEC=spec
     P-->>S: run/run-data.json + run/shots/
-    S->>A: play uc.ai-tests.json (mcp + job), one use case after another
+    S->>A: play goal.ai-tests.json (mcp + job), one use case after another
     A-->>S: run/ai-results-UC.json
     S->>R: review every step against use-cases.js
     R-->>S: run/review.json (ok / test / product / unsure)
     S->>B: build run --use-cases use-cases.js
-    B-->>S: run/e2e-report-run.html, one line per use case
+    B-->>S: run/e2e-report.html, one line per use case
 ```
 
 How the report shows it:
@@ -109,22 +110,23 @@ Output, in the target repo:
 <plan>/use-cases.js                       read only (from generate-use-case)
 <e2e-dir>/
 ├── README.md                             how to run the tests, for teammates
-├── step.ts                               step() screenshot per step, apiStep() request + response per step, reveal()
-├── helpers/<feature>.ts                  seed copies, name map, sweep()
+├── support/step.ts                       step() screenshot per step, apiStep() request + response per step, reveal()
 ├── reporters/
 │   ├── run-data-reporter.ts              writes the run folder, no HTML
 │   ├── build-report.mjs                  run folder → one HTML
 │   └── e2e-report-template.html          the report page, dark theme, Export PDF
-├── <uc-slug>.e2e.spec.ts                 ui + api scenarios of one use case
-├── <uc-slug>.ai-tests.json               mcp + job scenarios of one use case
-├── <uc-slug>.data.mts                    setup / cleanup command for the AI tester (one pattern for all)
+├── <domain>/                             latest version, edited in place by every spec
+│   ├── helpers/<feature>.ts              seed copies, name map, sweep()
+│   ├── <goal>.e2e.spec.ts                ui + api scenarios of one use case (no UC number)
+│   ├── <goal>.ai-tests.json              mcp + job scenarios of one use case
+│   └── <goal>.data.mts                   setup / cleanup command for the AI tester (one pattern for all)
 └── e2e-results/                          gitignored
-    └── <feature>-<stamp>/
-        ├── run-data.json                 Playwright results
+    └── <spec or _adhoc>/                 one folder per spec, updated by every run
+        ├── run-data.json                 latest result of each test
         ├── shots/                        step screenshots
         ├── ai-results-<UC>.json          AI tester results
         ├── review.json                   reviewer notes per step
-        └── e2e-report-<feature>-<stamp>.html
+        └── e2e-report.html
 ```
 
 Plus a `playwright.config.*` and login setup when the repo had none.

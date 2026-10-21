@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Smoke runner: triggers each flow's simulation probe, checks every hop in order, writes one HTML report.
-// Node 18+, no dependencies. Usage: node scripts/smoke/run.mjs <env> [flow ...] [--out <dir>]
+// Node 18+, no dependencies. Usage: node scripts/smoke/run.mjs [<env>] [flow ...] [--spec <NNN-slug>] [--out <dir>]
+// scripts/smoke/.env (git-ignored) may set SMOKE_ENV and SMOKE_SPEC; the shell, then arguments, win over it.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { dirname, join, relative } from 'node:path'
@@ -18,12 +19,26 @@ const args = process.argv.slice(2)
 const script = relative(process.cwd(), fileURLToPath(import.meta.url)) || 'run.mjs'
 const quote = (a) => (/^[\w@%+=:,./-]+$/.test(a) ? a : `'${a.replace(/'/g, `'\\''`)}'`)
 const command = ['node', script, ...args].map(quote).join(' ')
-const outFlagIndex = args.indexOf('--out')
-const outputDirectory = outFlagIndex >= 0 ? args.splice(outFlagIndex, 2)[1] : join(HERE, 'results')
-const [envName, ...onlyFlows] = args
-if (!envName) fatal('usage: node scripts/smoke/run.mjs <env> [flow ...] [--out <dir>]')
+const dotEnv = join(HERE, '.env')
+if (existsSync(dotEnv)) {
+  for (const raw of readFileSync(dotEnv, 'utf8').split(/\r?\n/)) {
+    const m = raw.trim().match(/^(?:export\s+)?([A-Z][A-Z0-9_]*)\s*=\s*(.*)$/)
+    if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].trim().replace(/^(['"])(.*)\1$/, '$2')
+  }
+}
+const takeFlag = (name) => {
+  const index = args.indexOf(name)
+  return index >= 0 ? args.splice(index, 2)[1] : undefined
+}
+const outFlag = takeFlag('--out')
+const spec = takeFlag('--spec') ?? process.env.SMOKE_SPEC ?? ''
+if (spec && !/^[0-9]{3}-[a-z0-9-]+$/.test(spec)) fatal(`--spec / SMOKE_SPEC must be a spec folder name like 185-remove-announcement-dismiss, got "${spec}"`)
+// One folder per spec (results/<spec>/), _adhoc/ without one. Each env keeps one report there, replaced by its next run.
+const outputDirectory = outFlag ?? join(HERE, 'results', spec || '_adhoc')
 
 const envs = JSON.parse(readFileSync(join(HERE, 'envs.json'), 'utf8'))
+const [envName, ...onlyFlows] = envs[args[0]] || !process.env.SMOKE_ENV ? args : [process.env.SMOKE_ENV, ...args]
+if (!envName) fatal('usage: node scripts/smoke/run.mjs [<env>] [flow ...] [--spec <NNN-slug>] [--out <dir>]  (or set SMOKE_ENV in scripts/smoke/.env)')
 const env = envs[envName]
 if (!env) fatal(`unknown env "${envName}" — known: ${Object.keys(envs).join(', ')}`)
 
@@ -214,7 +229,7 @@ async function runFlow(flow) {
     flow: flow.flow,
     description: flow.description,
     entry: flow.entry.service,
-    rerun: ['node', script, envName, flow.flow, ...(outFlagIndex >= 0 ? ['--out', outputDirectory] : [])].map(quote).join(' '),
+    rerun: ['node', script, envName, flow.flow, ...(spec ? ['--spec', spec] : []), ...(outFlag ? ['--out', outFlag] : [])].map(quote).join(' '),
     hops: [],
     startedAt: new Date().toISOString(),
   }
@@ -252,6 +267,7 @@ const startedAt = new Date()
 const results = await Promise.all(flows.map(runFlow))
 const report = {
   env: envName,
+  spec: spec || null,
   startedAt: startedAt.toISOString(),
   command,
   ms: Date.now() - startedAt.getTime(),
@@ -259,13 +275,10 @@ const report = {
   flows: results,
 }
 
-const pad = (number) => String(number).padStart(2, '0')
-const date = startedAt
-const stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
 if (!existsSync(outputDirectory)) mkdirSync(outputDirectory, { recursive: true })
 const template = readFileSync(join(HERE, 'report-template.html'), 'utf8')
 const data = JSON.stringify(report).replace(/</g, '\\u003c')
-const file = join(outputDirectory, `smoke-report-${envName}-${stamp}.html`)
+const file = join(outputDirectory, `smoke-report-${envName}.html`)
 writeFileSync(file, template.replace('/*__SMOKE_DATA__*/null', data))
 
 for (const flowResult of results) {

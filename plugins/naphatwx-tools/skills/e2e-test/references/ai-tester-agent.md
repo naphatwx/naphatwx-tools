@@ -8,7 +8,7 @@ Do not edit any file except the results file. Never change app code or test file
 
 Repo: <repo-root>   Guide files to follow: <paths>
 Use cases file: <plan>/use-cases.js   Your use case: <UC id> <title>
-Test file: <e2e-dir>/<uc-slug>.ai-tests.json
+Test file: <e2e-dir>/<domain>/<goal>.ai-tests.json
 Results file to write: <run>/ai-results-<UC id>.json
 MCP server: <name of the MCP server for the app under test>   Environment: <local url / env name>
 

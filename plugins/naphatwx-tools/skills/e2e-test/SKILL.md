@@ -9,10 +9,11 @@ argument-hint: "<plan folder | spec folder | spec number> [--core] [--env <name>
 ```text
 1 read      <plan>/use-cases.js ─► UC1 → its scenarios, UC2 → … (every surface; surface only picks the runner)
 2 harness   once per repo: Playwright config + login + step.ts + run-data reporter + build-report.mjs
-  helper    1 agent writes helpers/<feature>.ts (seed copies, sweep) and proves it
-3 write     1 writer agent per use case, in parallel ─► <uc>.e2e.spec.ts (ui + api) and <uc>.ai-tests.json (mcp + job)
-4 run       --core first: Playwright runs ui + api ─► run-data.json + shots/
-            then 1 AI tester per use case, one after another, runs mcp + job ─► ai-results-<UC>.json   (one run folder)
+  helper    1 agent writes <domain>/helpers/<feature>.ts (seed copies, sweep) and proves it
+  match     find the domain's existing tests by scenario id ─► update / add / ask before removing
+3 write     1 writer agent per use case, in parallel ─► <domain>/<goal>.e2e.spec.ts (ui + api) and <goal>.ai-tests.json (mcp + job)
+4 run       only this source's scenario ids, --core first: Playwright runs ui + api ─► e2e-results/<spec>/ (one folder per spec)
+            then 1 AI tester per use case, one after another, runs mcp + job ─► ai-results-<UC>.json   (same folder)
             fix test-side failures, re-run
 5 review    1 FRESH reviewer agent checks every step ─► review.json
             test problem ─► fix the test, re-run those files once, review again · product problem ─► finding
@@ -35,12 +36,13 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Rules
 
 - **Read the target repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, per-app guides). Their rules for where tests live, how to run tools and who edits app code win over this skill.
+- **Test source is the latest version, by domain; reports are by spec.** Tests live in `<e2e-dir>/<domain>/` and always match the latest code. Each round (a new spec on the same domain) edits them in place: never a spec folder, a spec number or a `UC<n>` in a test file name, because `UC<n>` restarts in every `use-cases.js`. The spec's own record is its `use-cases.js` and its report folder, `e2e-results/<spec>/` (one per spec, updated by every run). A repo guide with its own layout wins.
 - **`use-cases.js` is the one source.** Read it directly; never another skill's output (no mock, no play-scenarios files). Never write your own test cases or scenarios. A missing or wrong scenario is a finding: fix it with the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code), then test again.
 - **One test per scenario**, same id, in file order. Every surface is tested: `ui`, `api`, `mcp`, `job`. The surface only picks the runner.
 - **Tests only.** Never change application code to make a test pass. A missing selector or a real bug is a finding.
 - **Every step leaves proof**: a screenshot (`ui`) or the masked request and response (`api`, `mcp`, `job`). No tokens, cookies or passwords in any file.
 - **Own your data.** Each test works on its own copies of the seed records its scenario names, made by the feature's data helper (step 2b), deletes them after and checks they are gone. Never touch records you did not create. No play-scenarios seeds.
-- **One HTML report per run**, built from the run folder. Raw Playwright output is not a substitute.
+- **One HTML report per spec**, `e2e-results/<spec>/e2e-report.html`, rebuilt from the spec's one run folder after every run. No timestamps: every run of the spec updates the tests it ran and keeps the rest. Raw Playwright output is not a substitute.
 - Never run against production unless the user named it for this run.
 - **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
@@ -79,9 +81,9 @@ Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, 
 | Config + login exist | Reuse them. Add only what is missing below. |
 | Nothing | Add `@playwright/test` as a dev dependency where the repo keeps web dev dependencies, a config, and a login setup. Follow the repo's run rules (for example "run inside Docker"). |
 
-Copy these from this skill's `template/`, **unchanged**:
+Reuse the repo's own copies of these files wherever they already are (search `<e2e-dir>` for `step.ts` and `run-data-reporter.ts`, e.g. `support/step.ts`); never add a second copy. Copy only what is missing from this skill's `template/`, **unchanged**:
 
-- `<e2e-dir>/step.ts`:
+- `<e2e-dir>/support/step.ts`:
     - `step(page, title, body)` wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
     - `apiStep(request, title, { method, url, data?, headers? }, check)` sends one request, attaches the masked request and response, then runs `check(response, body)`. It returns the parsed body.
     - `reveal(locator)` scrolls the element into view below any sticky header or footer, in the page's own scroll container too.
@@ -107,7 +109,9 @@ workers: <number of spec files, max 4>,
 ```
 
 - `outputDir` is relative to the folder that holds the Playwright config. Add `e2e-results/` to `.gitignore`.
-- `E2E_RUN_DIR=<dir>` makes the reporter write into that folder. It must be inside `outputDir`, given from the repo root or from the config folder; any other path stops the run before anything is written. A re-run into the same folder replaces only the tests it ran.
+- `E2E_SPEC=<NNN-slug>` (the spec folder name) makes the reporter write into `<outputDir>/<NNN-slug>/`; unset → `<outputDir>/_adhoc/`. A value that is not `<NNN>-<slug>` stops the run.
+- That folder is reused by every run: a run replaces the tests it ran (each entry keeps its own `startedAt`), keeps the rest, and deletes screenshots nothing points to. Delete the folder for a clean start.
+- `E2E_RUN_DIR=<dir>` is an override for an odd folder. It must be inside `outputDir`, given from the repo root or from the config folder; any other path stops the run before anything is written.
 - **Login**: sign in once in a global setup and save `storageState`; every test reuses it. A scenario with another role signs in as that role in its own `test.use({ storageState })` or fixture. Use the repo's login helper or dev login. Read credentials from env vars, never from a file. The sign-in helper closes product tours and "what's new" overlays and marks them seen, so no shot shows them.
 
 The report keeps these features; keep them when you touch the template:
@@ -125,18 +129,32 @@ The report keeps these features; keep them when you touch the template:
 
 ## 2b. Data helper (once per feature, before the writers)
 
-Spawn **one** agent with the prompt in `references/data-helper-agent.md`. It writes `<e2e-dir>/helpers/<feature>.ts` (seed copies, settle, `sweep`) and one setup / cleanup runner for mcp and job scenarios, proves both with a throwaway spec, and deletes that spec. The writers import the helper; none writes its own data code.
+Pick `<domain>` first: the folder under `<e2e-dir>` whose tests cover this feature's pages (the repo's guide or README may list them). None fits → a new kebab-case folder named for the domain, never for the spec. Unsure between two → ask once.
+
+The domain already has a helper for this feature (`<e2e-dir>/<domain>/helpers/*.ts`) → reuse it; the agent only adds what the new scenarios need. Otherwise spawn **one** agent with the prompt in `references/data-helper-agent.md`. It writes `<e2e-dir>/<domain>/helpers/<feature>.ts` (seed copies, settle, `sweep`) and one setup / cleanup runner for mcp and job scenarios, proves both with a throwaway spec, and deletes that spec. The writers import the helper; none writes its own data code.
 
 Agents with no sub-agents write it themselves with the same prompt, before step 3.
 
+## 2c. Match the domain's existing tests
+
+Each test carries its scenario id: the `scenario` annotation in a `.e2e.spec.ts`, `"scenario"` in a `.ai-tests.json`. Search `<e2e-dir>/<domain>/` for every id in `use-cases.js`:
+
+| Found | Do |
+|---|---|
+| Same id | The writer updates that test in place to match the scenario as it is now. |
+| New id | The writer adds a test, in the file of its use case's goal (step 3). |
+| An id the domain's tests hold that this feature's previous `use-cases.js` had and this one dropped | List it. Ask before deleting the test: the behaviour may still exist under another spec. |
+
+Tests whose ids appear in no `use-cases.js` of this feature are someone else's: never touch them. The previous `use-cases.js` is the newest other `specs/*/plan/use-cases.js` whose scenario ids overlap these tests; say which one you used.
+
 ## 3. Write: one writer agent per use case, in parallel
 
-Spawn one agent per use case **in one message**, with the prompt in `references/writer-agent.md` (with `--core`, list only its core scenarios). Each writes, for its use case only:
+Spawn one agent per use case **in one message**, with the prompt in `references/writer-agent.md` (with `--core`, list only its core scenarios) and its step 2c rows. Each writes, for its use case only:
 
-- `<e2e-dir>/<uc-slug>.e2e.spec.ts`: one `test()` per `ui` and `api` scenario, in file order. Skip the file when the use case has none.
-- `<e2e-dir>/<uc-slug>.ai-tests.json`: the ordered calls or commands for each `mcp` and `job` scenario, plus its `runner` block and the one setup / cleanup command it names. Skip both when the use case has none.
+- `<e2e-dir>/<domain>/<goal>.e2e.spec.ts`: one `test()` per `ui` and `api` scenario, in file order. Skip the file when the use case has none.
+- `<e2e-dir>/<domain>/<goal>.ai-tests.json`: the ordered calls or commands for each `mcp` and `job` scenario, plus its `runner` block and the one setup / cleanup command it names. Skip both when the use case has none.
 
-`<uc-slug>` is the use case id and title, kebab-case: `uc2-cut-a-new-version`. Writers run nothing.
+`<goal>` is the use case title, kebab-case, with no `UC<n>`: `cut-a-new-version`. The file exists → the writer edits it: it updates and adds its scenarios' tests and leaves every other test in the file as it is. A matched test that sits in another file is updated there. Writers run nothing.
 
 Agents with no sub-agents write the use cases one after another with the same prompt.
 
@@ -149,14 +167,17 @@ When they are done:
 
 Order, always: **core pass** (`--core` run → fix test-side failures → re-run → review, step 5), then the **full run** into the same `<run>` and a review of the scenarios not yet reviewed. With `--core`, stop after the core pass. The run folder keeps the latest attempt of each test; the reviewer reviews that.
 
-One run folder `<run>` = `<e2e-dir>/e2e-results/<feature>-<YYYYMMDD-HHMMSS>`. Give it from the repo root or from the config folder; a path outside `<e2e-dir>/e2e-results/` stops the run.
+The run folder `<run>` = `e2e-results/<spec>/`. `<spec>` is the spec folder name (`185-remove-announcement-dismiss`); a source with no spec folder (plan folder, feature description) has none, so the run goes to `_adhoc/`. Every run of the spec, first or re-run, this round or a later one, uses the same command and folder.
 
 ```bash
-E2E_RUN_DIR=<run> PW_BASE_URL=<url> E2E_REPORT_NAME=<feature> npx playwright test <e2e-dir>/<feature spec files> [--grep @core]
+E2E_SPEC=<spec> PW_BASE_URL=<url> npx playwright test <e2e-dir>/<domain>/ --grep " (<id>|<id>|…) "
 ```
 
+- A new round of the spec (a later task changed the use cases): delete `<run>/review*.json` first, so the reviewer starts fresh. Test results need no reset; the run replaces the ones it touches.
+
+- `--grep` lists only this source's scenario ids, because the domain folder also holds other specs' tests. The title is `<id> <scenario title>`, so the spaces around the group stop one id from matching a longer one.
 - From the repo root, add `--config <path to the Playwright config>`.
-- Core pass → add `--grep @core` (writers tag every core test `@core`), and give each AI tester only its core scenarios.
+- Core pass → list only the core ids (writers also tag every core test `@core`), and give each AI tester only its core scenarios.
 - Run it the way the repo's guide says to run tools (for example in its Docker service). Spec files run on parallel workers; tests inside a file run in order.
 - After Playwright, spawn one **AI tester** per use case that has a `.ai-tests.json`, with the prompt in `references/ai-tester-agent.md`, **one after another, never in parallel**: they share one stack, and parallel testers time out on setup and mix up each other's results. Each writes `<run>/ai-results-<UC>.json`. The tester needs the MCP server of the app under test (local, not production) and a shell for `job` steps.
 - A failure caused by the environment (server down, cold compile timeout, expired session, MCP server not connected) is not a product failure. Fix the environment and re-run only the failed files or scenarios once, into the same `<run>`.
@@ -187,10 +208,11 @@ node <e2e-dir>/reporters/build-report.mjs <run> --use-cases <plan>/use-cases.js 
 
 - `--core` → the report keeps only the core scenarios; a core one with no result shows as "not run".
 
-It merges the run folder into `<run>/e2e-report-<run name>.html` (screenshots embedded), prints one line per use case and `E2E report: <path>`. Open the file and check: the tree matches `use-cases.js`, every `ui` step has a screenshot, every other step has a request and response, flagged steps show the note.
+It merges the run folder into `<run>/e2e-report.html` (screenshots embedded; the same file every run), prints one line per use case and `E2E report: <path>`. Open the file and check: the tree matches `use-cases.js`, every `ui` step has a screenshot, every other step has a request and response, flagged steps show the note.
 
 Reply with:
-- the spec files and `.ai-tests.json` files written
+- the domain folder, and the spec files and `.ai-tests.json` files written
+- per file: the tests updated, added and (after the user agreed) removed, by scenario id, and the previous `use-cases.js` used in step 2c
 - per use case: passed / total, core passed / core total, and the scenario ids failed or not run (from the build output); say when it was a `--core` run
 - each failure: scenario id, step, and likely cause (product bug, missing selector, wrong scenario, environment)
 - review flags: `product` and `unsure` flags with their notes; `test` flags you fixed
@@ -204,28 +226,28 @@ Reply with:
 
 All strict JSON. Paths inside are relative to the run folder.
 
-`<run>/run-data.json` (written by the reporter):
+`<run>/run-data.json` (written by the reporter; the top-level `stamp` / `startedAt` / `ms` describe the newest run, each test's `startedAt` the run that produced it):
 
 ```json
 { "name": "legacy-new-version", "stamp": "20261008-110000", "startedAt": "2026-10-08T04:00:00.000Z", "ms": 48200, "baseURL": "http://localhost:3000",
   "tests": [ { "key": "patch-version", "scenario": "patch-version", "useCase": "UC2", "title": "patch-version PATCH from 2.3.2-2",
-    "file": "uc2-cut-a-new-version.e2e.spec.ts:18", "project": "chromium", "status": "failed", "outcome": "unexpected", "ms": 15800, "retry": 0, "error": "…",
+    "file": "legacy-versions/cut-a-new-version.e2e.spec.ts:18", "project": "chromium", "status": "failed", "outcome": "unexpected", "ms": 15800, "retry": 0, "error": "…", "startedAt": "2026-10-08T04:00:00.000Z",
     "steps": [ { "title": "Pick PATCH", "status": "passed", "ms": 600, "shot": "shots/<id>-r0-2.jpg" },
                { "title": "POST the version", "status": "passed", "ms": 90, "call": { "target": "POST /api/versions", "request": {}, "response": { "status": 201, "body": {} } } } ],
     "finalShot": "shots/<id>-r0-final.png", "trace": "test-results/…/trace.zip", "annotations": [], "attempts": [] } ] }
 ```
 
-`<e2e-dir>/<uc-slug>.ai-tests.json` (written by the writer, read by the AI tester):
+`<e2e-dir>/<domain>/<goal>.ai-tests.json` (written by the writer, read by the AI tester):
 
 ```json
 { "useCase": "UC2",
-  "runner": { "setup": "npx tsx e2e/uc2-cut-a-new-version.data.mts setup", "cleanup": "npx tsx e2e/uc2-cut-a-new-version.data.mts cleanup",
+  "runner": { "setup": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts setup", "cleanup": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts cleanup",
               "prints": "JSON map of seed name → copy, e.g. { \"delta-super\": { \"name\": \"delta-super-e2e2-k7q2\", \"id\": 9001 } }" },
   "tests": [
   { "scenario": "mcp-create-version", "surface": "mcp", "role": "MANAGER_DEV",
-    "steps": [ { "title": "Copy delta-super", "setup": true, "command": "npx tsx e2e/uc2-cut-a-new-version.data.mts setup delta-super" },
+    "steps": [ { "title": "Copy delta-super", "setup": true, "command": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts setup delta-super" },
                { "title": "Cut a PATCH version of delta-super", "call": "RepositoryVersionService · CreateRepositoryVersion", "params": { "repositoryId": "<from step 1: delta-super.id>", "bump": "PATCH" }, "expect": "version 2.3.3-1, status PENDING" },
-               { "title": "Delete the delta-super copy", "cleanup": true, "command": "npx tsx e2e/uc2-cut-a-new-version.data.mts cleanup" } ] },
+               { "title": "Delete the delta-super copy", "cleanup": true, "command": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts cleanup" } ] },
   { "scenario": "backfill-rerun", "surface": "job",
     "steps": [ { "title": "Run the backfill twice", "command": "node scripts/backfill.mjs", "expect": "prints \"backfill: updated=0 skipped=3\"" } ] } ] }
 ```

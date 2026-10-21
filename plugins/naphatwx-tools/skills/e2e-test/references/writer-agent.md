@@ -10,13 +10,16 @@ Write the e2e tests for ONE use case. Do not run them. Do not edit any other fil
 Repo: <repo-root>   Guide files to follow: <paths>
 Use cases file: <plan>/use-cases.js   Your use case: <UC id> <title>
 Your scenarios, in file order: <id (surface[, core]), id (surface[, core]), …>
-E2E folder: <e2e-dir>
-  - ui + api scenarios  → <e2e-dir>/<uc-slug>.e2e.spec.ts      (skip when there are none)
-  - mcp + job scenarios → <e2e-dir>/<uc-slug>.ai-tests.json    (skip when there are none)
-                          + its setup / cleanup command (rule 17), e.g. <e2e-dir>/<uc-slug>.data.mts
+E2E folder: <e2e-dir>   Domain folder: <e2e-dir>/<domain>   <goal> = the use case title, kebab-case, no UC number
+  - ui + api scenarios  → <e2e-dir>/<domain>/<goal>.e2e.spec.ts      (skip when there are none)
+  - mcp + job scenarios → <e2e-dir>/<domain>/<goal>.ai-tests.json    (skip when there are none)
+                          + its setup / cleanup command (rule 17), e.g. <e2e-dir>/<domain>/<goal>.data.mts
+Existing tests (step 2c): update in place: <id → file, …>   add: <id, …>   (empty when none)
+  A file that exists is edited, never rewritten: change only your scenarios' tests and leave every
+  other test, import and helper in it as it is. Delete no test.
 Shared helpers (already written, import them, never copy them):
   - import { step, apiStep, reveal } from '<relative path to step.ts>'
-  - data helper: <e2e-dir>/helpers/<feature>.ts   exports: <list from the data helper agent>
+  - data helper: <e2e-dir>/<domain>/helpers/<feature>.ts   exports: <list from the data helper agent>
   - mcp / job setup + cleanup runner: <the one runner pattern the data helper agent chose>
   - login: <storageState path / fixture name, and how to sign in as another role>
 Base URL comes from the Playwright config. Never hardcode a host or port.

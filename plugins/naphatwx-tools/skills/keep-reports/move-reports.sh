@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Moves report output (e2e-test, smoke-test, deploy-plan) from a git worktree into the main checkout.
+# e2e-results/ and scripts/smoke/results/ hold one folder per spec: on a clash the newer copy wins.
 # Usage: move-reports.sh [--dry-run] [extra report folder ...]   (folders are repo-relative)
 set -euo pipefail
 
@@ -41,7 +42,16 @@ free_name() {
   echo "$candidate"
 }
 
-moved=0 same=0 renamed=0 skipped=0
+# Newest file time (epoch seconds) inside a file or folder; BSD and GNU stat.
+newest() {
+  find "$1" -type f -exec stat -f %m {} + 2>/dev/null | sort -n | tail -1 ||
+    find "$1" -type f -exec stat -c %Y {} + | sort -n | tail -1
+}
+
+# e2e-results/ and scripts/smoke/results/ hold one folder per spec (or _adhoc): one report each, so the newer copy wins.
+one_per_spec() { [ "$1" = scripts/smoke/results ] || [ "$(basename "$1")" = e2e-results ]; }
+
+moved=0 same=0 renamed=0 replaced=0 kept=0 skipped=0
 for folder in ${folders[@]+"${folders[@]}"}; do
   if [ -L "$folder" ]; then echo "skip  $folder (symlink, already points elsewhere)"; skipped=$((skipped + 1)); continue; fi
   for entry in "$folder"/* "$folder"/.[!.]*; do
@@ -54,6 +64,23 @@ for folder in ${folders[@]+"${folders[@]}"}; do
         echo "same  $entry (already in main, removing worktree copy)"
         [ $dry = 1 ] || rm -rf "$entry"
         same=$((same + 1)); continue
+      fi
+      if one_per_spec "$folder"; then
+        wt_time=$(newest "$entry"); main_time=$(newest "$dest")
+        if [ "${main_time:-0}" -ge "${wt_time:-0}" ]; then
+          echo "keep  $entry (main's copy is newer; worktree copy left in place)"
+          kept=$((kept + 1)); continue
+        fi
+        echo "replace $entry in main (worktree copy is newer)"
+        replaced=$((replaced + 1))
+        [ $dry = 1 ] && continue
+        staging="$dest.keep-reports-$$"
+        cp -Rp "$entry" "$staging"
+        if ! diff -rq "$entry" "$staging" >/dev/null; then
+          rm -rf "$staging"; echo "FAILED copy check for $entry; nothing replaced." >&2; exit 1
+        fi
+        rm -rf "$dest"; mv "$staging" "$dest"; rm -rf "$entry"
+        continue
       fi
       dest="$dest_dir/$(free_name "$dest_dir" "$(basename "$entry")" "$entry")"
       renamed=$((renamed + 1))
@@ -76,4 +103,4 @@ done
 
 [ $dry = 1 ] && mode="dry run, nothing changed" || mode="done"
 echo "main: $main"
-echo "$mode: moved $moved ($renamed renamed), already there $same, skipped $skipped"
+echo "$mode: moved $moved ($renamed renamed), replaced $replaced, kept newer in main $kept, already there $same, skipped $skipped"
