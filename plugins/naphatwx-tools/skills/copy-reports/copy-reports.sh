@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Moves report output (e2e-test, smoke-test, deploy-plan) from a git worktree into the main checkout.
+# Copies report output (e2e-test, smoke-test, deploy-plan) from a git worktree into the main checkout.
+# Never deletes anything in the worktree.
 # e2e-results/ and scripts/smoke/results/ hold one folder per spec: on a clash the newer copy wins.
-# Usage: move-reports.sh [--dry-run] [extra report folder ...]   (folders are repo-relative)
+# Usage: copy-reports.sh [--dry-run] [extra report folder ...]   (folders are repo-relative)
 set -euo pipefail
 
 dry=0
@@ -33,12 +34,15 @@ for dir in ${extra[@]+"${extra[@]}"}; do
   [ -d "$dir" ] && folders+=("$dir") || echo "skip  $dir (no such folder)"
 done
 
-# A free name in main: <name>-wt-<branch>[-N][.ext]; a run folder keeps no extension split.
+# A name in main: <name>-wt-<branch>[-N][.ext]; a run folder keeps no extension split.
+# Returns an existing one with the same content, so a rerun does not copy again.
 free_name() {
   local parent=$1 name=$2 base ext candidate n=2
   if [ -d "$top/$3" ] || [[ "$name" != *.* ]]; then base=$name; ext=""; else base=${name%.*}; ext=".${name##*.}"; fi
   candidate="$base-wt-$branch$ext"
-  while [ -e "$parent/$candidate" ]; do candidate="$base-wt-$branch-$n$ext"; n=$((n + 1)); done
+  while [ -e "$parent/$candidate" ] && ! diff -rq "$3" "$parent/$candidate" >/dev/null 2>&1; do
+    candidate="$base-wt-$branch-$n$ext"; n=$((n + 1))
+  done
   echo "$candidate"
 }
 
@@ -51,7 +55,7 @@ newest() {
 # e2e-results/ and scripts/smoke/results/ hold one folder per spec (or _adhoc): one report each, so the newer copy wins.
 one_per_spec() { [ "$1" = scripts/smoke/results ] || [ "$(basename "$1")" = e2e-results ]; }
 
-moved=0 same=0 renamed=0 replaced=0 kept=0 skipped=0
+copied=0 same=0 renamed=0 replaced=0 kept=0 skipped=0
 for folder in ${folders[@]+"${folders[@]}"}; do
   if [ -L "$folder" ]; then echo "skip  $folder (symlink, already points elsewhere)"; skipped=$((skipped + 1)); continue; fi
   for entry in "$folder"/* "$folder"/.[!.]*; do
@@ -61,8 +65,7 @@ for folder in ${folders[@]+"${folders[@]}"}; do
     dest="$dest_dir/$(basename "$entry")"
     if [ -e "$dest" ]; then
       if diff -rq "$entry" "$dest" >/dev/null 2>&1; then
-        echo "same  $entry (already in main, removing worktree copy)"
-        [ $dry = 1 ] || rm -rf "$entry"
+        echo "same  $entry (already in main)"
         same=$((same + 1)); continue
       fi
       if one_per_spec "$folder"; then
@@ -77,30 +80,32 @@ for folder in ${folders[@]+"${folders[@]}"}; do
         staging="$dest.keep-reports-$$"
         cp -Rp "$entry" "$staging"
         if ! diff -rq "$entry" "$staging" >/dev/null; then
-          rm -rf "$staging"; echo "FAILED copy check for $entry; nothing replaced." >&2; exit 1
+          rm -rf "$staging"; echo "FAILED copy check for $entry; nothing replaced, worktree copy unchanged." >&2; exit 1
         fi
-        rm -rf "$dest"; mv "$staging" "$dest"; rm -rf "$entry"
+        rm -rf "$dest"; mv "$staging" "$dest"
         continue
       fi
       dest="$dest_dir/$(free_name "$dest_dir" "$(basename "$entry")" "$entry")"
+      if [ -e "$dest" ]; then
+        echo "same  $entry (already in main as ${dest#"$main"/})"
+        same=$((same + 1)); continue
+      fi
       renamed=$((renamed + 1))
-      echo "move  $entry -> ${dest#"$main"/} (name taken in main)"
+      echo "copy  $entry -> ${dest#"$main"/} (name taken in main)"
     else
-      echo "move  $entry -> ${dest#"$main"/}"
+      echo "copy  $entry -> ${dest#"$main"/}"
     fi
-    [ $dry = 1 ] && { moved=$((moved + 1)); continue; }
+    [ $dry = 1 ] && { copied=$((copied + 1)); continue; }
     mkdir -p "$dest_dir"
     cp -Rp "$entry" "$dest"
-    if diff -rq "$entry" "$dest" >/dev/null; then
-      rm -rf "$entry"
-    else
-      echo "FAILED copy check for $entry; worktree copy kept." >&2
+    if ! diff -rq "$entry" "$dest" >/dev/null; then
+      echo "FAILED copy check for $entry; worktree copy unchanged." >&2
       exit 1
     fi
-    moved=$((moved + 1))
+    copied=$((copied + 1))
   done
 done
 
 [ $dry = 1 ] && mode="dry run, nothing changed" || mode="done"
 echo "main: $main"
-echo "$mode: moved $moved ($renamed renamed), replaced $replaced, kept newer in main $kept, already there $same, skipped $skipped"
+echo "$mode: copied $copied ($renamed renamed), replaced $replaced, kept newer in main $kept, already there $same, skipped $skipped"
