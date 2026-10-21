@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.242",
+    "version": "1.9.243",
     "description": "My personal commands shared across PCs",
     "commands": [],
     "skills": [
@@ -27,7 +27,8 @@
         "./skills/smoke-test",
         "./skills/e2e-test",
         "./skills/deploy-plan",
-        "./skills/work-flow"
+        "./skills/work-flow",
+        "./skills/keep-reports"
     ],
     "hooks": {
         "SessionStart": [

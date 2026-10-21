@@ -17,6 +17,7 @@ Each skill folder has a `README.md` with diagrams of how it works.
 | [e2e-test](plugins/naphatwx-tools/skills/e2e-test/) | Test every scenario of a feature (UI in the browser, API by request, MCP by an AI agent), with a fresh-agent review and one HTML report |
 | [smoke-test](plugins/naphatwx-tools/skills/smoke-test/) | Check after a deploy that every service in a real flow still reaches the next one |
 | [deploy-plan](plugins/naphatwx-tools/skills/deploy-plan/) | Build a deployment plan as a clickable HTML checklist, split into Pre-deploy and Post-deploy |
+| [keep-reports](plugins/naphatwx-tools/skills/keep-reports/) | Move e2e, smoke and deploy-plan output from a worktree into the main checkout |
 | [review-code](plugins/naphatwx-tools/skills/review-code/) | Review only the changed lines of staged changes, files or a GitLab MR |
 | [get-mr-diffs](plugins/naphatwx-tools/skills/get-mr-diffs/) | Helper: fetch a GitLab MR diff, local git first, else GitLab MCP |
 | [generate-changelog](plugins/naphatwx-tools/skills/generate-changelog/) | Write a short changelog from a GitLab MR diff, as one copy-paste code block |
