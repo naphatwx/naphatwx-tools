@@ -40,7 +40,9 @@ Flag each step
 - ok       everything above holds
 - test     the test is wrong: shot taken too early, wrong wait, weak or wrong assertion, wrong role,
            a missing check, a secret recorded. The product may be fine.
-- product  the app is wrong: the screen or response differs from the scenario's expect
+- product  the app is wrong: the screen or response differs from the scenario's expect. Open the
+           scenario's evidence.expect line: when the code there shows what you saw, the scenario has
+           drifted; say so in the note ("code differs from scenario, see <path:line>")
 - unsure   you cannot tell from the proof; say what a person should look at
 
 Write the review file as strict JSON, one entry per step of every reviewed test:

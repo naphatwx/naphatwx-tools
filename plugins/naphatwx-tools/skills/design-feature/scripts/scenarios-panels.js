@@ -56,13 +56,16 @@ const scenariosOf = useCaseId => SCENARIOS.filter(s => s.useCase === useCaseId);
 const playCell = scenario => playable(scenario) ? `<a href="${escapeHtml(href(scenario))}" ${newTabAttributes}>Play ↗</a>`
     : !hasMock ? '' : `<span class="aside">${(scenario.surface || 'ui') === 'ui' ? 'not in the mock' : 'No mock'}</span>`;
 const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
-// channel tag (ui / mcp / api / job), title + kind + story chip, first expect line, then one muted line per "na" reason
+// channel tag (ui / mcp / api / job), title + kind + story chip, first expect line, the gate, then one muted line per "na" reason
 const notApplicableLines = scenario => scenario.na && typeof scenario.na === 'object' ? Object.entries(scenario.na).map(([channel, why]) => `<br><span class="aside not-applicable">${escapeHtml(channel)} n/a: ${escapeHtml(why)}</span>`).join('') : '';
+// the gate in the code that lets the actor in or stops them; a spec-only scenario says it is not traced yet
+const evidenceLine = scenario => scenario.source === 'spec' ? '<br><span class="aside not-applicable">from the spec: not traced in the code yet</span>'
+    : scenario.evidence && scenario.evidence.gate ? `<br><span class="aside not-applicable">gate: <code>${escapeHtml(scenario.evidence.gate)}</code></span>` : '';
 const kindTag = scenario => scenario.kind ? `<span class="scenario-kind ${escapeHtml(scenario.kind)}">${escapeHtml(scenario.kind)}</span>` : '';
 const isCore = scenario => scenario.core === true;
 const corePill = scenario => isCore(scenario) ? '<span class="core-pill" title="Core: play first">Core</span>' : '';
 const scenarioCell = scenario => `${scenario.surface ? `<span class="channel-tag">${escapeHtml(scenario.surface)}</span> ` : ''}<span class="scenario-name">${escapeHtml(scenario.title)}</span>${kindTag(scenario)}${corePill(scenario)} <span class="references">${escapeHtml(scenario.story)}</span>`
-    + `<br><span class="aside">${escapeHtml((scenario.expect || [])[0] || '')}</span>${notApplicableLines(scenario)}`;
+    + `<br><span class="aside">${escapeHtml((scenario.expect || [])[0] || '')}</span>${evidenceLine(scenario)}${notApplicableLines(scenario)}`;
 
 // ---------------------------------------------------------------- "Open the mock" link on the Use cases heading
 html = html.replace(/(<section class="slide" id="use-cases"[^>]*>\s*<h2>[\s\S]*?)(?: <a class="side-link"[^>]*>[^<]*<\/a>)?<\/h2>/,

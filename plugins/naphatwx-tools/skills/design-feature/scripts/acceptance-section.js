@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Writes the "Acceptance criteria" section of overview.html from <plan>/use-cases.js (ACCEPTANCE + SCENARIOS):
 // one row per criterion with the scenarios that cite it, per channel. A channel with no scenario is a gap.
+// MISMATCHES (where the spec and the code disagree) follow as a "Spec vs code" table.
 // Usage: node acceptance-section.js <plan-dir> [--use-cases <file>]   (prints the coverage; exit 0 even with gaps)
 
 const fs = require('fs');
@@ -53,10 +54,13 @@ if (!MARK.test(html)) fail('No <!-- acceptance:start --> … <!-- acceptance:end
 let SCENARIOS = [];
 /** @type {import('../template/use-cases.types').Acceptance[] | null} */
 let ACCEPTANCE = null;
+/** @type {import('../template/use-cases.types').Mismatch[]} */
+let MISMATCHES = [];
 try {
     const source = fs.readFileSync(useCasesFile, 'utf8');
     SCENARIOS = parseVariable(source, 'SCENARIOS', useCasesFile);
     if (/\bACCEPTANCE\s*=/.test(source)) ACCEPTANCE = parseVariable(source, 'ACCEPTANCE', useCasesFile);
+    if (/\bMISMATCHES\s*=/.test(source)) MISMATCHES = parseVariable(source, 'MISMATCHES', useCasesFile);
 } catch (error) { fail(`${useCasesFile}: ${error.message}`); }
 
 const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[c]));
@@ -103,6 +107,16 @@ else {
         ...rows.map(tableRow),
         `${INDENT}    </tbody></table></div>`].join('\n');
 }
+if (MISMATCHES.length) {
+    const scenarioLinks = ids => (ids || []).map(id => `<a href="#sc-${escapeHtml(id)}">${escapeHtml(id)}</a>`).join(' · ');
+    body += '\n' + [`${INDENT}<h3 id="spec-vs-code">Spec vs code (${MISMATCHES.length})</h3>`,
+        `${INDENT}<div class="table-wrap"><table class="acceptance-table">`,
+        `${INDENT}    <thead><tr><th>Spec</th><th>What differs</th><th>Code</th><th>Fix</th><th>Scenarios</th></tr></thead><tbody>`,
+        ...MISMATCHES.map(m => `${INDENT}        <tr id="${escapeHtml(String(m.id).toLowerCase())}"><td><strong class="nowrap">${escapeHtml(m.id)} · ${escapeHtml(m.spec)}</strong></td>`
+            + `<td>${escapeHtml(m.differs)}</td><td>${(m.evidence || []).map(ref => `<code>${escapeHtml(ref)}</code>`).join('<br>')}</td>`
+            + `<td class="nowrap">the ${escapeHtml(m.fix)}</td><td>${scenarioLinks(m.scenarios)}</td></tr>`),
+        `${INDENT}    </tbody></table></div>`].join('\n');
+}
 html = html.replace(MARK, (_, start, end) => `${start}\n${body}\n${end}`);
 fs.writeFileSync(overviewPath, html);
 
@@ -113,4 +127,8 @@ else {
     print(`Acceptance criteria written: ${summary}`);
     rows.forEach(row => print(`  ${row.criterion.id}  ${[...row.lines.map(line => `${line.channel}: ${line.by.length ? line.by.map(s => s.id).join(', ') : 'GAP'}`),
         ...row.notApplicableList.map(([channel]) => `${channel}: n/a`)].join(' · ')}`));
+}
+if (MISMATCHES.length) {
+    print(`Spec vs code: ${plural(MISMATCHES.length, 'mismatch', 'mismatches')}`);
+    MISMATCHES.forEach(m => print(`  ${m.id} ${m.spec} (fix the ${m.fix}): ${m.differs}`));
 }

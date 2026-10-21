@@ -58,7 +58,8 @@ Find `use-cases.js`:
 | spec folder or spec number | `<spec-folder>/plan/use-cases.js` |
 | missing | run the `generate-use-case` skill with the source first, then come back |
 
-- Check it: `node <generate-use-case skill dir>/scripts/check.js <plan>/use-cases.js`. Errors → fix them through `generate-use-case` first.
+- Check it: `node <generate-use-case skill dir>/scripts/check.js <plan>/use-cases.js --strict`. Errors → fix them through `generate-use-case` first. A scenario with `"source": "spec"` was never traced in the code: run `generate-use-case` in verify mode first, so tests don't encode the spec's guess.
+- Each scenario's `evidence` points at its code: `entry` (route, RPC, tool, command), `gate` and the line behind each `expect`. Give it to the writer and the AI tester, so they find the page, selectors and calls from the code instead of guessing.
 - Read `USE_CASES` and `SCENARIOS`. Keep the order: UC1 → its scenarios in file order, UC2 → …
 - `--core` → keep only the scenarios with `"core": true` for steps 3–6. The others are not written, run or listed as not run.
 - Runner per scenario, from its `surface`:
@@ -199,7 +200,7 @@ Then, per flagged step:
 
 Agents with no sub-agents do the review themselves, step by step, against the same checklist, after the run.
 
-When the code's message, status or list differs from a scenario's `expect` and the code is right (e.g. 200 vs 201, an RBAC refusal string), list it for `generate-use-case` to update the scenario; don't flag it `product`.
+When the code's message, status or list differs from a scenario's `expect` and the code is right (e.g. 200 vs 201, an RBAC refusal string), list it for `generate-use-case` to update the scenario (its verify mode re-checks the evidence); don't flag it `product`. A scenario listed in a `MISMATCHES` entry with `"fix": "code"` follows today's code: the gap is known, not a new finding.
 
 ## 6. Report
 
@@ -218,6 +219,7 @@ Reply with:
 - each failure: scenario id, step, and likely cause (product bug, missing selector, wrong scenario, environment)
 - review flags: `product` and `unsure` flags with their notes; `test` flags you fixed
 - findings for the app owner: missing selectors, routes or tools, code / scenario mismatches, scenarios to fix with `generate-use-case`
+- the open `MISMATCHES` from `use-cases.js`, one line each (`M1 FR-017 (fix the code): …`), so the spec-vs-code decisions stay in view
 - whether cleanup is confirmed
 - the **full path** of the HTML report
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Checks a use-cases.js file (USE_CASES + SCENARIOS + ACCEPTANCE): fields, channel coverage, acceptance coverage, core share.
-// Usage: node check.js <use-cases.js> [--json]
-// Exit 1 on any error; warnings (no example, no twin on another channel, likely duplicates, over budget, too many core) keep exit 0.
+// Checks a use-cases.js file (USE_CASES + SCENARIOS + ACCEPTANCE + MISMATCHES): fields, channel and acceptance coverage,
+// core share, evidence refs (file exists, line in range) and that every quoted string in an expect line is in the code.
+// Usage: node check.js <use-cases.js> [--root <repo>] [--strict] [--json]   (--strict: a source "spec" scenario is an error)
 
 const fs = require('fs');
 const path = require('path');
@@ -9,6 +9,8 @@ const path = require('path');
 const file = process.argv[2];
 if (!file) { process.stderr.write('usage: node check.js <use-cases.js> [--json]\n'); process.exit(2); }
 const asJson = process.argv.includes('--json');
+const strict = process.argv.includes('--strict');
+const rootArg = process.argv.includes('--root') ? process.argv[process.argv.indexOf('--root') + 1] : null;
 const out = s => process.stdout.write(s + '\n');
 const errors = [];
 const warnings = [];
@@ -35,12 +37,15 @@ let UCS = [];
 let SCS = [];
 /** @type {import('../template/use-cases.types').Acceptance[] | null} */
 let ACS = null;
+/** @type {import('../template/use-cases.types').Mismatch[]} */
+let MMS = [];
 try {
     const src = fs.readFileSync(file, 'utf8');
     if (/\bUSE_CASE_FLOWS\s*=/.test(src)) errors.push(`${file} is in the old format (USE_CASE_FLOWS); rewrite it as USE_CASES + SCENARIOS (SKILL.md, User Input)`);
     else {
         UCS = parseVar(src, 'USE_CASES'); SCS = parseVar(src, 'SCENARIOS');
         if (/\bACCEPTANCE\s*=/.test(src)) ACS = parseVar(src, 'ACCEPTANCE');
+        if (/\bMISMATCHES\s*=/.test(src)) MMS = parseVar(src, 'MISMATCHES');
     }
 } catch (e) { errors.push(`${file} is missing or not strict JSON: ${e.message}`); }
 
@@ -51,10 +56,11 @@ function fieldsOf(name) {
     if (!body) throw new Error(`use-cases.types.d.ts has no interface ${name}`);
     return new Set([...body[1].matchAll(/^\s+(\w+)\??:/gm)].map(m => m[1]));
 }
-const FIELDS = { USE_CASES: fieldsOf('UseCase'), SCENARIOS: fieldsOf('ScenarioFields'), ACCEPTANCE: fieldsOf('Acceptance') };
+const FIELDS = { USE_CASES: fieldsOf('UseCase'), SCENARIOS: fieldsOf('ScenarioFields'), ACCEPTANCE: fieldsOf('Acceptance'), MISMATCHES: fieldsOf('Mismatch') };
+const EVIDENCE_FIELDS = fieldsOf('Evidence');
 // mock fields get their own message below
 const MOCK_FIELDS = ['state', 'scenario', 'page', 'params', 'steps', 'op', 'req', 'parts'];
-for (const [list, entries] of [['USE_CASES', UCS], ['SCENARIOS', SCS], ['ACCEPTANCE', ACS || []]])
+for (const [list, entries] of [['USE_CASES', UCS], ['SCENARIOS', SCS], ['ACCEPTANCE', ACS || []], ['MISMATCHES', MMS]])
     for (const e of entries) for (const k of Object.keys(e))
         if (!FIELDS[list].has(k) && !(list === 'SCENARIOS' && MOCK_FIELDS.includes(k))) errors.push(`${e.id || '(no id)'}: unknown field "${k}" in ${list}; allowed: ${[...FIELDS[list]].join(', ')} (use-cases.types.d.ts)`);
 
@@ -193,6 +199,155 @@ for (const s of SCS) {
         warnings.push(`${name}: talks about a role or permission but names no permission string (e.g. "DEV: has things.read, not things.create")`);
 }
 
+// Evidence: code is the source of truth. Every code scenario names its entry point, its gate and the code behind each expect line.
+const SOURCES = ['code', 'spec'];
+function findRoot() {
+    if (rootArg) return path.resolve(rootArg);
+    for (let dir = path.dirname(path.resolve(file)); ; dir = path.dirname(dir)) {
+        if (fs.existsSync(path.join(dir, '.git'))) return dir;
+        if (path.dirname(dir) === dir) return null;
+    }
+}
+const ROOT = findRoot();
+const lineCounts = new Map();
+/** "" when the ref is fine, else why not. */
+function badRef(ref) {
+    const m = String(ref || '').match(/^([^:\s]+):(\d+)(?:-(\d+))?$/);
+    if (!m) return `"${ref}" is not path:line or path:from-to`;
+    if (path.isAbsolute(m[1]) || m[1].split('/').includes('..')) return `"${ref}" must be repo-relative`;
+    if (!ROOT) return `no repo root for "${ref}"; pass --root <repo>`;
+    if (!lineCounts.has(m[1])) {
+        let n = null;
+        try { n = fs.readFileSync(path.join(ROOT, m[1]), 'utf8').split('\n').length; } catch {}
+        lineCounts.set(m[1], n);
+    }
+    const lines = lineCounts.get(m[1]);
+    if (lines == null) return `"${ref}": file not found`;
+    const from = +m[2], to = +(m[3] || m[2]);
+    if (from < 1 || to < from || to > lines) return `"${ref}": line out of range (the file has ${lines} lines)`;
+    return '';
+}
+// segments may hold Next.js route groups and params: app/(main)/[id]/page.tsx
+const REF_IN_TEXT = /[\w@.][\w@.()[\]-]*(?:\/[\w@.()[\]-]+)*\.\w+:\d+(?:-\d+)?/g;
+const specOnly = [];
+let codeScenarios = 0, withEvidence = 0;
+for (const s of SCS) {
+    const name = s.id || '(no id)';
+    if (s.source != null && !SOURCES.includes(s.source)) errors.push(`${name}: source must be "code" or "spec", or left out (= code)`);
+    if (s.source === 'spec') specOnly.push(s.id);
+    else codeScenarios++;
+    for (const [k, why] of Object.entries(s.na && typeof s.na === 'object' ? s.na : {}))
+        for (const ref of String(why).match(REF_IN_TEXT) || []) { const bad = badRef(ref); if (bad) errors.push(`${name}: na.${k} cites ${bad}`); }
+    const ev = s.evidence;
+    if (ev == null) continue;
+    withEvidence++;
+    if (typeof ev !== 'object' || Array.isArray(ev)) { errors.push(`${name}: evidence must be { entry, gate, roles?, expect: [...] }`); continue; }
+    for (const k of Object.keys(ev)) if (!EVIDENCE_FIELDS.has(k)) errors.push(`${name}: unknown evidence field "${k}"; allowed: ${[...EVIDENCE_FIELDS].join(', ')}`);
+    for (const k of ['entry', 'gate']) {
+        if (!ev[k]) errors.push(`${name}: evidence.${k} is missing`);
+        else { const bad = badRef(ev[k]); if (bad) errors.push(`${name}: evidence.${k} ${bad}`); }
+    }
+    if (ev.roles) { const bad = badRef(ev.roles); if (bad) errors.push(`${name}: evidence.roles ${bad}`); }
+    const lines = Array.isArray(s.expect) ? s.expect.length : 0;
+    if (!Array.isArray(ev.expect) || ev.expect.length !== lines) errors.push(`${name}: evidence.expect must hold one ref per expect line (${lines}), in order`);
+    else ev.expect.forEach((ref, i) => { const bad = badRef(ref); if (bad) errors.push(`${name}: evidence.expect[${i}] ${bad}`); });
+    const text = [s.title, s.given, s.when].filter(Boolean).join(' ');
+    if (!ev.roles && (text.match(PERM) || []).some(p => !notPerm(p))) warnings.push(`${name}: names a permission but has no evidence.roles (the seed or role-permission row that grants or withholds it)`);
+}
+if (codeScenarios && !withEvidence) errors.push(`no scenario has evidence; trace each one in the code (SKILL.md step 2), or run verify mode to add it to an older file`);
+else for (const s of SCS) if (s.source !== 'spec' && s.evidence == null) errors.push(`${s.id || '(no id)'}: no evidence; add entry, gate and one ref per expect line, or set "source": "spec" when the code does not exist yet`);
+if (specOnly.length) (strict ? errors : warnings).push(`${specOnly.length} scenario(s) from the spec only (${specOnly.join(', ')}); run generate-use-case verify once the code exists, before play-scenarios or e2e-test use them`);
+
+// Mismatches: the spec and the code disagree; the scenarios follow the code and the user decides which side to fix.
+const mmIds = new Set();
+for (const m of MMS) {
+    const name = m.id || '(no id)';
+    if (!/^M\d+$/.test(m.id || '')) errors.push(`mismatch "${name}": id must look like M1`);
+    if (mmIds.has(m.id)) errors.push(`duplicate mismatch id: ${m.id}`);
+    mmIds.add(m.id);
+    for (const k of ['spec', 'differs']) if (!m[k]) errors.push(`mismatch ${name}: missing ${k}`);
+    if (!['spec', 'code'].includes(m.fix)) errors.push(`mismatch ${name}: fix must be "spec" or "code"`);
+    if (!Array.isArray(m.evidence) || !m.evidence.length) errors.push(`mismatch ${name}: evidence must list at least one path:line`);
+    else m.evidence.forEach(ref => { const bad = badRef(ref); if (bad) errors.push(`mismatch ${name}: evidence ${bad}`); });
+    for (const id of m.scenarios || []) if (!ids.has(id)) errors.push(`mismatch ${name}: scenario ${id} is not in SCENARIOS`);
+}
+
+// Strings: every quoted text in a code scenario's expect is in the code. A value in the quote (a number, ALL_CAPS, a
+// kebab or dotted name) matches any value or placeholder there, so "Version 2.3.3-1 was created." finds `Version ${v} was created.`.
+// Text built at run time passes when it fills a format string at the line's evidence ("your role %s cannot %s. %s").
+const SKIP_FILE = /(^|\/)(specs|docs|node_modules|vendor|dist|build|coverage|e2e|__tests__|\.git)\/|\.(md|mdx|txt|lock|svg|png|jpe?g|gif|ico|pdf|woff2?|map)$|[._-](test|spec)\.\w+$|_test\.go$|\.feature$|\.pb\.go$|_pb\.\w+$|\.min\.js$|(^|\/)package-lock\.json$/;
+const isValue = w => /\d/.test(w) || /^[A-Z][A-Z0-9_]+$/.test(w) || /^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(w) || /^[a-z]\w*(?:\.\w+)+$/.test(w);
+const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const HOLE = '(?:%[-+# 0-9.]*[a-zA-Z]|\\$\\{[^}]{1,80}\\}|\\{\\{[^}]{1,80}\\}\\}|\\{[^{}\\n]{1,80}\\}';
+const WILD = `${HOLE}|[^\\s"'\`<>]{1,80}?)`;
+const WILD_RUN = `${HOLE}|[^"'\`<>\\n]{1,160}?)`;
+/** The quote as a regex: words as they are, values as wildcards (a run of values is one); null when it is only values. */
+function quoteRegex(q) {
+    let words = 0;
+    const parts = [];
+    for (const chunk of q.trim().split(/\s+/)) {
+        const m = chunk.match(/^([^A-Za-z0-9_]*)(.*?)([^A-Za-z0-9_]*)$/);
+        const value = m[2] && isValue(m[2]);
+        if (m[2] && !value) words++;
+        if (value && parts.length && parts[parts.length - 1].value) { parts[parts.length - 1] = { value: true, re: WILD_RUN }; continue; }
+        parts.push(value ? { value: true, re: esc(m[1]) + WILD + esc(m[3]) } : { value: false, re: esc(chunk) });
+    }
+    return words ? new RegExp(parts.map(p => p.re).join('\\s+')) : null;
+}
+/** Joins "a " + "b" concatenations so a message split over lines reads as one literal. */
+const joinConcat = text => text.replace(/["'`]\s*\+\s*["'`]/g, '');
+/** Does the quote fill a format string near this ref? */
+function fillsFormat(q, ref) {
+    const m = String(ref || '').match(/^([^:\s]+):(\d+)(?:-(\d+))?$/);
+    if (!m || !ROOT) return false;
+    let lines;
+    try { lines = fs.readFileSync(path.join(ROOT, m[1]), 'utf8').split('\n'); } catch { return false; }
+    const near = joinConcat(lines.slice(Math.max(0, +m[2] - 4), +(m[3] || m[2]) + 3).join('\n'));
+    for (const lit of near.match(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`[^`]*`/g) || []) {
+        const body = lit.slice(1, -1);
+        const holes = body.split(/%[-+# 0-9.]*[a-zA-Z]|\$\{[^}]*\}|\{\w*\}/);
+        if (holes.length < 2 || holes.join('').replace(/\W/g, '').length < 8) continue;
+        if (new RegExp('^\\s*' + holes.map(h => esc(h.trim()).replace(/\s+/g, '\\s+')).join('\\s*(.+?)\\s*') + '\\s*$').test(q.trim())) return true;
+    }
+    return false;
+}
+const quotes = new Map(); // quote → [{ id, ref }]
+for (const s of SCS) if (s.source !== 'spec') (Array.isArray(s.expect) ? s.expect : []).forEach((line, i) => {
+    for (const m of String(line).matchAll(/"([^"]{2,})"/g))
+        quotes.set(m[1], [...(quotes.get(m[1]) || []), { id: s.id, ref: s.evidence && Array.isArray(s.evidence.expect) ? s.evidence.expect[i] : null }]);
+});
+const strings = { checked: quotes.size, missing: [] };
+if (quotes.size && ROOT) {
+    const pending = new Map([...quotes.keys()].map(q => {
+        const re = quoteRegex(q);
+        // the longest plain word, to skip files fast
+        const key = (q.split(/\s+/).map(c => c.replace(/^\W+|\W+$/g, '')).filter(w => w && !isValue(w)).sort((a, b) => b.length - a.length)[0]) || q;
+        return [q, { re, key }];
+    }));
+    let list = [];
+    try { list = require('child_process').execFileSync('git', ['-C', ROOT, 'ls-files', '-z'], { encoding: 'utf8', maxBuffer: 1 << 28 }).split('\0').filter(Boolean); }
+    catch { const walk = d => fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }).flatMap(e => e.isDirectory() ? (SKIP_FILE.test(`${d}${e.name}/`) ? [] : walk(`${d}${e.name}/`)) : [`${d}${e.name}`]); list = walk(''); }
+    const own = path.relative(ROOT, path.dirname(path.resolve(file)));
+    for (const rel of list) {
+        if (!pending.size) break;
+        if (SKIP_FILE.test(rel) || (own && rel.startsWith(own + '/'))) continue;
+        let text;
+        try { if (fs.statSync(path.join(ROOT, rel)).size > 2e6) continue; text = fs.readFileSync(path.join(ROOT, rel), 'utf8'); } catch { continue; }
+        if (text.includes('\0')) continue;
+        let joined = null;
+        for (const [q, { re, key }] of pending) {
+            if (!text.includes(key)) continue;
+            if (joined == null) joined = joinConcat(text);
+            if (re ? re.test(joined) : joined.includes(q)) pending.delete(q);
+        }
+    }
+    for (const q of pending.keys()) {
+        if (quotes.get(q).every(({ ref }) => fillsFormat(q, ref))) continue;
+        strings.missing.push(q);
+        errors.push(`${[...new Set(quotes.get(q).map(x => x.id))].join(', ')}: "${q.length > 90 ? q.slice(0, 90) + '…' : q}" is not in the code; copy the text the code shows (spec text that differs goes in MISMATCHES), and write user input and example values without quotes`);
+    }
+} else if (quotes.size) errors.push('no repo root to check quoted strings against; pass --root <repo>');
+
 // Core = play first: every basic, plus the main alternates and the errors users hit most. Aim for 15–25% of all scenarios.
 const CORE_MAX = 0.3;
 const coreCount = list => list.filter(s => s.core === true).length;
@@ -210,11 +365,16 @@ const perSurface = bySurface(SCS);
 const perKind = byKind(SCS);
 const acceptance = ACS == null ? null : { total: acCoverage.length, fullyCovered: acCoverage.filter(r => !r.missing.length).length, rows: acCoverage };
 const core = { total: coreCount(SCS), percent: Math.round(coreShare * 100), ids: SCS.filter(s => s.core === true).map(s => s.id) };
-if (asJson) out(JSON.stringify({ useCases: UCS.length, scenarios: SCS.length, perUseCase, perSurface, perKind, core, acceptance, errors, warnings }, null, 2));
+const evidence = { code: codeScenarios, withEvidence, specOnly, strings };
+const mismatches = MMS.map(m => ({ id: m.id, spec: m.spec, fix: m.fix, differs: m.differs, evidence: m.evidence, scenarios: m.scenarios || [] }));
+if (asJson) out(JSON.stringify({ useCases: UCS.length, scenarios: SCS.length, perUseCase, perSurface, perKind, core, acceptance, evidence, mismatches, errors, warnings }, null, 2));
 else {
     out(`${count(UCS.length, 'use case')}, ${count(SCS.length, 'scenario')} (${surfaceText(perSurface)}; ${KINDS.map(k => `${perKind[k]} ${k}`).join(', ')}); ${core.total} core (${core.percent}%)`);
     perUseCase.forEach(c => out(`  ${c.useCase} ${c.title} [${c.channels.join(', ')}]: ${c.count} (${surfaceText(c.perSurface)}) · core ${c.core}${c.core ? ` (${surfaceText(c.corePerSurface)})` : ''}`));
     if (acceptance) out(`${acceptance.total} acceptance criteri${acceptance.total === 1 ? 'on' : 'a'}: ${acceptance.fullyCovered} covered on every channel`);
+    out(`evidence: ${withEvidence} of ${SCS.length} scenarios; ${specOnly.length} from the spec only; ${strings.checked - strings.missing.length} of ${strings.checked} quoted strings found in the code`);
+    out(`${MMS.length} mismatch${MMS.length === 1 ? '' : 'es'} between spec and code${MMS.length ? ':' : ''}`);
+    MMS.forEach(m => out(`  ${m.id} ${m.spec} (fix the ${m.fix}): ${m.differs}`));
     if (warnings.length) out(`\n${warnings.length} warning(s):\n- ${warnings.join('\n- ')}`);
     out(errors.length ? `\n${errors.length} error(s):\n- ${errors.join('\n- ')}` : '\nNo errors.');
 }

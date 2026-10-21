@@ -154,6 +154,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
         - A table with one row per `ACCEPTANCE` entry, in file order (`id="ac-us1-ac3"`): its id, then Given / when / then in one sentence.
         - Per channel of the criterion, a `.channel-tag` and the scenarios that cite it (through their `story`, `US1 · AC2–4` included), each a link to its row `#sc-<id>` in the Scenarios view (a click opens that view). A channel with no citing scenario shows an amber `gap` line; an `na` channel shows its reason, muted.
         - No `ACCEPTANCE` list, or an empty one → one line saying so, pointing to the generate-use-case skill.
+        - When `MISMATCHES` has entries: a "Spec vs code (N)" table after the criteria (`id="spec-vs-code"`), one row per entry: id and spec ref, what differs, the code refs, the side to fix, links to its scenarios.
         - Re-run it after `use-cases.js` changes; it is safe to re-run.
     4. **Use cases**: an `ol.use-case-index` with one row per use case (`UC<n>` + name, link to `#uc-NN`, user story and priority on the right, which `overview.js` folds into a `N refs` chip). Then one block per use case (copy the block between the `one block per use case` comments):
         - `<header class="use-case-head">`: `<h3>` with `<span class="section-number">UC<n></span>` + the use case name, then `<p class="references">` with its tags (user story, requirement ids joined by ` · `; no file names). `overview.js` turns the line into a `N refs` chip on the title line; a click shows the IDs, and Export PDF prints them all.
@@ -259,6 +260,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - List the use cases (one line each), the ER diagram page(s), and which mock was built (standalone, in-project with its folder, or none).
 - Scenarios: the total, the count per use case and channel and how many are playable, copied from the script output, plus the path of `use-cases.js` (play-scenarios and e2e-test read it too).
 - Acceptance criteria: the summary line from `acceptance-section.js` (`N criteria · M covered on every channel · K gaps`), then each gap as `US<n> · AC<m>: no <channel> scenario`, and each `n/a` channel with its reason, one line each.
+- Spec vs code: each mismatch the script printed, one line each (`M1 FR-017 (fix the spec): …`). They need the user's decision. Say how many scenarios are from the spec only (`check.js` evidence line) when there are any.
 - Mock review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
 - Remind the user: each diagram is edited in its own file under `flowchart/`, `sequence-diagram/` or `database/`; the overview picks up the change on reload.
 

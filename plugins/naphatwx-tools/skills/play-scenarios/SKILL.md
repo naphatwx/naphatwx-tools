@@ -63,6 +63,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Plan folder (has `overview.html`, from the `design-feature` skill) → `<plan>` is the plan folder. Write `<plan>/live/`.
 - Spec folder only → `<plan>` is `<spec-folder>/plan/`. Write `<plan>/live/`.
 - `<plan>/use-cases.js` missing → run the `generate-use-case` skill with the same input first. Never write use cases or scenarios here.
+- Check it first: `node <generate-use-case skill dir>/scripts/check.js <plan>/use-cases.js --strict`. Errors → fix them through `generate-use-case`. A scenario with `"source": "spec"` was never traced in the code: run `generate-use-case` in verify mode first.
 - No base URL → read the app's dev config (compose file, `package.json` dev script, `.env`) for its local web port, or ask once (use AskUserQuestion when the agent has it).
 - No app repo path → the repo that holds the plan folder, when it has the app; otherwise ask once.
 
@@ -89,6 +90,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 1. Read the feature
 
 - From the plan folder: `overview.html` (scope, screens, errors) and `use-cases.js`.
+- Each scenario's `evidence` names its code: `entry` (the route, RPC, tool or command), `gate` (the check on the role) and the line behind each `expect`. Start the scan (step 2) there instead of searching.
 - When `<plan>/mock/shared/scenario-play.js` exists, it has each scenario's screen, params and steps. Start from it; names and values change to the seeded ones.
 - List per scenario: the screen and route, the data it needs, whether it **writes** (creates or changes data) or only reads, and the role it runs as with the permissions that matter (the scenario's `given` names them).
 - A scenario with no screen (surface `mcp`, `api` or `job`) is an **AI scenario**: list the MCP tool and operation (`mcp`), the REST or gRPC call (`api`), or the job command (`job`) it plays, and the ids it needs from a seed.
@@ -179,6 +181,7 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
     - `job`: names the command and the repo it runs in.
     - Asks the agent to show the exact request and the full response of every call, and to read the tool's input schema first when it has one.
     - Lists the calls in order with their values, `{key}` for what a seed makes. Says "I confirm the writes below" when a call writes.
+    - Names the scenario's `evidence.entry` (`path:line`), so the agent can read the handler when an answer surprises it.
     - Ends by asking for the values `expect` checks ("Tell me the new version's status, source and releaseBranch, and the second call's error").
     - A value MCP can't give (e.g. a merge request number only the screen shows) → the seed returns it in `values`. With no seed, a `{key}` the viewer types, and a `lookup` line in the recorded calls saying where it came from.
 - An AI scenario's `steps`: for `mcp`, connect the agent to the local MCP server once (the exact `claude mcp add` command, the token's source; never a token); for `api`, where the agent gets the API token. Then press ▶ Seed, copy the prompt into the agent and approve its calls, check its answer against What you should see.
@@ -237,7 +240,8 @@ Do this after step 7 with the app up and `server.mjs` running, or when the user 
 
 - Output: `✅ Play page created at: <plan>/live/index.html`
 - Counts copied from `check-live.js`: scenarios (by surface), playable live, by the AI (recorded pass, fail), skipped, seed commands.
-- The AI's FAILs from `ai-results.md`, each with the call and the answer.
+- The AI's FAILs from `ai-results.md`, each with the call and the answer. For each, open its scenario's `evidence.expect` line: when the code there gives the answer the AI got, the scenario has drifted (run `generate-use-case` verify), not the app.
+- The open `MISMATCHES` from `use-cases.js`, one line each, so a tester knows which spec lines the app doesn't follow on purpose or yet.
 - App changes made (login route, headers), each with its path.
 - The keys to fill in `live/.env`, each with where to get it (from `.env.example`).
 - Skipped scenarios with their reasons.

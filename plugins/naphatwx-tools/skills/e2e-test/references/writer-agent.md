@@ -26,6 +26,9 @@ Base URL comes from the Playwright config. Never hardcode a host or port.
 
 The scenarios are the spec. Read each one's given / when / expect. Never add, drop, merge or rename a
 scenario. A scenario you cannot test as written is a finding: say why, do not write a different test.
+Each scenario's evidence (repo-relative path:line) is where it lives in the code: open evidence.entry for
+the route, RPC or tool, evidence.gate for the check on the role, evidence.expect for each line's text and
+the markup to select. The code there differs from the scenario → a finding, not a different test.
 
 All scenarios
 1. One test per scenario, same id, in file order. Title: "<scenario id> <scenario title>".
