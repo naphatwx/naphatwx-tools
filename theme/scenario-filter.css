@@ -11,14 +11,15 @@
 .filter-dock:focus-within { border-color: var(--accent); }
 .filter-chips { display: flex; align-items: center; gap: 4px; }
 .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px 3px 10px; font: inherit; color: var(--accent); white-space: nowrap; background: var(--accent-fill); border: 1px solid var(--accent); border-radius: 999px; cursor: pointer; }
-.filter-chip:hover { background: var(--accent-soft); }
+/* .filter-dock prefix: outranks a page's own button:hover rule */
+.filter-dock .filter-chip:hover { background: var(--accent-soft); }
 .filter-chip svg { width: 12px; height: 12px; }
 .filter-key { padding: 0 6px; font: var(--fs-tag)/18px var(--mono); color: var(--text-3); border: 1px solid var(--line-strong); border-radius: var(--radius); }
 .filter-sep { width: 1px; height: 20px; flex: none; background: var(--line-strong); }
 .filter-count { padding: 0 10px; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text-2); white-space: nowrap; }
 .filter-action { padding: 6px 12px; font: inherit; color: var(--text-2); white-space: nowrap; background: none; border: 0; border-radius: 999px; cursor: pointer; }
 .filter-action:not([aria-pressed="true"]):hover { color: var(--text); background: var(--hover); }
-.filter-action[aria-pressed="true"] { color: var(--accent); background: var(--accent-fill); }
+.filter-dock .filter-action[aria-pressed="true"] { color: var(--accent); background: var(--accent-fill); }
 .filter-clear { color: var(--accent); }
 .filter-clear[hidden] { display: none; }
 /* the groups slide open under the bar when the field has focus */
@@ -32,7 +33,7 @@
 .filter-options { display: flex; flex-wrap: wrap; gap: 6px; }
 .filter-option { padding: 3px 12px; font: inherit; color: var(--text-2); white-space: nowrap; background: none; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer; }
 .filter-option:not([aria-pressed="true"]):hover { color: var(--text); background: var(--hover); }
-.filter-option[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.filter-dock .filter-option[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
 .filter-option .n { margin-left: 4px; font-family: var(--mono); opacity: 0.75; }
 .filter-option.zero:not([aria-pressed="true"]) { opacity: 0.45; }
 .filter-mark { color: var(--accent); background: none; font-weight: 700; }
