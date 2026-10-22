@@ -81,8 +81,8 @@
       --max-w-6xl: 72rem;
       --max-w-7xl: 80rem;
 
-      /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-4xl */
-      --page-w: min(80%, var(--max-w-4xl));
+      /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-5xl */
+      --page-w: min(80%, var(--max-w-5xl));
       --gutter: clamp(16px, 3vw, 24px);
 
       --radius: 6px;
@@ -160,7 +160,7 @@
   body { font-size: var(--fs-body); line-height: 1.5; }
   [hidden] { display: none !important; }
   /* no sidebar here, so the report gets a wider column than the theme text width */
-  main { max-width: min(80%, var(--max-w-4xl)); margin: 0 auto; padding: 16px var(--gutter) 48px; }
+  main { max-width: min(80%, var(--max-w-5xl)); margin: 0 auto; padding: 16px var(--gutter) 48px; }
   h1 { font-size: var(--fs-h1); line-height: 1.25; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; overflow-wrap: anywhere; }
   code { font-size: var(--fs-code); overflow-wrap: anywhere; }
 

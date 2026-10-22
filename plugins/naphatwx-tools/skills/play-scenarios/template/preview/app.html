@@ -82,8 +82,8 @@
             --max-w-6xl: 72rem;
             --max-w-7xl: 80rem;
 
-            /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-4xl */
-            --page-w: min(80%, var(--max-w-4xl));
+            /* Page frame: every page centers its content at the same width, 80% of the window up to --max-w-5xl */
+            --page-w: min(80%, var(--max-w-5xl));
             --gutter: clamp(16px, 3vw, 24px);
 
             --radius: 6px;
@@ -133,7 +133,7 @@
         /* theme:base:end */
         /* Preview only: stands in for the running app, so the template plays from disk. Delete preview/ in a real run. */
         body { padding: 48px 64px; font-size: 22px; line-height: 1.5; }
-        .box { max-width: var(--max-w-4xl); padding: 32px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+        .box { max-width: var(--max-w-5xl); padding: 32px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
         code { color: var(--accent); }
         .meta { color: var(--text-3); }
     </style>
