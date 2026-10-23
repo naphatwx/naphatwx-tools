@@ -18,6 +18,48 @@ function addExportPdf(target, prepare) {
     return button;
 }
 /* theme:pdf-js:end */
+/* theme:font-size-js:start */
+/* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
+const FONT_SIZE_KEY = 'naphatwx-font-size';
+function applyFontSize(size) {
+    if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
+    else delete document.documentElement.dataset.fs;
+    document.querySelectorAll('.fs-btn').forEach((button) => {
+        const on = button.dataset.size === (size === 'small' || size === 'large' ? size : 'medium');
+        button.classList.toggle('active', on);
+        button.setAttribute('aria-pressed', String(on));
+    });
+}
+try { applyFontSize(localStorage.getItem(FONT_SIZE_KEY)); } catch {}
+addEventListener('storage', (event) => { if (event.key === FONT_SIZE_KEY) applyFontSize(event.newValue); });
+function addFontSize(target) {
+    if (!target) {
+        target = document.querySelector('.float-bar');
+        if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+    }
+    const picker = document.createElement('div');
+    picker.className = 'fs-picker no-print';
+    picker.setAttribute('role', 'group');
+    picker.setAttribute('aria-label', 'Text size');
+    for (const [size, label] of [['small', 'Small'], ['medium', 'Medium'], ['large', 'Large']]) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'fs-btn';
+        button.dataset.size = size;
+        button.title = label + ' text';
+        button.setAttribute('aria-label', label + ' text');
+        button.textContent = 'A';
+        button.addEventListener('click', () => {
+            applyFontSize(size);
+            try { localStorage.setItem(FONT_SIZE_KEY, size); } catch {}
+        });
+        picker.append(button);
+    }
+    target.append(picker);
+    applyFontSize(document.documentElement.dataset.fs);
+    return picker;
+}
+/* theme:font-size-js:end */
 /* theme:scenario-filter-js:start */
 /* Synced from theme/scenario-filter.js by theme/sync.mjs. Do not edit here. */
 function addScenarioFilter(anchor, options) {
@@ -339,7 +381,8 @@ const loadFrames = () => Promise.all(frames.filter(f => !f.dataset.loaded).map(f
     setTimeout(done, 2000);
     frame.loading = "eager";
 })));
-document.getElementById("keysBtn").before(addExportPdf(document.querySelector(".tools"), loadFrames));
+const tools = document.querySelector(".tools");
+document.getElementById("keysBtn").before(addFontSize(tools), addExportPdf(tools, loadFrames));
 
 // ===== Present: one step per screen. A use case gives one step per view; an API section one per RPC.
 // Long steps scroll down; nothing scrolls sideways. ← → or Space step, Esc leaves.

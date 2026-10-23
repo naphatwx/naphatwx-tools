@@ -10,7 +10,7 @@ Generate a single-file HTML documentation page from a bundled template.
 The template is a dark-only docs layout with a left sidebar, and search box. The style is inspired by the Clerk docs.
 
 Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
-The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
+The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
 
 ## User Input
 
@@ -37,7 +37,7 @@ The output **must** keep all of these:
 
 1. Single self-contained file. No external CSS, JS, fonts, or images.
 2. Dark only. Add no light theme, theme toggle, or other palette.
-3. Export PDF stays and works. `addExportPdf()` adds it to the top bar.
+3. Export PDF and the A / A / A text size picker stay and work. `addFontSize()` and `addExportPdf()` add them to the top bar.
 4. The sidebar nav, search box, and active-section highlight stay and work.
 5. Every `nav-link` `href` matches a real heading `id` in the content.
 6. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.

@@ -1,6 +1,7 @@
 /* One diagram page: Export PDF, labels fitted to their text, each SVG at 1:1, and the embed contract with a host page
    (design-feature's overview.html). Embedded, it hides the file's .eyebrow and h1 and posts {type: "diagram-height", height, width}
-   on every resize (postMessage works on file://). Needs addExportPdf (pdf.js) and fitDiagramLabels (diagram-labels.js). */
+   on every resize (postMessage works on file://). Needs addExportPdf (pdf.js), addFontSize (font-size.js) and fitDiagramLabels (diagram-labels.js).
+   The text size picker shows only when the file is opened on its own; embedded, the frame follows the host's choice. */
 (function () {
     const embedded = parent !== window;
     const style = document.createElement('style');
@@ -22,6 +23,7 @@
         svg.before(box);
         box.append(svg);
     });
+    if (!embedded) addFontSize();
     addExportPdf();
     // height: the body's box, padding included, not documentElement, whose scrollHeight never drops below the frame's height;
     // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled

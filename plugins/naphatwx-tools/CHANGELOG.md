@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.9.252
+
+**Text size picker is back: A / A / A on every page**
+
+- Every HTML page gets three "A" buttons (small / medium / large) next to Export PDF. Medium is the default.
+    - Only body, meta and code text change: Small 14 / 12 / 12px, Large 18 / 16 / 16px. Headings stay the same.
+    - Large also grows tags to 14px and diagram labels to 16px (sub-lines 14px). Diagram shapes keep their size.
+    - The choice is saved in `localStorage` (`naphatwx-font-size`), shared by every page, and followed live by other open pages and embedded diagrams.
+    - Diagram pages show the picker only when opened on their own.
+- A few spots that used a fixed step now use their role size, so they follow the picker: html-document nav, eyebrow, search and card text, legends, sequence-viewer code, play-scenarios overlay code.
+- theme: new `font-size.css` and `font-size.js` (`addFontSize(target)`), synced into `theme:font-size` and `theme:font-size-js` blocks. Sizes per option are in `tokens.css` under `:root[data-fs]`.
+
 ## 1.9.234
 
 **Text size picker removed**

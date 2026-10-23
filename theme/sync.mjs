@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Copies the theme/ blocks (tokens, base, pdf, diff, report, disclosure, slide.js, scenario, page-head, seq, scrollbar, pdf.js, diagram scripts) into skill templates between marker comments,
+// Copies the theme/ blocks (tokens, base, pdf, font-size, diff, report, disclosure, slide.js, scenario, page-head, seq, scrollbar, pdf.js, diagram scripts) into skill templates between marker comments,
 // so each skill folder stays self-contained (`npx skills add` installs one folder only).
 // Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS) and the use-cases.js type (TYPES_COPIES).
 // Usage: node theme/sync.mjs          write the blocks and preview copies
@@ -24,6 +24,7 @@ const SOURCES = {
     tokens: 'tokens.css', base: 'base.css', pdf: 'pdf.css', 'pdf-js': 'pdf.js', diff: 'diff.css', report: 'report.css', disclosure: 'disclosure.css', 'slide-js': 'slide.js', scenario: 'scenario.css', scrollbar: 'scrollbar.css', 'page-head': 'page-head.css', seq: 'seq.css',
     'diagram-labels-js': 'diagram-labels.js', 'diagram-embed-js': 'diagram-embed.js',
     'scenario-filter': 'scenario-filter.css', 'scenario-filter-js': 'scenario-filter.js',
+    'font-size': 'font-size.css', 'font-size-js': 'font-size.js',
 };
 const BLOCKS = Object.fromEntries(Object.entries(SOURCES)
     .map(([name, file]) => [name, stripHeader(readFileSync(join(ROOT, 'theme', file), 'utf8'))]));

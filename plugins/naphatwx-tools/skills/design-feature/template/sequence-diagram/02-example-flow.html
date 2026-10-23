@@ -91,6 +91,22 @@
         --radius-xl: 12px;
         --ease: cubic-bezier(0.2, 0, 0, 1);
     }
+
+    /* Text size picker (theme/font-size.js) sets html[data-fs]. Medium is the default above.
+       Only body, meta and code change; Large also grows tags and diagram labels. */
+    :root[data-fs="small"] {
+        --fs-body: 0.875rem;
+        --fs-meta: 0.75rem;
+        --fs-code: 0.75rem;
+    }
+    :root[data-fs="large"] {
+        --fs-body: 1.125rem;
+        --fs-meta: 1rem;
+        --fs-code: 1rem;
+        --fs-tag: 0.875rem;
+        --fs-dia: 1rem;
+        --fs-dia-sub: 0.875rem;
+    }
     /* theme:tokens:end */
     /* theme:base:start */
     /* Synced from theme/base.css by theme/sync.mjs. Do not edit here. */
@@ -311,6 +327,22 @@
           --radius-xl: 12px;
           --ease: cubic-bezier(0.2, 0, 0, 1);
       }
+
+      /* Text size picker (theme/font-size.js) sets html[data-fs]. Medium is the default above.
+         Only body, meta and code change; Large also grows tags and diagram labels. */
+      :root[data-fs="small"] {
+          --fs-body: 0.875rem;
+          --fs-meta: 0.75rem;
+          --fs-code: 0.75rem;
+      }
+      :root[data-fs="large"] {
+          --fs-body: 1.125rem;
+          --fs-meta: 1rem;
+          --fs-code: 1rem;
+          --fs-tag: 0.875rem;
+          --fs-dia: 1rem;
+          --fs-dia-sub: 0.875rem;
+      }
       /* theme:tokens:end */
       /* theme:pdf:start */
       /* Synced from theme/pdf.css by theme/sync.mjs. Do not edit here. */
@@ -332,6 +364,54 @@
           .references-ids { display: inline !important; }
       }
       /* theme:pdf:end */
+      /* theme:font-size:start */
+      /* Synced from theme/font-size.css by theme/sync.mjs. Do not edit here. */
+      .fs-picker {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          padding: 2px;
+          border: 1px solid var(--line-strong);
+          border-radius: var(--radius-lg);
+          background: var(--surface-2);
+      }
+      /* Inside the float bar: no box of its own, a line before Export PDF */
+      .float-bar .fs-picker {
+          padding: 0 4px 0 0;
+          margin-right: 2px;
+          border: 0;
+          border-right: 1px solid var(--line-strong);
+          border-radius: 0;
+          background: none;
+      }
+      /* .fs-picker prefix: beats toolbar rules like `.tools button` and `.float-bar button` */
+      .fs-picker .fs-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 30px;
+          height: 30px;
+          padding: 0;
+          border: none;
+          border-radius: var(--radius);
+          background: none;
+          color: var(--text-3);
+          cursor: pointer;
+          font-family: var(--sans);
+          font-weight: 600;
+          line-height: 1;
+          /* Trim the line box to the cap height, so the "A" centers by its visible shape, not its font box */
+          text-box: trim-both cap alphabetic;
+          transition: background 0.12s, color 0.12s;
+      }
+      .float-bar .fs-picker .fs-btn { height: 32px; border-radius: var(--radius-md); }
+      /* px, not rem: the picker must not resize itself when the text size changes */
+      .fs-picker .fs-btn[data-size="small"] { font-size: 12px; }
+      .fs-picker .fs-btn[data-size="medium"] { font-size: 15px; }
+      .fs-picker .fs-btn[data-size="large"] { font-size: 18px; }
+      .fs-picker .fs-btn:hover { background: var(--hover); color: var(--text); }
+      .fs-picker .fs-btn.active { background: var(--accent-soft); color: var(--accent); }
+      /* theme:font-size:end */
       .edge-label-background { fill: var(--surface); }
   </style>
   <script>
@@ -355,6 +435,48 @@
           return button;
       }
       /* theme:pdf-js:end */
+      /* theme:font-size-js:start */
+      /* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
+      const FONT_SIZE_KEY = 'naphatwx-font-size';
+      function applyFontSize(size) {
+          if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
+          else delete document.documentElement.dataset.fs;
+          document.querySelectorAll('.fs-btn').forEach((button) => {
+              const on = button.dataset.size === (size === 'small' || size === 'large' ? size : 'medium');
+              button.classList.toggle('active', on);
+              button.setAttribute('aria-pressed', String(on));
+          });
+      }
+      try { applyFontSize(localStorage.getItem(FONT_SIZE_KEY)); } catch {}
+      addEventListener('storage', (event) => { if (event.key === FONT_SIZE_KEY) applyFontSize(event.newValue); });
+      function addFontSize(target) {
+          if (!target) {
+              target = document.querySelector('.float-bar');
+              if (!target) { target = document.createElement('div'); target.className = 'float-bar no-print'; document.body.append(target); }
+          }
+          const picker = document.createElement('div');
+          picker.className = 'fs-picker no-print';
+          picker.setAttribute('role', 'group');
+          picker.setAttribute('aria-label', 'Text size');
+          for (const [size, label] of [['small', 'Small'], ['medium', 'Medium'], ['large', 'Large']]) {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'fs-btn';
+              button.dataset.size = size;
+              button.title = label + ' text';
+              button.setAttribute('aria-label', label + ' text');
+              button.textContent = 'A';
+              button.addEventListener('click', () => {
+                  applyFontSize(size);
+                  try { localStorage.setItem(FONT_SIZE_KEY, size); } catch {}
+              });
+              picker.append(button);
+          }
+          target.append(picker);
+          applyFontSize(document.documentElement.dataset.fs);
+          return picker;
+      }
+      /* theme:font-size-js:end */
       /* theme:diagram-labels-js:start */
       /* Synced from theme/diagram-labels.js by theme/sync.mjs. Do not edit here. */
       function fitDiagramLabels(root = document) {
@@ -411,6 +533,7 @@
               svg.before(box);
               box.append(svg);
           });
+          if (!embedded) addFontSize();
           addExportPdf();
           // height: the body's box, padding included, not documentElement, whose scrollHeight never drops below the frame's height;
           // width: the widest drawing at 1:1 plus padding, so a lightbox can show it whole, scaled

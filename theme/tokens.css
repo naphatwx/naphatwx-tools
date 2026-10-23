@@ -84,3 +84,19 @@
     --radius-xl: 12px;
     --ease: cubic-bezier(0.2, 0, 0, 1);
 }
+
+/* Text size picker (theme/font-size.js) sets html[data-fs]. Medium is the default above.
+   Only body, meta and code change; Large also grows tags and diagram labels. */
+:root[data-fs="small"] {
+    --fs-body: 0.875rem;
+    --fs-meta: 0.75rem;
+    --fs-code: 0.75rem;
+}
+:root[data-fs="large"] {
+    --fs-body: 1.125rem;
+    --fs-meta: 1rem;
+    --fs-code: 1rem;
+    --fs-tag: 0.875rem;
+    --fs-dia: 1rem;
+    --fs-dia-sub: 0.875rem;
+}

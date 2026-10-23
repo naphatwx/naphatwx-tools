@@ -127,7 +127,7 @@ The report keeps these features; keep them when you touch the template:
 - Retries: the final attempt shows, earlier ones sit under "Earlier attempts", a test that passed on retry is flaky. A skipped test shows its `skip` / `fixme` reason.
 - A failed Playwright test has a copyable rerun command, and a `npx playwright show-trace <path>` command when a trace was saved.
 - Dark only. Styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
-- **Export PDF** button: opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
+- **Export PDF** button: opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
 
 ## 2b. Data helper (once per feature, before the writers)
 

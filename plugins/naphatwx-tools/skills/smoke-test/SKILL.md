@@ -91,7 +91,7 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
    - Copy `template/run.mjs` and `template/report-template.html` unchanged.
    - Copy `template/README.md` to `scripts/smoke/README.md` unchanged: how teammates run it and read failures.
    - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
-   - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call.
+   - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
    - Write `envs.json`, using the base URLs the repo's config files show for each env. Ask for any you cannot find.
    - Write one `flows/<flow>.json` per flow, filled from the hop table, with `mapVersion`.
    - Add `scripts/smoke/results/` and `scripts/smoke/.env` to `.gitignore`. Write `scripts/smoke/.env.example` with `SMOKE_ENV=` and `SMOKE_SPEC=`, no values.
