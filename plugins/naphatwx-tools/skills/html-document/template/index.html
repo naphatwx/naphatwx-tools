@@ -179,12 +179,11 @@
             align-items: center;
             gap: 2px;
             padding: 2px;
-            border: 1px solid var(--line-strong);
             border-radius: var(--radius-lg);
             background: var(--surface-2);
         }
-        /* Inside the float bar: no box of its own, a line before Export PDF */
-        .float-bar .fs-picker {
+        /* Inside a tool bar: no box of its own, a line before Export PDF */
+        :is(.float-bar, .tools) .fs-picker {
             padding: 0 4px 0 0;
             margin-right: 2px;
             border: 0;
@@ -212,7 +211,7 @@
             text-box: trim-both cap alphabetic;
             transition: background 0.12s, color 0.12s;
         }
-        .float-bar .fs-picker .fs-btn { height: 32px; border-radius: var(--radius-md); }
+        :is(.float-bar, .tools) .fs-picker .fs-btn { height: 32px; border-radius: var(--radius-md); }
         /* px, not rem: the picker must not resize itself when the text size changes */
         .fs-picker .fs-btn[data-size="small"] { font-size: 12px; }
         .fs-picker .fs-btn[data-size="medium"] { font-size: 15px; }
