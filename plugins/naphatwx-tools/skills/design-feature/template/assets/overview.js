@@ -84,15 +84,15 @@ function addScenarioFilter(anchor, options) {
     if (options.flag) groups.push(['flag', 'Review', [['yes', 'Has review flags']]]);
     const hasCore = [...data.values()].some((row) => row.core);
 
-    let state = { status: [], type: [], kind: [], flag: [], core: false, q: '' };
+    let state = { status: [], type: [], kind: [], flag: [], core: false, search: '' };
     try {
         const saved = JSON.parse(localStorage.getItem(options.storageKey));
         if (saved) groups.forEach(([key, , items]) => { state[key] = (saved[key] || []).filter((value) => items.some(([id]) => id === value)); });
-        if (saved) { state.core = hasCore && !!saved.core; state.q = typeof saved.q === 'string' ? saved.q : ''; }
+        if (saved) { state.core = hasCore && !!saved.core; state.search = typeof saved.search === 'string' ? saved.search : ''; }
     } catch { /* storage blocked: the filter starts open */ }
 
     const match = (row, skip) => groups.every(([key]) => key === skip || !state[key].length || state[key].includes(row[key]))
-        && (skip === 'core' || !state.core || row.core) && (!state.q || row.text.includes(state.q));
+        && (skip === 'core' || !state.core || row.core) && (!state.search || row.text.includes(state.search));
     // a count is what you would get by picking it, with the other choices kept
     const countOf = (key, value) => [...data.values()].filter((row) => match(row, key) && (key === 'core' ? row.core : row[key] === value)).length;
     const active = () => [...groups.flatMap(([key, , items]) => state[key].map((value) => ({ key, value, label: items.find(([id]) => id === value)[1] }))),
@@ -136,13 +136,13 @@ function addScenarioFilter(anchor, options) {
     if (hasCore) addGroup('core', 'Core', [['', 'Core only']]);
     dock.append(bar, panel);
 
-    input.value = state.q;
-    input.addEventListener('input', () => { state.q = input.value.trim().toLowerCase(); apply(); });
+    input.value = state.search;
+    input.addEventListener('input', () => { state.search = input.value.trim().toLowerCase(); apply(); });
     input.addEventListener('focus', () => dock.classList.add('open'));
     input.addEventListener('keydown', (event) => {
         if (event.key === 'Backspace' && !input.value) { const last = active().pop(); if (last) toggle(last.key, last.value); }
     });
-    clear.onclick = () => { groups.forEach(([key]) => { state[key] = []; }); state.core = false; state.q = ''; input.value = ''; apply(); };
+    clear.onclick = () => { groups.forEach(([key]) => { state[key] = []; }); state.core = false; state.search = ''; input.value = ''; apply(); };
     // the panel floats over the rows, so a click outside or Escape closes it
     document.addEventListener('click', (event) => { if (!dock.contains(event.target)) dock.classList.remove('open'); });
     document.addEventListener('keydown', (event) => {
@@ -154,13 +154,13 @@ function addScenarioFilter(anchor, options) {
         const title = titleOf(row);
         title.querySelectorAll('mark.filter-mark').forEach((old) => old.replaceWith(old.textContent));
         title.normalize();
-        if (!state.q) return;
+        if (!state.search) return;
         const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
         const hits = [];
-        while (walker.nextNode()) { const at = walker.currentNode.data.toLowerCase().indexOf(state.q); if (at >= 0) hits.push([walker.currentNode, at]); }
+        while (walker.nextNode()) { const at = walker.currentNode.data.toLowerCase().indexOf(state.search); if (at >= 0) hits.push([walker.currentNode, at]); }
         hits.forEach(([node, at]) => {
             const hit = node.splitText(at);
-            hit.splitText(state.q.length);
+            hit.splitText(state.search.length);
             const element = document.createElement('mark');
             element.className = 'filter-mark';
             element.textContent = hit.data;
@@ -184,7 +184,7 @@ function addScenarioFilter(anchor, options) {
             chip.onclick = (event) => { event.preventDefault(); toggle(key, value); };
             return chip;
         }));
-        clear.hidden = !active().length && !state.q;
+        clear.hidden = !active().length && !state.search;
         if (options.groups) document.querySelectorAll(options.groups).forEach((group) => {
             const mine = [...data.keys()].filter((element) => group.contains(element));
             let empty = group.querySelector(':scope > .filter-empty');
@@ -325,13 +325,13 @@ document.addEventListener("click", (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (a) reveal(a.getAttribute("href").slice(1));
 });
-// ===== Reload keeps what was open: views, "more" blocks, refs chips, the lightbox and the scroll spot.
+// ===== Reload keeps what was open: views, "more" blocks, references chips, the lightbox and the scroll spot.
 // Saved per page when it closes; a different #hash (a shared link) wins over the saved spot.
 const PAGE_KEY = "naphatwx:design:" + location.pathname;
 const stateKey = PAGE_KEY + ":view";
 const saved = (() => { try { return JSON.parse(store.get(stateKey)) || {}; } catch { return {}; } })();
 const detailsBlocks = [...document.querySelectorAll("details")];
-const refsChips = [...document.querySelectorAll(".references-chip")];
+const referencesChips = [...document.querySelectorAll(".references-chip")];
 const diagramBoxes = [];
 (saved.views || []).forEach(id => {
     const tab = viewButtons.find(button => button.getAttribute("aria-controls") === id);
@@ -339,14 +339,14 @@ const diagramBoxes = [];
 });
 document.querySelectorAll(".panel.entering").forEach(panel => panel.classList.remove("entering"));
 (saved.details || []).forEach(i => { if (detailsBlocks[i]) detailsBlocks[i].open = true; });
-(saved.refs || []).forEach(i => refsChips[i]?.setAttribute("aria-expanded", "true"));
+(saved.references || []).forEach(i => referencesChips[i]?.setAttribute("aria-expanded", "true"));
 const restoreScroll = saved.scroll != null && location.hash === (saved.hash || "");
 if (restoreScroll) history.scrollRestoration = "manual";
 else if (location.hash) reveal(location.hash.slice(1))?.scrollIntoView();
 addEventListener("pagehide", () => store.set(stateKey, JSON.stringify({
     views: viewButtons.filter(button => button.getAttribute("aria-expanded") === "true").map(button => button.getAttribute("aria-controls")),
     details: detailsBlocks.flatMap((block, i) => block.open ? [i] : []),
-    refs: refsChips.flatMap((chip, i) => chip.getAttribute("aria-expanded") === "true" ? [i] : []),
+    references: referencesChips.flatMap((chip, i) => chip.getAttribute("aria-expanded") === "true" ? [i] : []),
     lightbox: lit ? diagramBoxes.indexOf(lit.box) : -1,
     hash: location.hash,
     scroll: presenting() ? null : scrollY, // presenting: the step's #hash marks the spot
