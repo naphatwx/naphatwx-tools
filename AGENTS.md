@@ -36,7 +36,9 @@
 - Every page with a `.float-bar` gets bottom padding from `theme/pdf.css` (`--float-space`), so the bar never hides the last line. A full-window page sets it back to 0 in its own CSS.
 - Text size picker: `theme/font-size.css` syncs into `/* theme:font-size:start */ … end */` and `theme/font-size.js` (`addFontSize(target)`) into `/* theme:font-size-js:start */ … end */`, right after the pdf blocks. Every page that calls `addExportPdf` calls `addFontSize` just before it, so Export PDF stays last. Diagram pages show it only when opened on their own.
   - Sizes live in `theme/tokens.css` under `:root[data-fs]`. Only role tokens change: Small / Large set `--fs-body`, `--fs-meta`, `--fs-code`; Large also `--fs-tag`, `--fs-dia`, `--fs-dia-sub`. So templates size text by role, not by step (`--fs-sm`).
-  - The choice is saved in `localStorage` (`naphatwx-font-size`), shared by every page, and followed live by other open pages and embedded frames.
+  - The choice is saved in `localStorage` (`naphatwx:font-size`), shared by every page, and followed live by other open pages and embedded frames.
+- Browser storage keys (`localStorage`, `sessionStorage`): `naphatwx:<tool>:<scope>:<what>`, e.g. `naphatwx:play:<slug>:results`.
+  - `<tool>`: `design`, `mock`, `play`, `deploy`, `e2e`, `gallery`. `<scope>` is the feature slug, else the page data's id or name, else `location.pathname`; drop it for settings every page shares (`naphatwx:font-size`).
 - Never edit between the markers. Edit `theme/`, then run `node theme/sync.mjs`.
 - design-feature's `template/mock`, `flowchart`, `sequence-diagram` and `database` are preview copies of the generate-mock-ui and generate-diagram templates. Edit the source, then run `node theme/sync.mjs`. Files that differ on purpose are listed in `OWN` in `theme/sync.mjs`.
 - Run `node theme/sync.mjs --check` before committing. It fails on drift, on any hex color that is not a theme color, and on text tokens below 4.5:1 contrast.

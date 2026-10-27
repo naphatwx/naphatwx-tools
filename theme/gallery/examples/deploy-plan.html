@@ -178,12 +178,11 @@
       align-items: center;
       gap: 2px;
       padding: 2px;
-      border: 1px solid var(--line-strong);
       border-radius: var(--radius-lg);
       background: var(--surface-2);
   }
-  /* Inside the float bar: no box of its own, a line before Export PDF */
-  .float-bar .fs-picker {
+  /* Inside a tool bar: no box of its own, a line before Export PDF */
+  :is(.float-bar, .tools) .fs-picker {
       padding: 0 4px 0 0;
       margin-right: 2px;
       border: 0;
@@ -211,7 +210,7 @@
       text-box: trim-both cap alphabetic;
       transition: background 0.12s, color 0.12s;
   }
-  .float-bar .fs-picker .fs-btn { height: 32px; border-radius: var(--radius-md); }
+  :is(.float-bar, .tools) .fs-picker .fs-btn { height: 32px; border-radius: var(--radius-md); }
   /* px, not rem: the picker must not resize itself when the text size changes */
   .fs-picker .fs-btn[data-size="small"] { font-size: 12px; }
   .fs-picker .fs-btn[data-size="medium"] { font-size: 15px; }
@@ -349,7 +348,7 @@ function addExportPdf(target, prepare) {
 /* theme:pdf-js:end */
 /* theme:font-size-js:start */
 /* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
-const FONT_SIZE_KEY = 'naphatwx-font-size';
+const FONT_SIZE_KEY = 'naphatwx:font-size';
 function applyFontSize(size) {
     if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
     else delete document.documentElement.dataset.fs;
@@ -400,7 +399,7 @@ const createElement = (tag, attributes = {}, ...children) => {
 const say = (message) => { const announcer = document.getElementById('announce'); announcer.textContent = ''; setTimeout(() => { announcer.textContent = message; }, 50); };
 
 // Ticks live in this browser only. Storage can throw (private mode), so the page works without it.
-const KEY = 'deploy-plan:' + (DATA && DATA.id || location.pathname);
+const KEY = 'naphatwx:deploy:' + (DATA && DATA.id || location.pathname) + ':ticks';
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
 function save(ticks) { try { localStorage.setItem(KEY, JSON.stringify(ticks)); } catch {} }
 let state = load();

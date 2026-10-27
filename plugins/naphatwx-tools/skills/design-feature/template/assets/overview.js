@@ -20,7 +20,7 @@ function addExportPdf(target, prepare) {
 /* theme:pdf-js:end */
 /* theme:font-size-js:start */
 /* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
-const FONT_SIZE_KEY = 'naphatwx-font-size';
+const FONT_SIZE_KEY = 'naphatwx:font-size';
 function applyFontSize(size) {
     if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
     else delete document.documentElement.dataset.fs;
@@ -216,9 +216,9 @@ function setCollapsed(on, remember = true) {
     railEdge.setAttribute("aria-expanded", String(!on));
     railEdge.setAttribute("aria-label", label);
     railEdge.title = label + " ( [ )";
-    if (remember) store.set("plan-rail", on ? "collapsed" : "");
+    if (remember) store.set("naphatwx:design:rail", on ? "collapsed" : "");
 }
-setCollapsed(store.get("plan-rail") === "collapsed", false);
+setCollapsed(store.get("naphatwx:design:rail") === "collapsed", false);
 const collapsed = () => root.getAttribute("data-rail") === "collapsed";
 const setDrawer = (on) => on ? root.setAttribute("data-drawer", "open") : root.removeAttribute("data-drawer");
 function toggleRail() { small.matches ? setDrawer(!root.hasAttribute("data-drawer")) : setCollapsed(!collapsed()); }
@@ -327,7 +327,8 @@ document.addEventListener("click", (e) => {
 });
 // ===== Reload keeps what was open: views, "more" blocks, refs chips, the lightbox and the scroll spot.
 // Saved per page when it closes; a different #hash (a shared link) wins over the saved spot.
-const stateKey = "plan-open:" + location.pathname;
+const PAGE_KEY = "naphatwx:design:" + location.pathname;
+const stateKey = PAGE_KEY + ":view";
 const saved = (() => { try { return JSON.parse(store.get(stateKey)) || {}; } catch { return {}; } })();
 const detailsBlocks = [...document.querySelectorAll("details")];
 const refsChips = [...document.querySelectorAll(".references-chip")];
@@ -364,9 +365,9 @@ function setAll(on) {
     root.setAttribute("data-all", on ? "on" : "off");
     openAll.setAttribute("aria-pressed", String(on));
     openAll.textContent = on ? "Close all" : "Open all";
-    store.set("plan-all", on ? "on" : "off");
+    store.set("naphatwx:design:open-all", on ? "on" : "off");
 }
-setAll(store.get("plan-all") === "on");
+setAll(store.get("naphatwx:design:open-all") === "on");
 // Close all also closes views opened one by one (by a click or by Present), not only the stacked ones
 openAll.addEventListener("click", () => {
     const on = root.getAttribute("data-all") !== "on";
@@ -556,12 +557,12 @@ const zoomOn = () => root.getAttribute("data-zoom") === "on";
 function setZoom(on) {
     root.setAttribute("data-zoom", on ? "on" : "off");
     zoomToggle.setAttribute("aria-pressed", String(on));
-    store.set("plan-zoom", on ? "on" : "off");
+    store.set("naphatwx:design:zoom", on ? "on" : "off");
     if (!on) zooms.forEach(z => z.reset());
     // zoom pans with a drag instead of the box's sideways scroll
     else document.querySelectorAll(".zoomable").forEach(box => { box.scrollLeft = 0; });
 }
-setZoom(store.get("plan-zoom") === "on");
+setZoom(store.get("naphatwx:design:zoom") === "on");
 zoomToggle.addEventListener("click", () => setZoom(!zoomOn()));
 
 function makeZoomable(box) {
@@ -700,4 +701,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ===== Scenarios: Kind + Core-only filter over every use case's Scenarios view (bar and rows written by scenarios-panels.js) =====
 const scenarioFilterBar = document.getElementById("scenario-filter");
-if (scenarioFilterBar) addScenarioFilter(scenarioFilterBar, { rows: "tr[data-kind]", groups: '.panel[id$="-sc"]', title: ".scenario-name", storageKey: "plan-scenario-filter:" + location.pathname });
+if (scenarioFilterBar) addScenarioFilter(scenarioFilterBar, { rows: "tr[data-kind]", groups: '.panel[id$="-sc"]', title: ".scenario-name", storageKey: PAGE_KEY + ":filter" });

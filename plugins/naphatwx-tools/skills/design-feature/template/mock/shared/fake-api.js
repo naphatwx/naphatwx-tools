@@ -5,7 +5,7 @@
 
 var FakeApi = (function () {
     const D = MOCK_DATA, st = States.current;
-    const STORE = 'mock:<feature-slug>';
+    const STORE = 'naphatwx:mock:<feature-slug>';
     const LATENCY = 450;
     const TIMEOUT_SIM_MS = 2600; // stands in for the real call bound, so the demo doesn't stall
 

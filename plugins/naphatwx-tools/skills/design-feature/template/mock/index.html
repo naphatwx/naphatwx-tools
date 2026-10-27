@@ -463,7 +463,7 @@
         /* theme:pdf-js:end */
         /* theme:font-size-js:start */
         /* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
-        const FONT_SIZE_KEY = 'naphatwx-font-size';
+        const FONT_SIZE_KEY = 'naphatwx:font-size';
         function applyFontSize(size) {
             if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
             else delete document.documentElement.dataset.fs;
@@ -725,7 +725,7 @@
                 </div>
               </section>`;
         }).join('');
-        addScenarioFilter(document.getElementById('scenario-filter'), { rows: '.scenario[data-sc]', groups: '.scenario-list', storageKey: 'mock-filter:' + FakeApi.STORE });
+        addScenarioFilter(document.getElementById('scenario-filter'), { rows: '.scenario[data-sc]', groups: '.scenario-list', storageKey: FakeApi.STORE + ':filter' });
         /** Scroll the scenario list so this card sits at its top; the page itself does not move.
             Room under the last card (--tail) lets any card reach the top; it is trimmed once the card has slid open. */
         function scrollToTop(item) {
@@ -804,7 +804,7 @@
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases
         addEventListener('resize', () => document.querySelectorAll('section[data-use-case]').forEach(fit)); // height-only changes skip the observer
         // ---------------------------------------------------------------- results, per reviewer (kept apart from the mock's store)
-        const RESULTS_KEY = 'mock-results:' + FakeApi.STORE;
+        const RESULTS_KEY = FakeApi.STORE + ':results';
         const STATUS = { pass: '✓ Pass', fail: '✗ Fail', '': 'Not played' };
         const ICON = {
             pass: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',

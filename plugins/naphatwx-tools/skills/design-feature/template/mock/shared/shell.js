@@ -3,10 +3,10 @@
 
 var Shell = (function () {
     const root = document.documentElement;
-    try { if (localStorage.getItem('mock:theme') === 'light') root.classList.remove('dark'); } catch { /* storage blocked */ }
+    try { if (localStorage.getItem('naphatwx:mock:theme') === 'light') root.classList.remove('dark'); } catch { /* storage blocked */ }
     function toggleTheme() {
         root.classList.toggle('dark');
-        try { localStorage.setItem('mock:theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch { /* storage blocked */ }
+        try { localStorage.setItem('naphatwx:mock:theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch { /* storage blocked */ }
     }
 
     // ---- app chrome: copy from the app's layout, sidebar and page header components

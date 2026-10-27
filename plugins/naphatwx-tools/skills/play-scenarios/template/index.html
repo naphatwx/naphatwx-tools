@@ -468,7 +468,7 @@
         /* theme:pdf-js:end */
         /* theme:font-size-js:start */
         /* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
-        const FONT_SIZE_KEY = 'naphatwx-font-size';
+        const FONT_SIZE_KEY = 'naphatwx:font-size';
         function applyFontSize(size) {
             if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
             else delete document.documentElement.dataset.fs;
@@ -723,7 +723,7 @@
         }
 
         // ---------------------------------------------------------------- results, per viewer
-        const RESULTS_KEY = `play:${LIVE_CONFIG.slug}:results`;
+        const RESULTS_KEY = `naphatwx:play:${LIVE_CONFIG.slug}:results`;
         let results = {};
         try { results = JSON.parse(localStorage.getItem(RESULTS_KEY)) || {}; } catch { }
         // results recorded by the AI (results.js); what this viewer clicked wins, and a cleared scenario stays empty
@@ -771,7 +771,7 @@
         }).join('');
         // status comes from the marks, so renderResults() runs the filter again after each Pass / Fail
         const scenarioFilter = addScenarioFilter(document.getElementById('scenario-filter'), {
-            rows: '.scenario[data-sc]', groups: '.scenario-list', storageKey: `play:${LIVE_CONFIG.slug}:filter`,
+            rows: '.scenario[data-sc]', groups: '.scenario-list', storageKey: `naphatwx:play:${LIVE_CONFIG.slug}:filter`,
             statuses: [['pass', 'Pass'], ['fail', 'Fail'], ['left', 'Left'], ['skip', 'Skipped']],
             status: row => byId(row.dataset.sc).skip ? 'skip' : results[row.dataset.sc]?.status || 'left',
         });

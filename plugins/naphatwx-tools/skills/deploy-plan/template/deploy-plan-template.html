@@ -348,7 +348,7 @@ function addExportPdf(target, prepare) {
 /* theme:pdf-js:end */
 /* theme:font-size-js:start */
 /* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
-const FONT_SIZE_KEY = 'naphatwx-font-size';
+const FONT_SIZE_KEY = 'naphatwx:font-size';
 function applyFontSize(size) {
     if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
     else delete document.documentElement.dataset.fs;
@@ -399,7 +399,7 @@ const createElement = (tag, attributes = {}, ...children) => {
 const say = (message) => { const announcer = document.getElementById('announce'); announcer.textContent = ''; setTimeout(() => { announcer.textContent = message; }, 50); };
 
 // Ticks live in this browser only. Storage can throw (private mode), so the page works without it.
-const KEY = 'deploy-plan:' + (DATA && DATA.id || location.pathname);
+const KEY = 'naphatwx:deploy:' + (DATA && DATA.id || location.pathname) + ':ticks';
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
 function save(ticks) { try { localStorage.setItem(KEY, JSON.stringify(ticks)); } catch {} }
 let state = load();

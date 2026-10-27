@@ -70,7 +70,7 @@ function fit(view) {
 const ro = new ResizeObserver((entries) => entries.forEach((e) => fit(e.target)));
 
 function render(mode) {
-    try { localStorage.setItem('gallery-width', mode); } catch {}
+    try { localStorage.setItem('naphatwx:gallery:width', mode); } catch {}
     document.querySelectorAll('.bar button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.w === mode)));
     const widths = mode === 'all' ? WIDTHS : [+mode];
     ro.disconnect();
@@ -87,7 +87,7 @@ function render(mode) {
 
 document.querySelectorAll('.bar button').forEach((b) => b.addEventListener('click', () => render(b.dataset.w)));
 let start = '1920';
-try { start = localStorage.getItem('gallery-width') || start; } catch {}
+try { start = localStorage.getItem('naphatwx:gallery:width') || start; } catch {}
 render(start);
 </script>
 </body>

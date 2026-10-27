@@ -173,12 +173,12 @@
             const [path, query] = location.hash.slice(1).split('?');
             const q = new URLSearchParams(query);
             if (path === '/dev/login') {
-                try { sessionStorage.setItem('preview:user', q.get('as')); } catch { }
+                try { sessionStorage.setItem('naphatwx:play:preview-user', q.get('as')); } catch { }
                 location.replace('#' + q.get('next'));
                 return;
             }
             let user = 'nobody';
-            try { user = sessionStorage.getItem('preview:user') || user; } catch { }
+            try { user = sessionStorage.getItem('naphatwx:play:preview-user') || user; } catch { }
             document.getElementById('route').textContent = location.hash.slice(1) || '/';
             document.getElementById('user').textContent = user;
         }

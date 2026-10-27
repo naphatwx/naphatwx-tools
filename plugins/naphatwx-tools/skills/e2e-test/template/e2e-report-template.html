@@ -459,7 +459,7 @@ function addExportPdf(target, prepare) {
 /* theme:pdf-js:end */
 /* theme:font-size-js:start */
 /* Synced from theme/font-size.js by theme/sync.mjs. Do not edit here. */
-const FONT_SIZE_KEY = 'naphatwx-font-size';
+const FONT_SIZE_KEY = 'naphatwx:font-size';
 function applyFontSize(size) {
     if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
     else delete document.documentElement.dataset.fs;
@@ -968,7 +968,7 @@ function render() {
   place();
   // Default order is use-cases.js order, the same tree every skill shows; Failed first lifts failures to the top of each use case.
   addScenarioFilter(filterSlot, {
-    rows: 'section.test', storageKey: 'e2e-filter:' + DATA.name, statuses: STATUSES,
+    rows: 'section.test', storageKey: 'naphatwx:e2e:' + DATA.name + ':filter', statuses: STATUSES,
     flag: flaggedTests ? (box) => box.dataset.flags !== '0' : null,
     sort: { label: 'Failed first', run: (on) => { failedFirst = on; place(); } },
     after() {

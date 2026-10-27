@@ -1,7 +1,7 @@
 /* Text size picker: three "A" buttons (small / medium / large), saved in localStorage so every page opens at the same size.
    addFontSize(target) appends it to target, or to the bottom-right .float-bar (made if the page has none). Returns the picker.
    Call it before addExportPdf, so Export PDF stays last. Embedded diagram frames follow the host page's choice live. */
-const FONT_SIZE_KEY = 'naphatwx-font-size';
+const FONT_SIZE_KEY = 'naphatwx:font-size';
 function applyFontSize(size) {
     if (size === 'small' || size === 'large') document.documentElement.dataset.fs = size;
     else delete document.documentElement.dataset.fs;
