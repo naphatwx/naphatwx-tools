@@ -109,3 +109,12 @@ To disable it, add this to your `~/.claude/settings.json` and start a new sessio
 
 - Full rules: `plugins/naphatwx-tools/hooks/response-rules.md` (loaded once at session start).
 - A short reminder is added to every prompt.
+
+## 🏷️ Herdr Tab Name Hook
+
+When Claude Code runs inside [herdr](https://herdr.dev), the herdr tab takes the Claude session name. Claude Code only.
+
+- Name: the `/rename` title, else Claude's auto title.
+- Updates when you send a prompt and when Claude ends a reply. A `/rename` shows on the next prompt or reply end.
+- Renames only the tab Claude runs in (`$HERDR_TAB_ID`). Outside herdr it does nothing.
+- Script: `plugins/naphatwx-tools/hooks/herdr-tab-name.sh`.

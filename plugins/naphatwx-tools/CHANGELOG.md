@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.259
+
+**Herdr tab follows the Claude session name**
+
+- New Claude Code hook `hooks/herdr-tab-name.sh`, on `UserPromptSubmit` and `Stop`.
+    - Inside herdr, it renames the current tab to the session name: the `/rename` title, else Claude's auto title.
+    - Outside herdr it does nothing.
+
 ## 1.9.252
 
 **Text size picker is back: A / A / A on every page**
