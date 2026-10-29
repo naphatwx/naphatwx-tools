@@ -93,6 +93,21 @@ Add `-g` to install for your user instead of the current project. Drop the `-a` 
 
 ---
 
+## 🧭 Hooks at a Glance
+
+All three are off by default.
+
+| | Response rules | Herdr tab name | Herdr Claude tab |
+|---|---|---|---|
+| What it is | Claude Code hook | Claude Code hook | herdr plugin |
+| Who runs it | Claude Code | Claude Code | herdr |
+| When it runs | Session start + every prompt | Every prompt + every reply end | Every new herdr tab |
+| How to turn on | `NAPHATWX_RESPONSE_RULES=1` in `~/.claude/settings.json` | `NAPHATWX_HERDR_TAB_NAME=1` in `~/.claude/settings.json` | `herdr plugin link <repo>/plugins/naphatwx-tools/hooks/herdr-claude-tab` |
+| Needs | `bash`, `cat` | `bash`, `grep`, `tail`, `jq`, herdr | `sh`, `python3`, herdr |
+| macOS | ✅ Works, tested | ✅ Works, tested | ✅ Works, tested |
+| Linux | ✅ Should work, not tested | ✅ Should work, not tested | ✅ Should work, not tested |
+| Windows | ✅ Should work through Git Bash, not tested | ⚠️ Only with `jq` installed (`winget install jqlang.jq`), not tested | ❌ Does not run: no PowerShell script, and `platforms` skips Windows |
+
 ## 🧩 Response Rules Hook
 
 The plugin ships a hook that injects chat formatting rules (plain language, lists only). It is **off by default** and works in Claude Code only.
@@ -129,3 +144,19 @@ To turn it on, add this to your `~/.claude/settings.json` and start a new sessio
 - Updates when you send a prompt and when Claude ends a reply. A `/rename` shows on the next prompt or reply end.
 - Renames only the tab Claude runs in (`$HERDR_TAB_ID`). Outside herdr it does nothing.
 - Script: `plugins/naphatwx-tools/hooks/herdr-tab-name.sh`.
+
+## 🤖 Herdr Claude Tab Plugin
+
+A [herdr](https://herdr.dev) plugin: every new herdr tab starts `claude` in its pane. Split panes stay plain shells. It is **off by default**.
+
+To turn it on, link it into herdr from your clone of this repo:
+
+```bash
+herdr plugin link <repo>/plugins/naphatwx-tools/hooks/herdr-claude-tab
+```
+
+- New workspaces and worktrees also open a tab, so they start Claude too.
+- Turn off for now: `herdr plugin disable naphatwx.claude-tab` (back on: `enable`).
+- Remove: `herdr plugin unlink naphatwx.claude-tab`.
+- herdr runs the files from your clone, so a `git pull` updates it.
+- Files: `plugins/naphatwx-tools/hooks/herdr-claude-tab/` (`herdr-plugin.toml`, `start-claude.sh`).

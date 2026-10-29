@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.262
+
+**New herdr tabs can start Claude on their own**
+
+- New herdr plugin `hooks/herdr-claude-tab/` (`naphatwx.claude-tab`). It runs `claude` in every new herdr tab (`tab.created`). Split panes stay plain shells.
+- Off by default. Turn it on with `herdr plugin link <repo>/plugins/naphatwx-tools/hooks/herdr-claude-tab`.
+
 ## 1.9.260
 
 **Both hooks are now opt-in**

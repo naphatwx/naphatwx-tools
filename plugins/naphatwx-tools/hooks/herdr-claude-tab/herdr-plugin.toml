@@ -1,0 +1,10 @@
+id = "naphatwx.claude-tab"
+name = "Claude Tab"
+version = "0.1.0"
+min_herdr_version = "0.8.0"
+description = "Start claude in every new tab"
+platforms = ["macos", "linux"]
+
+[[events]]
+on = "tab.created"
+command = ["sh", "start-claude.sh"]
