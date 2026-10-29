@@ -95,14 +95,14 @@ Add `-g` to install for your user instead of the current project. Drop the `-a` 
 
 ## 🧩 Response Rules Hook
 
-The plugin ships a hook that injects chat formatting rules (plain language, lists only). It is **on by default** and works in Claude Code only.
+The plugin ships a hook that injects chat formatting rules (plain language, lists only). It is **off by default** and works in Claude Code only.
 
-To disable it, add this to your `~/.claude/settings.json` and start a new session:
+To turn it on, add this to your `~/.claude/settings.json` and start a new session:
 
 ```json
 {
     "env": {
-        "NAPHATWX_RESPONSE_RULES": "0"
+        "NAPHATWX_RESPONSE_RULES": "1"
     }
 }
 ```
@@ -112,7 +112,18 @@ To disable it, add this to your `~/.claude/settings.json` and start a new sessio
 
 ## 🏷️ Herdr Tab Name Hook
 
-When Claude Code runs inside [herdr](https://herdr.dev), the herdr tab takes the Claude session name. Claude Code only.
+When Claude Code runs inside [herdr](https://herdr.dev), the herdr tab takes the Claude session name. It is **off by default** and works in Claude Code only.
+
+To turn it on, add this to your `~/.claude/settings.json` and start a new session:
+
+```json
+{
+    "env": {
+        "NAPHATWX_HERDR_TAB_NAME": "1"
+    }
+}
+```
+
 
 - Name: the `/rename` title, else Claude's auto title.
 - Updates when you send a prompt and when Claude ends a reply. A `/rename` shows on the next prompt or reply end.

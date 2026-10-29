@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.260
+
+**Both hooks are now opt-in**
+
+- Response rules and the herdr tab name hook are off by default.
+- Turn each on in `~/.claude/settings.json` under `env`, then start a new session:
+    - `NAPHATWX_RESPONSE_RULES=1`
+    - `NAPHATWX_HERDR_TAB_NAME=1`
+- Breaking: anyone who relied on response rules being on by default must now set `NAPHATWX_RESPONSE_RULES=1`.
+
 ## 1.9.259
 
 **Herdr tab follows the Claude session name**

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Injects the chat response rules: full ruleset on SessionStart, a short reminder per prompt.
-# On by default; set NAPHATWX_RESPONSE_RULES=0 to turn it off.
+# Off by default; set NAPHATWX_RESPONSE_RULES=1 to turn it on.
 
-[ "${NAPHATWX_RESPONSE_RULES:-1}" = "0" ] && exit 0
+[ "${NAPHATWX_RESPONSE_RULES:-0}" = "1" ] || exit 0
 
 case "${1:-}" in
     session)
