@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.263
+
+**Herdr tab name hook does less work**
+
+- `hooks/herdr-tab-name.sh` now runs on `Stop` only, not on every prompt.
+- It reads the session title from herdr (the pane's terminal title), not from the transcript, and renames the tab only when the title changed.
+- No `jq` needed anymore, so it should also work on Windows through Git Bash.
+- A `/rename` now shows on the tab after the next reply ends.
+
 ## 1.9.262
 
 **New herdr tabs can start Claude on their own**
