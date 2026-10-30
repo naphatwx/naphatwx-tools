@@ -623,7 +623,8 @@ tr:target > td { background: var(--accent-soft); }
 .filter-search input::placeholder { color: var(--text-3); }
 .filter-search input::-webkit-search-cancel-button { display: none; }
 .filter-dock:focus-within { border-color: var(--accent); }
-.filter-chips { display: flex; align-items: center; gap: 4px; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+.filter-chips:empty { display: none; }
 .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px 3px 10px; font: inherit; color: var(--accent); white-space: nowrap; background: var(--accent-fill); border: 1px solid var(--accent); border-radius: 999px; cursor: pointer; }
 /* .filter-dock prefix: outranks a page's own button:hover rule */
 .filter-dock .filter-chip:hover { background: var(--accent-soft); }

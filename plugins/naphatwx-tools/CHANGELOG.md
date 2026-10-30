@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.264
+
+**Filter chips get their own row**
+
+- Picked filters now show as chips in a row under the search box, not inside it.
+- Many chips wrap onto new lines instead of covering the count and Clear button.
+- The scenario rows move down as the chips row grows, so the bar never hides the first row.
+
 ## 1.9.263
 
 **Herdr tab name hook does less work**

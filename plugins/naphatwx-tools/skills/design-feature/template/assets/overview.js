@@ -108,9 +108,9 @@ function addScenarioFilter(anchor, options) {
     wrap.append(dock);
     anchor.replaceWith(wrap);
     const bar = make('<div class="filter-bar"></div>');
-    const field = make(`<label class="filter-search">${ICON_SEARCH}<span class="filter-chips"></span><input type="search" placeholder="Filter scenarios" aria-label="Filter scenarios by title"><kbd class="filter-key" title="Press / to search">/</kbd></label>`);
+    const field = make(`<label class="filter-search">${ICON_SEARCH}<input type="search" placeholder="Filter scenarios" aria-label="Filter scenarios by title"><kbd class="filter-key" title="Press / to search">/</kbd></label>`);
     const input = field.querySelector('input');
-    const chips = field.querySelector('.filter-chips');
+    const chips = make('<div class="filter-chips"></div>');
     const count = make('<span class="filter-count" aria-live="polite"></span>');
     const clear = make('<button type="button" class="filter-action filter-clear" hidden>Clear</button>');
     bar.append(field, make('<span class="filter-sep"></span>'), count, clear);
@@ -134,7 +134,9 @@ function addScenarioFilter(anchor, options) {
     };
     groups.forEach(([key, label, items]) => addGroup(key, label, items));
     if (hasCore) addGroup('core', 'Core', [['', 'Core only']]);
-    dock.append(bar, panel);
+    dock.append(bar, chips, panel);
+    // the wrap keeps the closed dock's height (bar + chips), so the rows below move down as chips wrap
+    new ResizeObserver(() => { if (dock.offsetHeight) wrap.style.height = `${dock.offsetHeight - panel.offsetHeight}px`; }).observe(dock);
 
     input.value = state.search;
     input.addEventListener('input', () => { state.search = input.value.trim().toLowerCase(); apply(); });
@@ -181,7 +183,8 @@ function addScenarioFilter(anchor, options) {
         });
         chips.replaceChildren(...active().map(({ key, value, label }) => {
             const chip = make(`<button type="button" class="filter-chip" aria-label="Remove ${label}">${label}${ICON_X}</button>`);
-            chip.onclick = (event) => { event.preventDefault(); toggle(key, value); };
+            // stop: the chip is gone by the time the outside-click check runs
+            chip.onclick = (event) => { event.stopPropagation(); toggle(key, value); };
             return chip;
         }));
         clear.hidden = !active().length && !state.search;
