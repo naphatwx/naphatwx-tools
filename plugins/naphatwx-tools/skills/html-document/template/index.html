@@ -220,611 +220,477 @@
         .fs-picker .fs-btn.active { background: var(--accent-soft); color: var(--accent); }
         /* theme:font-size:end */
 
-        /* ============ TYPE SCALE ============ */
+        /* ============ PAGE: same rail + sheet layout as design-feature's overview ============ */
         :root {
-            /* --fs-body, --fs-code, --fs-tag and the heading steps come from the theme, so text matches every other page */
-            --fs-icon: 1.25rem;
+            --measure: var(--page-w);
+            --rail-w: 320px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
+        * { margin: 0; padding: 0; }
+        html { font-size: 16px; scroll-behavior: smooth; scroll-padding-top: 20px; }
+        body { font: var(--fs-body)/1.55 var(--sans); }
+        a { text-decoration: none; }
+        a:hover { text-decoration: underline; text-underline-offset: 3px; }
+        :focus-visible { border-radius: 4px; }
+        code, kbd { font-size: var(--fs-code); }
+        :is(h1, h2, h3, h4) code { font-size: inherit; }
+        code { color: var(--text); }
+        strong { color: var(--text); font-weight: 600; }
+        .aside { color: var(--text-2); }
+        .muted { color: var(--text-3); }
+        .skip {
+            position: fixed; top: 12px; left: 12px; z-index: 60;
+            padding: 8px 14px; border-radius: var(--radius); background: var(--accent); color: var(--bg); font-weight: 600;
+            transform: translateY(-200%);
         }
+        .skip:focus { transform: none; }
 
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--line-3);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-size: var(--fs-body);
-            line-height: 1.6;
-        }
-
-        /* ============ LAYOUT ============ */
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ============ SIDEBAR ============ */
-        .sidebar {
-            width: 270px;
-            flex-shrink: 0;
+        /* ============ RAIL (always open; the edge button or "[" hides it) ============ */
+        .rail {
+            position: fixed; inset: 0 auto 0 0; z-index: 20;
+            width: var(--rail-w);
+            padding: 20px 0 24px;
             background: var(--surface);
             border-right: 1px solid var(--line);
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
-            padding: 20px 14px 40px;
+            overflow: hidden auto;
         }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 10px 18px;
-            font-weight: 600;
-            font-size: var(--fs-lead);
+        .rail-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rail-brand {
+            display: flex; align-items: center; gap: 12px;
+            padding: 0 18px 0 19px; margin-bottom: 18px;
+            color: var(--text); font: 600 var(--fs-body)/1 var(--sans);
         }
-
-        .brand .logo {
-            /* fixed square — never squeezed by a long brand name */
-            flex: 0 0 24px;
-            width: 24px;
-            height: 24px;
-            aspect-ratio: 1;
-            border-radius: var(--radius);
-            background: var(--accent);
-            display: grid;
-            place-items: center;
-            color: var(--bg);
-            font-size: var(--fs-sm);
-            font-weight: 700;
+        .rail-mark {
+            flex: none; display: grid; place-items: center;
+            width: 26px; height: 26px; border-radius: var(--radius);
+            background: var(--text); color: var(--bg); font-size: var(--fs-sm); font-weight: 700;
         }
-
-        .nav-search {
-            width: 100%;
-            background: var(--surface-2);
-            border: 1px solid var(--line);
-            border-radius: var(--radius-md);
-            padding: 8px 12px;
-            color: var(--text);
-            font-size: var(--fs-meta);
-            margin-bottom: 18px;
-            outline: none;
+        .rail-search { display: block; padding: 0 14px; margin-bottom: 12px; }
+        .rail-search input {
+            width: 100%; height: 34px; padding: 0 10px;
+            background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius-md);
+            color: var(--text); font: var(--fs-body) var(--sans);
         }
-
-        .nav-search:focus {
-            border-color: var(--accent);
-        }
-
-        .nav-search::placeholder {
-            color: var(--text-3);
-        }
-
-        .nav-group {
-            margin-bottom: 18px;
-        }
-
-        .nav-group-title {
-            font-size: var(--fs-tag);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--text-3);
-            padding: 6px 10px;
-            font-weight: 600;
-        }
-
-        .nav-link {
-            display: block;
-            padding: 6px 10px;
-            font-size: var(--fs-meta);
-            border-radius: 7px;
-            color: var(--text-2);
+        .rail-search input::placeholder { color: var(--text-3); }
+        .rail-list, .rail-list ol { list-style: none; padding: 0; }
+        .rail-list li { margin: 0; }
+        .rail-list a {
+            display: flex; align-items: baseline; gap: 8px;
+            padding: 9px 16px 9px 20px;
+            color: var(--text-2); font-size: var(--fs-body); line-height: 1.4;
             text-decoration: none;
-            transition: background 0.12s, color 0.12s;
         }
+        .rail-list a:hover { color: var(--text); background: var(--hover); }
+        .rail-list .number { flex: none; color: var(--text-3); min-width: 24px; font-variant-numeric: tabular-nums; }
+        .rail-list ol .number { min-width: 32px; }
+        .rail-list ol a { padding-top: 7px; padding-bottom: 7px; padding-left: 40px; }
+        .rail-list a.active { color: var(--accent); background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); font-weight: 600; }
+        .rail-list a.active .number { color: var(--accent); }
+        .rail-list a.hidden { display: none; }
 
-        .nav-link:hover {
-            background: var(--hover);
-            color: var(--text);
-        }
-
-        .nav-link.active {
-            background: var(--accent-soft);
-            color: var(--accent);
-            font-weight: 500;
-        }
-
-        .nav-link.hidden {
-            display: none;
-        }
-
-        /* ============ MAIN ============ */
-        .main {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 12px;
-            padding: 14px 40px;
-            background: color-mix(in srgb, var(--bg) 80%, transparent);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--line);
-        }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: auto;
-        }
-
-        .export-pdf {
-            height: 32px;
-            padding: 0 12px;
-            border: 1px solid var(--line);
-            border-radius: var(--radius-md);
-            background: var(--surface-2);
-            color: var(--text);
-            font: inherit;
-            font-size: var(--fs-body);
+        /* round button riding the rail's right edge */
+        .rail-edge {
+            position: fixed; top: 50%; left: calc(var(--rail-w) - 19px); z-index: 40;
+            transform: translateY(-50%);
+            width: 38px; height: 38px; border-radius: 50%;
+            display: grid; place-items: center;
+            border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
             cursor: pointer;
+            transition: left 0.2s var(--ease), color 0.12s, background 0.12s;
         }
+        .rail-edge:hover { color: var(--text); background: var(--hover); }
+        .rail-edge svg { width: 19px; height: 19px; transition: transform 0.2s var(--ease); }
+        html[data-rail="collapsed"] .rail { visibility: hidden; }
+        html[data-rail="collapsed"] .rail-edge { left: 8px; }
+        html[data-rail="collapsed"] .rail-edge svg { transform: rotate(180deg); }
 
-        .export-pdf:hover {
-            background: var(--hover);
-        }
+        /* ============ SHEET ============ */
+        .sheet { margin-left: var(--rail-w); padding: 40px 32px 120px; }
+        html[data-rail="collapsed"] .sheet { margin-left: 0; }
+        .slide { max-width: var(--measure); margin: 0 auto; }
+        .slide + .slide { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
 
-        /* PDF: the article alone, full width; no sidebar or top bar. */
-        @media print {
-            .sidebar, .topbar {
-                display: none !important;
-            }
+        .kicker { font-size: var(--fs-meta); color: var(--text-3); margin-bottom: 8px; }
+        h1 { font-size: var(--fs-h1); line-height: 1.08; letter-spacing: -0.025em; color: var(--text); font-weight: 650; text-wrap: balance; }
+        h2 { font-size: var(--fs-h2); line-height: 1.2; letter-spacing: -0.015em; color: var(--text); font-weight: 600; margin-bottom: 12px; }
+        h3 { font-size: var(--fs-h3); line-height: 1.3; color: var(--text); font-weight: 600; margin: 24px 0 8px; scroll-margin-top: 20px; }
+        h4 { font-size: var(--fs-body); color: var(--text); font-weight: 600; margin: 20px 0 8px; }
+        .section-number { color: var(--text-3); margin-right: 14px; font-variant-numeric: tabular-nums; }
+        h3 .section-number { margin-right: 10px; }
+        .lead { font-size: var(--fs-lead); line-height: 1.5; color: var(--text); margin-top: 8px; }
+        p { color: var(--text); }
+        p + p { margin-top: 8px; }
+        ul, ol { padding-left: 1.2em; margin: 8px 0; color: var(--text); }
+        li + li { margin-top: 2px; }
+        li::marker { color: var(--text-3); }
 
-            .content {
-                max-width: none;
-                padding: 16px;
-            }
-        }
-
-        .content {
-            max-width: var(--max-w-5xl);
-            margin: 0 auto;
-            padding: 40px 40px 120px;
-        }
-
-        /* ============ TYPOGRAPHY ============ */
-        .eyebrow {
-            font-size: var(--fs-meta);
-            color: var(--accent);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .content h1 {
-            font-size: var(--fs-h1);
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-            margin-bottom: 14px;
-        }
-
-        .content h2 {
-            font-size: var(--fs-h2);
-            font-weight: 650;
-            letter-spacing: -0.01em;
-            margin: 44px 0 14px;
-            padding-top: 12px;
-            scroll-margin-top: 80px;
-        }
-
-        .content h3 {
-            font-size: var(--fs-h3);
-            font-weight: 600;
-            margin: 30px 0 10px;
-            scroll-margin-top: 80px;
-        }
-
-        .lead {
-            font-size: var(--fs-lead);
-            color: var(--text-2);
-            margin-bottom: 8px;
-        }
-
-        .content p {
-            margin: 12px 0;
-            color: var(--text-2);
-        }
-
-        .content a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .content a:hover {
-            text-decoration: underline;
-        }
-
-        .content ul,
-        .content ol {
-            margin: 12px 0;
-            padding-left: 22px;
-            color: var(--text-2);
-        }
-
-        .content li {
-            margin: 6px 0;
-        }
-
-        .content li::marker {
-            color: var(--text-3);
-        }
-
-        .content strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        /* inline + block code */
-        code {
-            font-size: var(--fs-code);
-            background: var(--surface-2);
-            border: 1px solid var(--line);
-            border-radius: 5px;
-            padding: 1.5px 6px;
-            color: var(--text);
-        }
+        .facts { display: grid; grid-template-columns: 9.5rem 1fr; gap: 4px 24px; margin-top: 20px; }
+        .facts dt { padding-top: 2px; }
+        .facts dd { color: var(--text); overflow-wrap: anywhere; }
+        h2 + .facts { margin-top: 0; }
 
         pre {
-            background: var(--surface-2);
-            border: 1px solid var(--line);
-            border-radius: var(--radius-lg);
-            padding: 16px 18px;
-            overflow-x: auto;
-            margin: 16px 0;
+            margin: 12px 0; padding: 14px 16px; overflow-x: auto;
+            background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
         }
+        pre code { font-size: var(--fs-code); line-height: 1.6; }
 
-        pre code {
-            background: none;
-            border: none;
-            padding: 0;
-            font-size: var(--fs-code);
-            line-height: 1.6;
+        /* tinted band with a mono label, like the overview's blocker line */
+        .callout { margin: 12px 0; padding: 8px 14px; border-radius: var(--radius-lg); background: var(--accent-soft); color: var(--text); }
+        .callout > strong:first-child { display: inline-block; margin-right: 8px; color: var(--accent); font: 600 var(--fs-code)/1.4 var(--mono); }
+        .callout.warn { background: var(--warn-soft); }
+        .callout.warn > strong:first-child { color: var(--warn); }
+        .callout.danger { background: var(--bad-soft); }
+        .callout.danger > strong:first-child { color: var(--bad); }
+
+        /* numbered steps: mono counter column, like the overview's open questions */
+        .steps { list-style: none; padding: 0; counter-reset: step; }
+        .steps > li { counter-increment: step; display: grid; grid-template-columns: 2rem 1fr; gap: 2px 8px; padding: 8px 0; border-bottom: 1px solid var(--line); margin: 0; }
+        .steps > li::before { content: counter(step); grid-row: span 2; font: 500 var(--fs-code)/1.65 var(--mono); color: var(--text-3); }
+        .steps > li > :not(strong) { grid-column: 2; }
+
+        .pill { font: 500 var(--fs-code)/1 var(--sans); text-transform: uppercase; padding: 4px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+        .pill.quiet { background: var(--surface-2); color: var(--text-2); }
+
+        details.more { margin-top: 20px; border-top: 1px solid var(--line); }
+        details.more > summary {
+            list-style: none; cursor: pointer; padding: 8px 0;
+            color: var(--text); font-weight: 500;
+            display: flex; align-items: baseline; gap: 12px;
         }
+        details.more > summary::-webkit-details-marker { display: none; }
+        details.more > summary::before { content: "+"; font-family: var(--mono); color: var(--text-2); width: 12px; }
+        details.more[open] > summary::before { content: "−"; }
+        details.more > summary .aside { font-size: var(--fs-meta); font-weight: 400; }
+        details.more > summary:hover { color: var(--accent); }
+        details.more > :not(summary) { margin-bottom: 12px; }
 
-        /* ============ CALLOUT ============ */
-        .callout {
-            display: flex;
-            gap: 12px;
-            border: 1px solid var(--line);
-            border-left: 3px solid var(--accent);
-            background: var(--accent-soft);
-            border-radius: var(--radius-lg);
-            padding: 14px 16px;
-            margin: 18px 0;
-            color: var(--text-2);
+        .table-wrap { overflow-x: auto; margin: 12px 0; }
+        table { width: 100%; border-collapse: collapse; font-size: var(--fs-body); }
+        th { text-align: left; padding: 0 16px 6px 0; border-bottom: 1px solid var(--line-strong); }
+        td { padding: 6px 16px 6px 0; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
+        td .aside { font-size: var(--fs-meta); }
+
+        /* ============ DIAGRAMS: inline SVG drawn at 1:1 (labels 14px, secondary 12px); a wider one scrolls in its box ============ */
+        .flowchart, .sequence {
+            margin: 12px 0; padding: 16px; overflow: auto hidden;
+            background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl);
         }
+        .flowchart svg, .sequence svg { display: block; max-width: none; height: auto; margin: 0 auto; font-family: var(--sans); }
+        .flowchart .connector { fill: none; stroke: var(--connector); stroke-width: 1.6; }
+        .flowchart .arrowhead { fill: var(--connector); }
+        .flowchart .exit { fill: var(--text-3); font-size: var(--fs-dia-sub); }
+        .flowchart .edge-label-background { fill: var(--surface); }
+        .flowchart .node text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; text-anchor: middle; }
+        .flowchart .node .detail { fill: var(--text-2); font-family: var(--mono); font-size: var(--fs-dia-sub); font-weight: 400; }
+        .flowchart .pill { fill: var(--bg); stroke: var(--line-3); stroke-width: 1.4; }
+        .flowchart .box { fill: var(--surface-3); stroke: var(--line-strong); stroke-width: 1.2; }
+        .flowchart .decision { fill: var(--accent-fill); stroke: var(--accent); stroke-width: 1.4; }
+        /* theme:seq:start */
+        /* Synced from theme/seq.css by theme/sync.mjs. Do not edit here. */
+        .sequence .actor rect { fill: var(--surface-2); stroke: var(--line-strong); }
+        .sequence .actor text { fill: var(--text); font-size: var(--fs-dia); font-weight: 600; }
+        .sequence .actor .subtitle { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 400; }
+        .sequence .lifeline { stroke: var(--line-strong); stroke-dasharray: 3 4; }
+        .sequence .message { stroke: var(--text-2); stroke-width: 1.4; fill: none; }
+        .sequence .message.return { stroke-dasharray: 5 4; stroke: var(--text-3); }
+        .sequence .message.hot { stroke: var(--accent); stroke-width: 1.8; }
+        .sequence .label-text { fill: var(--text-2); font-size: var(--fs-dia); font-family: var(--mono); }
+        .sequence .label-text.hot { fill: var(--accent); }
+        .sequence .edge-label-background { fill: var(--surface); }
+        .sequence .number { fill: var(--text-3); font-size: var(--fs-dia-sub); font-weight: 600; }
+        .sequence .phase line { stroke: var(--line); }
+        .sequence .phase rect { fill: var(--surface-2); }
+        .sequence .phase text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-weight: 600; }
+        .sequence .note rect { fill: var(--bg); stroke: var(--line-strong); }
+        .sequence .note text { fill: var(--text-2); font-size: var(--fs-dia-sub); font-family: var(--mono); }
+        .sequence .frame rect.box { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
+        .sequence .frame rect.tab { fill: var(--surface-2); stroke: var(--line-strong); }
+        .sequence .frame text { fill: var(--text); font-size: var(--fs-dia-sub); font-weight: 700; }
+        .sequence .frame .condition { fill: var(--text-3); font-weight: 500; font-style: italic; }
+        .sequence .frame line { stroke: var(--line-strong); stroke-dasharray: 6 4; }
+        .sequence .arrowhead { fill: var(--text-2); }
+        .sequence .arrowhead.return { fill: var(--text-3); }
+        .sequence .arrowhead.hot { fill: var(--accent); }
+        /* theme:seq:end */
 
-        .callout .icon {
-            flex-shrink: 0;
-            font-size: var(--fs-icon);
+        /* ============ TABLE CARDS: data model, request / response; state marks come from the theme ============ */
+        .legend { display: flex; gap: 20px; margin: 16px 0 8px; font: var(--fs-code) var(--mono); }
+        .legend .add { color: var(--add); }
+        .legend .change { color: var(--change); }
+        .legend .drop { color: var(--drop); }
+        .tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; align-items: start; margin: 12px 0; }
+        .table-card { border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+        .table-card-head {
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px;
+            padding: 7px 12px; border-bottom: 1px solid var(--line);
+            font: 600 var(--fs-code) var(--mono); color: var(--text);
         }
-
-        .callout.warn {
-            border-left-color: var(--warn);
-            background: var(--warn-soft);
+        .table-card-head > :first-child { min-width: 0; overflow-wrap: break-word; }
+        .table-card-head .tag { margin-left: auto; }
+        .tag { flex: none; white-space: nowrap; font: 500 var(--fs-meta) var(--sans); color: var(--text-2); }
+        .row {
+            display: grid; grid-template-columns: minmax(14ch, max-content) minmax(0, 1fr) auto; align-items: baseline; gap: 2px 16px;
+            padding: 3px 12px; font: var(--fs-code)/1.5 var(--mono);
         }
+        .row + .row { border-top: 1px solid var(--line); }
+        .row .column { min-width: 0; color: var(--text); font-weight: 500; overflow-wrap: anywhere; }
+        .row .type { min-width: 0; color: var(--text-2); overflow-wrap: anywhere; }
+        .row .key { color: var(--text-3); font: inherit; white-space: nowrap; text-align: right; }
+        /* theme:diff:start */
+        /* Synced from theme/diff.css by theme/sync.mjs. Do not edit here. */
+        /* Card state shows three ways, not by color alone: a gutter bar, a tinted head and a signed pill */
+        .table-card:is(.add, .drop) { position: relative; }
+        .table-card.add { border-color: var(--add); }
+        .table-card.drop { border-color: var(--drop); }
+        .table-card.external { border-style: dashed; }
+        .table-card:is(.add, .drop)::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--add); }
+        .table-card.drop::before { background: var(--drop); }
+        .table-card:is(.add, .drop) :is(.table-card-head, .row) { padding-left: 16px; }
+        .table-card.add .table-card-head { background: var(--ok-soft); }
+        .table-card.drop .table-card-head { background: var(--bad-soft); }
+        .table-card.drop :is(.table-card-head > :first-child, .table-card-name) { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+        .table-card.drop .row { opacity: 0.55; }
+        .table-card:is(.add, .drop, .change) .tag { align-self: center; padding: 4px 8px; border-radius: 999px; font: 700 var(--fs-tag)/1 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+        .table-card.add .tag { color: var(--bg); background: var(--add); }
+        .table-card.drop .tag { color: var(--bg); background: var(--drop); }
+        .table-card.change .tag { padding: 3px 7px; border: 1px solid var(--change); color: var(--change); }
+        .table-card.add .tag::before { content: "+ "; }
+        .table-card.drop .tag::before { content: "− "; }
+        .table-card.change .tag::before { content: "~ "; }
+        /* Changed rows: tinted, name and key in the mark's color; a dropped row is struck through */
+        .table-card .row.add { background: var(--ok-soft); }
+        .table-card .row.change { background: var(--warn-soft); }
+        .table-card .row.drop { background: var(--bad-soft); }
+        .table-card .row.add :is(.column, .key) { color: var(--add); }
+        .table-card .row.change :is(.column, .key) { color: var(--change); }
+        .table-card .row.drop :is(.column, .type, .key) { color: var(--drop); }
+        .table-card .row.drop :is(.column, .type) { text-decoration: line-through; text-decoration-thickness: 1px; }
+        /* Legend swatches */
+        .legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: middle; border: 1.5px solid var(--line-3); border-radius: 3px; }
+        .legend i.add { border-color: var(--add); background: var(--ok-soft); box-shadow: inset 3px 0 var(--add); }
+        .legend i.drop { border-color: var(--drop); background: var(--bad-soft); box-shadow: inset 3px 0 var(--drop); }
+        .legend i.external { border-style: dashed; }
+        /* SVG (ER diagram): the same classes. Text fills with currentColor, so the color rules above apply */
+        svg .table-card text { fill: currentColor; }
+        svg .table-card-box { fill: var(--surface-2); stroke: var(--line-3); stroke-width: 1.2; }
+        svg .table-card:is(.add, .drop) > .table-card-box { stroke: var(--add); stroke-width: 1.6; }
+        svg .table-card.drop > .table-card-box { stroke: var(--drop); }
+        svg .table-card.external > .table-card-box { stroke-dasharray: 5 4; }
+        svg .table-card-head { fill: var(--surface-3); }
+        svg .table-card.add > .table-card-head { fill: var(--ok-soft); }
+        svg .table-card.drop > .table-card-head { fill: var(--bad-soft); }
+        svg .table-card-bar { fill: var(--add); }
+        svg .table-card.drop .table-card-bar { fill: var(--drop); }
+        svg .tag > rect { fill: none; stroke: var(--change); }
+        svg .table-card.add .tag > rect { fill: var(--add); stroke: none; }
+        svg .table-card.drop .tag > rect { fill: var(--drop); stroke: none; }
+        svg .table-card .row > .row-background { fill: transparent; }
+        svg .table-card .row.add > .row-background { fill: var(--ok-soft); }
+        svg .table-card .row.change > .row-background { fill: var(--warn-soft); }
+        svg .table-card .row.drop > .row-background { fill: var(--bad-soft); }
+        /* theme:diff:end */
+        .relation { margin-top: 8px; color: var(--text); overflow-wrap: anywhere; }
+        .cardinality { font-family: var(--mono); color: var(--text-3); margin: 0 6px; }
 
-        .callout.danger {
-            border-left-color: var(--bad);
-            background: var(--bad-soft);
+        /* ============ SMALL SCREENS ============ */
+        .menu {
+            display: none; place-items: center;
+            position: fixed; top: 14px; left: 14px; z-index: 25;
+            width: 40px; height: 40px; border-radius: var(--radius-lg);
+            background: var(--surface); border: 1px solid var(--line-strong); color: var(--text); font-size: var(--fs-lg); cursor: pointer;
         }
-
-        /* ============ CARD GRID ============ */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 14px;
-            margin: 20px 0;
-        }
-
-        .card {
-            border: 1px solid var(--line);
-            background: var(--surface);
-            border-radius: var(--radius-xl);
-            padding: 18px;
-            text-decoration: none;
-            color: inherit;
-            transition: background 0.12s, border-color 0.12s, transform 0.12s;
-        }
-
-        /* beats `.content a`: a card is a block link, not inline accent text */
-        .content a.card {
-            color: var(--text);
-            text-decoration: none;
-        }
-
-        .card:hover {
-            background: var(--hover);
-        }
-
-        .card .icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 9px;
-            border: 1px solid var(--line);
-            display: grid;
-            place-items: center;
-            font-size: var(--fs-icon);
-            margin-bottom: 12px;
-        }
-
-        .card h4 {
-            font-size: var(--fs-body);
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .card p {
-            font-size: var(--fs-meta);
-            color: var(--text-2);
-            margin: 0;
-        }
-
-        /* ============ TABLE ============ */
-        .table-wrap {
-            overflow-x: auto;
-            margin: 18px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--line);
-        }
-
-        th {
-            color: var(--text);
-            font-weight: 600;
-            border-bottom-color: var(--line-strong);
-        }
-
-        td {
-            color: var(--text-2);
-        }
-
-        /* ============ STEPS ============ */
-        .steps {
-            list-style: none;
-            padding: 0;
-            counter-reset: step;
-        }
-
-        .steps>li {
-            position: relative;
-            padding-left: 42px;
-            margin: 0 0 22px;
-            counter-increment: step;
-        }
-
-        .steps>li::before {
-            content: counter(step);
-            position: absolute;
-            left: 0;
-            top: -2px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--accent-soft);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            display: grid;
-            place-items: center;
-            font-size: var(--fs-sm);
-            font-weight: 600;
-        }
-
-        .steps>li strong {
-            display: block;
-            color: var(--text);
-            margin-bottom: 2px;
-        }
-
-        /* ============ MOBILE ============ */
-        .menu-button {
-            display: none;
-        }
-
         @media (max-width: 880px) {
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                z-index: 30;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-            }
+            .rail { z-index: 50; width: min(var(--rail-w), 86vw); transform: translateX(-100%); visibility: visible !important; transition: transform 0.24s var(--ease); }
+            html[data-drawer="open"] .rail { transform: none; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5); }
+            .rail-edge { display: none; }
+            .sheet, html[data-rail="collapsed"] .sheet { margin-left: 0; padding: 84px 16px 120px; }
+            .menu { display: grid; }
+            .facts { grid-template-columns: 1fr; gap: 2px; }
+            .facts dd { margin-bottom: 12px; }
+            :root { --fs-h1: var(--fs-xl); }
+            /* phones: a solid top bar holds ☰ and the tools, so nothing floats over the text */
+            html { scroll-padding-top: 80px; }
+            body::before { content: ""; position: fixed; inset: 0 0 auto; height: 68px; z-index: 24; background: var(--bg); border-bottom: 1px solid var(--line); }
+            .float-bar { top: 14px; right: 14px; bottom: auto; }
+        }
 
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .topbar {
-                justify-content: space-between;
-                padding: 12px 18px;
-            }
-
-            .content {
-                padding: 28px 18px 100px;
-            }
-
-            .menu-button {
-                display: grid;
-                place-items: center;
-                width: 34px;
-                height: 34px;
-                border-radius: var(--radius-md);
-                border: 1px solid var(--line);
-                background: var(--surface-2);
-                color: var(--text);
-                cursor: pointer;
-                font-size: var(--fs-icon);
-            }
+        @media print {
+            .rail, .rail-edge, .menu, .skip { display: none !important; }
+            body::before { display: none; }
+            .sheet, html[data-rail="collapsed"] .sheet { margin-left: 0; padding: 16px; }
+            .slide { max-width: none; }
+            .flowchart, .sequence { overflow: visible; }
+            .flowchart svg, .sequence svg { max-width: 100%; height: auto; }
         }
     </style>
 </head>
 
 <body>
-    <div class="layout">
-        <!-- ============ SIDEBAR ============ -->
-        <aside class="sidebar" id="sidebar">
-            <div class="brand">
-                <span class="logo">D</span>
-                <span>Docs</span>
-            </div>
-
-            <input class="nav-search" id="navSearch" placeholder="Search…" />
-
-            <nav id="nav">
-                <div class="nav-group">
-                    <div class="nav-group-title">Get started</div>
-                    <a class="nav-link" href="#overview">Overview</a>
-                    <a class="nav-link" href="#quickstart">Quickstart</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Core concepts</div>
-                    <a class="nav-link" href="#concepts">Key concepts</a>
-                    <a class="nav-link" href="#how-it-works">How it works</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Reference</div>
-                    <a class="nav-link" href="#reference">API reference</a>
-                    <a class="nav-link" href="#troubleshooting">Troubleshooting</a>
-                </div>
-            </nav>
-        </aside>
-
-        <!-- ============ MAIN ============ -->
-        <div class="main">
-            <header class="topbar">
-                <button class="menu-button" id="menuBtn" aria-label="Menu">☰</button>
-                <div class="topbar-actions">
-                </div>
-            </header>
-
-            <article class="content">
-                <div class="eyebrow">Get started</div>
-                <h1 id="overview">Introducing the documentation</h1>
-                <p class="lead">Find all the guides and resources you need to build with this project.</p>
-
-                <div class="card-grid">
-                    <a class="card" href="#quickstart">
-                        <div class="icon">⚡</div>
-                        <h4>Quickstart</h4>
-                        <p>Get up and running in a few minutes with a guided setup.</p>
-                    </a>
-                    <a class="card" href="#concepts">
-                        <div class="icon">📦</div>
-                        <h4>Core concepts</h4>
-                        <p>Understand the building blocks before you go deeper.</p>
-                    </a>
-                    <a class="card" href="#reference">
-                        <div class="icon">🔌</div>
-                        <h4>API reference</h4>
-                        <p>Dig into every endpoint, parameter, and response shape.</p>
-                    </a>
-                    <a class="card" href="#troubleshooting">
-                        <div class="icon">🛟</div>
-                        <h4>Troubleshooting</h4>
-                        <p>Fixes for the problems people hit most often.</p>
-                    </a>
-                </div>
-
-                <h2 id="quickstart">Quickstart</h2>
-                <p>Follow these steps to get a working setup.</p>
-                <ol class="steps">
-                    <li><strong>Install</strong>Add the package to your project.</li>
-                    <li><strong>Configure</strong>Set your keys and options.</li>
-                    <li><strong>Run</strong>Start the app and confirm it works.</li>
+    <a class="skip" href="#sheet">Skip to content</a>
+    <!-- ============ RAIL: one <li> per section (01, 02 …); sub-sections nest as 2.1, 2.2 … ============ -->
+    <nav class="rail" id="rail" aria-label="Sections">
+        <div class="rail-brand"><span class="rail-mark" aria-hidden="true">D</span><span class="rail-label">Docs</span></div>
+        <label class="rail-search">
+            <span class="sr-only">Search sections</span>
+            <input id="railSearch" type="search" placeholder="Search  /" autocomplete="off">
+        </label>
+        <ol class="rail-list" id="railList">
+            <li><a href="#overview"><span class="number">01</span><span class="rail-label">Overview</span></a></li>
+            <li><a href="#quickstart"><span class="number">02</span><span class="rail-label">Quickstart</span></a></li>
+            <li><a href="#concepts"><span class="number">03</span><span class="rail-label">Key concepts</span></a>
+                <ol>
+                    <li><a href="#workspace"><span class="number">3.1</span><span class="rail-label">Workspace</span></a></li>
+                    <li><a href="#project"><span class="number">3.2</span><span class="rail-label">Project</span></a></li>
                 </ol>
-
-                <pre><code>npm install example-package
+            </li>
+            <li><a href="#how-it-works"><span class="number">04</span><span class="rail-label">How it works</span></a>
+                <ol>
+                    <li><a href="#flow"><span class="number">4.1</span><span class="rail-label">Flow</span></a></li>
+                    <li><a href="#calls"><span class="number">4.2</span><span class="rail-label">Calls</span></a></li>
+                    <li><a href="#data"><span class="number">4.3</span><span class="rail-label">Data</span></a></li>
+                </ol>
+            </li>
+            <li><a href="#reference"><span class="number">05</span><span class="rail-label">API reference</span></a></li>
+            <li><a href="#troubleshooting"><span class="number">06</span><span class="rail-label">Troubleshooting</span></a></li>
+        </ol>
+    </nav>
+    <button class="rail-edge" id="railEdge" type="button" aria-controls="rail" aria-expanded="true" title="Hide index ( [ )" aria-label="Hide index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="11 17 6 12 11 7" />
+            <polyline points="18 17 13 12 18 7" />
+        </svg>
+    </button>
+    <button class="menu" id="menuBtn" type="button" aria-label="Open index">☰</button>
+    <main class="sheet" id="sheet" tabindex="-1">
+        <!-- ============ 01 OVERVIEW ============ -->
+        <section class="slide" id="overview">
+            <p class="kicker"><span class="section-number">01</span>Example project · v1.2</p>
+            <h1>Example project</h1>
+            <p class="lead">One short sentence: what this project does.</p>
+            <dl class="facts">
+                <dt>Install</dt>
+                <dd><code>npm install example-package</code></dd>
+                <dt>Needs</dt>
+                <dd>Node 20 or later.</dd>
+                <dt>Config</dt>
+                <dd><code>example.config.json</code> <a href="#reference">See API reference</a></dd>
+            </dl>
+        </section>
+        <!-- ============ 02 QUICKSTART ============ -->
+        <section class="slide" id="quickstart">
+            <h2><span class="section-number">02</span>Quickstart</h2>
+            <ol class="steps">
+                <li><strong>Install</strong><p>Add the package to your project.</p></li>
+                <li><strong>Configure</strong><p>Set your keys and options.</p></li>
+                <li><strong>Run</strong><p>Start the app and confirm it works.</p></li>
+            </ol>
+            <pre><code>npm install example-package
 example init</code></pre>
-
-                <div class="callout">
-                    <span class="icon">💡</span>
-                    <div>Tip: keep your secret keys out of version control.</div>
+            <p class="callout"><strong>Tip</strong>Keep your secret keys out of version control.</p>
+        </section>
+        <!-- ============ 03 KEY CONCEPTS: each h3 with an id gets a nested rail link ============ -->
+        <section class="slide" id="concepts">
+            <h2><span class="section-number">03</span>Key concepts</h2>
+            <h3 id="workspace"><span class="section-number">3.1</span>Workspace</h3>
+            <p>The top-level container for your work.</p>
+            <h3 id="project"><span class="section-number">3.2</span>Project</h3>
+            <p>A single unit inside a workspace.</p>
+            <ul>
+                <li>The client sends a request.</li>
+                <li>The server checks and runs it.</li>
+            </ul>
+        </section>
+        <!-- ============ 04 HOW IT WORKS: diagrams are inline SVG in the theme. Flowchart: .flowchart; sequence: .sequence; tables: .tables + .table-card ============ -->
+        <section class="slide" id="how-it-works">
+            <h2><span class="section-number">04</span>How it works</h2>
+            <h3 id="flow"><span class="section-number">4.1</span>Flow</h3>
+            <div class="flowchart">
+                <svg viewBox="0 0 600 356" width="600" height="356" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="flow-title">
+                    <title id="flow-title">Open the list: signed in loads it with GET /things, else the sign-in page.</title>
+                    <defs>
+                        <marker id="ah-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="arrowhead" d="M0,0 L10,5 L0,10 z"/></marker>
+                    </defs>
+                    <!-- one marker id per flowchart (ah-1, ah-2 …): a shared id breaks when the first diagram is hidden -->
+                    <!-- connectors first, behind the nodes -->
+                    <g class="connector" marker-end="url(#ah-1)">
+                        <path d="M280,56 V84"/>
+                        <path d="M400,134 H428"/>
+                        <path d="M280,182 V214"/>
+                        <path d="M280,268 V296"/>
+                    </g>
+                    <!-- exit labels center on their segment's midpoint (data-cx); fitDiagramLabels() sizes each box to its text -->
+                    <g class="edge-label" data-cx="414"><rect class="edge-label-background" x="400" y="114" width="28" height="16" rx="3"/><text class="exit" x="414" y="126" text-anchor="middle">No</text></g>
+                    <g class="edge-label" data-cx="280"><rect class="edge-label-background" x="264" y="190" width="32" height="16" rx="3"/><text class="exit" x="280" y="202" text-anchor="middle">Yes</text></g>
+                    <g class="node"><rect class="pill" x="200" y="12" width="160" height="44" rx="22"/><text x="280" y="30">Open the list</text><text class="detail" x="280" y="48">/things</text></g>
+                    <g class="node"><polygon class="decision" points="280,86 400,134 280,182 160,134"/><text x="280" y="129">Signed in?</text><text class="detail" x="280" y="149">session.valid</text></g>
+                    <g class="node"><rect class="pill" x="430" y="112" width="160" height="44" rx="22"/><text x="510" y="130">Sign-in page</text><text class="detail" x="510" y="148">/login</text></g>
+                    <g class="node"><rect class="box" x="200" y="216" width="160" height="52" rx="8"/><text x="280" y="237">Load the list</text><text class="detail" x="280" y="257">GET /things</text></g>
+                    <g class="node"><rect class="pill" x="200" y="298" width="160" height="44" rx="22"/><text x="280" y="316">List shown</text><text class="detail" x="280" y="334">200 OK</text></g>
+                </svg>
+            </div>
+            <h3 id="calls"><span class="section-number">4.2</span>Calls</h3>
+            <div class="sequence">
+                <svg viewBox="0 0 600 212" width="600" height="212" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sequence: the browser calls GET /things, the API reads things, the database returns rows.">
+                    <line class="lifeline" x1="100" x2="100" y1="60" y2="208"/>
+                    <line class="lifeline" x1="300" x2="300" y1="60" y2="208"/>
+                    <line class="lifeline" x1="500" x2="500" y1="60" y2="208"/>
+                    <g class="actor"><rect x="30" y="8" width="140" height="52" rx="8"/><text x="100" y="30" text-anchor="middle">Browser</text><text class="subtitle" x="100" y="49" text-anchor="middle">web app</text></g>
+                    <g class="actor"><rect x="230" y="8" width="140" height="52" rx="8"/><text x="300" y="30" text-anchor="middle">API</text><text class="subtitle" x="300" y="49" text-anchor="middle">things-svc</text></g>
+                    <g class="actor"><rect x="430" y="8" width="140" height="52" rx="8"/><text x="500" y="30" text-anchor="middle">Database</text><text class="subtitle" x="500" y="49" text-anchor="middle">postgres</text></g>
+                    <!-- call: .message; response: .message.return; side effect (a write): .message.hot -->
+                    <g class="step"><line class="message" x1="100" y1="100" x2="292" y2="100"/><path class="arrowhead" d="M299,100 l-9,-4.5 v9 z"/>
+                        <g class="edge-label" data-cx="200"><rect class="edge-label-background" x="150" y="80" width="100" height="18" rx="3"/><text class="label-text" x="200" y="93" text-anchor="middle">GET /things</text><text class="number edge-label-number" x="144" y="93" text-anchor="end">1</text></g></g>
+                    <g class="step"><line class="message" x1="300" y1="140" x2="492" y2="140"/><path class="arrowhead" d="M499,140 l-9,-4.5 v9 z"/>
+                        <g class="edge-label" data-cx="400"><rect class="edge-label-background" x="340" y="120" width="120" height="18" rx="3"/><text class="label-text" x="400" y="133" text-anchor="middle">SELECT things</text><text class="number edge-label-number" x="334" y="133" text-anchor="end">2</text></g></g>
+                    <g class="step"><line class="message return" x1="500" y1="180" x2="308" y2="180"/><path class="arrowhead return" d="M301,180 l9,-4.5 v9 z"/>
+                        <g class="edge-label" data-cx="400"><rect class="edge-label-background" x="375" y="160" width="50" height="18" rx="3"/><text class="label-text" x="400" y="173" text-anchor="middle">rows</text><text class="number edge-label-number" x="369" y="173" text-anchor="end">3</text></g></g>
+                </svg>
+            </div>
+            <h3 id="data"><span class="section-number">4.3</span>Data</h3>
+            <div class="tables">
+                <div class="table-card">
+                    <div class="table-card-head"><span>public.things</span><span class="tag">table</span></div>
+                    <div class="row"><span class="column">id</span><span class="type">bigint</span><span class="key">PK</span></div>
+                    <div class="row"><span class="column">owner_id</span><span class="type">bigint</span><span class="key">FK</span></div>
+                    <div class="row"><span class="column">name</span><span class="type">text not null</span><span class="key"></span></div>
                 </div>
-
-                <h2 id="concepts">Key concepts</h2>
-                <p>This section explains the most important terms.</p>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Term</th>
-                                <th>Meaning</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><code>Workspace</code></td>
-                                <td>The top-level container for your work.</td>
-                            </tr>
-                            <tr>
-                                <td><code>Project</code></td>
-                                <td>A single unit inside a workspace.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h2 id="how-it-works">How it works</h2>
-                <p>A short explanation of the flow.</p>
+            </div>
+            <p class="relation"><code>public.owners.id</code> <span class="cardinality">1 ── *</span> <code>public.things.owner_id</code></p>
+        </section>
+        <!-- ============ 05 API REFERENCE ============ -->
+        <section class="slide" id="reference">
+            <h2><span class="section-number">05</span>API reference</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Endpoint</th><th>Method</th><th>Does</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>/things</code> <span class="pill">new</span></td><td>POST</td><td>Create a thing.</td></tr>
+                        <tr><td><code>/things</code></td><td>GET</td><td>List things. <span class="aside">Max 100 per page.</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="callout warn"><strong>Rate limit</strong>60 calls per minute per key.</p>
+            <details class="more">
+                <summary>Error codes <span class="aside">every code the API returns</span></summary>
                 <ul>
-                    <li>The client sends a request.</li>
-                    <li>The server validates and processes it.</li>
-                    <li>A response is returned to the client.</li>
+                    <li><code>INVALID_ARGUMENT</code>: a field is missing or wrong.</li>
+                    <li><code>NOT_FOUND</code>: the thing does not exist.</li>
                 </ul>
-
-                <h2 id="reference">API reference</h2>
-                <p>Reference details go here.</p>
-                <div class="callout warn">
-                    <span class="icon">⚠️</span>
-                    <div>This endpoint is rate limited. Plan your calls accordingly.</div>
-                </div>
-
-                <h2 id="troubleshooting">Troubleshooting</h2>
-                <h3>Something does not load</h3>
-                <p>Check your network and confirm your keys are valid.</p>
-                <div class="callout danger">
-                    <span class="icon">🚫</span>
-                    <div>Never share your secret key in a public channel.</div>
-                </div>
-            </article>
-        </div>
-    </div>
+            </details>
+        </section>
+        <!-- ============ 06 TROUBLESHOOTING ============ -->
+        <section class="slide" id="troubleshooting">
+            <h2><span class="section-number">06</span>Troubleshooting</h2>
+            <h4>Something does not load</h4>
+            <p>Check your network and confirm your keys are valid.</p>
+            <p class="callout danger"><strong>Never</strong>Share your secret key in a public channel.</p>
+        </section>
+    </main>
+    <div class="float-bar no-print"></div>
 
     <script>
         /* theme:pdf-js:start */
@@ -889,38 +755,133 @@ example init</code></pre>
             return picker;
         }
         /* theme:font-size-js:end */
-        addFontSize(document.querySelector(".topbar-actions"));
-        addExportPdf(document.querySelector(".topbar-actions"));
-
-        // ===== Mobile sidebar =====
-        const sidebar = document.getElementById("sidebar");
-        document.getElementById("menuBtn")?.addEventListener("click", () => sidebar.classList.toggle("open"));
-        sidebar.addEventListener("click", (e) => {
-            if (e.target.classList.contains("nav-link")) sidebar.classList.remove("open");
-        });
-
-        // ===== Active section highlight on scroll =====
-        const links = [...document.querySelectorAll(".nav-link")];
-        const byId = new Map(links.map(l => [l.getAttribute("href").slice(1), l]));
-        const headings = [...document.querySelectorAll(".content h1, .content h2, .content h3")]
-            .filter(h => byId.has(h.id));
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    links.forEach(l => l.classList.remove("active"));
-                    byId.get(entry.target.id)?.classList.add("active");
+        /* theme:diagram-labels-js:start */
+        /* Synced from theme/diagram-labels.js by theme/sync.mjs. Do not edit here. */
+        function fitDiagramLabels(root = document) {
+            const PAD = 6, GAP = 4, roundTo1 = value => Math.round(value * 10) / 10;
+            let done = true;
+            root.querySelectorAll('g.edge-label').forEach(group => {
+                const text = group.querySelector(':scope > text');
+                if (!text) return;
+                const width = text.getComputedTextLength();
+                // 0: not laid out yet (a hidden panel or frame), so the next call fits it
+                if (!width) { done = false; return; }
+                let centerX = parseFloat(group.dataset.cx);
+                if (Number.isNaN(centerX)) {
+                    const x = text.x.baseVal[0]?.value || 0, anchor = getComputedStyle(text).textAnchor;
+                    centerX = anchor === 'start' ? x + width / 2 : anchor === 'end' ? x - width / 2 : x;
+                }
+                text.setAttribute('x', roundTo1(centerX));
+                text.setAttribute('text-anchor', 'middle');
+                const left = centerX - width / 2 - PAD;
+                const background = group.querySelector(':scope > .edge-label-background');
+                if (background) { background.setAttribute('x', roundTo1(left)); background.setAttribute('width', roundTo1(width + 2 * PAD)); }
+                const badge = group.querySelector(':scope > .edge-label-number');
+                if (badge) {
+                    badge.removeAttribute('transform');
+                    try {
+                        const box = badge.getBBox();
+                        badge.setAttribute('transform', `translate(${roundTo1(left - GAP - (box.x + box.width))} 0)`);
+                    } catch { done = false; }
                 }
             });
-        }, { rootMargin: "-10% 0px -80% 0px" });
-        headings.forEach(h => observer.observe(h));
+            return done;
+        }
+        /* theme:diagram-labels-js:end */
+        // refit when fonts load, text size changes (body resizes) or a closed <details> opens
+        const fitLabels = () => fitDiagramLabels();
+        fitLabels();
+        document.fonts?.ready.then(fitLabels);
+        new ResizeObserver(fitLabels).observe(document.body);
+        document.addEventListener("toggle", fitLabels, true);
+        // the PDF shows every hidden detail
+        addEventListener("beforeprint", () => document.querySelectorAll("details").forEach(d => { d.open = true; }));
+        addFontSize();
+        addExportPdf();
 
-        // ===== Sidebar search filter =====
-        document.getElementById("navSearch").addEventListener("input", (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            links.forEach(link => {
-                const hit = link.textContent.toLowerCase().includes(query);
-                link.classList.toggle("hidden", query && !hit);
+        const root = document.documentElement;
+        const store = {
+            get: (key) => { try { return localStorage.getItem(key); } catch { return null; } },
+            set: (key, value) => { try { localStorage.setItem(key, value); } catch { /* private window */ } },
+        };
+
+        // ===== Rail: always open; the edge button or "[" hides it (remembered). On phones ☰ opens it as a drawer. =====
+        const rail = document.getElementById("rail");
+        const railEdge = document.getElementById("railEdge");
+        const small = matchMedia("(max-width: 880px)");
+        function setCollapsed(on, remember = true) {
+            if (on) root.setAttribute("data-rail", "collapsed"); else root.removeAttribute("data-rail");
+            const label = on ? "Show index" : "Hide index";
+            railEdge.setAttribute("aria-expanded", String(!on));
+            railEdge.setAttribute("aria-label", label);
+            railEdge.title = label + " ( [ )";
+            if (remember) store.set("naphatwx:docs:rail", on ? "collapsed" : "");
+        }
+        setCollapsed(store.get("naphatwx:docs:rail") === "collapsed", false);
+        const setDrawer = (on) => on ? root.setAttribute("data-drawer", "open") : root.removeAttribute("data-drawer");
+        function toggleRail() { small.matches ? setDrawer(!root.hasAttribute("data-drawer")) : setCollapsed(root.getAttribute("data-rail") !== "collapsed"); }
+        railEdge.addEventListener("click", toggleRail);
+        document.getElementById("menuBtn").addEventListener("click", () => setDrawer(true));
+        rail.addEventListener("click", (e) => { if (small.matches && e.target.closest("a")) setDrawer(false); });
+        document.addEventListener("click", (e) => {
+            if (root.hasAttribute("data-drawer") && !rail.contains(e.target) && !e.target.closest("#menuBtn")) setDrawer(false);
+        });
+
+        // ===== Search ("/" focuses it): filters rail links, keeps a parent visible while a child matches =====
+        const search = document.getElementById("railSearch");
+        const railLinks = [...rail.querySelectorAll(".rail-list a")];
+        search.addEventListener("input", () => {
+            const query = search.value.toLowerCase().trim();
+            railLinks.forEach(a => a.classList.toggle("hidden", !!query && !a.textContent.toLowerCase().includes(query)));
+            rail.querySelectorAll(".rail-list > li").forEach(item => {
+                const childMatches = [...item.querySelectorAll("ol a")].some(a => !a.classList.contains("hidden"));
+                if (childMatches) item.querySelector(":scope > a").classList.remove("hidden");
             });
+        });
+        search.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") rail.querySelector(".rail-list a:not(.hidden)")?.click();
+            if (e.key === "Escape") { search.value = ""; search.dispatchEvent(new Event("input")); search.blur(); }
+        });
+
+        // ===== Active link on scroll: the last target whose top passed 120px; a clicked link wins until the next scroll gesture =====
+        const byId = new Map(railLinks.map(a => [a.getAttribute("href").slice(1), a]));
+        const targets = [...byId.keys()].map(id => document.getElementById(id)).filter(Boolean);
+        let pinnedLink = null, activeLink;
+        function setActive(link) {
+            if (link === activeLink) return;
+            activeLink = link;
+            railLinks.forEach(railLink => {
+                railLink.classList.toggle("active", railLink === link);
+                if (railLink === link) railLink.setAttribute("aria-current", "location"); else railLink.removeAttribute("aria-current");
+            });
+            railTitles(); // the active link is bold, so its label may now be cut short
+        }
+        function spy() {
+            if (pinnedLink) return;
+            const atBottom = innerHeight + scrollY >= root.scrollHeight - 2;
+            const passed = targets.filter(t => t.getBoundingClientRect().top <= 120);
+            const target = atBottom ? targets[targets.length - 1] : passed[passed.length - 1] || targets[0];
+            setActive(byId.get(target?.id));
+        }
+        railLinks.forEach(a => a.addEventListener("click", () => { pinnedLink = a; setActive(a); }));
+        ["wheel", "touchstart", "keydown"].forEach(eventName => addEventListener(eventName, () => { pinnedLink = null; }, { passive: true }));
+        addEventListener("scroll", spy, { passive: true });
+
+        // a rail label cut short by the ellipsis shows in full on hover
+        function railTitles() {
+            rail.querySelectorAll(".rail-label").forEach(label => {
+                const link = label.closest("a") || label;
+                if (label.scrollWidth > label.clientWidth) link.title = label.textContent.trim(); else link.removeAttribute("title");
+            });
+        }
+        addEventListener("resize", railTitles);
+        spy();
+
+        // ===== Keys: "[" hides the rail, "/" searches it =====
+        document.addEventListener("keydown", (e) => {
+            if (e.target.closest("input, textarea, select, [contenteditable]") || e.metaKey || e.ctrlKey || e.altKey) return;
+            if (e.key === "[") toggleRail();
+            if (e.key === "/") { e.preventDefault(); small.matches ? setDrawer(true) : setCollapsed(false); search.focus(); }
         });
     </script>
 </body>

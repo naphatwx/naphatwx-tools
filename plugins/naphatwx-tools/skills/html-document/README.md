@@ -1,11 +1,11 @@
 # html-document
 
-Generates one self-contained HTML docs page, dark only, with a sidebar and section search, from files or a topic.
+Generates one self-contained HTML docs page, dark only, in the naphatwx theme (the same look as design-feature's overview), from files or a topic.
 
 ## When to use it
 
 - You have markdown, a `docs/` folder or a topic, and want one styled page to share or open offline.
-- You want readers to jump between sections from a sidebar and filter them by name.
+- You want readers to jump between sections from a numbered rail and filter them by name.
 - Say: "make HTML docs for X", "turn this markdown into a docs page".
 
 | You want | Use instead |
@@ -27,9 +27,9 @@ graph TD
     ASK --> READ
     READ --> COPY[copy template/index.html]
     COPY --> FILL[replace the title and brand with the topic]
-    FILL --> NAV[rewrite the sidebar nav: groups and links]
-    NAV --> ART["rewrite article.content: headings, cards, callouts, steps, code, tables"]
-    ART --> CHK{every nav-link href matches a heading id?}
+    FILL --> NAV["rewrite the rail: 01, 02 … with nested N.M links"]
+    NAV --> ART["rewrite the sections: kicker, facts, callouts, steps, code, tables"]
+    ART --> CHK{every rail link href matches an id?}
     CHK -->|no| NAV
     CHK -->|yes| OUT["write #lt;topic#gt;.html"]
     OUT --> MSG["reply: ✅ Docs created at: #lt;path#gt;"]
@@ -42,6 +42,9 @@ Rules the diagram doesn't show:
 - Text uses the `--fs-*` tokens, never fixed `px`.
 - Colors use the theme tokens, never new hex values. Never edit between the `theme:` markers.
 - The Export PDF button stays: it opens the print dialog, pick "Save as PDF".
+- `[` hides the rail; `/` jumps to its search.
+- Diagrams (flowchart, sequence, table cards) are inline SVG in the theme, never Mermaid or an image.
+- A part the template does not have reuses a theme class first, else matches the closest part with theme tokens.
 
 ## Input → output
 
@@ -54,7 +57,7 @@ Output:
 
 ```
 <project root>/
-└── <topic>.html     the docs page: sidebar nav with search, active-section highlight, Export PDF
+└── <topic>.html     the docs page: numbered rail with search, active-section highlight, text size, Export PDF
 ```
 
 

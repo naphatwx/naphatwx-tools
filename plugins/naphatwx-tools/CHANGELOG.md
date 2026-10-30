@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.9.266
+
+**html-document uses the design-feature page look**
+
+- The docs page now has the same layout as design-feature's overview: a numbered rail on the left (`01`, `02` … with nested `2.1` items), rail search, the round edge button, and a centered sheet.
+- `[` hides the rail and `/` jumps to its search. The rail state is kept in `localStorage` (`naphatwx:docs:rail`).
+- Text size and Export PDF move to the floating bar at the bottom right.
+- New page parts: kicker, `.facts` list, `.pill`, `details.more`. Callouts are tinted bands with a label; steps use a number column.
+- The card grid and the Clerk-style top bar are gone.
+- Diagrams use the theme: flowcharts, sequence diagrams and table cards are inline SVG with the `theme:seq`, `theme:diff` and `theme:diagram-labels-js` blocks. The template shows one of each.
+- New rule for anything not in the template: reuse a theme class first, else match the closest part with theme tokens. No Mermaid, chart library or web font.
+
 ## 1.9.265
 
 **Herdr tab name also runs at session start**

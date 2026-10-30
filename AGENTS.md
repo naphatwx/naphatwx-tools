@@ -25,7 +25,7 @@
   - `scenario.css` (`scenario`): generate-mock-ui and play-scenarios index chrome (use-case rows, collapsible scenario list, frame, results).
   - `scenario-filter.css` (`scenario-filter`) + `scenario-filter.js` (`scenario-filter-js`, `addScenarioFilter(anchor, { rows, groups, storageKey, statuses, status, flag, title, sort, after })`): the sticky search + Status / Type / Kind / Core filter bar of the e2e report, the mock and play players and the design-feature overview. Rows carry `data-surface`, `data-kind`, `data-core`.
   - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
-  - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview and the generate-diagram viewer.
+  - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview, the generate-diagram viewer and the html-document template.
 - `theme/use-cases.d.ts` is the type of `use-cases.js` (`UseCase`, `Scenario`, `Acceptance`). `node theme/sync.mjs` copies it whole, as `use-cases.types.d.ts`, next to every `use-cases.js` a skill ships or reads (`TYPES_COPIES`). generate-use-case's `check.js` reads its field names and rejects any other field. Add or rename a field there first.
 - `.scenario-kind`, `.core-pill` and `.references-chip` live in `base.css`; their print rules in `pdf.css`.
 - Scenario badge order, on every page that lists scenarios: status → surface (channel) tag → title → kind → core → refs chip. Skip a badge the page does not show; never reorder.
@@ -33,13 +33,13 @@
   - After the title: traits, always-shown (kind) before optional (core). Buttons (refs chip) go last.
   - Each page-making `SKILL.md` that lists scenarios repeats this order.
 - Radii: use `--radius` (6px), `--radius-md` (8px), `--radius-lg` (10px), `--radius-xl` (12px), never a raw px value.
-- Change marks: `theme/diff.css` syncs into `/* theme:diff:start */ … end */`. One class set for every table or message card, HTML and SVG: `.table-card` (+ `.add` / `.drop` / `.change` / `.external`), `.table-card-head` (name first, then `.tag`), `.row` (+ `.add` / `.change` / `.drop`) with `.column`, `.type`, `.key`. Used by the design-feature overview, the API contracts page and the ER diagram.
+- Change marks: `theme/diff.css` syncs into `/* theme:diff:start */ … end */`. One class set for every table or message card, HTML and SVG: `.table-card` (+ `.add` / `.drop` / `.change` / `.external`), `.table-card-head` (name first, then `.tag`), `.row` (+ `.add` / `.change` / `.drop`) with `.column`, `.type`, `.key`. Used by the design-feature overview, the API contracts page, the ER diagram and the html-document template.
 - Every page with a `.float-bar` gets bottom padding from `theme/pdf.css` (`--float-space`), so the bar never hides the last line. A full-window page sets it back to 0 in its own CSS.
 - Text size picker: `theme/font-size.css` syncs into `/* theme:font-size:start */ … end */` and `theme/font-size.js` (`addFontSize(target)`) into `/* theme:font-size-js:start */ … end */`, right after the pdf blocks. Every page that calls `addExportPdf` calls `addFontSize` just before it, so Export PDF stays last. Diagram pages show it only when opened on their own.
   - Sizes live in `theme/tokens.css` under `:root[data-fs]`. Only role tokens change: Small / Large set `--fs-body`, `--fs-meta`, `--fs-code`; Large also `--fs-tag`, `--fs-dia`, `--fs-dia-sub`. So templates size text by role, not by step (`--fs-sm`).
   - The choice is saved in `localStorage` (`naphatwx:font-size`), shared by every page, and followed live by other open pages and embedded frames.
 - Browser storage keys (`localStorage`, `sessionStorage`): `naphatwx:<tool>:<scope>:<what>`, e.g. `naphatwx:play:<slug>:results`.
-  - `<tool>`: `design`, `mock`, `play`, `deploy`, `e2e`, `gallery`. `<scope>` is the feature slug, else the page data's id or name, else `location.pathname`; drop it for settings every page shares (`naphatwx:font-size`).
+  - `<tool>`: `design`, `mock`, `play`, `deploy`, `e2e`, `gallery`, `docs`. `<scope>` is the feature slug, else the page data's id or name, else `location.pathname`; drop it for settings every page shares (`naphatwx:font-size`).
 - Never edit between the markers. Edit `theme/`, then run `node theme/sync.mjs`.
 - design-feature's `template/mock`, `flowchart`, `sequence-diagram` and `database` are preview copies of the generate-mock-ui and generate-diagram templates. Edit the source, then run `node theme/sync.mjs`. Files that differ on purpose are listed in `OWN` in `theme/sync.mjs`.
 - Run `node theme/sync.mjs --check` before committing. It fails on drift, on any hex color that is not a theme color, and on text tokens below 4.5:1 contrast.
