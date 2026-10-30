@@ -101,7 +101,7 @@ All three are off by default.
 |---|---|---|---|
 | What it is | Claude Code hook | Claude Code hook | herdr plugin |
 | Who runs it | Claude Code | Claude Code | herdr |
-| When it runs | Session start + every prompt | Every reply end | Every new herdr tab |
+| When it runs | Session start + every prompt | Session start + every reply end | Every new herdr tab |
 | How to turn on | `NAPHATWX_RESPONSE_RULES=1` in `~/.claude/settings.json` | `NAPHATWX_HERDR_TAB_NAME=1` in `~/.claude/settings.json` | `herdr plugin link <repo>/plugins/naphatwx-tools/hooks/herdr-claude-tab` |
 | Needs | `bash`, `cat` | `bash`, `sed`, herdr | `sh`, `python3`, herdr |
 | macOS | ✅ Works, tested | ✅ Works, tested | ✅ Works, tested |
@@ -141,7 +141,7 @@ To turn it on, add this to your `~/.claude/settings.json` and start a new sessio
 
 
 - Name: the title Claude shows in the terminal title: the `/rename` title, else Claude's auto title. The hook reads it from herdr, not from the transcript.
-- Updates when Claude ends a reply, and only renames when the title changed. A `/rename` shows on the next reply end.
+- Updates at session start and when Claude ends a reply, and only renames when the title changed. A `/rename` shows on the next reply end.
 - Renames only the tab Claude runs in (`$HERDR_TAB_ID`). Outside herdr it does nothing.
 - Script: `plugins/naphatwx-tools/hooks/herdr-tab-name.sh`.
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Sync the herdr tab label with the Claude session title, once per reply (Stop).
+# Sync the herdr tab label with the Claude session title, at session start and once per reply (Stop).
 # Reads the pane's terminal title from herdr, where Claude shows the session title.
 # Off by default; set NAPHATWX_HERDR_TAB_NAME=1 to turn it on.
 [ "${NAPHATWX_HERDR_TAB_NAME:-0}" = "1" ] || exit 0

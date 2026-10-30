@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.265
+
+**Herdr tab name also runs at session start**
+
+- `hooks/herdr-tab-name.sh` now also runs on `SessionStart`, so a resumed session names its tab right away.
+- It still runs on `Stop` after each reply.
+
 ## 1.9.264
 
 **Filter chips get their own row**
