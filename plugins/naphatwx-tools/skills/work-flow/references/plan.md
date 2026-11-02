@@ -29,11 +29,13 @@ Map the code before asking anything: facts the code answers are never questions.
 Run the `grilling` skill (`mattpocock-skills:grilling` in Claude Code) on the task. Not `grill-me`: that one
 only the user can start. Rounds go on until no decision is left open.
 - Give `grilling` the Rules that apply list when you start it: it sees only what is in its context.
-- **Rule check, each round.** Before the user sees a round, one read-only sub-agent checks every question
-  against the Rules that apply list, the guides, the ADRs and similar code.
+- **Rule check, each round.** Before the user sees a round, check every question against the Rules that apply
+  list. A question the list does not cover but a lookup could → one read-only sub-agent checks the guides,
+  the ADRs and similar code, for all such questions in the round.
   - Priority: a written rule (guide, ADR) beats a code pattern. Check the written rules first.
   - Answered → don't ask. Write it under Decisions as `(rule: <file:line or guide section>)`.
   - Otherwise → ask. Two sources of the same rank that disagree don't answer it.
+  - Show the settled ones at the top of the round, each with its source, so the user can overrule one.
 - Write each answer under Decisions as `<question> → <answer> (user | auto)`.
 - The grill ends when `grilling` asks to confirm shared understanding and gets a yes. That yes ends the
   grill only: go straight on to step 4. The go-ahead to code is "implement" in step 6.

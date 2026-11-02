@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.281
+
+**work-flow rule check: sources in the round, sub-agent only when needed**
+
+- Each round shows the settled questions at the top, each with its source.
+- Questions are checked against the Rules that apply list first; a read-only sub-agent runs only for questions that need a lookup the list does not cover.
+
 ## 1.9.280
 
 **work-flow rule check: simpler, with priority**
