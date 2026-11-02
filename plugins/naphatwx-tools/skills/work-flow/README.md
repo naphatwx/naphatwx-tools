@@ -25,6 +25,8 @@ flowchart TD
     subgraph P0["Phase 0 - Plan (edits nothing but the plan)"]
         GR{{grilling: YOU answer, or auto-answer after scope}} --> DR[draft .work/NNN-slug/plan.md]
         DR --> VER[spec verify: plan vs project rules, agent fixes]
+        VER --> PS{{PLAN STOP: summary; you say implement}}
+        PS -->|changes| GR
     end
 
     P0 --> P1[Phase 1 - Routing: split tasks per app, find the order]
@@ -47,7 +49,7 @@ flowchart TD
     ASK[/you ask for a gate, any phase/] -.-> ON[gate runners, report only]
 ```
 
-- Your two stops: the grilling questions and the checkpoint after code. No plan mode and no approval prompt: your final yes in the grill is the go-ahead.
+- Your three stops: the grilling questions, the plan stop (a summary of what will be built; say `implement` to go on), and the checkpoint after code. No plan mode.
 - Auto-answer: write `auto-answer` in the input or in a grill reply. You still answer the scope question; a decider sub-agent answers the rest and gives the final yes. Its answers are marked `(auto)` in the plan.
 - Spec verify checks the plan against the project's rules, not the requirements. The agent fixes what it finds; a decider sub-agent settles disputes.
 - At the checkpoint you try the code first; tests come after you confirm.
@@ -78,7 +80,7 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 | [SKILL.md](SKILL.md) | The agent's instructions: phases, Phases 1–3 and the checkpoint, hard rules |
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
-| [references/plan.md](references/plan.md) | Phase 0: number, explore, grilling and auto-answer, draft, spec verify |
+| [references/plan.md](references/plan.md) | Phase 0: number, explore, grilling and auto-answer, draft, spec verify, plan stop |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
 

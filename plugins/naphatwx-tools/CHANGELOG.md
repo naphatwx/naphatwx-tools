@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.274
+
+**work-flow stops after the plan**
+
+- New plan stop at the end of Phase 0: a summary of the plan (path, goal, Accept, changes and tasks per app, decisions the user did not make, top risks). Code starts only on "implement".
+- Changes at the plan stop go back to the grill or the draft, re-verify only the touched apps, then stop again.
+- Three stops: the grill, the plan stop, the checkpoint. Auto-answer skips only the grill.
+
 ## 1.9.273
 
 **work-flow drops plan mode and the approval stop, adds auto-answer**

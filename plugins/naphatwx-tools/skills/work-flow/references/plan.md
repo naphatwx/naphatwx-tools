@@ -1,7 +1,7 @@
 # Phase 0: Plan
 
-The main agent writes the plan straight to the task folder. It edits nothing but the plan. The grill is
-the only stop in this phase: once it ends, the plan is drafted and verified, and the flow goes on to code.
+The main agent writes the plan straight to the task folder. It edits nothing but the plan. Two stops:
+the grill, and the plan summary at the end. Code starts only when the user says "implement".
 
 ## 1. Number and folder
 
@@ -26,8 +26,8 @@ Map the code before asking anything: facts the code answers are never questions.
 Run the `grilling` skill (`mattpocock-skills:grilling` in Claude Code) on the task. Not `grill-me`: that one
 only the user can start. Rounds go on until no decision is left open.
 - Write each answer under Decisions as `<question> → <answer> (user | auto)`.
-- The grill ends when `grilling` asks to confirm shared understanding and gets a yes. That yes is the
-  go-ahead for the whole task: no other stop comes before the checkpoint after code.
+- The grill ends when `grilling` asks to confirm shared understanding and gets a yes. That yes ends the
+  grill only: go straight on to step 4. The go-ahead to code is "implement" in step 6.
 - `grilling` missing → stop and tell the user to install it:
   `/plugin install mattpocock-skills@claude-plugins-official`
 
@@ -38,7 +38,7 @@ The user turns it on with "auto-answer" (or "auto") in the input or in any grill
   recommended answers. Mark those answers `(auto)`.
 - **Scope stays with the user.** The first question (what to build, what is out) goes to the user when the
   input does not settle it, or when the feature already exists. Auto-answer starts after it.
-- The decider also gives the final yes, so the grill ends without a stop.
+- The decider also gives the final yes, so the grill ends without a stop. The plan stop in step 6 still stops.
 - Show each auto-answered round to the user, one line per question, so the choices are on record.
 
 ## 4. Draft
@@ -88,5 +88,18 @@ the grill settled those.
 4. A finding that changes scope or a user decision → back to the grill for that one question.
 5. A verifier never becomes that app's owner later.
 
-Then set the status line to `Phase: 1` and go straight to Phase 1. The checkpoint report names the plan
-path and lists the decisions that spec verify or the decider made.
+## 6. Plan stop
+
+Set the status line to `Phase: 0 · … · Next: say "implement"`, then stop and end the turn. Report:
+
+- The plan path.
+- What will be built: the goal and the Accept lines, in short.
+- What changes per app, and the task count per app.
+- The decisions the user did not make (auto, spec verify, decider).
+- The top risks.
+
+Then wait.
+- "implement" → set the status line to `Phase: 1` and go to Phase 1.
+- Changes → a new decision goes back to the grill for that question, a wording or scope fix back to step 4;
+  run spec verify again only for the apps the change touches, then stop here again.
+- `/work-flow <number>` on a task at this stop shows the summary again and waits.
