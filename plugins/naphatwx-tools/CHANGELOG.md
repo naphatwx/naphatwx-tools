@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.9.278
+
+**work-flow grill: one rule check per round**
+
+- The rule filter and the gap check become one step: before each round, one read-only sub-agent checks every question against the Rules that apply list, the guides, the ADRs and similar code.
+- Answered → `(rule: <source>)`, not asked. Rules conflict or the task must break one → asked. The rest → asked.
+- No more sorting questions into decisions and conventions.
+
+## 1.9.277
+
+**work-flow grill adds a gap check each round**
+
+- Each round sorts the frontier: decisions ("what should it do?") are asked; conventions ("how do we do it here?") not on the Rules that apply list go to one read-only sub-agent for the whole round.
+- Found → added to the list as `(rule: <source>)`, not asked. Not found → asked.
+- Decisions are asked while the check runs. No full re-Explore per round.
+
 ## 1.9.276
 
 **work-flow stops asking what the project's rules already answer**

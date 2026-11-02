@@ -29,9 +29,11 @@ Map the code before asking anything: facts the code answers are never questions.
 Run the `grilling` skill (`mattpocock-skills:grilling` in Claude Code) on the task. Not `grill-me`: that one
 only the user can start. Rounds go on until no decision is left open.
 - Give `grilling` the Rules that apply list when you start it: it sees only what is in its context.
-- **Rule filter, before every round.** A question the project already answers (a guide rule, an ADR, an
-  existing code pattern) is not asked. Write it under Decisions as `(rule: <source>)` instead.
-  Ask it only when two rules conflict, or when the task has to break a rule.
+- **Rule check, each round.** Before the user sees a round, one read-only sub-agent checks every question
+  against the Rules that apply list, the guides, the ADRs and the most similar feature in the code.
+  - Answered → not asked. Write it under Decisions as `(rule: <source>)` and add it to the list.
+  - Two rules conflict, or the task has to break one → ask it.
+  - The rest → ask them.
 - Write each answer under Decisions as `<question> → <answer> (user | auto)`.
 - The grill ends when `grilling` asks to confirm shared understanding and gets a yes. That yes ends the
   grill only: go straight on to step 4. The go-ahead to code is "implement" in step 6.
