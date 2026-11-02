@@ -9,7 +9,7 @@ Run right before the branch leaves draft or merges. Two parts: fix numbers, then
 
 ## Number check
 
-Only when the profile lists numbered folders or a spec folder. Numbers taken on parallel branches, or in
+Only when the profile lists numbered folders, or the task has a number. Numbers taken on parallel branches, or in
 another checkout, can collide by merge time.
 
 1. `git fetch origin <target>` then `git merge origin/<target>`. A conflict in app code goes to that app's owner.
@@ -17,8 +17,8 @@ another checkout, can collide by merge time.
 3. Check against the merged tree plus that branch:
    - No number appears twice.
    - Our numbers run in order right after the highest one, with no gap (migrations).
-   - Our spec number: no other spec folder with a different slug uses it, in any place listed in `spec.md` → "Spec numbers in use" (other worktrees and checkouts included).
-4. **Renumber only our own files**, in their original order. Migrations go to the app's owner (headers and comments too). The spec folder is the main agent's: move it to the next free number and update `flow.md`. Update every reference in the same change: spec, docs, test data, MR/PR text.
+   - Our task number: no other task folder with a different slug uses it, in any place listed in `plan.md` → "1. Number and folder" (other worktrees and checkouts included).
+4. **Renumber only our own files**, in their original order. Migrations go to the app's owner (headers and comments too). The task folder is the main agent's: move it to the next free number and update the title line of `plan.md`. Update every reference in the same change: spec, docs, test data, MR/PR text.
 5. Report old → new numbers. Commit only if the user asks, as `chore(<area>): renumber …`.
 
 ## The gate
@@ -38,7 +38,7 @@ another checkout, can collide by merge time.
 4. A failing test that shows a real bug → fix the code, never weaken the test.
 5. PRE-EXISTING failures → report, open a separate task, do not fix.
 
-Report per app and per test run. Set `flow.md` to `Phase: done`.
+Report per app and per test run. Set the `plan.md` status line to `Phase: done`.
 
 If the target branch moves after this → redo the number check. Re-gate only the apps the new merge changed.
 

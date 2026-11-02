@@ -8,7 +8,7 @@
    - Names that cross apps (queues, topics, events, routes, permissions) match and follow the guide's naming rules.
    - Env vars and config flow through every layer that needs them.
    - The profile's `Cross-app checks`.
-   - Every story in the spec has code behind it.
+   - Every Accept line in the plan has code behind it.
 3. **Collect all findings first.** Drop the ones that are wrong, and say why.
 4. **Fix in one batch.** Send each app's confirmed findings to its owner, `MODE: fix`, all at once.
 5. **Re-review only the fixed parts**, with a fresh reviewer. No gate runs here; Phase 6 covers the fixes.
@@ -28,4 +28,4 @@ Main agent. Skip a step the profile does not list.
    - What is left to try by hand.
    - Steps the profile turned off (no integration tests, no docs path, ...).
 
-Set `flow.md` to `Phase: 6`. Phase 6 starts when the user is ready to leave draft or merge; ask if it is not clear.
+Set the `plan.md` status line to `Phase: 6`. Phase 6 starts when the user is ready to leave draft or merge; ask if it is not clear.

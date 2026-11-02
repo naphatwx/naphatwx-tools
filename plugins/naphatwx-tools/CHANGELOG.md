@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.271
+
+**work-flow plans in plan mode, saves one plan.md**
+
+- Phase 0 runs in Claude Code's plan mode: Matt Pocock's `grill-me` asks the questions (no limit), the agent drafts the plan, spec verify fixes it against the project rules, then the user approves with the built-in prompt.
+- The approved plan is copied to `.work/NNN-<slug>/plan.md` (profile `Work folder`, default `.work/`). Its second line is the status line; `flow.md` is gone.
+- Removed: speckit and the light `spec.md`, the clarify step. `references/spec.md` is now `references/plan.md`.
+- Task numbers count `.work/` in this checkout, every worktree and `Other checkouts`.
+- Stops: the grill, the plan approval, the checkpoint.
+
 ## 1.9.270
 
 **work-flow checks spec numbers across checkouts**
