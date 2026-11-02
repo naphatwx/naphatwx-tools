@@ -327,7 +327,9 @@ if (quotes.size && ROOT) {
     let list = [];
     try { list = require('child_process').execFileSync('git', ['-C', ROOT, 'ls-files', '-z'], { encoding: 'utf8', maxBuffer: 1 << 28 }).split('\0').filter(Boolean); }
     catch { const walk = d => fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }).flatMap(e => e.isDirectory() ? (SKIP_FILE.test(`${d}${e.name}/`) ? [] : walk(`${d}${e.name}/`)) : [`${d}${e.name}`]); list = walk(''); }
-    const own = path.relative(ROOT, path.dirname(path.resolve(file)));
+    const planDir = path.dirname(path.resolve(file));
+    // <spec-folder>/plan/ → skip the whole spec folder, wherever the spec tool put it.
+    const own = path.relative(ROOT, path.basename(planDir) === 'plan' ? path.dirname(planDir) : planDir);
     for (const rel of list) {
         if (!pending.size) break;
         if (SKIP_FILE.test(rel) || (own && rel.startsWith(own + '/'))) continue;

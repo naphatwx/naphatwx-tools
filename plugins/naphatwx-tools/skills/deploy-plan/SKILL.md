@@ -106,7 +106,7 @@ Pre-deploy holds only what must exist before the new code starts: env vars the n
 These are not always added. Add each one only when it applies to this change and can be done as written.
 - Pre: the people who must know are told (only for a change with downtime, risk, or users who will notice).
 - Post: the deployed version matches the release; the health check passes; logs show no new errors for the services touched (quote the log lines to watch).
-- **Smoke test: only when the repo has smoke coverage for this change.** Grep `scripts/smoke/features/` and `scripts/smoke/review/` (or the repo's smoke folder) for the spec number, the feature name, the RPC or the page. If a feature or review file covers it, add one step that runs that file. No coverage → no smoke step. Never add a generic full-suite run.
+- **Smoke test: only when the repo has smoke coverage for this change.** Grep `scripts/smoke/features/` and `scripts/smoke/review/` (or the repo's smoke folder) for the spec folder name, the feature name, the RPC or the page. If a feature or review file covers it, add one step that runs that file. No coverage → no smoke step. Never add a generic full-suite run.
 
 ### Rollback
 

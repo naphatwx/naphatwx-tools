@@ -1,6 +1,6 @@
 ---
 name: design-feature
-description: Plan a feature as a browsable HTML folder (acceptance criteria, use cases with their flow diagrams and scenarios, database and API changes, open questions) from a spec or idea. Use when the user says "design this feature" or "plan spec 127". The full plan; one diagram is generate-diagram, a mock alone is generate-mock-ui.
+description: Plan a feature as a browsable HTML folder (acceptance criteria, use cases with their flow diagrams and scenarios, database and API changes, open questions) from a spec or idea. Use when the user says "design this feature" or "plan this spec folder". The full plan; one diagram is generate-diagram, a mock alone is generate-mock-ui.
 argument-hint: <spec-folder | feature description> [output-path]
 ---
 
@@ -57,7 +57,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 **Expected format:** `<spec-folder | feature description> [output-path]`
 
-- A spec folder or file → read it as the source of truth.
+- A spec folder or file, from any spec tool → read it as the source of truth.
 - A plain description → plan from it, and mark every unknown as **TBD**. Never invent endpoints, tables or fields.
 - No output path:
     - Input is a spec folder → write to `<spec-folder>/plan/`.
@@ -80,7 +80,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Every iframed diagram keeps its own Export PDF button, at the bottom right of the frame, under the drawing: the frame's height includes the room for it, so it never covers the diagram.
     - Step details never sit inside a diagram: they go on the page right after the `.sequence` box (manual: `render.js` adds them).
 4. Every rail link `href="#id"` (`.rail-list a`, nested ones included) matches a real `id` on the page, and every `.slide` has a `data-title` (presentation mode labels its steps with it).
-5. Every mock link (into `mock/`, or the app's `/mock/spec<NNN>` route) opens in a new tab: `target="_blank" rel="noopener"`. This is for the local folder; the published copy drops it (step 8).
+5. Every mock link (into `mock/`, or the app's `/mock/<spec-slug>` route) opens in a new tab: `target="_blank" rel="noopener"`. This is for the local folder; the published copy drops it (step 8).
 6. No external scripts, styles or fonts in `overview.html` or the diagram files: text uses the OS font. `assets/`, `render.js` and the diagram files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
@@ -145,7 +145,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 4. Fill in `overview.html`
 
 - Merge the sub-agent fragments from `.parts/` into their sections, add their open questions to Open questions, then delete `.parts/`.
-- Replace the `<title>`, the rail brand (`.rail-mark` letter + name) and the kicker (spec number, ticket, status).
+- Replace the `<title>`, the rail brand (`.rail-mark` letter + name) and the kicker (spec name, ticket, status).
 - Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="section-number">` (`02`–`08` in the `<h2>`, `01` at the start of the Overview kicker; use cases `UC<n>`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
     1. **Overview**: the `<h1>`, a one-sentence `.lead` + a `<dl class="facts">` of 3–4 key facts (key decision, data impact, API impact, UI impact or eligibility/scale), each `<dd>` one short line; a fact about data or API ends with a link to its section.
     2. **Scope**: the `.scope` block, full width: `<h3 class="label">In scope</h3>` with its bullet list, then `<h3 class="label">Out of scope</h3>` with its bullet list below it. Each out-of-scope item ends with its reason in `<span class="aside">— why</span>`.
@@ -218,7 +218,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 5. Offer the mock
 
 - Ask which mock to build (use AskUserQuestion when the agent has it). Skip the question when the feature has no UI.
-    - **In project** (recommended when the frontend app is found): mock pages inside the real app at `<routes-root>/mock/spec<NNN>/` (e.g. `apps/<web-app>/app/(main)/mock/spec164/`), built from its real components and types, with local data and no API / RPC calls. The user manages the branch and ignores the folder.
+    - **In project** (recommended when the frontend app is found): mock pages inside the real app at `<routes-root>/mock/<spec-slug>/` (e.g. `apps/<web-app>/app/(main)/mock/login-flow/`), built from its real components and types, with local data and no API / RPC calls. The user manages the branch and ignores the folder.
     - **Standalone HTML**: `<output>/mock/`, opens from disk, no app needed.
     - **No mock**.
 - In project / Standalone → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder and the chosen mode (`in-project` / `standalone`). It reads `<output>/use-cases.js`, writes the mock with `mock/shared/scenario-play.js` (how to play each scenario) and re-runs `scripts/scenarios-panels.js`, which adds the Play links and "Open the mock ↗".

@@ -95,7 +95,7 @@ Rules the diagrams don't show:
 
 ## Input → output
 
-Input: `setup [flow ...] | run [<env>] [flow ...] [--spec <NNN-slug>]`
+Input: `setup [flow ...] | run [<env>] [flow ...] [--spec <spec>]`
 
 - `setup`: build the probe for the named flows, or ask which ones.
 - `run <env>`: `<env>` is a key in `scripts/smoke/envs.json` (or `SMOKE_ENV` in `scripts/smoke/.env`). Flows left out means all. `--spec` (or `SMOKE_SPEC`) picks the report folder.

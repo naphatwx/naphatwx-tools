@@ -23,9 +23,9 @@ graph TD
     A --> B[strip --tiny / --full, keep the MR reference]
     B --> C[get-mr-diffs]
     C -->|MCP not authorized, repo not local| P[ask the user to paste the diff or file list]
-    C --> D[group by spec or area from the diff: app folders, specs/NNN-*]
+    C --> D[group by spec or area from the diff: app folders, spec folders]
     P --> D
-    D --> E[one plain line per area, spec number in parentheses]
+    D --> E[one plain line per area, spec id in parentheses]
     E --> F{flag}
     F -->|--tiny| T[title + one flat bullet per area]
     F -->|none| N[title + one bullet per area with a short detail]

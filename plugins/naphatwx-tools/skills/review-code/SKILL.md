@@ -233,13 +233,14 @@ diff.
 After generating the report, save a copy into the related spec's `PRIVATE`
 folder **if one exists**:
 
-1. **Find the related spec folder** under `specs/`:
+1. **Find the related spec folder** (any folder that holds a spec, from any
+   spec tool, e.g. under `specs/`):
    - MR review → use the MR's source branch; staged/file review → use the
      current git branch (`git branch --show-current`).
-   - Match the branch name to a `specs/<folder>/` (exact name, or the `NNN-`
-     prefixed variant).
+   - Match the branch name to a spec folder name (exact, or the folder name
+     with an id prefix such as `123-`).
    - If no spec folder matches, skip this step silently.
-2. **Write the report to `specs/<folder>/PRIVATE/review-code/`**:
+2. **Write the report to `<spec-folder>/PRIVATE/review-code/`**:
    - Create `PRIVATE/` and `review-code/` if they do not exist.
 3. **File naming** — always include the round number:
    - MR review: `review-mr-<iid>-round-<n>.md` (e.g., `review-mr-1325-round-1.md`)

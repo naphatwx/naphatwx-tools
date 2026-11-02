@@ -7,7 +7,7 @@ Writes and runs automated tests for every scenario in a feature's `use-cases.js`
 - You want a feature tested end to end, with proof of every step: a screenshot, or the request and response.
 - You want the MCP side tested by an AI agent, the way users reach it.
 - You want one shareable file, grouped by use case and scenario.
-- Say: "e2e test spec 127", "test this end to end".
+- Say: "e2e test this spec folder", "test this end to end".
 
 | You want | Use instead |
 |----------|-------------|
@@ -100,7 +100,7 @@ Rules the diagrams don't show:
 
 ## Input → output
 
-Input: `<plan folder | spec folder | spec number> [--env <name>] [--base-url <url>]`
+Input: `<plan folder | spec folder> [--env <name>] [--base-url <url>]`
 
 - No `--env` or `--base-url` → the repo's local dev URL.
 

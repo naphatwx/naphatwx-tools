@@ -1,7 +1,7 @@
 ---
 name: e2e-test
-description: Write and run automated tests for every scenario in a feature's use-cases.js, on every surface (ui in the browser with a screenshot per step, api calls with request and response, mcp and job scenarios played by an AI tester), then a fresh reviewer checks every step and one HTML report shows it all. Use when the user says "e2e test spec 127" or "test this end to end". Playing by hand is play-scenarios; service checks after a deploy are smoke-test.
-argument-hint: "<plan folder | spec folder | spec number> [--core] [--env <name>] [--base-url <url>]"
+description: Write and run automated tests for every scenario in a feature's use-cases.js, on every surface (ui in the browser with a screenshot per step, api calls with request and response, mcp and job scenarios played by an AI tester), then a fresh reviewer checks every step and one HTML report shows it all. Use when the user says "e2e test this spec folder" or "test this end to end". Playing by hand is play-scenarios; service checks after a deploy are smoke-test.
+argument-hint: "<plan folder | spec folder> [--core] [--env <name>] [--base-url <url>]"
 ---
 
 # E2E Test
@@ -29,14 +29,14 @@ $ARGUMENTS
 
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
-- **Source**: a plan folder, a spec folder or a spec number. If none is given, ask once.
+- **Source**: a plan folder or a spec folder (any folder that holds the spec, from any tool). If none is given, ask once.
 - `--env <name>` / `--base-url <url>`: where to run. If neither is given, use the repo's local dev URL and say which one.
 - `--core`: run only the core scenarios (`"core": true` in `use-cases.js`: every basic, the main alternates and the errors users hit most). Stop after the core pass of step 4–5.
 
 ## Rules
 
 - **Read the target repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, per-app guides). Their rules for where tests live, how to run tools and who edits app code win over this skill.
-- **Test source is the latest version, by domain; reports are by spec.** Tests live in `<e2e-dir>/<domain>/` and always match the latest code. Each round (a new spec on the same domain) edits them in place: never a spec folder, a spec number or a `UC<n>` in a test file name, because `UC<n>` restarts in every `use-cases.js`. The spec's own record is its `use-cases.js` and its report folder, `e2e-results/<spec>/` (one per spec, updated by every run). A repo guide with its own layout wins.
+- **Test source is the latest version, by domain; reports are by spec.** Tests live in `<e2e-dir>/<domain>/` and always match the latest code. Each round (a new spec on the same domain) edits them in place: never a spec folder name or a `UC<n>` in a test file name, because `UC<n>` restarts in every `use-cases.js`. The spec's own record is its `use-cases.js` and its report folder, `e2e-results/<spec>/` (one per spec, updated by every run). A repo guide with its own layout wins.
 - **`use-cases.js` is the one source.** Read it directly; never another skill's output (no mock, no play-scenarios files). Never write your own test cases or scenarios. A missing or wrong scenario is a finding: fix it with the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code), then test again.
 - **One test per scenario**, same id, in file order. Every surface is tested: `ui`, `api`, `mcp`, `job`. The surface only picks the runner.
 - **Tests only.** Never change application code to make a test pass. A missing selector or a real bug is a finding.
@@ -55,7 +55,7 @@ Find `use-cases.js`:
 | Source | File |
 |---|---|
 | plan folder | `<plan>/use-cases.js` |
-| spec folder or spec number | `<spec-folder>/plan/use-cases.js` |
+| spec folder | `<spec-folder>/plan/use-cases.js` |
 | missing | run the `generate-use-case` skill with the source first, then come back |
 
 - Check it: `node <generate-use-case skill dir>/scripts/check.js <plan>/use-cases.js --strict`. Errors → fix them through `generate-use-case` first. A scenario with `"source": "spec"` was never traced in the code: run `generate-use-case` in verify mode first, so tests don't encode the spec's guess.
@@ -111,7 +111,7 @@ workers: <number of spec files, max 4>,
 ```
 
 - `outputDir` is relative to the folder that holds the Playwright config. Add `e2e-results/` to `.gitignore`.
-- `E2E_SPEC=<NNN-slug>` (the spec folder name) makes the reporter write into `<outputDir>/<NNN-slug>/`; unset → `<outputDir>/_adhoc/`. A value that is not `<NNN>-<slug>` stops the run.
+- `E2E_SPEC=<spec>` (the spec folder name) makes the reporter write into `<outputDir>/<spec>/`; unset → `<outputDir>/_adhoc/`. A value that is not a plain folder name (letters, digits, `.`, `_`, `-`) stops the run.
 - That folder is reused by every run: a run replaces the tests it ran (each entry keeps its own `startedAt`), keeps the rest, and deletes screenshots nothing points to. Delete the folder for a clean start.
 - `E2E_RUN_DIR=<dir>` is an override for an odd folder. It must be inside `outputDir`, given from the repo root or from the config folder; any other path stops the run before anything is written.
 - **Login**: sign in once in a global setup and save `storageState`; every test reuses it. A scenario with another role signs in as that role in its own `test.use({ storageState })` or fixture. Use the repo's login helper or dev login. Read credentials from env vars, never from a file. The sign-in helper closes product tours and "what's new" overlays and marks them seen, so no shot shows them.
@@ -147,7 +147,7 @@ Each test carries its scenario id: the `scenario` annotation in a `.e2e.spec.ts`
 | New id | The writer adds a test, in the file of its use case's goal (step 3). |
 | An id the domain's tests hold that this feature's previous `use-cases.js` had and this one dropped | List it. Ask before deleting the test: the behaviour may still exist under another spec. |
 
-Tests whose ids appear in no `use-cases.js` of this feature are someone else's: never touch them. The previous `use-cases.js` is the newest other `specs/*/plan/use-cases.js` whose scenario ids overlap these tests; say which one you used.
+Tests whose ids appear in no `use-cases.js` of this feature are someone else's: never touch them. The previous `use-cases.js` is the newest other `<spec-folder>/plan/use-cases.js` (spec folders next to this one) whose scenario ids overlap these tests; say which one you used.
 
 ## 3. Write: one writer agent per use case, in parallel
 
@@ -169,7 +169,7 @@ When they are done:
 
 Order, always: **core pass** (`--core` run → fix test-side failures → re-run → review, step 5), then the **full run** into the same `<run>` and a review of the scenarios not yet reviewed. With `--core`, stop after the core pass. The run folder keeps the latest attempt of each test; the reviewer reviews that.
 
-The run folder `<run>` = `e2e-results/<spec>/`. `<spec>` is the spec folder name (`185-remove-announcement-dismiss`); a source with no spec folder (plan folder, feature description) has none, so the run goes to `_adhoc/`. Every run of the spec, first or re-run, this round or a later one, uses the same command and folder.
+The run folder `<run>` = `e2e-results/<spec>/`. `<spec>` is the spec folder name (`remove-announcement-dismiss`); a source with no spec folder (plan folder, feature description) has none, so the run goes to `_adhoc/`. Every run of the spec, first or re-run, this round or a later one, uses the same command and folder.
 
 ```bash
 E2E_SPEC=<spec> PW_BASE_URL=<url> npx playwright test <e2e-dir>/<domain>/ --grep " (<id>|<id>|…) "

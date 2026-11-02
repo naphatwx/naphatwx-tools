@@ -22,8 +22,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
    Note from its result: current title/description, Draft status, and the
    commits + changed files in `base_sha..head_sha`.
 
-2. **Read the driving spec/context.** If commits reference a `specs/NNN-*` folder,
-   read that `spec.md` to understand the feature, phase, and scope. Otherwise infer
+2. **Read the driving spec/context.** If commits or changed files point to a spec
+   folder (from any spec tool), read its spec to understand the feature, phase, and scope. Otherwise infer
    intent from the commits and diff.
 
 3. **Write the output**:

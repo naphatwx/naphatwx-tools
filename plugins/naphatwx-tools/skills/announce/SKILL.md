@@ -95,8 +95,8 @@ Skill-specific rules:
 - **Ignore the MR title and description entirely** — do not read them as
   content, do not let them shape the analysis or the draft. The file diffs are
   the sole content source; derive every claim in the announcement from them.
-- **Filter noise**: skip tests, lockfiles, generated code, `docs/`, `specs/`
-  when reading locally; on the MCP fallback pass `excluded_file_patterns`, e.g.
+- **Filter noise**: skip tests, lockfiles, generated code, `docs/` and spec
+  folders (e.g. `specs/`) when reading locally; on the MCP fallback pass `excluded_file_patterns`, e.g.
   `["_test\\.go$", "\\.spec\\.ts$", "package-lock\\.json", "/gen/", "\\.pb\\.go$", "\\.feature$", "^docs/", "^specs/"]`.
 - If the diff is still too large to read inline (common for release MRs), read
   it in chunks, or hand it to a subagent (when the agent has one) with an explicit
@@ -111,7 +111,7 @@ chat (draft announcements for open MRs are fine, just flag it).
 Read the file diffs and take stock of **every meaningful change across all
 apps** — thanos-grpc (backend/API), thanos-web (UI), thanos-worker, the MCP
 gateway, RBAC/permissions, and schema. Group the changes by area or by spec,
-inferring the grouping from file paths (`apps/<app>/...`, `specs/NNN-*`,
+inferring the grouping from file paths (`apps/<app>/...`, spec folders,
 `migrations/...`) and from what the code actually does.
 
 For each group, translate it into what it means for a **user of the platform**:
@@ -129,8 +129,8 @@ internal refactors with zero observable effect). But err toward **including** a
 change grouped under a short housekeeping line rather than dropping it — the goal
 is a release roundup that covers the whole MR, not only the flashy UI parts.
 
-If the diff touches spec folders (`specs/NNN-*`), you may read a `spec.md`'s
-user stories for wording, but the diff stays the source of truth for what
+If the diff touches a spec folder (any folder that holds a spec, from any
+tool), you may read its spec's user stories for wording, but the diff stays the source of truth for what
 actually changed.
 
 ### 4. Draft the announcement

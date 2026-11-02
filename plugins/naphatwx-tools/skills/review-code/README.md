@@ -35,8 +35,8 @@ graph TD
     G --> R[review each hunk: what changed, works?, breaks callers?, breaks guidelines?, re-builds or repeats code?]
     R --> K[scope check: drop findings not on a changed line]
     K --> O[print report: PASS or FAIL]
-    O --> P{"specs/<branch>/ exists?"}
-    P -->|yes| Q["save a copy to specs/<folder>/PRIVATE/review-code/"]
+    O --> P{"spec folder for the branch exists?"}
+    P -->|yes| Q["save a copy to spec-folder/PRIVATE/review-code/"]
     P -->|no| N[skip]
 ```
 
@@ -65,7 +65,7 @@ Output: a chat reply with the review. Header (files, scope, changed lines, langu
 When a spec folder matches the branch, a copy is also saved:
 
 ```
-specs/<folder>/PRIVATE/review-code/
+<spec-folder>/PRIVATE/review-code/
 ├── review-mr-<iid>-round-<n>.md        MR review
 └── review-<target>-round-<n>.md        staged or file review, e.g. review-staged-round-1.md
 ```

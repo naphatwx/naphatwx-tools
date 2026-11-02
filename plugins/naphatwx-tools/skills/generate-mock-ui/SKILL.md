@@ -1,6 +1,6 @@
 ---
 name: generate-mock-ui
-description: Build a clickable mock UI for a feature in the app's real design system, standalone or inside the app, with every edge state. Use when the user says "mock UI for spec 127" or "clickable prototype". Screens only, no real API; the full plan is design-feature.
+description: Build a clickable mock UI for a feature in the app's real design system, standalone or inside the app, with every edge state. Use when the user says "mock UI for this spec folder" or "clickable prototype". Screens only, no real API; the full plan is design-feature.
 argument-hint: <plan-folder | spec-folder> [frontend-app-path] [standalone | in-project]
 ---
 
@@ -11,7 +11,7 @@ Build a clickable mock of a planned feature, in one of two modes:
 | Mode | Where | Built from | Steps |
 |------|-------|-----------|-------|
 | standalone | `<plan-folder>/mock/` | plain HTML + copied class strings + local data in the real answer shapes; opens from disk | this file |
-| in-project | `<routes-root>/mock/spec<NNN>/` in the real app | the app's real components and types; local data, no API / RPC calls; needs the app's dev server | [in-project](references/in-project.md) |
+| in-project | `<routes-root>/mock/<spec-slug>/` in the real app | the app's real components and types; local data, no API / RPC calls; needs the app's dev server | [in-project](references/in-project.md) |
 
 Standalone mode builds `mock/` — a clickable mock that opens straight from disk and doubles as the frontend contract. The mock is **only an interactive UI**: the app's real design system, with data shaped like the real API answers.
 

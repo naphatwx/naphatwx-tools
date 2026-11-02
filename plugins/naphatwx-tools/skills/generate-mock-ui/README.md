@@ -7,7 +7,7 @@ Builds a clickable mock UI of a planned feature in the app's real design system,
 - You have a feature plan or spec, and you want to click through its screens before the backend exists.
 - You want every edge state (empty, refused, unreachable, timeout) on its own link.
 - You want a frontend contract (`types.ts`, `rules.js`, `data.js`) the real build can follow.
-- Say: "mock UI for spec 127", "clickable prototype".
+- Say: "mock UI for this spec folder", "clickable prototype".
 
 | You want | Use instead |
 |----------|-------------|
@@ -34,7 +34,7 @@ graph TD
     S4 --> S5["shared/scenario-play.js: how to play each ui scenario"]
     S5 --> S6["shared/: states, local data, components, shell"]
     S6 --> S7["page/*.html: one per screen, every state"]
-    MODE -->|in-project| P1["references/in-project.md: routes in the app at mock/spec NNN"]
+    MODE -->|in-project| P1["references/in-project.md: routes in the app at mock/spec-slug"]
     P1 --> P2["_mock/: types, rules, data, states, one hook per screen"]
     P2 --> P3[pages built from the app's real components]
     S7 --> LINK[scenarios-panels.js: Play links in the plan's overview]
@@ -102,7 +102,7 @@ Rules the diagrams don't show:
 - Use cases and scenarios are read-only here. A wrong one is fixed with `generate-use-case`.
 - Only `ui` scenarios play. `mcp`, `api` and `job` ones show "No mock": no console, no fake call. Play them with `play-scenarios` or test them with `e2e-test`.
 - Every count reported comes from `check-scenarios.js` (or `scenarios-panels.js` in-project), never by eye.
-- In-project writes only inside `mock/spec<NNN>/`: no API or RPC calls, no edits to other app files.
+- In-project writes only inside `mock/<spec-slug>/`: no API or RPC calls, no edits to other app files.
 - Run by `design-feature`: the review is skipped here, since design-feature runs it after its own checks.
 
 ## Input → output
@@ -139,7 +139,7 @@ Output, standalone:
 Output, in-project:
 
 ```
-<routes-root>/mock/spec<NNN>/
+<routes-root>/mock/<spec-slug>/
 ├── page.tsx                index: scenarios grouped by use case
 ├── <screen>/page.tsx       one route per screen; state from ?state=
 └── _mock/                  types.ts, rules.ts, data.ts, states.ts, use-cases.ts,

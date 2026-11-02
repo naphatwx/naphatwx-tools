@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Smoke runner: triggers each flow's simulation probe, checks every hop in order, writes one HTML report.
-// Node 18+, no dependencies. Usage: node scripts/smoke/run.mjs [<env>] [flow ...] [--spec <NNN-slug>] [--out <dir>]
+// Node 18+, no dependencies. Usage: node scripts/smoke/run.mjs [<env>] [flow ...] [--spec <spec>] [--out <dir>]
 // scripts/smoke/.env (git-ignored) may set SMOKE_ENV and SMOKE_SPEC; the shell, then arguments, win over it.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -32,13 +32,13 @@ const takeFlag = (name) => {
 }
 const outFlag = takeFlag('--out')
 const spec = takeFlag('--spec') ?? process.env.SMOKE_SPEC ?? ''
-if (spec && !/^[0-9]{3}-[a-z0-9-]+$/.test(spec)) fatal(`--spec / SMOKE_SPEC must be a spec folder name like 185-remove-announcement-dismiss, got "${spec}"`)
+if (spec && !/^[A-Za-z0-9][\w.-]*$/.test(spec)) fatal(`--spec / SMOKE_SPEC must be a spec folder name (letters, digits, '.', '_', '-') like remove-announcement-dismiss, got "${spec}"`)
 // One folder per spec (results/<spec>/), _adhoc/ without one. Each env keeps one report there, replaced by its next run.
 const outputDirectory = outFlag ?? join(HERE, 'results', spec || '_adhoc')
 
 const envs = JSON.parse(readFileSync(join(HERE, 'envs.json'), 'utf8'))
 const [envName, ...onlyFlows] = envs[args[0]] || !process.env.SMOKE_ENV ? args : [process.env.SMOKE_ENV, ...args]
-if (!envName) fatal('usage: node scripts/smoke/run.mjs [<env>] [flow ...] [--spec <NNN-slug>] [--out <dir>]  (or set SMOKE_ENV in scripts/smoke/.env)')
+if (!envName) fatal('usage: node scripts/smoke/run.mjs [<env>] [flow ...] [--spec <spec>] [--out <dir>]  (or set SMOKE_ENV in scripts/smoke/.env)')
 const env = envs[envName]
 if (!env) fatal(`unknown env "${envName}" — known: ${Object.keys(envs).join(', ')}`)
 

@@ -1,6 +1,6 @@
 ---
 name: generate-use-case
-description: Write a feature's use cases (one per user goal), their scenarios (one per rule or outcome, on every channel users reach it - UI, MCP, API, job) and the spec's acceptance criteria to one use-cases.js file. Scenarios are traced in the code, each with file:line evidence; where the spec and the code disagree, the code wins and the gap is listed. Use when the user says "use cases for spec 127", "list the use cases", or "verify the use cases" after a merge or refactor. Data only; design-feature, generate-mock-ui, play-scenarios and e2e-test read the file.
+description: Write a feature's use cases (one per user goal), their scenarios (one per rule or outcome, on every channel users reach it - UI, MCP, API, job) and the spec's acceptance criteria to one use-cases.js file. Scenarios are traced in the code, each with file:line evidence; where the spec and the code disagree, the code wins and the gap is listed. Use when the user says "use cases for this spec folder", "list the use cases", or "verify the use cases" after a merge or refactor. Data only; design-feature, generate-mock-ui, play-scenarios and e2e-test read the file.
 argument-hint: [verify] <spec-folder | plan-folder | use-cases.js | feature description> [output-folder]
 ---
 
@@ -55,11 +55,11 @@ Where the file goes (`<plan>`):
 |-------|----------|
 | output folder given | that folder |
 | plan folder (has `overview.html`, from design-feature) | the plan folder |
-| spec folder or spec number (`specs/<n>-*`) | `<spec-folder>/plan/` (where design-feature writes its plan) |
+| spec folder (any folder that holds the spec, from any tool) | `<spec-folder>/plan/` (where design-feature writes its plan) |
 | feature description | `plans/<feature-slug>/` at the project root |
 
 - `<plan>/use-cases.js` already exists → read it and update it in place. Keep every existing scenario `id` that still matches, so links from the mock, the plan and test files keep working. When the merge pass (step 2b) folds scenarios together, the merged one keeps the first id; list every removed id in the reply.
-- No `<plan>/use-cases.js` yet, but an earlier spec changed the same feature (its `specs/*/plan/use-cases.js` has use cases with the same goals) → start from the newest such file. Copy the use cases and scenarios this spec keeps, with their ids, then change, add and drop scenarios as this spec says. Number the use cases from `UC1` again, in this spec's order. Name the file you started from and list every dropped id in the reply. Reason: `e2e-test` finds the existing tests by scenario id and updates them in place; a new id for an unchanged rule makes it add a duplicate test.
+- No `<plan>/use-cases.js` yet, but an earlier spec changed the same feature (a `<spec-folder>/plan/use-cases.js` next to this spec folder has use cases with the same goals) → start from the newest such file. Copy the use cases and scenarios this spec keeps, with their ids, then change, add and drop scenarios as this spec says. Number the use cases from `UC1` again, in this spec's order. Name the file you started from and list every dropped id in the reply. Reason: `e2e-test` finds the existing tests by scenario id and updates them in place; a new id for an unchanged rule makes it add a duplicate test.
 - The file is in the old format (`USE_CASE_FLOWS` + `USE_CASES`, grouped by flow `3.N`) → rewrite it in the new one: each flow that is a user goal becomes a use case, each old use case becomes a scenario with the same `id`. Move the scenarios of a flow that is not a goal (step 1).
 - A file with no `channels`, no `ACCEPTANCE`, no `kind`, or MCP scenarios marked `surface: "api"` → update it in place: set `mcp`, add `channels`, `ACCEPTANCE` and `kind`, then add the missing twins. Keep every id.
 - A file with scenarios but no `evidence` (written before code tracing) → trace each scenario as in step 1b and add its `evidence`, keeping its id. A scenario whose trace shows other behaviour is rewritten to the code's behaviour, and the gap goes in `MISMATCHES`.
@@ -237,7 +237,7 @@ Before and after, from a real plan:
 - It warns when two scenarios share use case, channel, kind and story ref (and, for exceptions, the first quoted message), and when a use case has more than 12 scenarios on one channel. Merge them (step 2b), or say in the reply why they stay apart.
 - It warns when a scenario has no twin (same story ref) on another channel of its use case and no `na` reason, when an `api` scenario talks about MCP, and when an acceptance criterion skips a channel of its use case with no `na`. Add the twin, or the reason.
 - It fails on a code scenario with no `evidence`, an evidence or `na` ref whose file is missing or whose line is out of range, an absolute path, and `evidence.expect` not holding one ref per `expect` line. Fix the ref, or trace again: a moved line is drift.
-- It fails when a quoted string in a code scenario's `expect` is not in the code (outside `specs/`, `docs/`, tests and the plan folder). Copy the code's text; put the spec's text in `MISMATCHES`; take user input and example values out of the quotes.
+- It fails when a quoted string in a code scenario's `expect` is not in the code (outside `specs/`, `docs/`, tests and the spec folder). Copy the code's text; put the spec's text in `MISMATCHES`; take user input and example values out of the quotes.
 - It checks `MISMATCHES` fields, refs and scenario ids, and prints each entry.
 - It warns on every `"source": "spec"` scenario (`--strict` makes it an error; play-scenarios and e2e-test run it so), and on a scenario that names a permission with no `evidence.roles`.
 - It finds the repo root by walking up from the file to `.git`. Pass `--root <repo>` when the file is outside the repo.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.282
+
+**Spec input works with any spec tool**
+
+- Input is a spec folder path, from any tool. No bare spec number, no `specs/NNN-*` rule.
+- e2e-test, generate-use-case, design-feature, generate-mock-ui, play-scenarios, deploy-plan, smoke-test: drop the spec number input and examples.
+- `E2E_SPEC` and `--spec` / `SMOKE_SPEC` take any plain folder name (letters, digits, `.`, `_`, `-`), not only `<NNN>-<slug>`.
+- In-project mocks live at `mock/<spec-slug>/` (the spec folder name, lowercased) instead of `mock/spec<NNN>/`.
+- generate-use-case's `check.js` skips the whole spec folder around `<spec-folder>/plan/`, wherever it sits.
+- generate-changelog, announce, update-merge-request, review-code find spec folders by content and name, not by `specs/NNN-*`.
+
 ## 1.9.281
 
 **work-flow rule check: sources in the round, sub-agent only when needed**

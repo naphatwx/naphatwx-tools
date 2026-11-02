@@ -6,7 +6,7 @@ Builds a local page where you play a feature's scenarios by hand on the real run
 
 - You have a feature's use cases and scenarios, and you want to try each one on your local app.
 - You want fresh test data for every try, made through the app's own API.
-- Say: "play the scenarios on my local app", "test spec 127 by hand".
+- Say: "play the scenarios on my local app", "test this spec folder by hand".
 
 | You want | Use instead |
 |----------|-------------|

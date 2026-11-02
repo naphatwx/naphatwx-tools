@@ -61,14 +61,15 @@ Command-specific rules:
 ### 3. Summarize
 
 Group changes by spec or area, derived from the diff itself: changed file
-paths (app/module folders) and `specs/NNN-*` folders touched or referenced in
-the changed code. For each group write a short, plain-language line of what
+paths (app/module folders) and spec folders (any folder that holds a spec, from
+any tool) touched or referenced in the changed code. For each group write a short, plain-language line of what
 changed — what a reader of the changelog cares about, not implementation
 trivia.
 
 Rules:
-- Lead each area with a short label; append the spec number in parentheses when
-  the diff shows one, e.g. `(spec 101)` or `(specs 103, 107)`.
+- Lead each area with a short label; append the spec in parentheses when the
+  diff shows one: the leading id of its folder name if it has one, else the
+  folder name, e.g. `(spec 101)`, `(specs 103, 107)` or `(spec login-flow)`.
 - Plain everyday words, short lines. Cut filler.
 - Never paste raw local paths, dev sandbox names (`dev00`), or internal branch
   names.

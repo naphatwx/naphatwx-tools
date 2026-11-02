@@ -9,10 +9,10 @@ Automated tests for the app's scenarios, one test per scenario in a spec's `use-
 2. Run the Playwright tests (ui + api scenarios), from the repo root or the folder that holds the Playwright config:
 
     ```bash
-    E2E_SPEC=<NNN-slug> PW_BASE_URL=http://localhost:3000 npx playwright test <e2e-dir>/<domain>/
+    E2E_SPEC=<spec> PW_BASE_URL=http://localhost:3000 npx playwright test <e2e-dir>/<domain>/
     ```
 
-    - `E2E_SPEC` is the spec folder name. Every run goes to `e2e-results/<NNN-slug>/`; left out → `e2e-results/_adhoc/`. A run replaces the tests it ran and keeps the rest, so the folder always holds the latest result of each test. Delete it for a clean start.
+    - `E2E_SPEC` is the spec folder name. Every run goes to `e2e-results/<spec>/`; left out → `e2e-results/_adhoc/`. A run replaces the tests it ran and keeps the rest, so the folder always holds the latest result of each test. Delete it for a clean start.
     - `PW_BASE_URL` is the app to test. Left out → the config's local URL.
     - From the repo root, add `--config <path to playwright.config.*>`.
     - Add a file path to run one use case only, or `--grep " (<scenario id>|…) "` to run only one spec's scenarios.
@@ -23,10 +23,10 @@ Automated tests for the app's scenarios, one test per scenario in a spec's `use-
 4. Build the report:
 
     ```bash
-    node <e2e-dir>/reporters/build-report.mjs e2e-results/<NNN-slug> --use-cases <plan>/use-cases.js
+    node <e2e-dir>/reporters/build-report.mjs e2e-results/<spec> --use-cases <plan>/use-cases.js
     ```
 
-    It writes `e2e-results/<NNN-slug>/e2e-report.html`, prints one line per use case and `E2E report: <path>`. Open that file.
+    It writes `e2e-results/<spec>/e2e-report.html`, prints one line per use case and `E2E report: <path>`. Open that file.
 
 ## Using it
 

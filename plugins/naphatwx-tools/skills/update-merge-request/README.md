@@ -22,13 +22,13 @@ sequenceDiagram
     actor U as You
     participant A as Agent
     participant H as get-mr-diffs
-    participant R as Repo (specs/)
+    participant R as Repo (spec folder)
     participant M as GitLab MCP
     U->>A: /update-merge-request <url-or-iid>
     A->>H: MR reference
     H-->>A: current title + description, Draft status, commits + changed files in base..head
-    opt commits reference specs/NNN-*
-        A->>R: read spec.md
+    opt commits point to a spec folder
+        A->>R: read its spec
     end
     A->>A: write title (conventional commit) + description (What, Why, Changes, Scope, Testing)
     A-->>U: Title and Description as two code blocks

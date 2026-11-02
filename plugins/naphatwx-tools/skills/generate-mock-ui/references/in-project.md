@@ -3,7 +3,7 @@
 Mock pages written inside the real frontend app, built from its real components and real types. The pages call no API or RPC: data is local, and every event only changes local state.
 
 ```
-<routes-root>/mock/spec<NNN>/
+<routes-root>/mock/<spec-slug>/
 ├── page.tsx                index: scenarios grouped by use case, one link each
 ├── <screen>/page.tsx       one route per screen; state from ?state=
 └── _mock/                  private folder, not a route
@@ -22,19 +22,19 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 ## Where it lives
 
 - `<routes-root>`: the folder whose pages render inside the app's main layout (sidebar, top bar), e.g. `apps/<web-app>/app/(main)/` in a Next.js app with a `(main)` route group.
-- `spec<NNN>`: the spec number from the spec folder name (`specs/164-foo/` → `spec164`). No number → ask once.
+- `<spec-slug>`: the spec folder name in lowercase, each run of other characters than `a-z`, `0-9` turned into `-` (`164-foo/` → `164-foo`, `Login Flow/` → `login-flow`). No spec folder → ask once.
 - Folder already exists → read it, update the screens it has and add the missing ones. Never delete files you didn't write.
 
 ## Hard Rules
 
-1. **Write only inside `mock/spec<NNN>/`.** Never edit another file: no shared components, no route registry, no `.gitignore`, no git branch or commit. The user manages branches and ignores the folder.
+1. **Write only inside `mock/<spec-slug>/`.** Never edit another file: no shared components, no route registry, no `.gitignore`, no git branch or commit. The user manages branches and ignores the folder.
     - A router that needs a route registered outside the folder → don't add it; give the user the exact line in the confirm step.
 2. **No API or RPC calls.** No `fetch`, no RPC or HTTP client, no data-fetching hook, no server action, no import of the app's API layer. Data comes from `_mock/data.ts`; events change local state.
 3. **Real components only.** Import the app's existing components, layout parts, icons and tokens. Write no new design-system code; a missing piece is built from existing parts inside the page.
 4. **Real types.** Import generated proto / OpenAPI / DTO types from the app. A type the feature adds but the app doesn't generate yet goes in `_mock/types.ts`, each marked `// TODO: not generated yet — <source file>`. Never invent a field the source doesn't have.
 5. **One set of rules.** Every mapping, validation, computed value and refusal goes through `_mock/rules.ts`, exactly as strict as the spec.
 6. **One hook per screen.** `use<Screen>()` holds the screen's state and event handlers, with the return shape the real hook will have. Building the real feature then means replacing that hook.
-7. **Every state has a link.** Each edge state from the spec is a mock state, reachable as `/mock/spec<NNN>/<screen>?state=<id>`. Never an empty list where the real app would show an error.
+7. **Every state has a link.** Each edge state from the spec is a mock state, reachable as `/mock/<spec-slug>/<screen>?state=<id>`. Never an empty list where the real app would show an error.
 8. **Mock-only UI is obvious.** `StatePanel` is fixed at the bottom right, dashed pink border, labelled `Mock state`. Nothing mock-only uses product styling.
 9. The folder passes the app's own typecheck and lint. Code comments max 3 lines; no absolute local paths.
 
@@ -76,7 +76,7 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 ### 5. Link the plan (when a plan folder exists)
 
 - Run the design-feature skill's `scripts/scenarios-panels.js` with the in-project source and links:
-  `node <design-feature skill dir, sibling of this skill>/scripts/scenarios-panels.js <plan-folder> --play-file <mock-folder>/_mock/scenario-play.ts --play "http://localhost:<port>/mock/spec<NNN>/{page}?state={state}&sc={id}" --mock http://localhost:<port>/mock/spec<NNN>`
+  `node <design-feature skill dir, sibling of this skill>/scripts/scenarios-panels.js <plan-folder> --play-file <mock-folder>/_mock/scenario-play.ts --play "http://localhost:<port>/mock/<spec-slug>/{page}?state={state}&sc={id}" --mock http://localhost:<port>/mock/<spec-slug>`
 - It writes every use case's "Scenarios (N)" view and the "Open the mock ↗" link. Then add one muted line under the Use cases section's first line: the mock runs in the app, start it with the app's dev command.
 
 ### 6. Verify
@@ -92,7 +92,7 @@ The tree uses Next.js App Router names. Another router → keep the same split w
 
 ### 7. Confirm
 
-- Output: `✅ Mock created at: <mock-folder>` (repo-relative) and the index URL `http://localhost:<port>/mock/spec<NNN>`.
+- Output: `✅ Mock created at: <mock-folder>` (repo-relative) and the index URL `http://localhost:<port>/mock/<spec-slug>`.
 - Scenarios per use case and the total, as printed by `scenarios-panels.js` — never counted by eye.
 - List the screens and mock states, the types still marked `TODO: not generated yet`, and any route line the user must add (Hard Rule 1).
 - Note when `git check-ignore` says the folder is not ignored yet.

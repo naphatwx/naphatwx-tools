@@ -8,7 +8,7 @@ Plans a feature as a browsable HTML folder: acceptance criteria with the scenari
 - You want each use case drawn twice: its logic (flowchart) and how its services talk (sequence).
 - You want to see, per acceptance criterion, which scenario covers it on each channel (UI, MCP, API, job), and where the gaps are.
 - You want an optional clickable mock linked from each scenario.
-- Say: "design this feature", "plan spec 127".
+- Say: "design this feature", "plan this spec folder".
 
 | You want | Use instead |
 |----------|-------------|
@@ -121,7 +121,7 @@ Output:
 └── mock/                      optional standalone mock, by generate-mock-ui
 ```
 
-An in-project mock lives in the app instead, at `<routes-root>/mock/spec<NNN>/`.
+An in-project mock lives in the app instead, at `<routes-root>/mock/<spec-slug>/`.
 
 Step 8 (only when asked) writes a publish copy outside the plan folder: `overview.html` becomes `index.html`, and links lose `target="_blank"`.
 

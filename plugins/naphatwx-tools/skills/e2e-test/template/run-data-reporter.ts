@@ -41,7 +41,7 @@ const pad = (number: number) => String(number).padStart(2, '0')
 // Built from a char code: a literal ESC in the pattern trips no-control-regex.
 const ANSI_COLOUR = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g')
 const stripAnsi = (text = '') => text.replace(ANSI_COLOUR, '')
-const SPEC_PATTERN = /^[0-9]{3}-[a-z0-9-]+$/
+const SPEC_PATTERN = /^[A-Za-z0-9][\w.-]*$/
 const ADHOC_DIR = '_adhoc'
 const safe = (text: string) => text.replace(/[^\w.-]+/g, '_').slice(0, 80)
 const inside = (root: string, path: string) => {
@@ -95,7 +95,7 @@ export default class RunDataReporter implements Reporter {
     // E2E_SPEC files the run under e2e-results/<spec>/; unset → _adhoc/. E2E_RUN_DIR still wins.
     const spec = process.env.E2E_SPEC || undefined
     if (spec !== undefined && !SPEC_PATTERN.test(spec)) {
-      throw new Error(`E2E_SPEC must be the spec folder name, <NNN>-<slug> in lowercase (e.g. 185-remove-announcement-dismiss); got "${spec}".`)
+      throw new Error(`E2E_SPEC must be the spec folder name: letters, digits, '.', '_' or '-' (e.g. remove-announcement-dismiss); got "${spec}".`)
     }
     this.name = process.env.E2E_REPORT_NAME ?? spec ?? this.options.name ?? 'e2e'
     // Real paths, so a symlinked checkout (e.g. /var vs /private/var) still compares equal.

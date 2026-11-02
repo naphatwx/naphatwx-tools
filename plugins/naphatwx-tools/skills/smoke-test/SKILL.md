@@ -1,7 +1,7 @@
 ---
 name: smoke-test
 description: Check after a deploy that every service in a real flow still reaches the next one, using a no-op probe. Use when the user says "smoke test staging" or "set up a smoke test". Checks service links and env vars, not the UI; for browser tests use e2e-test.
-argument-hint: "setup [flow ...] | run [<env>] [flow ...] [--spec <NNN-slug>]"
+argument-hint: "setup [flow ...] | run [<env>] [flow ...] [--spec <spec>]"
 ---
 
 # Smoke Test
@@ -29,8 +29,8 @@ $ARGUMENTS
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
 - `setup [flow ...]`: build the probe for these flows, or ask which flows.
-- `run [<env>] [flow ...] [--spec <NNN-slug>]`: run the probe on `<env>` for all flows, or only for the named ones. `<env>` and the spec may come from `scripts/smoke/.env` (`SMOKE_ENV`, `SMOKE_SPEC`); an argument wins.
-- `--spec`: the spec this deploy check belongs to (its `specs/NNN-*` folder name). Give it when the request names a spec or the work belongs to one.
+- `run [<env>] [flow ...] [--spec <spec>]`: run the probe on `<env>` for all flows, or only for the named ones. `<env>` and the spec may come from `scripts/smoke/.env` (`SMOKE_ENV`, `SMOKE_SPEC`); an argument wins.
+- `--spec`: the spec this deploy check belongs to (its spec folder name, from any spec tool). Give it when the request names a spec or the work belongs to one.
 - No mode given: if `scripts/smoke/flows/` exists in the repo, use `run` on the default non-production env (R1). Otherwise use `setup`.
 
 ## Rules
@@ -124,10 +124,10 @@ Report:
 ### R2. Run
 
 ```bash
-node scripts/smoke/run.mjs <env> [flow ...] [--spec <NNN-slug>]
+node scripts/smoke/run.mjs <env> [flow ...] [--spec <spec>]
 ```
 
-- One report folder per spec, no timestamps: `scripts/smoke/results/<NNN-slug>/smoke-report-<env>.html`, or `results/_adhoc/` with no spec. Each env keeps one report there; its next run replaces it. `--out <dir>` overrides the folder.
+- One report folder per spec, no timestamps: `scripts/smoke/results/<spec>/smoke-report-<env>.html`, or `results/_adhoc/` with no spec. Each env keeps one report there; its next run replaces it. `--out <dir>` overrides the folder.
 
 All flows run in parallel. In each flow the hops are checked in order, and each hop is polled until its own timeout. A hop that is never observed is `timed-out`. After the first failed or timed-out hop, the rest of that flow are `not-reached`, never red.
 

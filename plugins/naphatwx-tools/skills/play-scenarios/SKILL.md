@@ -1,6 +1,6 @@
 ---
 name: play-scenarios
-description: Play a feature's use-case scenarios by hand on the real running app, in the same framed layout as the mock UI. Each pick creates new data through the app's API, signs in as the scenario's role and opens the screen; mark Pass / Fail. A scenario with no screen (API, MCP, job) gets a prompt for your AI agent; the agent plays it on the local app and records each call and its Pass / Fail. Works on any project. Use when the user says "play the scenarios on my local app" or "test spec 127 by hand". Manual testing only; the mock with fake data is generate-mock-ui, automated browser tests are e2e-test.
+description: Play a feature's use-case scenarios by hand on the real running app, in the same framed layout as the mock UI. Each pick creates new data through the app's API, signs in as the scenario's role and opens the screen; mark Pass / Fail. A scenario with no screen (API, MCP, job) gets a prompt for your AI agent; the agent plays it on the local app and records each call and its Pass / Fail. Works on any project. Use when the user says "play the scenarios on my local app" or "test this spec folder by hand". Manual testing only; the mock with fake data is generate-mock-ui, automated browser tests are e2e-test.
 argument-hint: <plan-folder | spec-folder> [base-url] [app-repo-path]
 ---
 

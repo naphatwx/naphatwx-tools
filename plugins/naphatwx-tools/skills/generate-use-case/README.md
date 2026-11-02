@@ -10,7 +10,7 @@ The code is the source of truth. The spec says which goals to cover; each scenar
 - You are about to plan, mock, play or test a feature: those skills read this file and never write their own.
 - An old `use-cases.js` (`USE_CASE_FLOWS`) needs moving to the new format.
 - After a merge or refactor, re-check an existing file against the code (verify mode).
-- Say: "use cases for spec 127", "list the use cases", "verify the use cases of spec 127".
+- Say: "use cases for this spec folder", "list the use cases", "verify the use cases".
 
 | You want | Use instead |
 |----------|-------------|
