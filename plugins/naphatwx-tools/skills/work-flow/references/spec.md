@@ -4,9 +4,23 @@ The main agent writes the spec. It runs nothing. It ends with a spec verify.
 
 ## Folder
 
-The profile's `Spec folder`, numbered `NNN-<slug>` (next free number across the folder, tracked or not).
-No profile value → `specs/NNN-<slug>/`. Slug: 2–4 words, like `add-user-export`. The number is how the
-user refers to the task ("continue 194").
+The profile's `Spec folder`, numbered `NNN-<slug>`. No profile value → `specs/NNN-<slug>/`.
+Slug: 2–4 words, like `add-user-export`. The number is how the user refers to the task ("continue 194").
+
+**Next number** = 1 + the highest number used anywhere (see "Spec numbers in use"). New spec folders are
+often untracked, so another checkout of the same repo can hold a number git never shows.
+Speckit picks its own number: pass the chosen one (its `--number` option), or rename the folder it made.
+
+## Spec numbers in use
+
+Collect the `NNN` prefixes of the spec folder in every place below. Missing folder → skip it.
+
+1. This checkout.
+2. Every worktree of the repo: `git worktree list --porcelain` (the `worktree <path>` lines).
+3. The profile's `Other checkouts` (separate clones of the same repo).
+4. Tracked spec folders on the target branch and the hotfix branch: `git ls-tree --name-only origin/<branch> <spec-folder>/`.
+
+Report them in one line when picking a number: "Next spec: 195 (highest 194 in ../thanos.worktrees/foo)".
 
 ## Speckit path (when speckit is installed, as skills or commands)
 

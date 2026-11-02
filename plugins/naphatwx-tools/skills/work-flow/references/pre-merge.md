@@ -9,15 +9,16 @@ Run right before the branch leaves draft or merges. Two parts: fix numbers, then
 
 ## Number check
 
-Only when the profile lists numbered folders. A spec folder git ignores never collides, so it is never checked. Numbers taken on
-parallel branches can collide by merge time.
+Only when the profile lists numbered folders or a spec folder. Numbers taken on parallel branches, or in
+another checkout, can collide by merge time.
 
 1. `git fetch origin <target>` then `git merge origin/<target>`. A conflict in app code goes to that app's owner.
 2. If the project has a branch that gets hotfixes first (the profile's `Hotfix branch`, else ask once), fetch it and **read it only, never merge it**: `git ls-tree --name-only origin/<hotfix-branch> <numbered-folder>/`.
 3. Check against the merged tree plus that branch:
    - No number appears twice.
    - Our numbers run in order right after the highest one, with no gap (migrations).
-4. **Renumber only our own files**, in their original order. Migrations go to the app's owner (headers and comments too). A tracked spec folder is the main agent's. Update every reference in the same change: spec, docs, test data, MR/PR text.
+   - Our spec number: no other spec folder with a different slug uses it, in any place listed in `spec.md` → "Spec numbers in use" (other worktrees and checkouts included).
+4. **Renumber only our own files**, in their original order. Migrations go to the app's owner (headers and comments too). The spec folder is the main agent's: move it to the next free number and update `flow.md`. Update every reference in the same change: spec, docs, test data, MR/PR text.
 5. Report old → new numbers. Commit only if the user asks, as `chore(<area>): renumber …`.
 
 ## The gate

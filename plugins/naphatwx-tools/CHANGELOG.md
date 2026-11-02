@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.270
+
+**work-flow checks spec numbers across checkouts**
+
+- Before a new spec and in the Phase 6 number check, the flow collects spec numbers from this checkout, every git worktree, the profile's new `Other checkouts` and the tracked folders on the target and hotfix branches. Untracked spec folders no longer hide a number in use.
+- Speckit gets the chosen number (its `--number` option), or its folder is renamed.
+- Phase 6 moves our spec folder to the next free number when another checkout uses it with a different slug.
+
 ## 1.9.269
 
 **work-flow runs on its own, speckit back in Phase 0**

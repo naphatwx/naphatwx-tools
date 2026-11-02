@@ -19,6 +19,7 @@ The profile tells the flow what this project has. Read it once at start.
 | web | apps/web | apps/web/AGENTS.md | - |
 
 - Spec folder: `specs/NNN-<slug>/` (new folders gitignored) | specs/NNN-<slug>/
+- Other checkouts: `../thanos-2` (separate clones whose spec numbers count too; worktrees are found by git) | none
 - Run checks: `docker compose run --rm dev` | host
 - Gate per app:
   - api: `go build ./... && go vet ./...` · unit: `go test ./...`
