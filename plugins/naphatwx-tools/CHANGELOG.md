@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.280
+
+**work-flow rule check: simpler, with priority**
+
+- A rule or code pattern answers the question → not asked, written as `(rule: <file:line or guide section>)`. Anything else → asked.
+- Priority: a written rule (guide, ADR) beats a code pattern. Two sources of the same rank that disagree → asked.
+- Drops the 1.9.279 "recommendation cites a rule" line; the rule above covers it.
+
 ## 1.9.279
 
 **work-flow rule check: sources required**
