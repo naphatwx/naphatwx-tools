@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.279
+
+**work-flow rule check: sources required**
+
+- Every rule-settled answer needs a `file:line` or guide section. No source → the question is asked.
+- A question whose recommended answer cites a rule or pattern moves to settled, with that source.
+
 ## 1.9.278
 
 **work-flow grill: one rule check per round**
