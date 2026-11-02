@@ -21,10 +21,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Phases
 
 ```text
-Phase 0  Plan       grilling (YOU, or auto-answer) → draft plan.md → spec verify
+Phase 1  Plan       grilling (YOU, or auto-answer) → draft plan.md → spec verify
    ■ PLAN STOP: summary of the plan; "implement" to go on
-Phase 1  Routing    split tasks per app, find the order
-Phase 2  Code       code only: no test files, no checks
+Phase 2  Code       tasks by app tag, contract owner first; code only: no test files, no checks
    ■ USER CHECKPOINT: always stop here
 Phase 3  Tests      write tests, run nothing
 Phase 4  Review     fresh reviewer per app + cross-app check, fix in one batch
@@ -32,12 +31,12 @@ Phase 5  Docs       update the docs the profile lists, final summary
 Phase 6  Pre-merge  merge the target branch in, fix numbers, then THE gate
 ```
 
-Phases 1–3 and the checkpoint are below. For the others, read **only the reference file for the phase you are entering**.
+Phases 2–3 and the checkpoint are below. For the others, read **only the reference file for the phase you are entering**.
 
 | Phase | Read |
 |---|---|
 | Start, any phase | [references/profile.md](references/profile.md), [references/roles.md](references/roles.md) |
-| 0 | [references/plan.md](references/plan.md) |
+| 1 | [references/plan.md](references/plan.md) |
 | 4, 5 | [references/review-docs.md](references/review-docs.md) |
 | 6, or a gate the user asks for | [references/pre-merge.md](references/pre-merge.md) |
 
@@ -49,21 +48,17 @@ Phases 1–3 and the checkpoint are below. For the others, read **only the refer
    - Anything else → a new task. The whole input is what the user wants.
 2. **Load the project profile** (`references/profile.md`). Missing parts → ask once, then go on.
 3. **Status line**: the second line of `plan.md`. Update it at the end of every phase:
-   `- Phase: 0 | 1 | 2 | checkpoint | 3 | 4 | 5 | 6 | done · Apps: <apps> · Target: <branch> · Next: <one line>`
-
-## Phase 1: Routing
-
-1. Group the non-`[TEST]` tasks by app.
-2. Order: with codegen in the profile, the app that owns the contract goes first; the others start after it. Apps with no link start at the same time.
-3. Edits outside any app (root config, compose, env examples) → the main agent does them.
+   `- Phase: 1 | 2 | checkpoint | 3 | 4 | 5 | 6 | done · Apps: <apps> · Target: <branch> · Next: <one line>`
 
 ## Phase 2: Code
 
-1. Start one **owner** per app, `MODE: code` (`roles.md`), with its task ids, the path to `plan.md`, its folder and guide, and its codegen command if any. Independent owners go in one message.
-2. Keep each owner's id: a later fix goes back to the same instance (SendMessage when the agent has it).
-3. Follow-up owners from the profile start after their app's owner, `MODE: code`.
-4. An owner reports an edit outside its folder → route it to that folder's owner, or do it yourself if it is main-agent territory.
-5. Tick the done tasks.
+1. **Split by app tag.** Group the non-`[TEST]` tasks by their `[app]` tag. Tasks outside any app (root config, compose, env examples) → the main agent does them.
+2. **Order.** With codegen in the profile, the owner of the contract app goes first; the apps that use the contract start after it. Apps with no link start at the same time.
+3. Start one **owner** per app, `MODE: code` (`roles.md`), with its task ids, the path to `plan.md`, its folder and guide, and its codegen command if any. Owners that start at the same time go in one message.
+4. Keep each owner's id: a later fix goes back to the same instance (SendMessage when the agent has it).
+5. Follow-up owners from the profile start after their app's owner, `MODE: code`.
+6. An owner reports an edit outside its folder → route it to that folder's owner, or do it yourself if it is main-agent territory.
+7. Tick the done tasks.
 
 ## User checkpoint
 
@@ -74,7 +69,7 @@ Stop and end the turn. Report:
 - How to try it by hand: the screen or endpoint, and the steps. Mention the `play-scenarios` skill if the task has use cases.
 - Plainly: no tests are written yet and no build, lint or typecheck has run. The user can ask for a gate at any time.
 
-Then wait. "continue" / "review" → Phase 3. Change requests → same owners, back to Phase 2 (Phase 0 if the plan changes), then stop here again.
+Then wait. "continue" / "review" → Phase 3. Change requests → same owners, back to Phase 2 (Phase 1 if the plan changes), then stop here again.
 
 ## Phase 3: Tests
 
@@ -85,11 +80,11 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 
 ## Hard rules
 
-- **The flow runs on its own** except for three stops: the grill in Phase 0 (none with auto-answer, after scope), the plan stop, and the checkpoint.
+- **The flow runs on its own** except for three stops: the grill in Phase 1 (none with auto-answer, after scope), the plan stop, and the checkpoint.
 - **The plan stop always stops.** Code starts only when the user says "implement".
-- **Phase 0 edits nothing but the plan.** Do not use plan mode: its exit asks for an approval this flow does not have.
+- **Phase 1 edits nothing but the plan.** Do not use plan mode: its exit asks for an approval this flow does not have.
 - **The checkpoint after Phase 2 always stops.** End the turn. Go on only when the user says so ("continue", "review").
-- **Phases 0–5 run no checks and no tests.** No build, lint, typecheck, unit test or integration test. The only automatic gate is in Phase 6.
+- **Phases 1–5 run no checks and no tests.** No build, lint, typecheck, unit test or integration test. The only automatic gate is in Phase 6.
 - **A gate the user asks for runs at any time.** Report the result and stop. Do not fix unless asked.
 - **Phase 2 never creates or edits a test file.** Tests come in Phase 3, after the user confirms the behavior.
 - **The main agent orchestrates.** App code is changed by an app owner sub-agent (`references/roles.md`), even a one-line edit. The main agent edits only the work folder, root config and docs.

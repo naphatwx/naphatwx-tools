@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.275
+
+**work-flow merges Routing into Code**
+
+- Phase 1 Routing is gone: Code groups tasks by their `[app]` tag, runs the contract owner first, then starts the owners.
+- Phases renumbered, starting at 1: 1 Plan, 2 Code, 3 Tests, 4 Review, 5 Docs, 6 Pre-merge. Update the status line of an open `plan.md` by hand (old `Phase: 0` → 1; old 2–6 stay the same number for Code to Pre-merge, old `Phase: 1` Routing → 2).
+
 ## 1.9.274
 
 **work-flow stops after the plan**

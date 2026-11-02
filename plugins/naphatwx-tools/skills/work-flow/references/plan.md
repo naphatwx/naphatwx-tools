@@ -1,4 +1,4 @@
-# Phase 0: Plan
+# Phase 1: Plan
 
 The main agent writes the plan straight to the task folder. It edits nothing but the plan. Two stops:
 the grill, and the plan summary at the end. Code starts only when the user says "implement".
@@ -47,7 +47,7 @@ Write `<work folder>/NNN-<slug>/plan.md` in this shape. Skip a section that has 
 
 ```markdown
 # NNN · <Title>
-- Phase: 0 · Apps: <apps> · Target: <MR/PR target or "not known yet"> · Next: <one line>
+- Phase: 1 · Apps: <apps> · Target: <MR/PR target or "not known yet"> · Next: <one line>
 
 ## Goal
 - <one line>
@@ -90,7 +90,7 @@ the grill settled those.
 
 ## 6. Plan stop
 
-Set the status line to `Phase: 0 · … · Next: say "implement"`, then stop and end the turn. Report:
+Set the status line to `Phase: 1 · … · Next: say "implement"`, then stop and end the turn. Report:
 
 - The plan path.
 - What will be built: the goal and the Accept lines, in short.
@@ -99,7 +99,7 @@ Set the status line to `Phase: 0 · … · Next: say "implement"`, then stop and
 - The top risks.
 
 Then wait.
-- "implement" → set the status line to `Phase: 1` and go to Phase 1.
+- "implement" → set the status line to `Phase: 2` and go to Phase 2.
 - Changes → a new decision goes back to the grill for that question, a wording or scope fix back to step 4;
   run spec verify again only for the apps the change touches, then stop here again.
 - `/work-flow <number>` on a task at this stop shows the summary again and waits.

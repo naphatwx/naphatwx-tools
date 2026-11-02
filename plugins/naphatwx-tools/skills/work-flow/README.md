@@ -22,15 +22,14 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 ```mermaid
 flowchart TD
     START([/work-flow: next task number NNN]) --> P0
-    subgraph P0["Phase 0 - Plan (edits nothing but the plan)"]
+    subgraph P0["Phase 1 - Plan (edits nothing but the plan)"]
         GR{{grilling: YOU answer, or auto-answer after scope}} --> DR[draft .work/NNN-slug/plan.md]
         DR --> VER[spec verify: plan vs project rules, agent fixes]
         VER --> PS{{PLAN STOP: summary; you say implement}}
         PS -->|changes| GR
     end
 
-    P0 --> P1[Phase 1 - Routing: split tasks per app, find the order]
-    P1 --> P2[Phase 2 - Code: one owner per app, no tests, no checks]
+    P0 --> P2[Phase 2 - Code: tasks by app tag, one owner per app, no tests, no checks]
     P2 --> CP{{USER CHECKPOINT - always stops}}
     CP -->|changes| P2
     CP -->|continue| P3[Phase 3 - Tests: owners write unit + integration tests, run nothing]
@@ -77,16 +76,16 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 
 | Path | What |
 |------|------|
-| [SKILL.md](SKILL.md) | The agent's instructions: phases, Phases 1–3 and the checkpoint, hard rules |
+| [SKILL.md](SKILL.md) | The agent's instructions: phases, Phases 2–3 and the checkpoint, hard rules |
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
-| [references/plan.md](references/plan.md) | Phase 0: number, explore, grilling and auto-answer, draft, spec verify, plan stop |
+| [references/plan.md](references/plan.md) | Phase 1: number, explore, grilling and auto-answer, draft, spec verify, plan stop |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
 
 ## Related skills
 
-- `grilling` (mattpocock-skills): the Phase 0 questions.
+- `grilling` (mattpocock-skills): the Phase 1 questions.
 - `generate-use-case`, `design-feature`: can take the task folder as input.
 - `review-code`: reviewers may use it for the diff.
 - `play-scenarios`: try the code by hand at the checkpoint.
