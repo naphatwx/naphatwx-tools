@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.273
+
+**work-flow drops plan mode and the approval stop, adds auto-answer**
+
+- Phase 0 writes `.work/NNN-<slug>/plan.md` directly. No plan mode: its exit asks for an approval and then says "start coding".
+- Two stops: the grill and the checkpoint after code. The final yes in the grill is the go-ahead.
+- Auto-answer: `auto-answer` (or `auto`) in the input or a grill reply. The user still settles scope; the decider answers the rest, marked `(auto)`.
+- A spec verify finding that changes scope or a user decision goes back to the grill.
+- The checkpoint report names the plan and the decisions the user did not make.
+- Step 2 is now Explore: an `Explore` sub-agent maps the code (files, behavior, tests, docs, gaps) before the grill.
+
 ## 1.9.272
 
 **work-flow calls grilling, not grill-me**

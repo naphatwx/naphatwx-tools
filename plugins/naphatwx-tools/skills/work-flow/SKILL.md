@@ -1,6 +1,6 @@
 ---
 name: work-flow
-description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (plan mode + grilling), code, a stop for the user, tests, review, docs, pre-merge gate. The approved plan is saved as .work/NNN-slug/plan.md. Works on any project. Run it as "/work-flow <what you want>", or "/work-flow <number>" to resume. Slash only.
+description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (grilling, with an optional auto-answer), code, a stop for the user, tests, review, docs, pre-merge gate. The plan is saved as .work/NNN-slug/plan.md. Works on any project. Run it as "/work-flow <what you want>", or "/work-flow <number>" to resume. Slash only.
 argument-hint: <what-you-want | task number [phase] | (empty = status)>
 disable-model-invocation: true
 ---
@@ -21,7 +21,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Phases
 
 ```text
-Phase 0  Plan       plan mode: grilling (YOU) → draft → spec verify → YOU approve → plan.md
+Phase 0  Plan       grilling (YOU, or auto-answer) → draft plan.md → spec verify
 Phase 1  Routing    split tasks per app, find the order
 Phase 2  Code       code only: no test files, no checks
    ■ USER CHECKPOINT: always stop here
@@ -68,6 +68,7 @@ Phases 1–3 and the checkpoint are below. For the others, read **only the refer
 
 Stop and end the turn. Report:
 
+- The plan path, and the decisions not made by the user (auto, spec verify, decider).
 - What was built and the files changed, per app.
 - How to try it by hand: the screen or endpoint, and the steps. Mention the `play-scenarios` skill if the task has use cases.
 - Plainly: no tests are written yet and no build, lint or typecheck has run. The user can ask for a gate at any time.
@@ -83,8 +84,8 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 
 ## Hard rules
 
-- **The flow runs on its own** except for three stops: the grill in Phase 0, the plan approval, and the checkpoint.
-- **Phase 0 edits nothing but the plan.** Plan mode enforces it; agents without plan mode keep to it themselves.
+- **The flow runs on its own** except for two stops: the grill in Phase 0 (none with auto-answer, after scope) and the checkpoint.
+- **Phase 0 edits nothing but the plan.** Do not use plan mode: its exit asks for an approval this flow does not have.
 - **The checkpoint after Phase 2 always stops.** End the turn. Go on only when the user says so ("continue", "review").
 - **Phases 0–5 run no checks and no tests.** No build, lint, typecheck, unit test or integration test. The only automatic gate is in Phase 6.
 - **A gate the user asks for runs at any time.** Report the result and stop. Do not fix unless asked.
@@ -100,6 +101,7 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 
 - Spec verify findings: the main agent fixes them itself. One it disagrees with → the **decider** (`roles.md`), whose call is final.
 - Never leave an open question in the plan: the grill asks it.
+- Auto-answer: the decider answers grill rounds after the user settles scope (`references/plan.md`).
 - A step that fails or loops more than 3 times → stop and report the blocker.
 
 ## Agents without sub-agents

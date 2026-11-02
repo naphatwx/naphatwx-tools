@@ -81,7 +81,7 @@ For each new test, it confirms the test fails when the code under test is broken
 
 ## Decider
 
-Settles a spec verify finding the main agent disputes in Phase 0. Never answers grill questions: those are the user's. Use the profile's `Decider agent` when it names one.
+Settles a spec verify finding the main agent disputes in Phase 0. Answers grill rounds only when the user turned on auto-answer, and never the scope question (`plan.md` → Auto-answer). Use the profile's `Decider agent` when it names one.
 
 ```text
 ROLE: decider. You replace the user for this decision. Never defer back.

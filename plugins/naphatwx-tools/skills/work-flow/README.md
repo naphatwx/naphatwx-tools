@@ -7,7 +7,7 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 - You start a feature, bug fix or hotfix and want a fixed flow: plan, code, your review, tests, AI review, docs, pre-merge gate.
 - Needs Matt Pocock's `grilling` skill: `/plugin install mattpocock-skills@claude-plugins-official`.
 - You want sub-agents to write the code, one per app, and fresh sub-agents to review it.
-- Run: `/work-flow add CSV export to the users page`, or `/work-flow 127` to resume task 127, or `/work-flow` for status.
+- Run: `/work-flow add CSV export to the users page` (add `auto-answer` to skip the grill after scope), or `/work-flow 127` to resume task 127, or `/work-flow` for status.
 - Slash only. The agent never starts it by itself.
 
 | You want | Use instead |
@@ -22,12 +22,9 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 ```mermaid
 flowchart TD
     START([/work-flow: next task number NNN]) --> P0
-    subgraph P0["Phase 0 - Plan (plan mode, edits nothing)"]
-        GR[grilling: YOU answer] --> DR[draft plan]
+    subgraph P0["Phase 0 - Plan (edits nothing but the plan)"]
+        GR{{grilling: YOU answer, or auto-answer after scope}} --> DR[draft .work/NNN-slug/plan.md]
         DR --> VER[spec verify: plan vs project rules, agent fixes]
-        VER --> AP{{YOU approve}}
-        AP -->|keep planning| GR
-        AP -->|approved| SV[save .work/NNN-slug/plan.md]
     end
 
     P0 --> P1[Phase 1 - Routing: split tasks per app, find the order]
@@ -50,7 +47,8 @@ flowchart TD
     ASK[/you ask for a gate, any phase/] -.-> ON[gate runners, report only]
 ```
 
-- Your three stops: the grilling questions, the plan approval (Claude Code's own prompt), and the checkpoint after code.
+- Your two stops: the grilling questions and the checkpoint after code. No plan mode and no approval prompt: your final yes in the grill is the go-ahead.
+- Auto-answer: write `auto-answer` in the input or in a grill reply. You still answer the scope question; a decider sub-agent answers the rest and gives the final yes. Its answers are marked `(auto)` in the plan.
 - Spec verify checks the plan against the project's rules, not the requirements. The agent fixes what it finds; a decider sub-agent settles disputes.
 - At the checkpoint you try the code first; tests come after you confirm.
 - No build, lint or test runs before Phase 6, unless you ask for a gate.
@@ -80,7 +78,7 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 | [SKILL.md](SKILL.md) | The agent's instructions: phases, Phases 1–3 and the checkpoint, hard rules |
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
-| [references/plan.md](references/plan.md) | Phase 0: number, plan mode, grilling, draft, spec verify, approve, save |
+| [references/plan.md](references/plan.md) | Phase 0: number, explore, grilling and auto-answer, draft, spec verify |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
 
