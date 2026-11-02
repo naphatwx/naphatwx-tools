@@ -79,18 +79,18 @@ Writes integration tests in Phase 3 (`MODE: tests`) and runs only the added or c
 ones in Phase 6 (`MODE: run-tests`). Uses the project's test skill or guide if there is one.
 For each new test, it confirms the test fails when the code under test is broken, then restores the code.
 
-## Decider (Autopilot only)
+## Decider
 
-Stands in for the user in Phases 0–2. Use the profile's `Decider agent` when it names one.
+Settles a finding the main agent disputes (analyze issue, spec verify finding) in Phase 0. Never answers clarify questions: those are the user's. Use the profile's `Decider agent` when it names one.
 
 ```text
 ROLE: decider. You replace the user for this decision. Never defer back.
 Read: <root guide>, <app guides>, the spec folder <path>.
-Decide: <question, review or options>.
+Decide: <the finding and both positions>.
 Order of priority: security, project rules, the simplest working option, current best practice (search the web when the answer can go stale).
 Report per item:
 ### Decision: <topic>
-Choice: <option or APPROVED / NEEDS REVISION>
+Choice: <apply the finding / reject it / a third option>
 Reason: <2-3 sentences>
 Security: <"no concerns" or the risk>
 ```

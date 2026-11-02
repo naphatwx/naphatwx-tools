@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.269
+
+**work-flow runs on its own, speckit back in Phase 0**
+
+- No mode question and no size question. The flow runs by itself; the user answers only the clarify questions (skipped when there are none) and reviews at the checkpoint.
+- Phase 0 uses speckit when its commands are available (specify, clarify, plan, tasks, analyze; checklist only on request), else the light `spec.md`. Specs are numbered `NNN-<slug>` in the profile's spec folder, and `/work-flow 194` resumes one.
+- Spec verify checks the plan against the project's rules, not the requirements. The agent applies findings and analyze fixes itself; the decider only settles disputes.
+- Removed: Manual mode, the Small path, the "start coding?" question. `flow.md` drops `Mode` and `Size`, gains `Spec`.
+- Number check covers tracked numbered folders only; an ignored spec folder never collides.
+
 ## 1.9.268
 
 **work-flow gets a Small path and fewer files**

@@ -18,7 +18,7 @@ The profile tells the flow what this project has. Read it once at start.
 | api | apps/api | apps/api/AGENTS.md | api-specialist |
 | web | apps/web | apps/web/AGENTS.md | - |
 
-- Spec folder: `.work/<slug>/` (gitignored) | specs/NNN-<slug>/
+- Spec folder: `specs/NNN-<slug>/` (new folders gitignored) | specs/NNN-<slug>/
 - Run checks: `docker compose run --rm dev` | host
 - Gate per app:
   - api: `go build ./... && go vet ./...` · unit: `go test ./...`
@@ -28,7 +28,7 @@ The profile tells the flow what this project has. Read it once at start.
   - At pre-merge: full | changed
 - Codegen order: api first (`make proto`), then web (`npm run proto:gen`) | none
 - Follow-up owners: web → design-specialist (look and feel) | none
-- Numbered folders: migrations/sql, specs | none
+- Numbered folders (tracked only): migrations/sql | none
 - Hotfix branch (read only, never merged): staging | ask
 - Pre-merge app steps: api: apply migrations on the local stack | none
 - Cross-app checks: <extra names that must match across apps> | none

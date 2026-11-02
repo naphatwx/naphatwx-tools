@@ -6,7 +6,7 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 
 - You start a feature, bug fix or hotfix and want a fixed flow: spec, code, your review, tests, AI review, docs, pre-merge gate.
 - You want sub-agents to write the code, one per app, and fresh sub-agents to review it.
-- Run: `/work-flow add CSV export to the users page`, or `/work-flow specs/127-user-export` to resume, or `/work-flow` for status.
+- Run: `/work-flow add CSV export to the users page`, or `/work-flow 127` to resume spec 127, or `/work-flow` for status.
 - Slash only. The agent never starts it by itself.
 
 | You want | Use instead |
@@ -20,14 +20,11 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 
 ```mermaid
 flowchart TD
-    START([/work-flow: ask Autopilot or Manual + Small or Full]) --> SZ{size}
-
-    SZ -->|Small: 1 app, no contract, no migration| S0[Phase 0 - short spec.md, you review it]
-    S0 --> P2
-
-    SZ -->|Full| P0
+    START([/work-flow: new spec number NNN]) --> P0
     subgraph P0["Phase 0 - Spec (main agent, runs nothing)"]
-        LS[spec.md: Spec, Plan, Tasks] --> VER[spec verify: fresh verifier per app, read only]
+        SK[speckit specify / or light spec.md] --> CL[clarify: YOU answer]
+        CL --> PT[plan, tasks, analyze: agent fixes issues]
+        PT --> VER[spec verify: plan vs project rules, agent fixes]
     end
 
     P0 --> P1[Phase 1 - Routing: split tasks per app, find the order]
@@ -50,8 +47,8 @@ flowchart TD
     ASK[/you ask for a gate, any phase/] -.-> ON[gate runners, report only]
 ```
 
-- **Autopilot**: a decider sub-agent answers the questions in Phases 0–2. **Manual**: you answer them.
-- **Small** (one app, no contract, no migration, no new permission): short spec, no spec verify, no routing, one reviewer, no cross-app or number check. The checkpoint, tests, review and gate still run. Grows past Small → switches to Full.
+- Runs on its own. You answer the clarify questions in Phase 0 (skipped when there are none) and review at the checkpoint.
+- Spec verify checks the plan against the project's rules, not the requirements. The agent fixes what it finds; a decider sub-agent settles disputes.
 - The checkpoint after Phase 2 stops in both modes. You try the code first; tests come after you confirm.
 - No build, lint or test runs before Phase 6, unless you ask for a gate.
 - The main agent only orchestrates. App code is changed by the app's owner sub-agent.
@@ -62,14 +59,14 @@ The flow reads a `## Flow profile` section in the project's root `AGENTS.md` or 
 
 ## Input → output
 
-Input: `<what you want | spec-folder [phase] | (empty)>`
+Input: `<what you want | spec number or folder [phase] | (empty)>`
 
 Output:
 
 ```
-<spec folder>/
-├── spec.md   Spec, Plan, Tasks (Small: Goal, Accept, Tasks)
-└── flow.md   mode, phase, apps, target branch, next step
+<spec folder>/NNN-<slug>/
+├── spec.md, plan.md, tasks.md, …   from speckit, or one light spec.md
+└── flow.md                          spec, phase, apps, target branch, next step
 ```
 
 Plus the code, tests and docs changes on the working branch. Nothing is committed unless you ask.
@@ -78,7 +75,7 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 
 | Path | What |
 |------|------|
-| [SKILL.md](SKILL.md) | The agent's instructions: phases, Small vs Full, Phases 1–3 and the checkpoint, hard rules, modes |
+| [SKILL.md](SKILL.md) | The agent's instructions: phases, Phases 1–3 and the checkpoint, hard rules |
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
 | [references/spec.md](references/spec.md) | Phase 0: write spec.md, then spec verify |

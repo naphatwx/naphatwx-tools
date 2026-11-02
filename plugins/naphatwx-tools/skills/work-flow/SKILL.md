@@ -1,7 +1,7 @@
 ---
 name: work-flow
-description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - spec, code, a stop for the user, tests, review, docs, pre-merge gate. A Small path trims it for one-app tasks. Works on any project. Run it as "/work-flow <what you want>" or "/work-flow <spec-folder>" to resume. Slash only.
-argument-hint: <what-you-want | spec-folder [phase] | (empty = status)>
+description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - spec, code, a stop for the user, tests, review, docs, pre-merge gate. Runs on its own; the user answers the clarify questions and reviews at the checkpoint. Works on any project. Run it as "/work-flow <what you want>" or "/work-flow <spec-folder>" to resume. Slash only.
+argument-hint: <what-you-want | spec number or folder [phase] | (empty = status)>
 disable-model-invocation: true
 ---
 
@@ -21,12 +21,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Phases
 
 ```text
-Phase 0  Spec       spec.md → spec verify (Full only)
-Phase 1  Routing    split tasks per app, find the order (Full only)
+Phase 0  Spec       speckit (or a light spec.md), YOU answer clarify → spec verify
+Phase 1  Routing    split tasks per app, find the order
 Phase 2  Code       code only: no test files, no checks
    ■ USER CHECKPOINT: always stop here
 Phase 3  Tests      write tests, run nothing
-Phase 4  Review     fresh reviewer per app (+ cross-app check, Full only), fix in one batch
+Phase 4  Review     fresh reviewer per app + cross-app check, fix in one batch
 Phase 5  Docs       update the docs the profile lists, final summary
 Phase 6  Pre-merge  merge the target branch in, fix numbers, then THE gate
 ```
@@ -44,51 +44,21 @@ Phases 1–3 and the checkpoint are below. For the others, read **only the refer
 
 1. **Parse the input.**
    - Empty → find `flow.md` files in spec folders (see below), list each task with its phase and next step, ask which to pick up. Stop.
-   - A spec folder that holds `flow.md` → resume at its phase. A phase name after it (`spec`, `code`, `tests`, `review`, `docs`, `pre-merge`) re-runs that phase, only if `flow.md` shows the task already reached it.
+   - A spec number (`194`) or a spec folder that holds `flow.md` → resume at its phase. A phase name after it (`spec`, `code`, `tests`, `review`, `docs`, `pre-merge`) re-runs that phase, only if `flow.md` shows the task already reached it.
    - Anything else → a new task. The whole input is what the user wants.
 2. **Load the project profile** (`references/profile.md`). Missing parts → ask once, then go on.
-3. **New task only: ask the mode and confirm the size** in one question. Use AskUserQuestion when the agent has it, else ask in chat:
-   - **Autopilot**: run Phases 0–2 without questions, then stop at the checkpoint.
-   - **Manual**: ask the user at every review and decision point.
-   - **Size**: propose Small or Full (below) with a one-line reason; the user confirms.
-4. Write `flow.md` in the spec folder as soon as Phase 0 creates it, and update it at the end of every phase:
+3. Write `flow.md` in the spec folder as soon as Phase 0 creates it, and update it at the end of every phase:
 
 ```markdown
 # Flow
-- Mode: Autopilot | Manual
-- Size: Small | Full
+- Spec: <NNN-slug>
 - Phase: 0 | 1 | 2 | checkpoint | 3 | 4 | 5 | 6 | done
 - Apps: <apps this task changes>
 - Target branch: <from the open MR/PR, or "not known yet">
 - Next: <one line>
 ```
 
-## Small or Full
-
-**Small** = every one of these is true. Anything else is **Full**.
-
-- Only one app changes.
-- No shared contract changes (proto, API shape, queue or event name, shared types).
-- No file in a numbered folder (migrations and the like).
-- No new permission.
-
-| Step | Small | Full |
-|---|---|---|
-| `spec.md` | short shape (`spec.md` reference) | full shape |
-| Spec verify | skip | run |
-| Decider (Autopilot) | skip: ask the user, even in Autopilot | run |
-| Phase 1 routing | skip | run |
-| Code, checkpoint, tests | run | run |
-| Review | one fresh reviewer | one per app |
-| Cross-app check | skip | run |
-| Docs | only when behavior changed | run |
-| Number check | skip | run |
-| Phase 6 gate | run, one app | run |
-
-- The checkpoint, tests after the user confirms, a fresh reviewer and the Phase 6 gate never skip.
-- **Upgrade:** the task grows past Small (a second app, a contract, a migration) → stop, tell the user, set `Size: Full` and go back to Phase 0 to add the missing parts.
-
-## Phase 1: Routing (Full only)
+## Phase 1: Routing
 
 1. Group the non-`[TEST]` tasks by app.
 2. Order: with codegen in the profile, the app that owns the contract goes first; the others start after it. Apps with no link start at the same time.
@@ -100,7 +70,7 @@ Phases 1–3 and the checkpoint are below. For the others, read **only the refer
 2. Keep each owner's id: a later fix goes back to the same instance (SendMessage when the agent has it).
 3. Follow-up owners from the profile start after their app's owner, `MODE: code`.
 4. An owner reports an edit outside its folder → route it to that folder's owner, or do it yourself if it is main-agent territory.
-5. Tick the done tasks. Manual: report each app as it finishes.
+5. Tick the done tasks.
 
 ## User checkpoint
 
@@ -121,7 +91,8 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 
 ## Hard rules
 
-- **The checkpoint after Phase 2 always stops**, in Autopilot too. End the turn. Go on only when the user says so ("continue", "review").
+- **The flow runs on its own** except for two stops: the clarify questions in Phase 0 (the user answers; skipped when there are none) and the checkpoint.
+- **The checkpoint after Phase 2 always stops.** End the turn. Go on only when the user says so ("continue", "review").
 - **Phases 0–5 run no checks and no tests.** No build, lint, typecheck, unit test or integration test. The only automatic gate is in Phase 6.
 - **A gate the user asks for runs at any time.** Report the result and stop. Do not fix unless asked.
 - **Phase 2 never creates or edits a test file.** Tests come in Phase 3, after the user confirms the behavior.
@@ -132,19 +103,11 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 - **No commit, push or merge** unless the user asks, except the Phase 6 merge of the target branch, which the user started by entering Phase 6.
 - **Never fix a pre-existing failure inside the task.** Report it as a separate task.
 
-## Autopilot vs Manual
+## Decisions without the user
 
-| Step | Autopilot | Manual |
-|---|---|---|
-| Questions in Phase 0 | the **decider** sub-agent answers (Small: ask the user) | ask the user, wait |
-| `spec.md` review | decider reviews; revise until it approves (Small: the user) | present it, wait |
-| Spec verify findings (Full) | fix them; disputed ones go to the decider | present, fix the confirmed ones |
-| Before Phase 2 | go on | ask "start coding?" |
-| Checkpoint, Phases 3–6 | same in both modes | same in both modes |
-
-- Autopilot never leaves `[NEEDS CLARIFICATION]` markers, and asks the user before the checkpoint only on the Small path.
-- Autopilot: a step that fails or loops more than 3 times → stop and report the blocker.
-- Manual: give options and a recommendation; the user decides.
+- Analyze issues and spec verify findings: the main agent fixes them itself. One it disagrees with → the **decider** (`roles.md`), whose call is final.
+- Never leave `[NEEDS CLARIFICATION]` markers: ask them in the clarify step.
+- A step that fails or loops more than 3 times → stop and report the blocker.
 
 ## Agents without sub-agents
 

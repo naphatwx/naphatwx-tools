@@ -2,13 +2,31 @@
 
 The main agent writes the spec. It runs nothing. It ends with a spec verify.
 
-## Write the spec
+## Folder
 
-1. **Folder.** The profile's `Spec folder`. Else the repo's spec folder if it has one (`specs/`, `docs/specs/`), with its numbering (`NNN-<slug>`, next free number). Else `docs/specs/<slug>/`. Slug: 2–4 words, like `add-user-export`.
-2. **Ask or decide.** List up to 5 questions whose answer changes the design. Autopilot: the decider answers. Manual: ask the user (AskUserQuestion when the agent has it).
-3. **Write one file, `spec.md`**, short. Full: the shape below. Small: the short shape. Skip a section that has nothing.
-4. **Review.** Full + Autopilot: the decider reviews `spec.md`; NEEDS REVISION → fix, review again. Otherwise: present it to the user, wait.
-5. **Spec verify** (below). Full only.
+The profile's `Spec folder`, numbered `NNN-<slug>` (next free number across the folder, tracked or not).
+No profile value → `specs/NNN-<slug>/`. Slug: 2–4 words, like `add-user-export`. The number is how the
+user refers to the task ("continue 194").
+
+## Speckit path (when speckit is installed, as skills or commands)
+
+Run each step the way the agent has it: a skill (`speckit-specify`), a slash command (`/speckit.specify`), or read its command file and follow it. The table names the slash form.
+
+| # | Step | Who |
+|---|---|---|
+| 1 | `/speckit.specify <want>` | main agent; the folder must match the one above (move it if speckit wrote elsewhere) |
+| 2 | `/speckit.clarify` | **the user answers**. No questions → skip |
+| 3 | `/speckit.plan` | main agent |
+| 4 | `/speckit.tasks` | main agent; mark test tasks `[TEST]` if speckit did not |
+| 5 | `/speckit.analyze` | main agent fixes every real issue itself; a disputed one → the decider |
+| 6 | `/speckit.checklist` | only when the user asks |
+| 7 | Spec verify (below) | main agent fixes |
+
+## Light spec path (no speckit)
+
+1. Write `spec.md` in the shape below. Skip a section that has nothing.
+2. **Clarify**: up to 5 questions whose answer changes the design, in one message (AskUserQuestion when the agent has it). **The user answers.** No questions → skip. Write each answer under Decisions.
+3. Spec verify (below).
 
 ```markdown
 # <Title>
@@ -36,37 +54,24 @@ The main agent writes the spec. It runs nothing. It ends with a spec verify.
 - [ ] T002 [<app>] [TEST] <test task>
 ```
 
-Small shape:
-
-```markdown
-# <Title>
-
-- Goal: <one line>
-- Accept:
-  - <testable result>
-- Out of scope: <list>
-- App: <the one app> · files: <files or areas>
-- Tasks:
-  - [ ] T001 <task>
-  - [ ] T002 [TEST] <test task>
-```
-
 - Every story has at least one task. Every task names one app.
 - Test tasks carry `[TEST]`. Phase 2 skips them, Phase 3 does them.
 - For a bigger feature, the `generate-use-case` or `design-feature` skill can feed the Spec section.
 
-## Spec verify (Full only)
+## Spec verify
 
-Checks the spec against each app's guide and the real code. Catches made-up APIs, wrong
-paths and edits no task owns.
+Checks that the plan follows the project's rules and the real code: each app's guide, the root guide,
+existing helpers and components. Example: the plan writes a badge inline, the web guide says "a badge is
+its own component" → the plan and tasks change to "add a badge component". It does not judge the
+requirements; the user's clarify answers settle those.
 
 1. Start one fresh **spec verifier** per changed app (`roles.md`), all at once.
 2. A spec that touches another repo → one more verifier per repo.
-3. The main agent applies the fixes to the spec files.
-4. A CRITICAL finding that changes the plan or the task list → rewrite the Plan and Tasks sections, then review again.
+3. The main agent applies every fix to the spec files itself. A finding it disagrees with → the decider.
+4. A CRITICAL finding that changes the plan or the task list → update plan and tasks (speckit: `/speckit.plan`, `/speckit.tasks`, `/speckit.analyze` again).
 5. A verifier never becomes that app's owner later.
 
 ## Close Phase 0
 
-- Write `flow.md` (size, phase 1 for Full or 2 for Small, apps, target branch if an MR/PR exists).
-- Manual: ask "start coding?" and wait.
+- Write `flow.md` (phase 1, apps, target branch if an MR/PR exists).
+- Go straight to Phase 1. No "start coding?" question.
