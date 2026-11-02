@@ -14,9 +14,10 @@
 1. Start one **owner** per app, `MODE: code` (`roles.md`). Independent owners go in one message so they run at once.
 2. Give each owner its task ids, the spec folder, its folder and guide, and the codegen command if it needs one.
 3. Keep each owner's id, so a later fix can go back to the same instance (SendMessage when the agent has it).
-4. An owner reports an edit outside its folder → route it to that folder's owner, or do it yourself if it is main-agent territory.
-5. Tick the done tasks in the task list.
-6. Manual: report each app as it finishes.
+4. Follow-up owners from the profile start after their app's owner finishes, `MODE: code`.
+5. An owner reports an edit outside its folder → route it to that folder's owner, or do it yourself if it is main-agent territory.
+6. Tick the done tasks in the task list.
+7. Manual: report each app as it finishes.
 
 Phase 2 writes **no test file** and runs **no check**.
 

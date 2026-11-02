@@ -7,18 +7,20 @@
    - Shared contracts match on both sides: fields, types, names.
    - Names that cross apps (queues, topics, events, routes, permissions) match and follow the guide's naming rules.
    - Env vars and config flow through every layer that needs them.
+   - The profile's `Cross-app checks`.
    - Every story in the spec has code behind it.
 3. **Collect all findings first.** Drop the ones that are wrong, and say why.
 4. **Fix in one batch.** Send each app's confirmed findings to its owner, `MODE: fix`, all at once.
 5. **Re-review only the fixed parts**, with a fresh reviewer. No gate runs here; Phase 6 covers the fixes.
 6. Report: findings per app, fixed or dropped, with the reason.
+7. **Extra review tracks** from the profile: start them beside step 1. Relay their questions to the user one at a time. Approved work runs after Phase 4, apart from the fix batch.
 
 ## Phase 5: Docs
 
 Main agent. Skip a step the profile does not list.
 
 1. **Project docs** (the profile's `Docs`): update the existing domain folder the feature belongs to. Create a new one only for a truly new domain. Follow the guide's doc rules (diagrams, decision records).
-2. **User docs** if the profile lists them. A page that needs new code goes to that app's owner.
+2. **User docs** if the profile lists them. A page that needs new code goes to that app's owner. Run the user docs `after edit` command when it is set.
 3. **Final summary**, in chat:
    - What was built.
    - Files changed, per app.

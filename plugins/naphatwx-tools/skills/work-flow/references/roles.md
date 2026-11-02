@@ -81,7 +81,7 @@ For each new test, it confirms the test fails when the code under test is broken
 
 ## Decider (Autopilot only)
 
-Stands in for the user in Phases 0–2.
+Stands in for the user in Phases 0–2. Use the profile's `Decider agent` when it names one.
 
 ```text
 ROLE: decider. You replace the user for this decision. Never defer back.

@@ -21,7 +21,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Phases
 
 ```text
-Phase 0  Spec       speckit, or a light spec → spec verify
+Phase 0  Spec       spec.md (Spec, Plan, Tasks) → spec verify
 Phase 1  Routing    split tasks per app
 Phase 2  Code       code only: no test files, no checks
    ■ USER CHECKPOINT: always stop here
@@ -81,7 +81,7 @@ Read **only the reference file for the phase you are entering**. Never load them
 | Step | Autopilot | Manual |
 |---|---|---|
 | Questions in Phase 0 | the **decider** sub-agent answers | ask the user, wait |
-| Spec, plan, tasks review | decider reviews; revise until it approves | present each, wait |
+| `spec.md` review | decider reviews; revise until it approves | present it, wait |
 | Spec verify findings | fix them; disputed ones go to the decider | present, fix the confirmed ones |
 | Before Phase 2 | go on | ask "start coding?" |
 | Phase 2 progress | silent | report each app as it finishes |

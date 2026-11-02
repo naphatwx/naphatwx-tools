@@ -13,7 +13,7 @@ Only when the profile lists numbered folders (migrations, specs). Numbers taken 
 parallel branches can collide by merge time.
 
 1. `git fetch origin <target>` then `git merge origin/<target>`. A conflict in app code goes to that app's owner.
-2. If the project has a branch that gets hotfixes first (ask once, or the profile says so), fetch it and **read it only, never merge it**: `git ls-tree --name-only origin/<hotfix-branch> <numbered-folder>/`.
+2. If the project has a branch that gets hotfixes first (the profile's `Hotfix branch`, else ask once), fetch it and **read it only, never merge it**: `git ls-tree --name-only origin/<hotfix-branch> <numbered-folder>/`.
 3. Check against the merged tree plus that branch:
    - No number appears twice.
    - Our numbers run in order right after the highest one, with no gap (migrations).
@@ -25,8 +25,8 @@ parallel branches can collide by merge time.
 1. List the changed apps: `git diff --name-only origin/<target>...HEAD`, mapped to the profile's folders.
 2. In **one message**, start:
    - one **gate runner** per changed app, `FULL`, `TARGET: origin/<target>`;
-   - the integration test owner, `MODE: run-tests`, for the added or changed tests only (skip if none changed);
-   - any app step the profile lists for pre-merge (like running migrations on the local stack).
+   - the integration test owner, `MODE: run-tests`: the full suite when the profile says `At pre-merge: full`, else only the added or changed tests (skip if none changed);
+   - the profile's `Pre-merge app steps`.
 3. On a low-memory machine, run heavy builds one after the other.
 
 ## Fail loop
@@ -43,7 +43,7 @@ If the target branch moves after this → redo the number check. Re-gate only th
 
 ## A gate the user asks for (any phase)
 
-- "run the gate", "gate web", "run the tests" → gate runners for the apps named, or every changed app if none are named. `FULL` unless they say quick.
+- "run the gate", "gate web", "run the tests" → gate runners for the apps named, or every changed app if none are named. `FULL` unless they say quick. Unit tests use the profile's `Unit tests on request` command, unless the user asks for the full suite.
 - Integration tests asked for → the integration test owner, `MODE: run-tests`.
 - No `TARGET` unless known; every failure is then reported as-is.
 - Report and stop. Fix only if the user asks.

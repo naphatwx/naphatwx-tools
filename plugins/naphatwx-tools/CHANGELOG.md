@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.267
+
+**work-flow drops speckit**
+
+- Phase 0 always writes one `spec.md` (Spec, Plan, Tasks), then spec verify. The speckit path is gone.
+- New profile fields: `Spec folder` (a gitignored folder keeps the spec out of the repo), `Unit tests on request`, integration `At pre-merge: full | changed`, `Follow-up owners`, `Hotfix branch`, `Pre-merge app steps`, `Cross-app checks`, `Extra review tracks`, `Decider agent`, and a user docs `after edit` command.
+
 ## 1.9.266
 
 **html-document uses the design-feature page look**

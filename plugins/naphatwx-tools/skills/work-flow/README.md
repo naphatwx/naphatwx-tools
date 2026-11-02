@@ -23,10 +23,7 @@ flowchart TD
     START([/work-flow: ask Autopilot or Manual]) --> P0
 
     subgraph P0["Phase 0 - Spec (main agent, runs nothing)"]
-        SK{speckit in repo?} -->|yes| SP[specify → clarify → plan → tasks → analyze]
-        SK -->|no| LS[light spec.md: Spec, Plan, Tasks]
-        SP --> VER[spec verify: fresh verifier per app, read only]
-        LS --> VER
+        LS[spec.md: Spec, Plan, Tasks] --> VER[spec verify: fresh verifier per app, read only]
     end
 
     P0 --> P1[Phase 1 - Routing: split tasks per app, find the order]
@@ -66,9 +63,8 @@ Output:
 
 ```
 <spec folder>/
-├── spec.md, plan.md, tasks.md, ...   from speckit
-│   or spec.md                        the light spec (Spec, Plan, Tasks)
-└── flow.md                           mode, phase, apps, target branch, next step
+├── spec.md   Spec, Plan, Tasks
+└── flow.md   mode, phase, apps, target branch, next step
 ```
 
 Plus the code, tests and docs changes on the working branch. Nothing is committed unless you ask.
@@ -80,7 +76,7 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 | [SKILL.md](SKILL.md) | The agent's instructions: phases, hard rules, modes |
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
-| [references/spec.md](references/spec.md) | Phase 0: speckit or the light spec, then spec verify |
+| [references/spec.md](references/spec.md) | Phase 0: write spec.md, then spec verify |
 | [references/code.md](references/code.md) | Phases 1–2 and the user checkpoint |
 | [references/tests.md](references/tests.md) | Phase 3 |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |

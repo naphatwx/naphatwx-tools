@@ -18,18 +18,30 @@ The profile tells the flow what this project has. Read it once at start.
 | api | apps/api | apps/api/AGENTS.md | api-specialist |
 | web | apps/web | apps/web/AGENTS.md | - |
 
+- Spec folder: `.work/<slug>/` (gitignored) | specs/NNN-<slug>/
 - Run checks: `docker compose run --rm dev` | host
 - Gate per app:
   - api: `go build ./... && go vet ./...` · unit: `go test ./...`
   - web: `npx tsc --noEmit` · `npx eslint .` · unit: `npx vitest run` · build (last): `npm run build`
+- Unit tests on request: `<affected-tests command>` | same as pre-merge
 - Integration tests: `make integration` (folder: tests/integration) | none
+  - At pre-merge: full | changed
 - Codegen order: api first (`make proto`), then web (`npm run proto:gen`) | none
+- Follow-up owners: web → design-specialist (look and feel) | none
 - Numbered folders: migrations/sql, specs | none
+- Hotfix branch (read only, never merged): staging | ask
+- Pre-merge app steps: api: apply migrations on the local stack | none
+- Cross-app checks: <extra names that must match across apps> | none
+- Extra review tracks: <agent, when it runs> | none
+- Decider agent: <agent> | general-purpose
 - Docs: docs/features/<domain>/ (README.md, architecture.md, decisions/) | none
+  - User docs: apps/web/content/ · after edit: `npm run docs:index` | none
 - Target branch fallback: ask
 ```
 
 - `Owner agent` `-` → the generic owner role in `roles.md`.
+- `Follow-up owners` run after the named app's owner, in the same phase, with a clear split: the owner makes it work, the follow-up owner refines its own area.
+- `Extra review tracks` run beside Phase 4. They never join the fix batch and never hold the gate.
 - Every field is optional. A missing field turns its step off and the final summary says so.
 
 ## Detect when there is no profile
@@ -42,6 +54,7 @@ The profile tells the flow what this project has. Read it once at start.
 | Gate commands | `Makefile` targets, `package.json` scripts, `nx.json`, CI files (`.gitlab-ci.yml`, `.github/workflows/`, `Jenkinsfile`) |
 | Run checks | the guide says "run in Docker" or a compose service runs the toolchain |
 | Integration tests | a `tests/integration`, `e2e` or `features` folder, or an `integration` script |
+| Spec folder | a `specs/` or `docs/specs/` folder |
 | Numbered folders | folders whose entries start with a number, like `000123_x.up.sql` or `127-foo/` |
 | Docs | `docs/` structure the guide describes |
 
