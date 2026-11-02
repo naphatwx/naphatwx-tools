@@ -9,7 +9,7 @@ Run right before the branch leaves draft or merges. Two parts: fix numbers, then
 
 ## Number check
 
-Only when the profile lists numbered folders (migrations, specs). Numbers taken on
+Only when the profile lists numbered folders (migrations, specs) and the task is Full. Small still merges the target branch (step 1). Numbers taken on
 parallel branches can collide by merge time.
 
 1. `git fetch origin <target>` then `git merge origin/<target>`. A conflict in app code goes to that app's owner.

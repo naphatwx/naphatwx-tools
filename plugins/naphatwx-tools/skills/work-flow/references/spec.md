@@ -6,9 +6,9 @@ The main agent writes the spec. It runs nothing. It ends with a spec verify.
 
 1. **Folder.** The profile's `Spec folder`. Else the repo's spec folder if it has one (`specs/`, `docs/specs/`), with its numbering (`NNN-<slug>`, next free number). Else `docs/specs/<slug>/`. Slug: 2–4 words, like `add-user-export`.
 2. **Ask or decide.** List up to 5 questions whose answer changes the design. Autopilot: the decider answers. Manual: ask the user (AskUserQuestion when the agent has it).
-3. **Write one file, `spec.md`**, short. Use the shape below. Skip a section that has nothing.
-4. **Review.** Autopilot: the decider reviews `spec.md`; NEEDS REVISION → fix, review again. Manual: present it, wait.
-5. **Spec verify** (below).
+3. **Write one file, `spec.md`**, short. Full: the shape below. Small: the short shape. Skip a section that has nothing.
+4. **Review.** Full + Autopilot: the decider reviews `spec.md`; NEEDS REVISION → fix, review again. Otherwise: present it to the user, wait.
+5. **Spec verify** (below). Full only.
 
 ```markdown
 # <Title>
@@ -36,11 +36,26 @@ The main agent writes the spec. It runs nothing. It ends with a spec verify.
 - [ ] T002 [<app>] [TEST] <test task>
 ```
 
+Small shape:
+
+```markdown
+# <Title>
+
+- Goal: <one line>
+- Accept:
+  - <testable result>
+- Out of scope: <list>
+- App: <the one app> · files: <files or areas>
+- Tasks:
+  - [ ] T001 <task>
+  - [ ] T002 [TEST] <test task>
+```
+
 - Every story has at least one task. Every task names one app.
 - Test tasks carry `[TEST]`. Phase 2 skips them, Phase 3 does them.
 - For a bigger feature, the `generate-use-case` or `design-feature` skill can feed the Spec section.
 
-## Spec verify
+## Spec verify (Full only)
 
 Checks the spec against each app's guide and the real code. Catches made-up APIs, wrong
 paths and edits no task owns.
@@ -53,5 +68,5 @@ paths and edits no task owns.
 
 ## Close Phase 0
 
-- Write `flow.md` (phase 1, apps, target branch if an MR/PR exists).
+- Write `flow.md` (size, phase 1 for Full or 2 for Small, apps, target branch if an MR/PR exists).
 - Manual: ask "start coding?" and wait.

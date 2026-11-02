@@ -20,8 +20,12 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 
 ```mermaid
 flowchart TD
-    START([/work-flow: ask Autopilot or Manual]) --> P0
+    START([/work-flow: ask Autopilot or Manual + Small or Full]) --> SZ{size}
 
+    SZ -->|Small: 1 app, no contract, no migration| S0[Phase 0 - short spec.md, you review it]
+    S0 --> P2
+
+    SZ -->|Full| P0
     subgraph P0["Phase 0 - Spec (main agent, runs nothing)"]
         LS[spec.md: Spec, Plan, Tasks] --> VER[spec verify: fresh verifier per app, read only]
     end
@@ -47,6 +51,7 @@ flowchart TD
 ```
 
 - **Autopilot**: a decider sub-agent answers the questions in Phases 0–2. **Manual**: you answer them.
+- **Small** (one app, no contract, no migration, no new permission): short spec, no spec verify, no routing, one reviewer, no cross-app or number check. The checkpoint, tests, review and gate still run. Grows past Small → switches to Full.
 - The checkpoint after Phase 2 stops in both modes. You try the code first; tests come after you confirm.
 - No build, lint or test runs before Phase 6, unless you ask for a gate.
 - The main agent only orchestrates. App code is changed by the app's owner sub-agent.
@@ -63,7 +68,7 @@ Output:
 
 ```
 <spec folder>/
-├── spec.md   Spec, Plan, Tasks
+├── spec.md   Spec, Plan, Tasks (Small: Goal, Accept, Tasks)
 └── flow.md   mode, phase, apps, target branch, next step
 ```
 
@@ -73,12 +78,10 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 
 | Path | What |
 |------|------|
-| [SKILL.md](SKILL.md) | The agent's instructions: phases, hard rules, modes |
+| [SKILL.md](SKILL.md) | The agent's instructions: phases, Small vs Full, Phases 1–3 and the checkpoint, hard rules, modes |
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
 | [references/spec.md](references/spec.md) | Phase 0: write spec.md, then spec verify |
-| [references/code.md](references/code.md) | Phases 1–2 and the user checkpoint |
-| [references/tests.md](references/tests.md) | Phase 3 |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
 

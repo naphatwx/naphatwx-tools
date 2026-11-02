@@ -3,7 +3,7 @@
 ## Phase 4: Review
 
 1. **Per-app review.** One fresh **reviewer** per changed app (`roles.md`), all at once. Never the instance that wrote the code.
-2. **Cross-app check** (main agent; per-app reviewers cannot see it):
+2. **Cross-app check** (Full only; main agent; per-app reviewers cannot see it):
    - Shared contracts match on both sides: fields, types, names.
    - Names that cross apps (queues, topics, events, routes, permissions) match and follow the guide's naming rules.
    - Env vars and config flow through every layer that needs them.
@@ -17,7 +17,7 @@
 
 ## Phase 5: Docs
 
-Main agent. Skip a step the profile does not list.
+Main agent. Skip a step the profile does not list. Small: steps 1–2 only when the task changed behavior a user or a contributor can see.
 
 1. **Project docs** (the profile's `Docs`): update the existing domain folder the feature belongs to. Create a new one only for a truly new domain. Follow the guide's doc rules (diagrams, decision records).
 2. **User docs** if the profile lists them. A page that needs new code goes to that app's owner. Run the user docs `after edit` command when it is set.

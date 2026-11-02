@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.268
+
+**work-flow gets a Small path and fewer files**
+
+- New size step at start: the agent proposes Small or Full, you confirm. Small = one app, no shared contract, no numbered file, no new permission.
+- Small skips spec verify, the decider, Phase 1 routing, the cross-app check and the number check; it writes a short `spec.md` (Goal, Accept, Tasks) and gets one reviewer. Docs only when behavior changed. Checkpoint, tests, review and the Phase 6 gate still run.
+- A task that grows past Small stops and switches to Full.
+- `references/code.md` and `references/tests.md` are folded into `SKILL.md`; repeated rules removed. `flow.md` gains a `Size` line.
+
 ## 1.9.267
 
 **work-flow drops speckit**
