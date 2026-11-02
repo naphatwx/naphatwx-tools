@@ -19,12 +19,19 @@ Map the code before asking anything: facts the code answers are never questions.
 - Use the `Explore` sub-agent in Claude Code (any read-only sub-agent elsewhere). It reads the root guide,
   each app's guide and the code the task touches.
 - It returns a short map, not file dumps: files and symbols, current behavior, existing tests, docs, gaps.
+- It also returns **Rules that apply**: each guide rule, ADR and existing code pattern that settles a choice
+  in this task (pagination fields, error text, naming, permissions), with its source, like
+  `apps/<app>/AGENTS.md → Pagination` or `path/to/similar.go:42`.
 - One agent. More only when the task spans unrelated areas, one per area, all at once.
 
 ## 3. Grill
 
 Run the `grilling` skill (`mattpocock-skills:grilling` in Claude Code) on the task. Not `grill-me`: that one
 only the user can start. Rounds go on until no decision is left open.
+- Give `grilling` the Rules that apply list when you start it: it sees only what is in its context.
+- **Rule filter, before every round.** A question the project already answers (a guide rule, an ADR, an
+  existing code pattern) is not asked. Write it under Decisions as `(rule: <source>)` instead.
+  Ask it only when two rules conflict, or when the task has to break a rule.
 - Write each answer under Decisions as `<question> → <answer> (user | auto)`.
 - The grill ends when `grilling` asks to confirm shared understanding and gets a yes. That yes ends the
   grill only: go straight on to step 4. The go-ahead to code is "implement" in step 6.
@@ -56,7 +63,7 @@ Write `<work folder>/NNN-<slug>/plan.md` in this shape. Skip a section that has 
 - <testable result, with the exact user-facing message when there is one>
 
 ## Decisions
-- <question> → <answer> (user | auto | spec verify: <rule> | decider)
+- <question> → <answer> (user | auto | rule: <source> | spec verify: <rule> | decider)
 
 ## Changes per app
 - <app>: <files or areas, what changes>
@@ -96,6 +103,7 @@ Set the status line to `Phase: 1 · … · Next: say "implement"`, then stop and
 - What will be built: the goal and the Accept lines, in short.
 - What changes per app, and the task count per app.
 - The decisions the user did not make (auto, spec verify, decider).
+- The rule-settled decisions, one short line each, so the user can overrule one.
 - The top risks.
 
 Then wait.

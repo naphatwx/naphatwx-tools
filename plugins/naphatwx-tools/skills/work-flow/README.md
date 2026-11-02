@@ -50,6 +50,7 @@ flowchart TD
 
 - Your three stops: the grilling questions, the plan stop (a summary of what will be built; say `implement` to go on), and the checkpoint after code. No plan mode.
 - Auto-answer: write `auto-answer` in the input or in a grill reply. You still answer the scope question; a decider sub-agent answers the rest and gives the final yes. Its answers are marked `(auto)` in the plan.
+- The grill never asks what the project's rules already answer (guides, ADRs, existing code patterns). Those go in the plan as `(rule: <source>)`, and the plan stop lists them so you can overrule one.
 - Spec verify checks the plan against the project's rules, not the requirements. The agent fixes what it finds; a decider sub-agent settles disputes.
 - At the checkpoint you try the code first; tests come after you confirm.
 - No build, lint or test runs before Phase 6, unless you ask for a gate.

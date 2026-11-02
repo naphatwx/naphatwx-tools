@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.276
+
+**work-flow stops asking what the project's rules already answer**
+
+- Explore also returns "Rules that apply": guide rules, ADRs and existing code patterns that settle a choice, each with its source.
+- The grill gets that list and filters every round: a question a rule answers is not asked. It is written under Decisions as `(rule: <source>)`. Asked only when rules conflict or the task must break one.
+- The plan stop lists the rule-settled decisions so the user can overrule one. The decider never gets these questions either.
+
 ## 1.9.275
 
 **work-flow merges Routing into Code**

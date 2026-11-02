@@ -98,6 +98,7 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 
 - Spec verify findings: the main agent fixes them itself. One it disagrees with → the **decider** (`roles.md`), whose call is final.
 - Never leave an open question in the plan: the grill asks it.
+- The project's rules answer convention questions (guides, ADRs, existing patterns). The grill never asks them; the plan marks them `(rule: <source>)`.
 - Auto-answer: the decider answers grill rounds after the user settles scope (`references/plan.md`).
 - A step that fails or loops more than 3 times → stop and report the blocker.
 
