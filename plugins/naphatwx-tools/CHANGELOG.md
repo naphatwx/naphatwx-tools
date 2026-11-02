@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.272
+
+**work-flow calls grilling, not grill-me**
+
+- `grill-me` in mattpocock-skills is user-only (`disable-model-invocation`); it just calls `grilling`. Phase 0 now calls `grilling` directly.
+- The user's yes at the end of the grill only ends the grill; the plan approval stays the one go-ahead.
+- Install hint: `/plugin install mattpocock-skills@claude-plugins-official`.
+
 ## 1.9.271
 
 **work-flow plans in plan mode, saves one plan.md**

@@ -1,6 +1,6 @@
 ---
 name: work-flow
-description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (plan mode + grill-me), code, a stop for the user, tests, review, docs, pre-merge gate. The approved plan is saved as .work/NNN-slug/plan.md. Works on any project. Run it as "/work-flow <what you want>", or "/work-flow <number>" to resume. Slash only.
+description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (plan mode + grilling), code, a stop for the user, tests, review, docs, pre-merge gate. The approved plan is saved as .work/NNN-slug/plan.md. Works on any project. Run it as "/work-flow <what you want>", or "/work-flow <number>" to resume. Slash only.
 argument-hint: <what-you-want | task number [phase] | (empty = status)>
 disable-model-invocation: true
 ---
@@ -21,7 +21,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Phases
 
 ```text
-Phase 0  Plan       plan mode: grill-me (YOU) → draft → spec verify → YOU approve → plan.md
+Phase 0  Plan       plan mode: grilling (YOU) → draft → spec verify → YOU approve → plan.md
 Phase 1  Routing    split tasks per app, find the order
 Phase 2  Code       code only: no test files, no checks
    ■ USER CHECKPOINT: always stop here

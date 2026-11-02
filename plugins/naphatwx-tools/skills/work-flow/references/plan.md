@@ -20,10 +20,13 @@ anything: facts the code answers are never questions.
 
 ## 3. Grill
 
-Run the `grill-me` skill on the task. The user answers until no decision is left open.
-Write each answer under Decisions as `<question> → <answer> (user)`.
-`grill-me` missing → stop and tell the user to install it:
-`npx skills add https://github.com/mattpocock/skills --skill grill-me`
+Run the `grilling` skill (`mattpocock-skills:grilling` in Claude Code) on the task. Not `grill-me`: that one
+only the user can start. The user answers round by round until no decision is left open.
+- Write each answer under Decisions as `<question> → <answer> (user)`.
+- When `grilling` asks to confirm shared understanding, the user's yes ends the grill only. The plan approval
+  in step 6 is the real go-ahead, so go straight on to step 4.
+- `grilling` missing → stop and tell the user to install it:
+  `/plugin install mattpocock-skills@claude-plugins-official`
 
 ## 4. Draft
 
@@ -84,6 +87,6 @@ Exit plan mode (`ExitPlanMode`). Claude Code asks the user to approve.
 
 ## Agents without plan mode
 
-Write the plan straight to `<work folder>/NNN-<slug>/plan.md`, grill with the `grill-me` skill if the agent has
-it (else ask the same way in chat: one decision at a time, each with a recommended answer), run spec verify,
+Write the plan straight to `<work folder>/NNN-<slug>/plan.md`, grill with the `grilling` skill if the agent has
+it (else ask the same way in chat: rounds of numbered questions, each with a recommended answer), run spec verify,
 then ask the user to approve in chat.
