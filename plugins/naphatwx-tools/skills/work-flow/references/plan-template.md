@@ -13,6 +13,12 @@
 - Open: {open questions and reviews | none}
 - Next: {the next 1–3 steps}
 
+## Open questions
+- Q1 {question} — decides: {who} · needed before: {phase or task}
+
+## Rules check
+- [ ] {project rule} — {what is still to check, and when}
+
 ## Accept
 - **A1 {Topic} (new):** {role} can {action}. {What the user sees.}
 - **A2 {Topic} (changed):** {rule now}. Before: {what the app did}.
@@ -51,11 +57,8 @@
 **Ops**
 - D6 {question} → {answer} ({source})
 
-## Open questions
-- Q1 {question} — decides: {who} · needed before: {phase or task}
-
-## Rules check
-- [ ] {project rule} — {what is still to check, and when}
+## Risks
+- R1 {risk} → mitigation: {what limits it} | accepted ({who, date})
 
 ## Changes per app
 - {app} (`{folder}`):
@@ -100,9 +103,6 @@ stateDiagram-v2
 | App | Name | Value |
 |---|---|---|
 | {app} | `{NAME}` | `{value}` |
-
-## Risks
-- R1 {risk} → mitigation: {what limits it} | accepted ({who, date})
 
 ## Tasks
 

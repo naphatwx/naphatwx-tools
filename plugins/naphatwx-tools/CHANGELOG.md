@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.288
+
+**work-flow plan: section order**
+
+- Open questions and Rules check move up, right after Status: what waits on a person comes first.
+- Risks move up, right after Decisions: a choice and its cost are read together.
+
 ## 1.9.287
 
 **work-flow plan: sized to the task, no repeats**
