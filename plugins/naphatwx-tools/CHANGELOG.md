@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.284
+
+**work-flow setup step**
+
+- New first step in Start: create the work folder (`.work/`, or the profile's) at the repo root when missing.
+- Add it to the root `.gitignore` when git does not ignore it yet.
+
 ## 1.9.282
 
 **Spec input works with any spec tool**

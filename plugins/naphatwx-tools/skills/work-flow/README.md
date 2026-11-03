@@ -21,7 +21,8 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 
 ```mermaid
 flowchart TD
-    START([/work-flow: next task number NNN]) --> P0
+    START([/work-flow]) --> SU[Setup: create .work/ at the repo root, add it to .gitignore]
+    SU --> P0
     subgraph P0["Phase 1 - Plan (edits nothing but the plan)"]
         GR{{grilling: YOU answer, or auto-answer after scope}} --> DR[draft .work/NNN-slug/plan.md]
         DR --> VER[spec verify: plan vs project rules, agent fixes]
@@ -48,6 +49,7 @@ flowchart TD
     ASK[/you ask for a gate, any phase/] -.-> ON[gate runners, report only]
 ```
 
+- Setup runs first, every time: it creates `.work/` at the repo root and adds it to `.gitignore` when either is missing.
 - Your three stops: the grilling questions, the plan stop (a summary of what will be built; say `implement` to go on), and the checkpoint after code. No plan mode.
 - Auto-answer: write `auto-answer` in the input or in a grill reply. You still answer the scope question; a decider sub-agent answers the rest and gives the final yes. Its answers are marked `(auto)` in the plan.
 - The grill never asks what the project's rules already answer (guides, ADRs, existing code patterns). Those go in the plan as `(rule: <source>)`, and the plan stop lists them so you can overrule one.

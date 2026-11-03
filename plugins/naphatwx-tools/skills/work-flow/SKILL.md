@@ -21,6 +21,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Phases
 
 ```text
+Setup               .work/ at the project root, gitignored
 Phase 1  Plan       grilling (YOU, or auto-answer) → draft plan.md → spec verify
    ■ PLAN STOP: summary of the plan; "implement" to go on
 Phase 2  Code       tasks by app tag, contract owner first; code only: no test files, no checks
@@ -42,12 +43,16 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
 
 ## Start
 
-1. **Parse the input.**
+1. **Setup**, before anything else. Work folder: the `Work folder` in a saved `## Flow profile`, else `.work/`, at the repo root (`git rev-parse --show-toplevel`).
+   - Missing → create it.
+   - `git check-ignore -q <work folder>` fails → add `/<work folder>/` to the root `.gitignore` (create the file if missing).
+   - Say what changed in one line, or nothing if both were already there.
+2. **Parse the input.**
    - Empty → list every `<work folder>/*/plan.md` not at `Phase: done`, with its number, phase and next step; ask which to pick up. Stop.
    - A task number (`195`) or a task folder → resume at the phase in its `plan.md` status line. A phase name after it (`plan`, `code`, `tests`, `review`, `docs`, `pre-merge`) re-runs that phase, only if the task already reached it.
    - Anything else → a new task. The whole input is what the user wants.
-2. **Load the project profile** (`references/profile.md`). Missing parts → ask once, then go on.
-3. **Status line**: the second line of `plan.md`. Update it at the end of every phase:
+3. **Load the project profile** (`references/profile.md`). Missing parts → ask once, then go on.
+4. **Status line**: the second line of `plan.md`. Update it at the end of every phase:
    `- Phase: 1 | 2 | checkpoint | 3 | 4 | 5 | 6 | done · Apps: <apps> · Target: <branch> · Next: <one line>`
 
 ## Phase 2: Code
