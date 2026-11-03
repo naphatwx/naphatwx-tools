@@ -73,7 +73,7 @@ for (const resultFile of files(/^ai-results.*\.json$/)) {
   for (const test of readJson(resultFile).tests ?? []) {
     aiDurationMs += test.ms ?? 0;
     tests.set(test.scenario, {
-      scenario: test.scenario, title: test.title ?? test.scenario, runner: 'ai', role: test.role, status: test.status, outcome: OUTCOME[test.status] ?? 'unexpected',
+      scenario: test.scenario, title: test.title ?? test.scenario, runner: 'ai', role: test.role, prompt: test.prompt, reply: test.reply, status: test.status, outcome: OUTCOME[test.status] ?? 'unexpected',
       ms: test.ms ?? 0, retry: 0, error: test.error, steps: (test.steps ?? []).map(cleanStep), attempts: [],
       annotations: test.status === 'skipped' ? [{ type: 'skip', description: test.reason }] : [],
     });

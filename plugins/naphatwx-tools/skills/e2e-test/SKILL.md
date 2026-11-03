@@ -121,6 +121,7 @@ The report keeps these features; keep them when you touch the template:
 - Tree: use cases in `use-cases.js` order, then each scenario with a surface tag, its kind (`basic`, `alternate`, `exception`) and a Core pill on core scenarios, then its steps. Badge order: status → surface → title → kind → core. Core scenarios come first in each use case, then the rest, each group in file order. The header shows "Core: N/M passed". Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
 - Steps paged like slides: Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot (works on scrolling full-page shots too). A `ui` step without a screenshot shows a "No screenshot for this step" image. A full-page shot (taller than 1.5× its width) scrolls inside the viewer.
 - `api`, `mcp`, `job` steps show the call target, the request and the response in place of the screenshot.
+- `mcp` tests open as a chat: the role's prompt on the left, each tool call as a card (Refused or Failed ones in red, full request and response one click away), the AI agent's reply on the right. Setup and cleanup steps fold into "Setup" / "Clean up · N steps behind the scenes". "Show as steps" switches to the step viewer.
 - A step the reviewer flagged shows ⚑ in the step list and the reviewer's note above the screenshot. Header count and a "Has review flags" filter.
 - One test open at a time; every test starts closed; re-opening keeps the last step seen. A failed step shows its error.
 - One sticky search bar under the header, the same one the mock and play pages use: a search field (type to match scenario titles; `/` jumps in; matches are marked) and a live "n of N" count. Focus opens the groups as pills with live counts: Status (Failed, Flaky, Passed, Skipped, Not run), Type (ui / api / mcp / job), Kind (basic / alternate / exception), Review (has review flags), Core only. A group shows only the values the page has, and hides when it has one value. Values in one group combine with OR; groups combine with AND. Picked values show as chips in the field (click to remove; Backspace removes the last); Clear resets. The open panel floats over the rows; a click outside or Escape closes it. Status uses Playwright's own outcome, so it matches its summary. A use case with no test left hides its heading. The choice is kept in `localStorage`. A "Failed first" toggle in the bar lifts failures to the top of each use case; the default is file order.
@@ -247,7 +248,7 @@ All strict JSON. Paths inside are relative to the run folder.
   "runner": { "setup": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts setup", "cleanup": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts cleanup",
               "prints": "JSON map of seed name → copy, e.g. { \"delta-super\": { \"name\": \"delta-super-e2e2-k7q2\", \"id\": 9001 } }" },
   "tests": [
-  { "scenario": "mcp-create-version", "surface": "mcp", "role": "MANAGER_DEV",
+  { "scenario": "mcp-create-version", "surface": "mcp", "role": "MANAGER_DEV", "prompt": "cut a PATCH version of delta-super",
     "steps": [ { "title": "Copy delta-super", "setup": true, "command": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts setup delta-super" },
                { "title": "Cut a PATCH version of delta-super", "call": "RepositoryVersionService · CreateRepositoryVersion", "params": { "repositoryId": "<from step 1: delta-super.id>", "bump": "PATCH" }, "expect": "version 2.3.3-1, status PENDING" },
                { "title": "Delete the delta-super copy", "cleanup": true, "command": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts cleanup" } ] },
@@ -260,6 +261,7 @@ All strict JSON. Paths inside are relative to the run folder.
 ```json
 { "useCase": "UC2", "tests": [
   { "scenario": "mcp-create-version", "role": "MANAGER_DEV", "status": "passed", "ms": 4100, "error": "only when failed", "reason": "only when skipped",
+    "prompt": "cut a PATCH version of delta-super", "reply": "Cut version 2.3.3-1 of delta-super. It is PENDING.",
     "steps": [ { "title": "Cut a PATCH version", "status": "passed", "ms": 2900,
       "call": { "target": "RepositoryVersionService · CreateRepositoryVersion", "request": { "repositoryId": 9001, "bump": "PATCH" }, "response": { "version": "2.3.3-1", "status": "PENDING" } } },
                { "title": "Run the backfill", "status": "passed", "ms": 5200,
@@ -267,6 +269,7 @@ All strict JSON. Paths inside are relative to the run folder.
 ```
 
 - `status`: `passed` | `failed` | `skipped`. A later file replaces an earlier one for the same scenario.
+- mcp only: `prompt` (from the test file) and `reply` (the tester's answer to that user) feed the chat view. A step keeps `setup` / `cleanup` from the test file; `call.refused: true` marks a call the server rejected.
 
 `<run>/review.json` (written by the reviewer; `review-2.json` after a re-run replaces the notes of the scenarios it covers):
 

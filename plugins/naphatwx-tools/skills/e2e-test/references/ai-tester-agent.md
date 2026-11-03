@@ -31,6 +31,7 @@ For each scenario in the test file, in order
    - setup / cleanup steps run like the others, with the commands in the test file's `runner` block.
      Run cleanup even when an earlier step failed.
    - Each step's `call.response` comes from that step's own call or command output, never another step's.
+   - Mark `"refused": true` on a call the server rejected (error code, permission denied, validation error).
 5. Compare each response with the step's `expect` and the scenario's `expect`, exactly: quoted
    messages word for word, numbers, statuses, error codes. A step fails when it does not match.
    Never mark an error as passed unless the scenario expects that error.
@@ -42,10 +43,15 @@ Record
 8. Write the results file as strict JSON:
    { "useCase": "<UC id>", "tests": [ { "scenario": "<id>", "role": "<role>", "status": "passed" | "failed" | "skipped",
        "ms": <total>, "error"?: "<first mismatch, one or two lines>", "reason"?: "<why skipped>",
+       "prompt"?: "<the test's prompt, as given>", "reply"?: "<your answer to that user>",
        "steps": [ { "title": "<from the test file>", "status": "passed" | "failed", "ms": <n>, "error"?: "<mismatch>",
-                    "call": { "target": "<Service> · <Operation>" | "$ <command>",
+                    "setup"?: true, "cleanup"?: true,
+                    "call": { "target": "<Service> · <Operation>" | "$ <command>", "refused"?: true,
                               "request": <params object, or the command string>,
                               "response": <response object, or "exit <code>\n<output>"> } } ] } ] }
+   - mcp tests: copy `prompt` from the test file. `reply` is what you would tell that user after the calls:
+     what you did, the result with its key values, and why any call was refused. Plain words, at most 120.
+   - Copy `setup` / `cleanup` from the test file's step.
 9. Before you return, re-read the results file: it holds only your use case, and every step's
    `call.target` matches its title. Fix any that don't.
 

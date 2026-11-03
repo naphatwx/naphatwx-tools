@@ -79,6 +79,7 @@ mcp and job scenarios (.ai-tests.json, played later by an AI tester agent)
 16. Strict JSON:
     { "useCase": "<UC id>", "runner": { "setup": "<command>", "cleanup": "<command>", "prints": "<what setup prints>" },
       "tests": [ { "scenario": "<id>", "surface": "mcp" | "job", "role": "<role>",
+        "prompt": "<what this role would type to their AI agent>",                  ← mcp only
         "steps": [ { "title": "<plain sentence>", "setup"?: true, "cleanup"?: true,
                      "call": "<Service> · <Operation>", "params": { ... },     ← mcp
                      "command": "<shell command>",                             ← job
@@ -89,6 +90,8 @@ mcp and job scenarios (.ai-tests.json, played later by an AI tester agent)
     One step per tool call, in order: who-am-I check first when the server has one, then the setup
     command, the scenario's `when`, the checks of `expect`, then the cleanup command. A value from an
     earlier step is written "<from step N: field>".
+    `prompt` is the scenario's `when` as the role would ask it, in their words, naming the real copy
+    (e.g. "cut a PATCH version of delta-super"). One sentence, no tool names.
 19. job: the exact command from the repo (package script, Makefile, scripts/), run from the repo root,
     with flags that limit it to your copies. Never a command that touches shared or production data.
     `expect` names the output line or exit code the scenario expects.
