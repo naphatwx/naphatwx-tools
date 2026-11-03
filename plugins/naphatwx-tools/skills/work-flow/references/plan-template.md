@@ -14,10 +14,11 @@
 - Next: {the next 1–3 steps}
 
 ## Accept
-- **A1 {Topic}:** {role} can {action}. {What the user sees.}
-- **A2 {Topic}:** {rule}.
+- **A1 {Topic} (new):** {role} can {action}. {What the user sees.}
+- **A2 {Topic} (changed):** {rule now}. Before: {what the app did}.
   - Reason: `{REFUSAL_REASON}`
   - Message: "{What is wrong}. {What to do next}."
+- **A3 {Topic} (removed):** {behaviour that goes away}.
 
 ## Edge cases
 - **E1 {Case}:** {input or state} → {what happens, with the exact message}.
@@ -28,10 +29,6 @@
 
 ## Context (facts checked)
 - {count, size, limit or existing behaviour}: {value} (checked {YYYY-MM-DD}, {where})
-
-## Dependencies & assumptions
-- Depends on: {other repo MR, job, env var, existing feature}
-- Assumes: {thing that must stay true}
 
 ## Decisions
 
@@ -58,7 +55,6 @@
 - Q1 {question} — decides: {who} · needed before: {phase or task}
 
 ## Rules check
-- [x] {project rule} — {how the plan meets it} (D#)
 - [ ] {project rule} — {what is still to check, and when}
 
 ## Changes per app
@@ -69,10 +65,10 @@
 - User steps: {env vars, job config, other things only the user can do}
 
 ## Data / API
+- Contracts: [plan/api/contracts.html](plan/api/contracts.html) · Tables: [plan/database/er-diagram.html](plan/database/er-diagram.html)
 
 ### Tables
 - `{table}`: `{column}` {type, null, default} — {meaning}
-- Constraints: {unique, FK, check}
 - Migrations: {number} {name} — {what}; down: {what}
 
 ### Status flow
@@ -86,8 +82,6 @@ stateDiagram-v2
 | Route | RPC / handler | Permission |
 |---|---|---|
 | `{METHOD} {path}` | `{name}` | `{permission}` |
-
-- {request and response fields}
 
 ### Refusal reasons and texts
 | Reason | Code |
@@ -117,7 +111,7 @@ stateDiagram-v2
 - [ ] T002 [{app}] {what} (A#) · after: T001
 
 **Phase 3 — Tests**
-- [ ] T003 [{app}] [TEST] {cases} (A#, E#)
+- [ ] T003 [{app}] [TEST] {cases} (A#, E#) · after: T002
 
 **Phase 5 — Docs**
 - [ ] T004 [main] {docs, one ADR per [ADR] decision}
@@ -125,22 +119,13 @@ stateDiagram-v2
 **Release**
 - [ ] T005 [user] {step only the user can do}
 
-## Order
-```text
-W1  {app} T001 → T002
-W2  after T002: {app} T00x ‖ {app} T00y
-──  USER CHECKPOINT
-W3  tests → review → docs → pre-merge
-```
-
 ## Verify locally
 1. {start the apps and seed data}
 2. {open a page or call an endpoint as a role} → {expected result} (A#)
-3. {fake an outside callback} → {expected result} (A#)
-4. {trigger a refusal} → `{REASON}` with the exact message (A#)
+3. {trigger a refusal} → `{REASON}` with the exact message (A#)
 
 ## Release & rollback
+- Needs first: {other repo MR, job, env var, config that must exist before deploy}
 - Merge order: {repo or MR} → {repo or MR} → {deploy}
-- Before deploy: {env vars, job config, other preconditions}
 - After deploy: {first check}
 - Rollback: {previous build}; {migrations down, in order}; {other repo revert}

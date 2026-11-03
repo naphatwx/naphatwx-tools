@@ -70,12 +70,15 @@ Output:
 
 ```
 .work/NNN-<slug>/
-└── plan.md   status lines + Status, Accept (A#), Edge cases (E#), Out of scope, Context,
-              Decisions (D#, [ADR]), Open questions, Rules check, Changes, Data/API (status flow),
-              Risks, Tasks (by phase, with after:), Order, Verify locally, Release & rollback
+└── plan.md   always: status lines, Goal, Status, Accept (A#, new/changed/removed), Decisions (D#, [ADR]), Tasks
+              when needed: Edge cases (E#), Out of scope, Context, Open questions, Rules check (open only),
+              Changes, Data/API (links plan/ files), Risks, Verify locally, Release & rollback
 ```
 
+- A bug fix with one cause gets a small plan: Goal (bug and cause), Status, Accept, Tasks.
+- A section with nothing to say is left out. Order lives only in each task's `after:`.
 - One fact lives in one place. A changed fact is replaced, marked `(supersedes …)`; no history piles up.
+- Each owner agent gets its tasks plus the A#, D# and E# lines they cite, not the whole plan.
 - Tasks cite the A#, D# and E# they cover, so review can check every requirement has code and a test.
 - `## Status` is updated at every phase end, so a new session picks up from the file alone.
 - An older plan without these sections is moved to the new shape only when you say yes.
@@ -90,7 +93,8 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
 | [references/plan.md](references/plan.md) | Phase 1: number, explore, grilling and auto-answer, draft, spec verify, plan stop |
-| [references/plan-template.md](references/plan-template.md) | The shape of `plan.md` |
+| [references/plan-template.md](references/plan-template.md) | The full shape of `plan.md` |
+| [references/plan-template-fix.md](references/plan-template-fix.md) | The small shape, for a bug fix with one cause |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
 

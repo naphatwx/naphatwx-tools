@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.9.287
+
+**work-flow plan: sized to the task, no repeats**
+
+- New `references/plan-template-fix.md`: a small plan for a bug fix with one cause.
+- Full plan: only header, Goal, Status, Accept, Decisions and Tasks are required; other sections only when they have content. No `- None.`
+- Removed `## Order` (each task's `after:` is the order) and `## Dependencies & assumptions` (facts go to Context, preconditions to Release & rollback).
+- Rules check keeps only rules not yet settled by a decision.
+- Data / API links `plan/api/` and `plan/database/` files and keeps only what they lack.
+- Accept lines are tagged `(new)`, `(changed)` or `(removed)`; a changed line says what the app did before.
+- Owner agents get their tasks plus the cited A#, D#, E# lines, not the whole plan.
+
 ## 1.9.286
 
 **work-flow plan template**

@@ -37,7 +37,7 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
 | Phase | Read |
 |---|---|
 | Start, any phase | [references/profile.md](references/profile.md), [references/roles.md](references/roles.md) |
-| 1, or any edit to a plan | [references/plan.md](references/plan.md), [references/plan-template.md](references/plan-template.md) |
+| 1, or any edit to a plan | [references/plan.md](references/plan.md), then the template it picks |
 | 4, 5 | [references/review-docs.md](references/review-docs.md) |
 | 6, or a gate the user asks for | [references/pre-merge.md](references/pre-merge.md) |
 
@@ -56,12 +56,12 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
    - Line 2, the status line: `- Phase: 1 | 2 | checkpoint | 3 | 4 | 5 | 6 | done · Apps: <apps> · Target: <branch> · Next: <one line>`
    - Line 3: `- Branch: <branch per repo> · Updated: <today>`
    - `## Status`: what is done, what is written but not run, open questions and reviews, the next steps. A new session resumes from it.
-5. **Old plans.** A `plan.md` without `## Status` or IDs (A#, D#, T#) is an older shape. Before its next phase, offer once to move it to `references/plan-template.md`. Move it only on a yes: renumber, regroup, keep every fact.
+5. **Old plans.** A `plan.md` without `## Status` or IDs (A#, D#, T#), or with `## Order` or `## Dependencies & assumptions`, is an older shape. Before its next phase, offer once to move it to the current template (`references/plan.md` → 4. Draft). Move it only on a yes: renumber, regroup, keep every fact.
 
 ## Phase 2: Code
 
 1. **Split by app tag.** Group the non-`[TEST]` tasks by their `[app]` tag. Tasks outside any app (root config, compose, env examples) → the main agent does them.
-2. **Order.** Follow the plan's `## Order` and each task's `after:`. With codegen in the profile, the owner of the contract app goes first; the apps that use the contract start after it. Apps with no link start at the same time.
+2. **Order.** Follow each task's `after:`. With codegen in the profile, the owner of the contract app goes first; the apps that use the contract start after it. Apps with no link start at the same time.
 3. Start one **owner** per app, `MODE: code` (`roles.md`), with its task ids, the path to `plan.md`, its folder and guide, and its codegen command if any. Owners that start at the same time go in one message.
 4. Keep each owner's id: a later fix goes back to the same instance (SendMessage when the agent has it).
 5. Follow-up owners from the profile start after their app's owner, `MODE: code`.

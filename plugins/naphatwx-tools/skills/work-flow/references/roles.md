@@ -12,7 +12,7 @@ Writes code and tests for one app. Runs codegen. Runs no checks.
 ```text
 ROLE: owner of <app> (<folder>). MODE: code | tests | fix.
 Read first: <app guide>, <root guide>.
-Task: <tasks from the plan, with ids>. Plan: <path to plan.md>.
+Task: <tasks from the plan, with ids>, and the A#, D# and E# lines they cite, pasted in full. Plan: <path to plan.md> (open it only for a fact the pasted lines lack).
 Rules:
 - Edit only files under <folder>. Need a change elsewhere → report it, do not edit.
 - MODE code: no test files. MODE tests: tests only, for the files listed. MODE fix: fix the listed errors; you may re-run only the failing test files.

@@ -9,7 +9,7 @@
    - Env vars and config flow through every layer that needs them.
    - The profile's `Cross-app checks`.
    - Every A# and E# in the plan has code and a test behind it.
-   - Every ticked Rules check line still holds.
+   - Every `(rule: …)` decision still holds in the code, and every Rules check line is now settled.
 3. **Collect all findings first.** Drop the ones that are wrong, and say why.
 4. **Fix in one batch.** Send each app's confirmed findings to its owner, `MODE: fix`, all at once.
 5. **Re-review only the fixed parts**, with a fresh reviewer. No gate runs here; Phase 6 covers the fixes.

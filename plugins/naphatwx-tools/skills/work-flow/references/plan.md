@@ -56,25 +56,28 @@ The user turns it on with "auto-answer" (or "auto") in the input or in any grill
 
 ## 4. Draft
 
-Write `<work folder>/NNN-<slug>/plan.md` from [plan-template.md](plan-template.md). Keep its section order.
-A section with nothing to say gets `- None.`; drop a `Data / API` sub-section the task does not touch.
+Write `<work folder>/NNN-<slug>/plan.md` from a template. Keep its section order.
 
+- **Pick the size.**
+  - A bug fix with one cause → [plan-template-fix.md](plan-template-fix.md). Grow it into the full shape only when the fix needs a decision, a contract change or a migration.
+  - Anything else → [plan-template.md](plan-template.md).
+- **Required sections** (full shape): header, Goal, Status, Accept, Decisions, Tasks. Every other section and every `Data / API` sub-section is written only when it has content; delete it otherwise. Never write `- None.`
 - **One fact, one place.** A changed fact is replaced where it lives, with `(supersedes "<old>")`. Never keep old text, rounds or history.
+- **No restating.** A section never repeats another one in other words. When the task folder has `plan/api/` or `plan/database/` files, `Data / API` links them and keeps only what they lack.
 - **IDs:** A# accept, E# edge case, D# decision, Q# open question, R# risk, T# task. IDs never change once given; a dropped item keeps its number free.
-- **Accept:** each line is testable and names the role when it matters. A refusal gives its reason and exact message.
+- **Accept:** each line is testable and names the role when it matters. A refusal gives its reason and exact message. Tag each line `(new)`, `(changed)` or `(removed)` against what the app does today; a `(changed)` line says `Before: …`.
 - **Edge cases:** failure paths, outside systems that refuse or time out, two users at once, data that is missing.
 - **Out of scope:** everything the grill left out, every "not in v1" and every known gap, with its source.
-- **Context:** facts the design rests on (counts, sizes, limits, current code behaviour), each with the date and where it was checked. Facts go here, not in Decisions.
+- **Context:** facts the design rests on (counts, sizes, limits, current code behaviour, outside systems it relies on), each with the date and where it was checked. Facts go here, not in Decisions.
 - **Decisions:** grouped by topic, one line each, with a source: `(user | auto | rule: <source> | spec verify: <app> | decider)`. Mark a decision that needs a decision record `[ADR]` and add one line `why: … · rejected: …`; write `rejected: not recorded` rather than guess.
 - **Open questions:** only a question the user chose to defer. Each says who decides and the phase or task it blocks.
-- **Rules check:** one line per project rule that touches the task (the profile's `Rules check`, plus the Rules that apply list), ticked with the D# that meets it; an unticked line says when it gets checked.
+- **Rules check:** only the project rules (the profile's `Rules check`, plus the Rules that apply list) not yet settled by a Decision, each saying when it gets checked. A settled rule lives on its decision as `(rule: …)`; delete its line here.
 - **Changes per app:** paths, marked `(new)` or `(edit)` when known.
 - **Status flow:** every entity with a status gets one diagram with every move and its trigger.
 - **Risks:** each ends in `→ mitigation: …` or `→ accepted (<who, date>)`.
-- **Tasks:** grouped by phase. Each task names one app, cites the A#, D# and E# it covers, and ends `· after: T###` when it waits on another. Test tasks carry `[TEST]`; Phase 2 skips them, Phase 3 does them.
-- **Order:** the waves of tasks that can run at the same time, and the user checkpoint.
+- **Tasks:** grouped by phase. Each task names one app, cites the A#, D# and E# it covers, and ends `· after: T###` when it waits on another; `after:` is the only record of order. Test tasks carry `[TEST]`; Phase 2 skips them, Phase 3 does them.
 - **Verify locally:** the steps the user runs at the checkpoint, each citing the A# it shows.
-- **Release & rollback:** merge order across repos, what must exist before deploy, the first check after it, and how to undo it.
+- **Release & rollback:** what must exist before deploy, merge order across repos, the first check after deploy, and how to undo it.
 - Every A# and E# has at least one code task and one test task.
 
 ## 5. Spec verify
@@ -101,7 +104,7 @@ Set the status line to `Phase: 1 · … · Next: say "implement"` and fill `## S
 - The rule-settled decisions, one short line each, so the user can overrule one.
 - The `[ADR]` decisions whose `rejected:` says `not recorded`, so the user can fill them.
 - The open questions and what each blocks.
-- The top risks, and any unticked Rules check line.
+- The top risks, and any Rules check line.
 
 Then wait.
 - "implement" → set the status line to `Phase: 2` and go to Phase 2.
