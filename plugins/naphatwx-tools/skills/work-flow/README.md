@@ -70,8 +70,15 @@ Output:
 
 ```
 .work/NNN-<slug>/
-└── plan.md   status line + Goal, Accept, Decisions, Changes, Data/API, Risks, Tasks
+└── plan.md   status lines + Status, Accept (A#), Edge cases (E#), Out of scope, Context,
+              Decisions (D#, [ADR]), Open questions, Rules check, Changes, Data/API (status flow),
+              Risks, Tasks (by phase, with after:), Order, Verify locally, Release & rollback
 ```
+
+- One fact lives in one place. A changed fact is replaced, marked `(supersedes …)`; no history piles up.
+- Tasks cite the A#, D# and E# they cover, so review can check every requirement has code and a test.
+- `## Status` is updated at every phase end, so a new session picks up from the file alone.
+- An older plan without these sections is moved to the new shape only when you say yes.
 
 Plus the code, tests and docs changes on the working branch. Nothing is committed unless you ask.
 
@@ -83,6 +90,7 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
 | [references/plan.md](references/plan.md) | Phase 1: number, explore, grilling and auto-answer, draft, spec verify, plan stop |
+| [references/plan-template.md](references/plan-template.md) | The shape of `plan.md` |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
 

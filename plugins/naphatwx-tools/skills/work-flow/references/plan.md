@@ -36,7 +36,9 @@ only the user can start. Rounds go on until no decision is left open.
   - Answered → don't ask. Write it under Decisions as `(rule: <file:line or guide section>)`.
   - Otherwise → ask. Two sources of the same rank that disagree don't answer it.
   - Show the settled ones at the top of the round, each with its source, so the user can overrule one.
-- Write each answer under Decisions as `<question> → <answer> (user | auto)`.
+- Write each answer under Decisions as `D# <question> → <answer> (user | auto)`.
+- The user may defer a question ("answer later"). Write it under Open questions with who decides and the
+  phase or task it blocks. Only the user can defer; the decider never does.
 - The grill ends when `grilling` asks to confirm shared understanding and gets a yes. That yes ends the
   grill only: go straight on to step 4. The go-ahead to code is "implement" in step 6.
 - `grilling` missing → stop and tell the user to install it:
@@ -54,37 +56,26 @@ The user turns it on with "auto-answer" (or "auto") in the input or in any grill
 
 ## 4. Draft
 
-Write `<work folder>/NNN-<slug>/plan.md` in this shape. Skip a section that has nothing.
+Write `<work folder>/NNN-<slug>/plan.md` from [plan-template.md](plan-template.md). Keep its section order.
+A section with nothing to say gets `- None.`; drop a `Data / API` sub-section the task does not touch.
 
-```markdown
-# NNN · <Title>
-- Phase: 1 · Apps: <apps> · Target: <MR/PR target or "not known yet"> · Next: <one line>
-
-## Goal
-- <one line>
-
-## Accept
-- <testable result, with the exact user-facing message when there is one>
-
-## Decisions
-- <question> → <answer> (user | auto | rule: <source> | spec verify: <rule> | decider)
-
-## Changes per app
-- <app>: <files or areas, what changes>
-
-## Data / API
-- <tables, fields, endpoints, messages, migrations>
-
-## Risks
-- <list>
-
-## Tasks
-- [ ] T001 [<app>] <task>
-- [ ] T002 [<app>] [TEST] <test task>
-```
-
-- Every Accept line has at least one task. Every task names one app.
-- Test tasks carry `[TEST]`. Phase 2 skips them, Phase 3 does them.
+- **One fact, one place.** A changed fact is replaced where it lives, with `(supersedes "<old>")`. Never keep old text, rounds or history.
+- **IDs:** A# accept, E# edge case, D# decision, Q# open question, R# risk, T# task. IDs never change once given; a dropped item keeps its number free.
+- **Accept:** each line is testable and names the role when it matters. A refusal gives its reason and exact message.
+- **Edge cases:** failure paths, outside systems that refuse or time out, two users at once, data that is missing.
+- **Out of scope:** everything the grill left out, every "not in v1" and every known gap, with its source.
+- **Context:** facts the design rests on (counts, sizes, limits, current code behaviour), each with the date and where it was checked. Facts go here, not in Decisions.
+- **Decisions:** grouped by topic, one line each, with a source: `(user | auto | rule: <source> | spec verify: <app> | decider)`. Mark a decision that needs a decision record `[ADR]` and add one line `why: … · rejected: …`; write `rejected: not recorded` rather than guess.
+- **Open questions:** only a question the user chose to defer. Each says who decides and the phase or task it blocks.
+- **Rules check:** one line per project rule that touches the task (the profile's `Rules check`, plus the Rules that apply list), ticked with the D# that meets it; an unticked line says when it gets checked.
+- **Changes per app:** paths, marked `(new)` or `(edit)` when known.
+- **Status flow:** every entity with a status gets one diagram with every move and its trigger.
+- **Risks:** each ends in `→ mitigation: …` or `→ accepted (<who, date>)`.
+- **Tasks:** grouped by phase. Each task names one app, cites the A#, D# and E# it covers, and ends `· after: T###` when it waits on another. Test tasks carry `[TEST]`; Phase 2 skips them, Phase 3 does them.
+- **Order:** the waves of tasks that can run at the same time, and the user checkpoint.
+- **Verify locally:** the steps the user runs at the checkpoint, each citing the A# it shows.
+- **Release & rollback:** merge order across repos, what must exist before deploy, the first check after it, and how to undo it.
+- Every A# and E# has at least one code task and one test task.
 
 ## 5. Spec verify
 
@@ -101,14 +92,16 @@ the grill settled those.
 
 ## 6. Plan stop
 
-Set the status line to `Phase: 1 · … · Next: say "implement"`, then stop and end the turn. Report:
+Set the status line to `Phase: 1 · … · Next: say "implement"` and fill `## Status`, then stop and end the turn. Report:
 
 - The plan path.
 - What will be built: the goal and the Accept lines, in short.
 - What changes per app, and the task count per app.
 - The decisions the user did not make (auto, spec verify, decider).
 - The rule-settled decisions, one short line each, so the user can overrule one.
-- The top risks.
+- The `[ADR]` decisions whose `rejected:` says `not recorded`, so the user can fill them.
+- The open questions and what each blocks.
+- The top risks, and any unticked Rules check line.
 
 Then wait.
 - "implement" → set the status line to `Phase: 2` and go to Phase 2.

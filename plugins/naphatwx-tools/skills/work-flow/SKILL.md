@@ -37,7 +37,7 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
 | Phase | Read |
 |---|---|
 | Start, any phase | [references/profile.md](references/profile.md), [references/roles.md](references/roles.md) |
-| 1 | [references/plan.md](references/plan.md) |
+| 1, or any edit to a plan | [references/plan.md](references/plan.md), [references/plan-template.md](references/plan-template.md) |
 | 4, 5 | [references/review-docs.md](references/review-docs.md) |
 | 6, or a gate the user asks for | [references/pre-merge.md](references/pre-merge.md) |
 
@@ -52,13 +52,16 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
    - A task number (`195`) or a task folder → resume at the phase in its `plan.md` status line. A phase name after it (`plan`, `code`, `tests`, `review`, `docs`, `pre-merge`) re-runs that phase, only if the task already reached it.
    - Anything else → a new task. The whole input is what the user wants.
 3. **Load the project profile** (`references/profile.md`). Missing parts → ask once, then go on.
-4. **Status line**: the second line of `plan.md`. Update it at the end of every phase:
-   `- Phase: 1 | 2 | checkpoint | 3 | 4 | 5 | 6 | done · Apps: <apps> · Target: <branch> · Next: <one line>`
+4. **Status**: at the end of every phase, update three things in `plan.md`:
+   - Line 2, the status line: `- Phase: 1 | 2 | checkpoint | 3 | 4 | 5 | 6 | done · Apps: <apps> · Target: <branch> · Next: <one line>`
+   - Line 3: `- Branch: <branch per repo> · Updated: <today>`
+   - `## Status`: what is done, what is written but not run, open questions and reviews, the next steps. A new session resumes from it.
+5. **Old plans.** A `plan.md` without `## Status` or IDs (A#, D#, T#) is an older shape. Before its next phase, offer once to move it to `references/plan-template.md`. Move it only on a yes: renumber, regroup, keep every fact.
 
 ## Phase 2: Code
 
 1. **Split by app tag.** Group the non-`[TEST]` tasks by their `[app]` tag. Tasks outside any app (root config, compose, env examples) → the main agent does them.
-2. **Order.** With codegen in the profile, the owner of the contract app goes first; the apps that use the contract start after it. Apps with no link start at the same time.
+2. **Order.** Follow the plan's `## Order` and each task's `after:`. With codegen in the profile, the owner of the contract app goes first; the apps that use the contract start after it. Apps with no link start at the same time.
 3. Start one **owner** per app, `MODE: code` (`roles.md`), with its task ids, the path to `plan.md`, its folder and guide, and its codegen command if any. Owners that start at the same time go in one message.
 4. Keep each owner's id: a later fix goes back to the same instance (SendMessage when the agent has it).
 5. Follow-up owners from the profile start after their app's owner, `MODE: code`.
@@ -71,14 +74,14 @@ Stop and end the turn. Report:
 
 - The plan path.
 - What was built and the files changed, per app.
-- How to try it by hand: the screen or endpoint, and the steps. Mention the `play-scenarios` skill if the task has use cases.
+- How to try it by hand: the plan's `## Verify locally` steps, updated to what was built. Mention the `play-scenarios` skill if the task has use cases.
 - Plainly: no tests are written yet and no build, lint or typecheck has run. The user can ask for a gate at any time.
 
 Then wait. "continue" / "review" → Phase 3. Change requests → same owners, back to Phase 2 (Phase 1 if the plan changes), then stop here again.
 
 ## Phase 3: Tests
 
-1. **Unit tests**: one owner per changed app, `MODE: tests`, the same instance when it is still reachable. Scope: the files it changed plus its `[TEST]` tasks.
+1. **Unit tests**: one owner per changed app, `MODE: tests`, the same instance when it is still reachable. Scope: the files it changed plus its `[TEST]` tasks, covering every A# and E# those tasks cite.
 2. **Integration tests**: if the profile has them, the integration test owner, `MODE: tests`, for the added or changed behavior. Use the project's test skill or guide.
 3. A test that cannot pass without a code change is a real bug: report it and fix the code in Phase 4, never the test.
 4. Tick the `[TEST]` tasks. Report what was written, per app.
@@ -102,7 +105,7 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 ## Decisions without the user
 
 - Spec verify findings: the main agent fixes them itself. One it disagrees with → the **decider** (`roles.md`), whose call is final.
-- Never leave an open question in the plan: the grill asks it.
+- Never leave an open question in the plan: the grill asks it. Only the user can defer one; it goes under `## Open questions` with what it blocks.
 - The project's rules answer convention questions (guides, ADRs, existing patterns). The grill never asks them; the plan marks them `(rule: <source>)`.
 - Auto-answer: the decider answers grill rounds after the user settles scope (`references/plan.md`).
 - A step that fails or loops more than 3 times → stop and report the blocker.

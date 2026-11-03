@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9.286
+
+**work-flow plan template**
+
+- New `references/plan-template.md`: the full `plan.md` shape.
+- New sections: Status, Edge cases, Out of scope, Context (facts checked), Open questions, Rules check, Status flow, Order, Verify locally, Release & rollback.
+- IDs on every item (A#, E#, D#, Q#, R#, T#); tasks cite what they cover and say `after:`.
+- Decisions grouped by topic; `[ADR]` ones carry `why` and `rejected`, and Phase 5 writes one decision record each.
+- Risks end in a mitigation or who accepted them.
+- Only the user can defer a grill question; it goes under Open questions.
+- Review checks every A# and E# has code and a test. The checkpoint uses Verify locally.
+- Profile: optional `Rules check` field.
+- An older plan moves to the new shape only after the user says yes.
+
 ## 1.9.284
 
 **work-flow setup step**

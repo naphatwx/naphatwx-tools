@@ -18,7 +18,7 @@ another checkout, can collide by merge time.
    - No number appears twice.
    - Our numbers run in order right after the highest one, with no gap (migrations).
    - Our task number: no other task folder with a different slug uses it, in any place listed in `plan.md` → "1. Number and folder" (other worktrees and checkouts included).
-4. **Renumber only our own files**, in their original order. Migrations go to the app's owner (headers and comments too). The task folder is the main agent's: move it to the next free number and update the title line of `plan.md`. Update every reference in the same change: spec, docs, test data, MR/PR text.
+4. **Renumber only our own files**, in their original order. Migrations go to the app's owner (headers and comments too). The task folder is the main agent's: move it to the next free number and update the title line of `plan.md`. Update every reference in the same change: the plan (Data / API, Context, Tasks, Release & rollback), spec, docs, test data, MR/PR text.
 5. Report old → new numbers. Commit only if the user asks, as `chore(<area>): renumber …`.
 
 ## The gate

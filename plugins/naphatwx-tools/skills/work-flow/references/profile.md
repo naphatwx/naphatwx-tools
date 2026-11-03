@@ -33,6 +33,7 @@ The profile tells the flow what this project has. Read it once at start.
 - Hotfix branch (read only, never merged): staging | ask
 - Pre-merge app steps: api: apply migrations on the local stack | none
 - Cross-app checks: <extra names that must match across apps> | none
+- Rules check: <project rules every plan ticks, e.g. naming, permissions, error texts> | from the Rules that apply list
 - Extra review tracks: <agent, when it runs> | none
 - Decider agent: <agent> | general-purpose
 - Docs: docs/features/<domain>/ (README.md, architecture.md, decisions/) | none
