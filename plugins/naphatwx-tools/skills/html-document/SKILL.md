@@ -57,7 +57,7 @@ The output **must** keep all of these:
 
 - Read `assets/index.html` from this skill folder.
 - This file already satisfies every hard rule. Do not rewrite it from scratch.
-- Updating a page made earlier → start from `assets/index.html` again and move every section over as it is (text, cards, tables, diagrams), changing only what was asked; never edit the old file in place. Old content the template has no part for (e.g. link cards) gets the nearest template part, or a small CSS block outside the `theme:` markers that uses theme tokens and fits the template's content width at 1300px; no emoji icons. This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time.
+- Updating a page made earlier → Read the old file first (rename it to `*.old.html`), copy the template to the same path, move the content over, then delete the old file. Start from `assets/index.html` and move every section over as it is (text, cards, tables, diagrams), changing only what was asked; never edit the old file in place. Old content the template has no part for (e.g. link cards) gets the nearest template part, or a small CSS block outside the `theme:` markers that uses theme tokens and fits the template's content width at 1300px; no emoji icons. This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time.
 - Do not change the existing `<style>` and `<script>` rules or anything between the `theme:` markers. Only add CSS for a new part (step 3, "Anything else").
 - Delete example parts the content does not use (a diagram, a table card), and their rail links.
 

@@ -102,8 +102,8 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 
 ### 3. Copy the template
 
-- Copy `assets/` → `<output>/mock/`.
-- `mock/` already exists → keep the feature's files (`page/`, `shared/`, `contract/`), but copy `index.html` and `README.md` again on every run, then redo the edits below in them (the header text, `screenUrl()`). This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time. List the files the copy changed (`git status`) in the reply.
+- New mock → copy `assets/` → `<output>/mock/`.
+- `mock/` already exists → never copy the whole folder. Keep the feature's files (`page/`, `shared/`, `contract/`), but copy `index.html` and `README.md` again on every run, then redo the edits below in them (the header text, `screenUrl()`). This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time. List the files the copy changed (`git status`) in the reply.
 - Rename `page/example.html` to the first real screen; add one page per screen from the same skeleton. Register each in `States.PAGES`.
 - The template's "Thing" domain is a placeholder — replace all of it, including `screenUrl()` in `index.html` (the URL the real app would show) and `FakeApi.STORE` (`naphatwx:mock:<feature-slug>`).
 

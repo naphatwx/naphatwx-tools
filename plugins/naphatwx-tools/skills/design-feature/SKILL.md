@@ -117,11 +117,13 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ### 2. Pick the mode and copy the template
 
 - Mode: the `diagram-design` skill is available (`diagram-design:diagram-design` in Claude Code; any agent: listed in its skills) → diagram-design; otherwise manual. Pass it to every `generate-diagram` run.
-- Copy `assets/overview.html` → `<output>/overview.html` and `assets/assets/` → `<output>/assets/`. Overwrite `<output>/assets/` on every run, so the page gets the plugin's newest styles and script.
-- A plan that already exists → rebuild its pages from the newest template, never edit the old page in place: the new `overview.js` may need markup the old page lacks.
+- Copy `assets/assets/` → `<output>/assets/` on every run (overwrite), so the page gets the plugin's newest styles and script.
+- New plan → copy `assets/overview.html` → `<output>/overview.html`.
+- A plan that already exists → rebuild its pages from the newest template, never edit the old page in place: the new `overview.js` may need markup the old page lacks. Read the old file first (rename it to `*.old.html`), copy the template to the same path, move the content over, then delete the old file.
     - `overview.html`: start from `assets/overview.html` again and move each section's content (between its `<!-- =====` comments), the rail links and the `<title>` over from the old page. Then re-run `scenarios-panels.js` and `acceptance-section.js` (step 4).
     - `api/contracts.html`: start from `assets/api/contracts.html` again and move only its `API` data over.
-    - List the pages rebuilt in the reply. The API agent copies `assets/api/contracts.html` (step 3). The template's `flowchart/`, `sequence-diagram/`, `database/`, `mock/` and `use-cases.js` files exist only to preview it; don't copy them — `generate-diagram`, `generate-use-case` and `generate-mock-ui` write the real ones.
+    - List the pages rebuilt in the reply.
+- The API agent copies `assets/api/contracts.html` (step 3). The template's `flowchart/`, `sequence-diagram/`, `database/`, `mock/` and `use-cases.js` files exist only to preview it; don't copy them — `generate-diagram`, `generate-use-case` and `generate-mock-ui` write the real ones.
 - The template shows the same example use case twice: UC1 in manual mode (flowchart `<iframe>` + `render.js`), UC2 in diagram-design mode (`<iframe class="diagram-frame">`, files drawn by the diagram-design skill). Copy the block of the chosen mode as the use case block, then delete UC2 and its rail link from the output.
 - diagram-design mode: remove the `render.js` `<script>` lines and `SeqDiagrams.renderAll()` from the output `overview.html`.
 

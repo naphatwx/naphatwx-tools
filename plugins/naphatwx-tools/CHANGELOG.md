@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.291
+
+**Reruns never lose content**
+
+- design-feature, generate-mock-ui, play-scenarios: the "already exists" case comes first; a rerun never copies the whole folder over, never empties `results.js`, and reads an old page before replacing it.
+- deploy-plan, html-document, html-presentation: an update keeps the old file's path and reads it before replacing it.
+- generate-diagram: a diagram-design redraw replaces the old page kit instead of adding a second one.
+- e2e-test: the step 2 heading says the files are copied on every run.
+
 ## 1.9.290
 
 **Copies always come from the newest plugin**
@@ -13,7 +22,7 @@
 - generate-mock-ui: a scenario with no screen shows a short "No mock" frame (240px) instead of an empty 16:9 box; the scenario list keeps its height.
 - e2e-test no longer reuses the repo's old `step.ts`, reporter or report builder, so the report always has the newest layout and fixes.
 - e2e-test `step.ts`: every `if` body in braces (passes ESLint `curly`); `attachCall` is exported, for proof that is not an HTTP call.
-- e2e-test `run-data-reporter.ts`: entries keyed by scenario id, else file without line + title (old keys are recomputed on merge); a non-scenario entry whose test file is gone is dropped; `E2E_SPEC` refuses only `/`, `\` and `..`; records the config's `baseURL`; a bad setup stops the run in `onBegin`. Each entry keeps its own `startedAt`.
+- e2e-test `run-data-reporter.ts`: entries keyed by scenario id, else file without line + title (old keys are recomputed on merge); a non-scenario entry whose test file is gone is dropped; `E2E_SPEC` refuses only `/`, `\` and `..`; records the config's `baseURL`; a bad setup stops the run in `onBegin`.
 
 ## 1.9.289
 

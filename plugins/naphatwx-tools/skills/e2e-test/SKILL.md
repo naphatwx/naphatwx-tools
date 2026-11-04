@@ -73,7 +73,7 @@ Find `use-cases.js`:
 
 - An `api` scenario on a pure gRPC service (no HTTP / JSON route) → the AI tester runs it with `grpcurl`, as a `job`-style step. Say so in the reply.
 
-## 2. Harness (once per repo)
+## 2. Harness (config and login once per repo; copy the files every run)
 
 Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, a login helper, `@playwright/test` in `package.json`.
 
