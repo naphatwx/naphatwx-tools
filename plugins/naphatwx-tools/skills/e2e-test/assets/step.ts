@@ -11,8 +11,12 @@ export async function step(page: Page, title: string, body: () => Promise<void>)
       failure = error
     }
     const shot = await page.screenshot({ type: 'jpeg', quality: 60, animations: 'disabled' }).catch(() => null)
-    if (shot) await test.info().attach(`step: ${title}`, { body: shot, contentType: 'image/jpeg' })
-    if (failure) throw failure
+    if (shot) {
+      await test.info().attach(`step: ${title}`, { body: shot, contentType: 'image/jpeg' })
+    }
+    if (failure) {
+      throw failure
+    }
   })
 }
 
@@ -24,7 +28,9 @@ export async function reveal(target: Locator): Promise<void> {
     const pinned = (node: Element | null) => {
       for (let n = node as HTMLElement | null; n && n !== document.body; n = n.parentElement) {
         const position = getComputedStyle(n).position
-        if ((position === 'fixed' || position === 'sticky') && n.offsetHeight < window.innerHeight / 3) return n.contains(element) ? null : n
+        if ((position === 'fixed' || position === 'sticky') && n.offsetHeight < window.innerHeight / 3) {
+          return n.contains(element) ? null : n
+        }
       }
       return null
     }
@@ -35,15 +41,23 @@ export async function reveal(target: Locator): Promise<void> {
     const bottom = (foot?.getBoundingClientRect().top ?? window.innerHeight) - 8
     const offset = () => {
       const box = element.getBoundingClientRect()
-      if (box.top < top) return box.top - top
-      if (box.bottom > bottom) return Math.min(box.bottom - bottom, box.top - top)
+      if (box.top < top) {
+        return box.top - top
+      }
+      if (box.bottom > bottom) {
+        return Math.min(box.bottom - bottom, box.top - top)
+      }
       return 0
     }
     for (let n = element.parentElement; n && offset(); n = n.parentElement) {
       const overflow = getComputedStyle(n).overflowY
-      if ((overflow === 'auto' || overflow === 'scroll') && n.scrollHeight > n.clientHeight) n.scrollTop += offset()
+      if ((overflow === 'auto' || overflow === 'scroll') && n.scrollHeight > n.clientHeight) {
+        n.scrollTop += offset()
+      }
     }
-    if (offset()) window.scrollBy(0, offset())
+    if (offset()) {
+      window.scrollBy(0, offset())
+    }
   })
 }
 
@@ -54,8 +68,12 @@ const MAX = 20000
 
 // Hides secret-looking keys anywhere in a JSON value; the report is shared, so no tokens or cookies.
 export function mask(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(mask)
-  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, x]) => [k, SECRET.test(k) ? '***' : mask(x)]))
+  if (Array.isArray(value)) {
+    return value.map(mask)
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, x]) => [k, SECRET.test(k) ? '***' : mask(x)]))
+  }
   return value
 }
 
@@ -91,7 +109,9 @@ export async function apiStep(
   })
 }
 
-async function attachCall(title: string, request: unknown, response: unknown) {
+// Records a step's proof as its request and response. Exported for proof that is no HTTP call (a database read, a
+// capture of a page's requests): call it inside the top-level test.step / step() titled `title`, before its assertions.
+export async function attachCall(title: string, request: unknown, response: unknown) {
   const json = JSON.stringify({ request, response }, null, 2)
   await test.info().attach(`call: ${title}`, { body: Buffer.from(json), contentType: 'application/json' })
 }

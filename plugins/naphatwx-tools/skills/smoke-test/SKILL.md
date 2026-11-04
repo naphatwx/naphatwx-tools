@@ -88,7 +88,7 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
    - Store: use what the entry service already has.
    - Permissions: follow the repo's permission rules.
 2. **Runner** in `scripts/smoke/` (layout in `references/flow-map.md`):
-   - Copy `assets/run.mjs` and `assets/report-template.html` unchanged.
+   - Copy `assets/run.mjs` and `assets/report-template.html` unchanged. Run mode copies them again on every run (R1).
    - Copy `assets/README.md` to `scripts/smoke/README.md` unchanged: how teammates run it and read failures.
    - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
    - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
@@ -115,7 +115,8 @@ Report:
 
 ### R1. Preconditions
 
-- `scripts/smoke/run.mjs`, `report-template.html`, `envs.json` and `flows/*.json` exist. If not, say "run `smoke-test setup` first" and stop.
+- `scripts/smoke/envs.json` and `flows/*.json` exist. If not, say "run `smoke-test setup` first" and stop.
+- Copy `assets/run.mjs` and `assets/report-template.html` over `scripts/smoke/`, unchanged, on every run, so the runner and the report are the plugin's newest. Never run an old copy as it is. List the files the copy changed (`git status`) in the reply.
 - `<env>` (argument, else `SMOKE_ENV`) is a key in `envs.json`. If not, list the known envs and ask.
 - No env given anywhere → use the repo's shared non-production env from `envs.json` (a dev or staging key), and say which. Never pick a production env on your own: a production smoke is never required, so run one only when the user names it.
 - The auth env vars named in the flow files are set. Check the names only, never print values. If any are missing, list them and stop.

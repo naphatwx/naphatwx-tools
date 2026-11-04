@@ -120,6 +120,7 @@ Delegate to a read-only sub-agent when the agent can. Ask for concrete answers w
 ### 4. Copy the template
 
 - Copy `assets/` → `<plan>/live/`, without `preview/`. In `seeds/lib.mjs`, delete the `API_BASE === 'preview'` line. Empty `results.js` to `var PLAYED_RESULTS = {};` (keep its comment lines).
+- `live/` already exists → keep the feature's files (`live.js`, `results.js`, `ai-results.md`, `.env*`, its own seeds), but copy `server.mjs`, `index.html`, `README.md` and `seeds/lib.mjs` again on every run, so the page and server are the plugin's newest. Then redo the edits above (the `lib.mjs` line, the page title and `<h1>`). List the files the copy changed (`git status`) in the reply.
 - Replace the example seeds in `seeds/` with the feature's own.
 - Set the page title and `<h1>` to the feature name.
 - `LIVE_CONFIG`:

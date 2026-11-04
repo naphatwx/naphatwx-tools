@@ -64,6 +64,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 3. Draw
 
+- The output file already exists (a redraw) → start from the newest template again (manual mode) or paste the newest `assets/embed.html` again (diagram-design mode), and move only the diagram's data over (the flow `.js`, the `ER` object, the SVG). Never edit the old file in place. This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time.
 - Read the reference for the type and follow it: [flowchart](references/flowchart.md), [sequence](references/sequence.md), [er](references/er.md).
 - **Labels center on their line** (every type, both modes). Each message, edge and relation label is one group; the page script fits it at render time (after fonts load), so never size a box from a character count:
 

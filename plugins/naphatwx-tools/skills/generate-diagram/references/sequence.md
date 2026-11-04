@@ -29,7 +29,7 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 ## Manual mode
 
-- Copy `assets/sequence-diagram/render.js` to the output folder unchanged, if it is not there yet.
+- Copy `assets/sequence-diagram/render.js` to the output folder unchanged, on every run: overwrite an old copy, so every diagram draws with the plugin's newest renderer.
 - Write one `NN-<slug>.js` per flow. Header comment (max 3 lines): flow number, name, user story; the step format line from `assets/sequence-diagram/01-example-flow.js`.
 
 ```js

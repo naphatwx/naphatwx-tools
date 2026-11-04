@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.9.290
+
+**Copies always come from the newest plugin**
+
+- e2e-test, smoke-test, design-feature, generate-diagram, generate-use-case and play-scenarios copy their files from `assets/` on every run, overwriting the old copy at the same path. Filled outputs (plans, `live.js`, results) are kept.
+- Pages made earlier are rebuilt from the newest template on a rerun, with only their content moved over, so they never keep an old design:
+    - generate-mock-ui: `mock/index.html` and `README.md` are copied again, then the header and `screenUrl()` edits are redone.
+    - design-feature: `overview.html` (section content moved over, scripts re-run) and `api/contracts.html` (its `API` data moved over).
+    - generate-diagram (a redraw), html-document, html-presentation and deploy-plan (an update; same plan `id`, so the ticks stay).
+    - html-document: old content the template has no part for gets the nearest part, or theme-token CSS that fits the template's width; no emoji icons.
+- generate-mock-ui: a scenario with no screen shows a short "No mock" frame (240px) instead of an empty 16:9 box; the scenario list keeps its height.
+- e2e-test no longer reuses the repo's old `step.ts`, reporter or report builder, so the report always has the newest layout and fixes.
+- e2e-test `step.ts`: every `if` body in braces (passes ESLint `curly`); `attachCall` is exported, for proof that is not an HTTP call.
+- e2e-test `run-data-reporter.ts`: entries keyed by scenario id, else file without line + title (old keys are recomputed on merge); a non-scenario entry whose test file is gone is dropped; `E2E_SPEC` refuses only `/`, `\` and `..`; records the config's `baseURL`; a bad setup stops the run in `onBegin`. Each entry keeps its own `startedAt`.
+
 ## 1.9.289
 
 **Skill folders: scripts, references, assets**

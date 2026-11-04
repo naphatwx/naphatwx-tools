@@ -667,6 +667,7 @@
           animation.onfinish = () => { panel.hidden = !open; panel.style.overflow = ''; animation.cancel(); };
         }
         /* theme:slide-js:end */
+        const NO_MOCK_HEIGHT = 240;
         const SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080; // 16:9; the frame scales to the column width and keeps this ratio
         const list = items => items.map(item => `<li>${UI.esc(item)}</li>`).join('');
         const twoDigitNumber = useCaseId => useCaseId.slice(2).padStart(2, '0');
@@ -802,8 +803,10 @@
             // fit the frame's width only; the height follows at 16:9, so a short window scrolls the page
             const scale = Math.min(1, (frame.clientWidth) / SCREEN_WIDTH);
             const iframe = box.querySelector('iframe'); if (iframe) iframe.style.transform = `scale(${scale})`;
-            box.style.height = Math.round(SCREEN_HEIGHT * scale) + 'px';
-            block.querySelector('.use-case-row').style.setProperty('--frame-h', frame.offsetHeight + 'px');
+            // "No mock" needs no 16:9 box; the list keeps the full height so it doesn't jump between scenarios
+            const full = Math.round(SCREEN_HEIGHT * scale);
+            box.style.height = (iframe ? full : Math.min(full, NO_MOCK_HEIGHT)) + 'px';
+            block.querySelector('.use-case-row').style.setProperty('--frame-h', frame.offsetHeight - box.offsetHeight + full + 'px');
             block.querySelector('.scale-label').textContent = iframe ? `${Math.round(scale * 100)}% of ${SCREEN_WIDTH} px` : '';
         }
         new ResizeObserver(() => document.querySelectorAll('section[data-use-case]').forEach(fit)).observe(document.body); // the row tracks the viewport, not #use-cases

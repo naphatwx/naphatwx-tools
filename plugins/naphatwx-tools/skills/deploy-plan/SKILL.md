@@ -151,6 +151,7 @@ Wait for answers. If the user says go on, keep those steps marked `check`.
 ## 8. Write the HTML
 
 1. Copy `assets/deploy-plan-template.html` to `deploy-plans/<YYYY-MM-DD>-<slug>.html` at the repo root, unless the repo already has a place for deploy docs.
+   - Updating a plan made earlier → copy the template again and move only its plan JSON over, with the same `id` (the ticks are saved in the browser under it); never edit the old file in place. This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time.
    - The page is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers.
 2. Replace `/*__PLAN_DATA__*/null` with the plan JSON below. Change nothing else in the file.
 3. Escape `</` as `<\/` inside JSON strings, so the script tag stays closed.

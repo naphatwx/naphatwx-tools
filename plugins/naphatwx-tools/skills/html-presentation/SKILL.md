@@ -44,6 +44,7 @@ The output **must** keep all of these:
 
 - Read `assets/index.html` from this skill folder.
 - This file already satisfies every hard rule. Do not rewrite it from scratch.
+- Updating a deck made earlier → start from `assets/index.html` again and move every slide over as it is, changing only what was asked; never edit the old file in place. This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time.
 
 ### 2. Fill in content
 

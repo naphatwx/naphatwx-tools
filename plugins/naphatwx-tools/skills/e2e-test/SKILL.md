@@ -8,7 +8,7 @@ argument-hint: "<plan folder | spec folder> [--core] [--env <name>] [--base-url 
 
 ```text
 1 read      <plan>/use-cases.js ─► UC1 → its scenarios, UC2 → … (every surface; surface only picks the runner)
-2 harness   once per repo: Playwright config + login + step.ts + run-data reporter + build-report.mjs
+2 harness   once per repo: Playwright config + login · every run: copy step.ts, run-data reporter, build-report.mjs from assets/
   helper    1 agent writes <domain>/helpers/<feature>.ts (seed copies, sweep) and proves it
   match     find the domain's existing tests by scenario id ─► update / add / ask before removing
 3 write     1 writer agent per use case, in parallel ─► <domain>/<goal>.e2e.spec.ts (ui + api) and <goal>.ai-tests.json (mcp + job)
@@ -82,7 +82,7 @@ Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, 
 | Config + login exist | Reuse them. Add only what is missing below. |
 | Nothing | Add `@playwright/test` as a dev dependency where the repo keeps web dev dependencies, a config, and a login setup. Follow the repo's run rules (for example "run inside Docker"). |
 
-Reuse the repo's own copies of these files wherever they already are (search `<e2e-dir>` for `step.ts` and `run-data-reporter.ts`, e.g. `support/step.ts`); never add a second copy. Copy only what is missing from this skill's `assets/`, **unchanged**:
+Copy these files from this skill's `assets/` on **every run**, unchanged, so the repo always runs the plugin's newest version. A copy the repo already has (search `<e2e-dir>` for `step.ts` and `run-data-reporter.ts`, e.g. `support/step.ts`) is overwritten at its own path; never add a second copy. Never reuse an old copy as it is: it may miss fixes and the newest report layout. After copying, run the repo's typecheck, because older specs' tests import `step.ts` too, and list the files the copy changed (`git status`) in the reply:
 
 - `<e2e-dir>/support/step.ts`:
     - `step(page, title, body)` wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
@@ -90,7 +90,7 @@ Reuse the repo's own copies of these files wherever they already are (search `<e
     - `reveal(locator)` scrolls the element into view below any sticky header or footer, in the page's own scroll container too.
 - `<e2e-dir>/reporters/run-data-reporter.ts`: writes the run folder (`run-data.json` + `shots/`), not HTML.
 - `<e2e-dir>/reporters/build-report.mjs` and `reporters/e2e-report-template.html`: build the one HTML (step 6). Node only, no dependencies.
-- `<e2e-dir>/reporters/use-cases.types.d.ts`: the type of `use-cases.js`, for `build-report.mjs`. Replace it with this skill's copy on every run, so it matches the plan's file.
+- `<e2e-dir>/reporters/use-cases.types.d.ts`: the type of `use-cases.js`, for `build-report.mjs`.
 - `<e2e-dir>/README.md` from `assets/README.md`: how teammates run the tests and read the report. Skip it when the e2e folder already has a README.
 
 Wire the config:

@@ -1,7 +1,5 @@
-// Playwright reporter: writes <run dir>/run-data.json + shots/*.jpg; build-report.mjs turns them into one HTML.
-// Run dir: E2E_RUN_DIR (read from the cwd, else from the config folder) must sit inside outputDir
-// (default e2e-results/, next to the config), or onBegin throws. Unset → <outputDir>/<E2E_SPEC or _adhoc>/.
-// The folder is reused: each run replaces the tests it ran, keeps the rest, and prunes unreferenced shots/.
+// Writes <run dir>/run-data.json + shots/ for build-report.mjs. Run dir: E2E_RUN_DIR (inside outputDir), else
+// <outputDir>/<E2E_SPEC or _adhoc>/. Reused: a run replaces the tests it ran, keeps the rest, prunes unused shots.
 import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 
@@ -41,7 +39,6 @@ const pad = (number: number) => String(number).padStart(2, '0')
 // Built from a char code: a literal ESC in the pattern trips no-control-regex.
 const ANSI_COLOUR = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g')
 const stripAnsi = (text = '') => text.replace(ANSI_COLOUR, '')
-const SPEC_PATTERN = /^[A-Za-z0-9][\w.-]*$/
 const ADHOC_DIR = '_adhoc'
 const safe = (text: string) => text.replace(/[^\w.-]+/g, '_').slice(0, 80)
 const inside = (root: string, path: string) => {
@@ -49,11 +46,40 @@ const inside = (root: string, path: string) => {
   return rest !== '' && !rest.startsWith('..') && !isAbsolute(rest)
 }
 
-// The newest run's entries replace old ones with the same key; an old entry without a time gets its run's.
-export const mergeRunData = (old: RunData | undefined, run: Omit<RunData, 'tests'>, fresh: TestOut[]): RunData => {
-  const keys = new Set(fresh.map((t) => t.key))
-  const kept = (old?.tests ?? []).filter((t) => !keys.has(t.key)).map((t) => ({ ...t, startedAt: t.startedAt ?? old?.startedAt }))
-  return { ...run, tests: [...kept, ...fresh] }
+/** E2E_SPEC as given, undefined when unset; throws on '/', '\\' or '..', which could leave outputDir. */
+export const specFolder = (value: string | undefined) => {
+  if (!value) {
+    return undefined
+  }
+  if (/[/\\]/.test(value) || value.includes('..')) {
+    throw new Error(`E2E_SPEC must be a folder name with no "/", "\\" or ".."; got "${value}".`)
+  }
+  return value
+}
+
+const fileOnly = (file: string) => file.replace(/:\d+$/, '')
+// No line number in the key, so a test that moves in its file still replaces its old entry; `file` keeps it for display.
+export const entryKey = (t: Pick<TestOut, 'scenario' | 'file' | 'title'>) => t.scenario ?? `${fileOnly(t.file)} ${t.title}`
+
+// The newest run's entries replace old ones with the same key (stored keys are recomputed, so older
+// line-keyed data merges too); a non-scenario entry whose file is gone is dropped; old entries keep their run's time.
+export const mergeRunData = (
+  old: RunData | undefined,
+  run: Omit<RunData, 'tests'>,
+  fresh: TestOut[],
+  fileExists: (file: string) => boolean = () => true
+): RunData => {
+  const tests = new Map<string, TestOut>()
+  for (const t of old?.tests ?? []) {
+    if (t.scenario !== undefined || fileExists(fileOnly(t.file))) {
+      tests.set(entryKey(t), { ...t, key: entryKey(t), startedAt: t.startedAt ?? old?.startedAt })
+    }
+  }
+  for (const t of fresh) {
+    tests.delete(entryKey(t))
+    tests.set(entryKey(t), t)
+  }
+  return { ...run, tests: [...tests.values()] }
 }
 
 // Deletes every file in <runDir>/shots/ that no test entry points to.
@@ -81,22 +107,31 @@ export default class RunDataReporter implements Reporter {
   // One entry per test, keyed by test.id; a retry replaces the entry and moves the old one into attempts.
   private tests = new Map<string, TestOut>()
   private started = new Date()
+  private baseURL = ''
 
   constructor(options: Options = {}) {
     this.options = options
   }
 
+  // Playwright logs a reporter's throw and runs on (multiplexer.js wrap), so a bad setup stops the process here.
   onBegin(config: FullConfig, _suite: Suite) {
+    try {
+      this.open(config)
+    } catch (e) {
+      process.stderr.write(`\nError: ${(e as Error).message}\n`)
+      process.exit(1)
+    }
+  }
+
+  private open(config: FullConfig) {
+    this.baseURL = config.projects.map((p) => p.use?.baseURL).find((url): url is string => !!url) ?? ''
     this.rootDir = config.rootDir
     this.configDir = config.configFile ? dirname(config.configFile) : config.rootDir
     this.started = new Date()
     const date = this.started
     this.stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
     // E2E_SPEC files the run under e2e-results/<spec>/; unset → _adhoc/. E2E_RUN_DIR still wins.
-    const spec = process.env.E2E_SPEC || undefined
-    if (spec !== undefined && !SPEC_PATTERN.test(spec)) {
-      throw new Error(`E2E_SPEC must be the spec folder name: letters, digits, '.', '_' or '-' (e.g. remove-announcement-dismiss); got "${spec}".`)
-    }
+    const spec = specFolder(process.env.E2E_SPEC)
     this.name = process.env.E2E_REPORT_NAME ?? spec ?? this.options.name ?? 'e2e'
     // Real paths, so a symlinked checkout (e.g. /var vs /private/var) still compares equal.
     const configDir = realpathSync(this.configDir)
@@ -168,10 +203,12 @@ export default class RunDataReporter implements Reporter {
       .filter((a) => !seen.has(a.type + a.description) && seen.add(a.type + a.description))
       .map((a) => ({ type: a.type, description: a.description }))
     const scenario = tag('scenario')
+    // titlePath: '', project, file, ...describes, title.
+    const title = test.titlePath().slice(3).join(' › ') || test.title
     const file = relative(this.rootDir, test.location.file) + ':' + test.location.line
     this.tests.set(test.id, {
-      key: scenario ?? file + ' ' + test.title,
-      title: test.titlePath().slice(3).join(' › ') || test.title,
+      key: entryKey({ scenario, file, title }),
+      title,
       file,
       project: test.parent.project()?.name ?? '',
       status: result.status,
@@ -198,12 +235,12 @@ export default class RunDataReporter implements Reporter {
       stamp: this.stamp,
       startedAt: this.started.toISOString(),
       ms: result.duration,
-      baseURL: process.env.PW_BASE_URL ?? process.env.BASE_URL ?? old?.baseURL ?? '',
+      baseURL: this.baseURL || process.env.PW_BASE_URL || old?.baseURL || '',
     }
     const fresh = [...this.tests.values()]
-    // A run that ran nothing (e.g. --list) leaves an existing folder as it was.
+    // A run that ran nothing (e.g. a filter matching no test) leaves an existing folder as it was.
     if (fresh.length > 0 || !old) {
-      const data = mergeRunData(old, run, fresh)
+      const data = mergeRunData(old, run, fresh, (path) => existsSync(resolve(this.rootDir, path)))
       writeFileSync(file, JSON.stringify(data, null, 2))
       pruneShots(this.runDir, data)
     }
