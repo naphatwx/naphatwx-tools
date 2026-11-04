@@ -27,7 +27,7 @@ graph TD
     S1["1. read the spec, write .parts/brief.md"] --> S2{"2. diagram-design skill available?"}
     S2 -->|yes| M1["diagram-design mode: .html diagrams in iframes"]
     S2 -->|no| M2["manual mode: .svg flowcharts, .js sequences"]
-    M1 --> CP[copy overview.html + assets/ from assets/]
+    M1 --> CP["copy overview.html + assets/assets/ → output/assets/"]
     M2 --> CP
     CP --> S3[3. fan out section agents, in parallel]
     S3 --> S4["4. merge .parts/ into overview.html, run scenarios-panels.js + acceptance-section.js"]
