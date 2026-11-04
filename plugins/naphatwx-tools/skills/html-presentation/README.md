@@ -21,7 +21,7 @@ The agent copies the template and edits only the text inside each slide.
 
 ```mermaid
 graph TD
-    IN["input: topic and output path, both optional"] --> COPY[copy template/index.html]
+    IN["input: topic and output path, both optional"] --> COPY[copy assets/index.html]
     COPY --> FILL{topic given?}
     FILL -->|yes| W["write 4-6 slides on the topic, inside section.slide blocks only"]
     FILL -->|no| KEEP[keep the placeholder slides]
@@ -70,7 +70,7 @@ Output:
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
-| [template/index.html](template/index.html) | The deck with placeholder slides; copied, then the slide text replaced |
+| [assets/index.html](assets/index.html) | The deck with placeholder slides; copied, then the slide text replaced |
 
 ## Related skills
 

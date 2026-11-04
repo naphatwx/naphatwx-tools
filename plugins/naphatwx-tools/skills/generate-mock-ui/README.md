@@ -29,7 +29,7 @@ graph TD
     UC -->|yes| MODE{mode}
     MODE -->|standalone| S1[read the plan: screens, operations, edge states, scenarios]
     S1 --> S2[scan the app's design system: class strings, shell, components]
-    S2 --> S3["copy template/ to plan/mock/, replace the placeholder domain"]
+    S2 --> S3["copy assets/ to plan/mock/, replace the placeholder domain"]
     S3 --> S4["contract/: types.ts, rules.js, data.js"]
     S4 --> S5["shared/scenario-play.js: how to play each ui scenario"]
     S5 --> S6["shared/: states, local data, components, shell"]
@@ -154,8 +154,8 @@ Output, in-project:
 | [references/in-project.md](references/in-project.md) | In-project mode: mock routes inside the real app |
 | [references/mock-review.md](references/mock-review.md) | The review: two fresh reviewers, then one fix agent |
 | [scripts/check-scenarios.js](scripts/check-scenarios.js) | Syntax-checks every script; checks every `ui` scenario has one play entry with a real state and page, and no `mcp` / `api` / `job` scenario has one; prints the counts |
-| [template/](template/) | The standalone `mock/` folder on a placeholder domain; copied whole and filled in per feature |
-| [template/README.md](template/README.md) | Ships as `mock/README.md` |
+| [assets/](assets/) | The standalone `mock/` folder on a placeholder domain; copied whole and filled in per feature |
+| [assets/README.md](assets/README.md) | Ships as `mock/README.md` |
 | [use-cases.js](use-cases.js) | Example use cases for the template preview; never copied |
 
 ## Related skills

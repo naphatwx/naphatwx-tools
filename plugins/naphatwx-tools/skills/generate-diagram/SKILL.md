@@ -10,9 +10,9 @@ Draw one diagram (or one set of the same type) into a file a browser can open or
 
 | Type | Shows | diagram-design mode | Manual mode |
 |------|-------|---------------------|-------------|
-| `flowchart` | A flow's logic: steps, yes / no decisions, loops, end states | `NN-<slug>.html` (its Flowchart type) | `NN-<slug>.html` from `template/flowchart/` |
-| `sequence` | Who calls whom, in what order, what comes back, which writes leave the service | `NN-<slug>.html` (its Sequence type) | `NN-<slug>.js` + `render.js` from `template/sequence-diagram/` |
-| `er` | Tables, columns, types, keys and foreign keys, with what changes | `er-diagram.html` (its Database Schema type) | `er-diagram.html` from `template/er/` |
+| `flowchart` | A flow's logic: steps, yes / no decisions, loops, end states | `NN-<slug>.html` (its Flowchart type) | `NN-<slug>.html` from `assets/flowchart/` |
+| `sequence` | Who calls whom, in what order, what comes back, which writes leave the service | `NN-<slug>.html` (its Sequence type) | `NN-<slug>.js` + `render.js` from `assets/sequence-diagram/` |
+| `er` | Tables, columns, types, keys and foreign keys, with what changes | `er-diagram.html` (its Database Schema type) | `er-diagram.html` from `assets/er/` |
 
 ## User Input
 
@@ -39,9 +39,9 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - **Every diagram file has one Export PDF button**, the same everywhere: the `.float-bar` at the bottom right, made by `addExportPdf()` from the synced `theme:pdf` / `theme:pdf-js` blocks. It opens the print dialog and prints only that diagram, fitted to the page width, without the button. The page keeps room under its last line (`theme:pdf` pads the body), so the button never covers the drawing, also inside a host's iframe.
         - Manual templates (flowchart, sequence viewer, ER) already have it: keep the `theme:` blocks and the `addExportPdf(...)` call.
         - The text size picker sits in the same bar (`theme:font-size` blocks, `addFontSize(...)`). Keep it. Embedded, a diagram hides it and follows the host page's size.
-        - diagram-design files get it from the page kit, `template/embed.html` (step 3). Never copy or restyle the button.
+        - diagram-design files get it from the page kit, `assets/embed.html` (step 3). Never copy or restyle the button.
     - diagram-design mode: use the minimal dark template (`assets/template-dark.html`, `example-<type>-dark.html`) and skip its first-run style-guide question (the answer is always "proceed with the default"). Brief it so its output matches manual mode:
-        - Colors: only the theme's values, the hexes in the `theme:tokens` block of `template/er/er-diagram.html`. Map its defaults: paper `#2d3142` → `#18191d`; `#393e53` → `#1f2025`; `#41465b` → `#5c6069`; ink `#f5f5f5` → `#e2e3e7`; muted `#bfc0c0` → `#c6c8cf`; tags `#8e98ac` → `#a3a6b0`; accent `#f08a59` → `#8ab0ff`; blue `#274a73` → `#1b2232`; amber → `#f0c26b`; red `#ab5258` → `#f28b8d`; connectors `#6b6e78`.
+        - Colors: only the theme's values, the hexes in the `theme:tokens` block of `assets/er/er-diagram.html`. Map its defaults: paper `#2d3142` → `#18191d`; `#393e53` → `#1f2025`; `#41465b` → `#5c6069`; ink `#f5f5f5` → `#e2e3e7`; muted `#bfc0c0` → `#c6c8cf`; tags `#8e98ac` → `#a3a6b0`; accent `#f08a59` → `#8ab0ff`; blue `#274a73` → `#1b2232`; amber → `#f0c26b`; red `#ab5258` → `#f28b8d`; connectors `#6b6e78`.
         - Type: main labels 14px (`font-size` 14 in viewBox units); secondary lines (detail, exit label, note, sub, type) 12px. Shapes keep the size that fits 14px. Hosts draw the SVG at 1:1, never scaled, so keep the viewBox at most about 1000 wide (wider scrolls sideways). Sentence case labels (`Yes`, `Retry`, `1 · Load`): no all-caps or letter-spaced tags. No dot-grid or patterned background.
         - Fonts: the OS font, never a web font. Delete the Google Fonts `<link>` (and any `preconnect`) and swap the font stacks: Geist and Instrument Serif → `-apple-system, "Segoe UI", system-ui, sans-serif`; Geist Mono → `ui-monospace, "SF Mono", Menlo, Consolas, monospace` (single quotes inside SVG `font-family="…"` attributes).
 5. Manual-mode files load nothing from the network: no external scripts, styles or fonts.
@@ -78,7 +78,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - The text centers on `data-cx`; the box fits the rendered text plus 6px each side, centered on the same x; the step badge (`.edge-label-number`, optional) moves to just left of the box, outside it. The label itself never moves for the badge.
 - `data-cx` per type: a message arrow → `(x1 + x2) / 2`; a self-call loop → the middle of the loop's horizontal span; a flowchart edge → the middle of the segment it labels (above a level segment, on a vertical one, the box hiding the line behind it); an ER relationship → the middle of its line or level stub.
 - Lay out room for the widest label and its badge (about 8.6px per 14px mono character, on the wide side); the script only fits the box and moves the badge.
-- diagram-design mode, every type: paste `template/embed.html` (the page kit) just before `</body>` of every saved `.html`, unchanged. It adds the Export PDF button and label fitting, and keeps the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
+- diagram-design mode, every type: paste `assets/embed.html` (the page kit) just before `</body>` of every saved `.html`, unchanged. It adds the Export PDF button and label fitting, and keeps the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
     - Size: it posts `diagram-height` with `height` and `width` on every resize. The height includes the body's bottom padding, so the host's iframe keeps the room under the drawing where the Export PDF button sits. The host sizes the iframe to the height (no fixed height); its lightbox uses the width to show the whole drawing, scaled.
     - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
     - Width: each SVG draws at exactly its viewBox width (1:1, so labels render at their own size) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host. In print it shrinks to the page width.

@@ -55,7 +55,7 @@ The output **must** keep all of these:
 
 ### 2. Copy the template
 
-- Read `template/index.html` from this skill folder.
+- Read `assets/index.html` from this skill folder.
 - This file already satisfies every hard rule. Do not rewrite it from scratch.
 - Do not change the existing `<style>` and `<script>` rules or anything between the `theme:` markers. Only add CSS for a new part (step 3, "Anything else").
 - Delete example parts the content does not use (a diagram, a table card), and their rail links.

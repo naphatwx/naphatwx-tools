@@ -29,8 +29,8 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 ## Manual mode
 
-- Copy `template/sequence-diagram/render.js` to the output folder unchanged, if it is not there yet.
-- Write one `NN-<slug>.js` per flow. Header comment (max 3 lines): flow number, name, user story; the step format line from `template/sequence-diagram/01-example-flow.js`.
+- Copy `assets/sequence-diagram/render.js` to the output folder unchanged, if it is not there yet.
+- Write one `NN-<slug>.js` per flow. Header comment (max 3 lines): flow number, name, user story; the step format line from `assets/sequence-diagram/01-example-flow.js`.
 
 ```js
 SeqDiagrams.define("01-cut-new-version", {
@@ -61,7 +61,7 @@ SeqDiagrams.define("01-cut-new-version", {
 | `["opt", cond]` / `["loop", cond]` … `["end"]` | Optional or repeated block |
 
 - The `.js` files need a host page. A caller with its own page (design-feature's `overview.html`) loads them there.
-- No host page → also copy `template/sequence-diagram/index.html` to the output folder: set its title, and add one `<h2>` + `<div class="sequence" data-flow="NN-<slug>">` and one `<script src="NN-<slug>.js">` per flow.
+- No host page → also copy `assets/sequence-diagram/index.html` to the output folder: set its title, and add one `<h2>` + `<div class="sequence" data-flow="NN-<slug>">` and one `<script src="NN-<slug>.js">` per flow.
 
 ## Checks
 

@@ -1,6 +1,6 @@
 # Flow map and env files
 
-The runner (`template/run.mjs`) reads two kinds of file in the target repo's `scripts/smoke/` folder:
+The runner (`assets/run.mjs`) reads two kinds of file in the target repo's `scripts/smoke/` folder:
 
 - `flows/<flow>.json`: one file per flow, which says how to trigger it and how to check each hop
 - `envs.json`: the base URLs for each environment
@@ -11,8 +11,8 @@ Setup writes both. Run mode only reads them, and it never explores the code agai
 
 ```text
 scripts/smoke/
-├── run.mjs                 # copied from template/run.mjs
-├── report-template.html    # copied from template/report-template.html
+├── run.mjs                 # copied from assets/run.mjs
+├── report-template.html    # copied from assets/report-template.html
 ├── envs.json               # base URLs per env
 ├── .env.example            # SMOKE_ENV / SMOKE_SPEC; copy to .env (git-ignored)
 ├── flows/

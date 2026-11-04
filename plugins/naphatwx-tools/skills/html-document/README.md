@@ -25,7 +25,7 @@ graph TD
     SRC -->|yes| READ[read the files: topic, sections, steps, code, terms, tables, warnings]
     SRC -->|no| ASK[ask once where the content is, or offer placeholder content]
     ASK --> READ
-    READ --> COPY[copy template/index.html]
+    READ --> COPY[copy assets/index.html]
     COPY --> FILL[replace the title and brand with the topic]
     FILL --> NAV["rewrite the rail: 01, 02 … with nested N.M links"]
     NAV --> ART["rewrite the sections: kicker, facts, callouts, steps, code, tables"]
@@ -66,7 +66,7 @@ Output:
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
-| [template/index.html](template/index.html) | The docs page with sample content; copied, then its content replaced |
+| [assets/index.html](assets/index.html) | The docs page with sample content; copied, then its content replaced |
 
 ## Related skills
 

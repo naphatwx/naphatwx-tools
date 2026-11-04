@@ -88,8 +88,8 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
    - Store: use what the entry service already has.
    - Permissions: follow the repo's permission rules.
 2. **Runner** in `scripts/smoke/` (layout in `references/flow-map.md`):
-   - Copy `template/run.mjs` and `template/report-template.html` unchanged.
-   - Copy `template/README.md` to `scripts/smoke/README.md` unchanged: how teammates run it and read failures.
+   - Copy `assets/run.mjs` and `assets/report-template.html` unchanged.
+   - Copy `assets/README.md` to `scripts/smoke/README.md` unchanged: how teammates run it and read failures.
    - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
    - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
    - Write `envs.json`, using the base URLs the repo's config files show for each env. Ask for any you cannot find.

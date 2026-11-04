@@ -140,11 +140,11 @@ Plus a `playwright.config.*` and login setup when the repo had none.
 | [references/writer-agent.md](references/writer-agent.md) | Prompt for each writer agent: per-surface rules, selectors, data, waits |
 | [references/ai-tester-agent.md](references/ai-tester-agent.md) | Prompt for the AI tester: plays mcp and job scenarios, records each call |
 | [references/reviewer-agent.md](references/reviewer-agent.md) | Prompt for the fresh reviewer: the per-step checklist and flags |
-| [template/step.ts](template/step.ts) | `step()`, `apiStep()` and `reveal()` |
-| [template/run-data-reporter.ts](template/run-data-reporter.ts) | Playwright reporter: writes `run-data.json` + `shots/` |
-| [template/build-report.mjs](template/build-report.mjs) | Merges the run folder into one HTML |
-| [template/e2e-report-template.html](template/e2e-report-template.html) | The report page the build fills in |
-| [template/README.md](template/README.md) | Ships as the e2e folder's `README.md` |
+| [assets/step.ts](assets/step.ts) | `step()`, `apiStep()` and `reveal()` |
+| [assets/run-data-reporter.ts](assets/run-data-reporter.ts) | Playwright reporter: writes `run-data.json` + `shots/` |
+| [assets/build-report.mjs](assets/build-report.mjs) | Merges the run folder into one HTML |
+| [assets/e2e-report-template.html](assets/e2e-report-template.html) | The report page the build fills in |
+| [assets/README.md](assets/README.md) | Ships as the e2e folder's `README.md` |
 
 ## Related skills
 

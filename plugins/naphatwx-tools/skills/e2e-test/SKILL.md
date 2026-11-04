@@ -82,7 +82,7 @@ Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, 
 | Config + login exist | Reuse them. Add only what is missing below. |
 | Nothing | Add `@playwright/test` as a dev dependency where the repo keeps web dev dependencies, a config, and a login setup. Follow the repo's run rules (for example "run inside Docker"). |
 
-Reuse the repo's own copies of these files wherever they already are (search `<e2e-dir>` for `step.ts` and `run-data-reporter.ts`, e.g. `support/step.ts`); never add a second copy. Copy only what is missing from this skill's `template/`, **unchanged**:
+Reuse the repo's own copies of these files wherever they already are (search `<e2e-dir>` for `step.ts` and `run-data-reporter.ts`, e.g. `support/step.ts`); never add a second copy. Copy only what is missing from this skill's `assets/`, **unchanged**:
 
 - `<e2e-dir>/support/step.ts`:
     - `step(page, title, body)` wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
@@ -91,7 +91,7 @@ Reuse the repo's own copies of these files wherever they already are (search `<e
 - `<e2e-dir>/reporters/run-data-reporter.ts`: writes the run folder (`run-data.json` + `shots/`), not HTML.
 - `<e2e-dir>/reporters/build-report.mjs` and `reporters/e2e-report-template.html`: build the one HTML (step 6). Node only, no dependencies.
 - `<e2e-dir>/reporters/use-cases.types.d.ts`: the type of `use-cases.js`, for `build-report.mjs`. Replace it with this skill's copy on every run, so it matches the plan's file.
-- `<e2e-dir>/README.md` from `template/README.md`: how teammates run the tests and read the report. Skip it when the e2e folder already has a README.
+- `<e2e-dir>/README.md` from `assets/README.md`: how teammates run the tests and read the report. Skip it when the e2e folder already has a README.
 
 Wire the config:
 

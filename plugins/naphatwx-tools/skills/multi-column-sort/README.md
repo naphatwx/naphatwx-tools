@@ -53,7 +53,7 @@ Output: edits in your project. Names and paths follow the project's own style.
 
 ```
 <your project>/
-├── <utils>/sort-core.ts            copied from reference/, adapted
+├── <utils>/sort-core.ts            copied from assets/, adapted
 ├── <utils>/server-serializers.ts   only when the backend sorts; keep the one serializer you need
 └── <table component>               holds SortState, wires each header, consumes the state
 ```
@@ -63,9 +63,9 @@ Output: edits in your project. Names and paths follow the project's own style.
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions: behavior, client and server use, header UI, gotchas |
-| [reference/](reference/) | Code the agent copies into the project |
-| [reference/sort-core.ts](reference/sort-core.ts) | Types, `cycleSort`, `getSortDir`, `getSortIndex`, `clearSort`, `compareValues`, `makeComparator`; no dependencies |
-| [reference/server-serializers.ts](reference/server-serializers.ts) | `toDashPrefix`, `toDirSuffix`, `toSortObjects`, with an optional `FieldMap` |
+| [assets/](assets/) | Code the agent copies into the project |
+| [assets/sort-core.ts](assets/sort-core.ts) | Types, `cycleSort`, `getSortDir`, `getSortIndex`, `clearSort`, `compareValues`, `makeComparator`; no dependencies |
+| [assets/server-serializers.ts](assets/server-serializers.ts) | `toDashPrefix`, `toDirSuffix`, `toSortObjects`, with an optional `FieldMap` |
 
 ## Related skills
 

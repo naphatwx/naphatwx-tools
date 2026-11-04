@@ -53,7 +53,7 @@ graph TD
     E1 --> M
     T2 --> F
     M --> F
-    F[write use-cases.js from template/use-cases.js]
+    F[write use-cases.js from assets/use-cases.js]
     F --> G["node scripts/check.js: fields, coverage, evidence refs, quoted strings in the code"]
     G -->|errors| F
     G -->|exit 0| H[reply: path, counts, evidence, mismatches, next steps]
@@ -154,7 +154,7 @@ Output: the data file and its type.
 ```
 <plan>/
 ├── use-cases.js            var USE_CASES, SCENARIOS, ACCEPTANCE, MISMATCHES = [...]
-└── use-cases.types.d.ts    the type of every field (copied from template/)
+└── use-cases.types.d.ts    the type of every field (copied from assets/)
 ```
 
 ## Files in the skill folder
@@ -162,8 +162,8 @@ Output: the data file and its type.
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
-| [template/use-cases.js](template/use-cases.js) | Example file: 3 use cases, 18 scenarios across `ui`, `mcp` and `job` with evidence (one `source: "spec"`), 6 acceptance criteria, 1 mismatch |
-| [template/use-cases.types.d.ts](template/use-cases.types.d.ts) | The type of every field; synced from `theme/use-cases.d.ts`, never edited here |
+| [assets/use-cases.js](assets/use-cases.js) | Example file: 3 use cases, 18 scenarios across `ui`, `mcp` and `job` with evidence (one `source: "spec"`), 6 acceptance criteria, 1 mismatch |
+| [assets/use-cases.types.d.ts](assets/use-cases.types.d.ts) | The type of every field; synced from `theme/use-cases.d.ts`, never edited here |
 | [scripts/check.js](scripts/check.js) | Checks the file; prints the scenario count per use case and channel, the acceptance coverage, the evidence count and each mismatch; errors on a field the type does not have, a channel or acceptance criterion with no scenario, missing or broken evidence refs, and a quoted string not in the code; warns on a scenario with no twin on another channel, no example, a role with no permission string, or `source: "spec"` (an error with `--strict`); `--root <repo>` when the file is outside the repo; `--json` for machine output; exit 1 on any error |
 
 ## Related skills

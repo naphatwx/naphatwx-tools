@@ -114,7 +114,7 @@ Output: one HTML file, at the repo root unless the repo already has a place for 
 | Path | What |
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
-| [template/deploy-plan-template.html](template/deploy-plan-template.html) | The checklist page; the agent fills in the plan JSON and changes nothing else |
+| [assets/deploy-plan-template.html](assets/deploy-plan-template.html) | The checklist page; the agent fills in the plan JSON and changes nothing else |
 
 ## Related skills
 

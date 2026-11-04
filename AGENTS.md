@@ -7,7 +7,8 @@
 - `context: fork` runs a skill in a fresh sub-agent that does not see the chat. Use it only for skills that ask the user nothing and return one report (e.g. `check-job`). Add `background: false` when the skill needs MCP tools.
 - Keep skill bodies agent-neutral: name a Claude-only tool as an option ("use AskUserQuestion when the agent has it"), and give a fallback for `$ARGUMENTS`.
 - Refer to other skills by bare name, e.g. the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code).
-- `skills/<name>/README.md` is for people; agents follow `SKILL.md` only. `template/README.md` ships inside the generated folder.
+- Skill folders: `scripts/` (code the agent runs), `references/` (docs loaded when needed), `assets/` (files that go into the output or the repo: templates, copied code, preview data). No other folder names.
+- `skills/<name>/README.md` is for people; agents follow `SKILL.md` only. `assets/README.md` ships inside the generated folder.
 - No filler text in any skill or template. Add no intro line, subtitle, legend or note that repeats a heading or explains what the page shows, and no section or example block the user did not ask for. Every page-making `SKILL.md` repeats this as a rule, because agents read only `SKILL.md`.
 - `plugins/naphatwx-tools/hooks/` holds the Claude Code hooks (response rules, herdr tab name), each opt-in by an `NAPHATWX_*` env value. They are Claude Code only, wired inline in the Claude `plugin.json`. Don't add a `hooks/hooks.json`: Claude auto-loads it too, and the hook would run twice.
 - `hooks/herdr-claude-tab/` is a herdr plugin, not a Claude hook. The user links it into herdr by hand (`herdr plugin link`).
@@ -18,7 +19,7 @@
 - Source: `theme/tokens.css` (colors, fonts, radius) and `theme/base.css` (element defaults).
 - `node theme/sync.mjs` copies them into each template between `/* theme:tokens:start */ … end */` and `/* theme:base:start */ … end */` markers. Each skill folder stays self-contained, because `npx skills add` installs one folder only.
 - Export PDF: `theme/pdf.css` (print rules, `.no-print`) syncs into `/* theme:pdf:start */ … end */`; `theme/pdf.js` (`addExportPdf(target, prepare)`) syncs into `/* theme:pdf-js:start */ … end */` inside a `<script>` or `.js` file. Every HTML template has both and calls `addExportPdf` once. With no target, Export PDF goes into the bottom-right `.float-bar` (one long box); put page tools in a `<div class="float-bar no-print">` before it. Page-specific print layout goes in its own `@media print`, outside the markers.
-- Diagrams: `theme/diagram-labels.js` (`fitDiagramLabels`: each `.edge-label` box fits its rendered text) syncs into `/* theme:diagram-labels-js:start */ … end */`; `theme/diagram-embed.js` (Export PDF, 1:1 SVGs, the iframe embed contract) into `/* theme:diagram-embed-js:start */ … end */`. generate-diagram's `template/embed.html` holds both, for diagram-design files.
+- Diagrams: `theme/diagram-labels.js` (`fitDiagramLabels`: each `.edge-label` box fits its rendered text) syncs into `/* theme:diagram-labels-js:start */ … end */`; `theme/diagram-embed.js` (Export PDF, 1:1 SVGs, the iframe embed contract) into `/* theme:diagram-embed-js:start */ … end */`. generate-diagram's `assets/embed.html` holds both, for diagram-design files.
 - Opt-in shared blocks, each synced into `/* theme:<name>:start */ … end */` only where a page has the marker:
   - `report.css` (`report`): deploy-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.command code`.
   - `disclosure.css` (`disclosure`) + `slide.js` (`slide-js`, `slide(panel, open, instant)`): the `.disclosure` / `.disclosure-head` card and its 220ms slide. Used by the report pages and the mock and play scenario lists.
@@ -41,7 +42,7 @@
 - Browser storage keys (`localStorage`, `sessionStorage`): `naphatwx:<tool>:<scope>:<what>`, e.g. `naphatwx:play:<slug>:results`.
   - `<tool>`: `design`, `mock`, `play`, `deploy`, `e2e`, `gallery`, `docs`. `<scope>` is the feature slug, else the page data's id or name, else `location.pathname`; drop it for settings every page shares (`naphatwx:font-size`).
 - Never edit between the markers. Edit `theme/`, then run `node theme/sync.mjs`.
-- design-feature's `template/mock`, `flowchart`, `sequence-diagram` and `database` are preview copies of the generate-mock-ui and generate-diagram templates. Edit the source, then run `node theme/sync.mjs`. Files that differ on purpose are listed in `OWN` in `theme/sync.mjs`.
+- design-feature's `assets/mock`, `flowchart`, `sequence-diagram` and `database` are preview copies of the generate-mock-ui and generate-diagram templates. Edit the source, then run `node theme/sync.mjs`. Files that differ on purpose are listed in `OWN` in `theme/sync.mjs`.
 - Run `node theme/sync.mjs --check` before committing. It fails on drift, on any hex color that is not a theme color, and on text tokens below 4.5:1 contrast.
 - Template CSS uses `var(--token)` only. Standalone `.svg` files use the theme hex values.
 - Exception: mock screens (`mock/page|shared|contract`) use the target app's own design system.

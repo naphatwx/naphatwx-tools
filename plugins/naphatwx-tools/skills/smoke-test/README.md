@@ -135,9 +135,9 @@ Plus a chat summary: overall status, one line per flow, every failed hop with it
 | [references/explore-agent.md](references/explore-agent.md) | Prompt for the per-flow explore agent, and how to merge the hop tables |
 | [references/probe-contract.md](references/probe-contract.md) | What each service builds: entry call, hop report, shared store, safety rules |
 | [references/flow-map.md](references/flow-map.md) | `scripts/smoke/` layout, `envs.json` and `flows/<flow>.json` fields, report data |
-| [template/run.mjs](template/run.mjs) | The runner: triggers each flow, polls each hop, writes the report. Node 18+, no dependencies |
-| [template/report-template.html](template/report-template.html) | The report page; the runner fills in the data |
-| [template/README.md](template/README.md) | Ships as `scripts/smoke/README.md` |
+| [assets/run.mjs](assets/run.mjs) | The runner: triggers each flow, polls each hop, writes the report. Node 18+, no dependencies |
+| [assets/report-template.html](assets/report-template.html) | The report page; the runner fills in the data |
+| [assets/README.md](assets/README.md) | Ships as `scripts/smoke/README.md` |
 
 ## Related skills
 

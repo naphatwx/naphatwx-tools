@@ -29,7 +29,7 @@ append — call it out to the user rather than switching silently.
 
 ## The core (framework-agnostic)
 
-Copy [reference/sort-core.ts](reference/sort-core.ts) into the project. It has
+Copy [assets/sort-core.ts](assets/sort-core.ts) into the project. It has
 zero dependencies and no framework code:
 
 - `SortDir`, `SortEntry`, `SortState` — the types. `SortState` is an ordered
@@ -68,7 +68,7 @@ engines).
 ## Server-side sorting
 
 When the backend paginates/sorts, send the stack as a sort parameter. Pick the
-serializer in [reference/server-serializers.ts](reference/server-serializers.ts)
+serializer in [assets/server-serializers.ts](assets/server-serializers.ts)
 that matches the backend contract:
 
 - `toDashPrefix(state)` -> `"name,-age"` (`-` prefix = DESC). Common REST/JSON:API.

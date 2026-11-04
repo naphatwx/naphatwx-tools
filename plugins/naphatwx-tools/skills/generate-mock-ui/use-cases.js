@@ -1,5 +1,5 @@
 // @ts-check
-// Preview data for template/ only (its pages load ../use-cases.js): a copy of generate-use-case's template. A real mock reads <plan>/use-cases.js.
+// Preview data for assets/ only (its pages load ../use-cases.js): a copy of generate-use-case's template. A real mock reads <plan>/use-cases.js.
 // Written by the generate-use-case skill. All values are strict JSON (double quotes, no trailing commas) so a script can parse them after `var NAME = `.
 // Every skill that plays or tests the feature (mock, play, e2e) reads this file and shows the same tree: use case → scenarios, in this order.
 

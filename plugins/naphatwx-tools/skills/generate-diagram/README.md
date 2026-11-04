@@ -51,9 +51,9 @@ graph LR
         D3["er: er-diagram.html + page kit, or er-area.html per area over 5 tables"]
     end
     subgraph MAN["manual mode"]
-        M1["flowchart: NN-slug.html from template/flowchart/"]
+        M1["flowchart: NN-slug.html from assets/flowchart/"]
         M2["sequence: NN-slug.js + render.js, + index.html when no host page"]
-        M3["er: er-diagram.html from template/er/"]
+        M3["er: er-diagram.html from assets/er/"]
     end
 ```
 
@@ -109,10 +109,10 @@ Plus, in chat: the mode used, the embed snippet per file, and every `TBD` and op
 | [references/flowchart.md](references/flowchart.md) | Flowchart shapes, detail lines with real values, words-not-symbols table, checks |
 | [references/sequence.md](references/sequence.md) | Sequence labels, step format, step details fragment, checks |
 | [references/er.md](references/er.md) | What tables to include, change tags, layout, checks |
-| [template/flowchart/](template/flowchart/) | Example flowchart `.html`: inline SVG, Export PDF, the embed contract |
-| [template/embed.html](template/embed.html) | Page kit pasted into every diagram-design file: Export PDF, label fitting, the embed contract |
-| [template/sequence-diagram/](template/sequence-diagram/) | `render.js`, an example flow `.js` and the `index.html` host page |
-| [template/er/](template/er/) | `er-diagram.html`: the `ER` object, hover to trace relations, Export PDF |
+| [assets/flowchart/](assets/flowchart/) | Example flowchart `.html`: inline SVG, Export PDF, the embed contract |
+| [assets/embed.html](assets/embed.html) | Page kit pasted into every diagram-design file: Export PDF, label fitting, the embed contract |
+| [assets/sequence-diagram/](assets/sequence-diagram/) | `render.js`, an example flow `.js` and the `index.html` host page |
+| [assets/er/](assets/er/) | `er-diagram.html`: the `ER` object, hover to trace relations, Export PDF |
 
 ## Related skills
 

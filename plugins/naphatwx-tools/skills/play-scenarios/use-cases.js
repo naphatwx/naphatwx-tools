@@ -1,5 +1,5 @@
 // @ts-check
-// Preview data for template/ only (its index loads ../use-cases.js). A real run reads <plan>/use-cases.js from generate-use-case.
+// Preview data for assets/ only (its index loads ../use-cases.js). A real run reads <plan>/use-cases.js from generate-use-case.
 // All values are strict JSON (double quotes, no trailing commas) so a script can parse them after `var NAME = `.
 // How to play each scenario on the running app lives in live/live.js, keyed by scenario id.
 

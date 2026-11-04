@@ -122,7 +122,7 @@ For each use case and channel, find the entry point and follow it to every outco
 
 ### 2. Write `<plan>/use-cases.js`
 
-Start from `template/use-cases.js`. Copy `template/use-cases.types.d.ts` next to it, unchanged: it is the type of every field below. Write `MISMATCHES` too, empty (`[]`) when there are none.
+Start from `assets/use-cases.js`. Copy `assets/use-cases.types.d.ts` next to it, unchanged: it is the type of every field below. Write `MISMATCHES` too, empty (`[]`) when there are none.
 
 - Keep the `// @ts-check` line and the `/** @type {import("./use-cases.types").…[]} */` line above each list. An editor then flags a wrong field or value.
 - Never add a field the type does not have. `check.js` rejects it.

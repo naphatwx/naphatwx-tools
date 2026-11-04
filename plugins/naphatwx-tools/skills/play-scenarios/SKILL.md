@@ -30,7 +30,7 @@ It is generic: it needs a way to start the app, a health URL and an HTTP API. It
 ```
 <plan>/use-cases.js        USE_CASES + SCENARIOS (generate-use-case); read-only here
 live/
-├── README.md              how to run the page, for teammates; copied from template/ as is
+├── README.md              how to run the page, for teammates; copied from assets/ as is
 ├── index.html             one block per use case: scenario list (open one shows Pass / Fail and steps), framed app; results table
 ├── live.js                LIVE_CONFIG (app, API, pre-test, login) + LIVE_PLAY (seed, url, role, steps, prompt per scenario)
 ├── results.js             PLAYED_RESULTS: what the AI recorded for the no-screen scenarios (status, note, calls)
@@ -44,7 +44,7 @@ live/
     └── <name>.mjs         one seed per kind of data a scenario needs; ends by printing {"url": "/...", "values": {...}}
 ```
 
-`template/` already has this working against a stand-in app (`template/preview/`): copy it and fill it in, don't rebuild it. Its index reads `../use-cases.js`, which is this skill's `use-cases.js` (preview data only; never copy it).
+`assets/` already has this working against a stand-in app (`assets/preview/`): copy it and fill it in, don't rebuild it. Its index reads `../use-cases.js`, which is this skill's `use-cases.js` (preview data only; never copy it).
 
 ## How it works
 
@@ -119,7 +119,7 @@ Delegate to a read-only sub-agent when the agent can. Ask for concrete answers w
 
 ### 4. Copy the template
 
-- Copy `template/` → `<plan>/live/`, without `preview/`. In `seeds/lib.mjs`, delete the `API_BASE === 'preview'` line. Empty `results.js` to `var PLAYED_RESULTS = {};` (keep its comment lines).
+- Copy `assets/` → `<plan>/live/`, without `preview/`. In `seeds/lib.mjs`, delete the `API_BASE === 'preview'` line. Empty `results.js` to `var PLAYED_RESULTS = {};` (keep its comment lines).
 - Replace the example seeds in `seeds/` with the feature's own.
 - Set the page title and `<h1>` to the feature name.
 - `LIVE_CONFIG`:

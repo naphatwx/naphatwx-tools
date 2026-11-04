@@ -23,7 +23,7 @@ No `$ARGUMENTS` support → read the flags from the user's message.
 
 ## Steps
 
-1. Run `bash <this skill's folder>/copy-reports.sh $ARGUMENTS` from the worktree root.
+1. Run `bash <this skill's folder>/scripts/copy-reports.sh $ARGUMENTS` from the worktree root.
    - Folders it scans: `deploy-plans/`, `scripts/smoke/results/`, `.work/` (work-flow tasks), every `e2e-results/` (outside `node_modules`), and any extra repo-relative folder given.
    - It copies each run folder or file to the same path in the main checkout and checks the copy with `diff -r`. The worktree copy always stays.
    - Same content already in main → nothing is copied (`same`).

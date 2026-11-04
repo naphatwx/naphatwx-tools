@@ -27,7 +27,7 @@ graph TD
     S1["1. read the spec, write .parts/brief.md"] --> S2{"2. diagram-design skill available?"}
     S2 -->|yes| M1["diagram-design mode: .html diagrams in iframes"]
     S2 -->|no| M2["manual mode: .svg flowcharts, .js sequences"]
-    M1 --> CP[copy overview.html + assets/ from template/]
+    M1 --> CP[copy overview.html + assets/ from assets/]
     M2 --> CP
     CP --> S3[3. fan out section agents, in parallel]
     S3 --> S4["4. merge .parts/ into overview.html, run scenarios-panels.js + acceptance-section.js"]
@@ -133,14 +133,14 @@ Step 8 (only when asked) writes a publish copy outside the plan folder: `overvie
 | [scripts/scenarios-panels.js](scripts/scenarios-panels.js) | Writes each use case's Scenarios view from `use-cases.js`, with Play links when a mock exists; prints the counts |
 | [scripts/acceptance-section.js](scripts/acceptance-section.js) | Writes the Acceptance criteria section from `use-cases.js`: each criterion's scenarios per channel, and every gap; prints the coverage |
 | [scripts/publish-copy.js](scripts/publish-copy.js) | Builds a copy that works as a claude.ai Artifact and prints the publish arguments |
-| [template/overview.html](template/overview.html) | The entry page; copied, then filled in |
-| [template/assets/](template/assets/) | `overview.css` + `overview.js`; copied unchanged |
-| [template/flowchart/](template/flowchart/) | Preview diagrams; not copied. Synced from `generate-diagram` |
-| [template/sequence-diagram/](template/sequence-diagram/) | Preview diagrams + `render.js`; not copied. Synced from `generate-diagram` |
-| [template/database/](template/database/) | Preview ER diagram; not copied. Synced from `generate-diagram` |
-| [template/api/contracts.html](template/api/contracts.html) | The API contracts board; the API agent copies it and fills its `API` data |
-| [template/mock/](template/mock/) | Preview mock; not copied. Synced from `generate-mock-ui` |
-| [template/use-cases.js](template/use-cases.js) | Example use cases, scenarios and acceptance criteria for the preview (one gap on purpose); not copied |
+| [assets/overview.html](assets/overview.html) | The entry page; copied, then filled in |
+| [assets/assets/](assets/assets/) | `overview.css` + `overview.js`; copied unchanged |
+| [assets/flowchart/](assets/flowchart/) | Preview diagrams; not copied. Synced from `generate-diagram` |
+| [assets/sequence-diagram/](assets/sequence-diagram/) | Preview diagrams + `render.js`; not copied. Synced from `generate-diagram` |
+| [assets/database/](assets/database/) | Preview ER diagram; not copied. Synced from `generate-diagram` |
+| [assets/api/contracts.html](assets/api/contracts.html) | The API contracts board; the API agent copies it and fills its `API` data |
+| [assets/mock/](assets/mock/) | Preview mock; not copied. Synced from `generate-mock-ui` |
+| [assets/use-cases.js](assets/use-cases.js) | Example use cases, scenarios and acceptance criteria for the preview (one gap on purpose); not copied |
 
 ## Related skills
 

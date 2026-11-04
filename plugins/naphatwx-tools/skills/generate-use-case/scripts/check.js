@@ -31,13 +31,13 @@ function parseVar(src, name) {
     throw new Error(`${name}: unclosed array`);
 }
 
-/** @type {import('../template/use-cases.types').UseCase[]} */
+/** @type {import('../assets/use-cases.types').UseCase[]} */
 let UCS = [];
-/** @type {import('../template/use-cases.types').Scenario[]} */
+/** @type {import('../assets/use-cases.types').Scenario[]} */
 let SCS = [];
-/** @type {import('../template/use-cases.types').Acceptance[] | null} */
+/** @type {import('../assets/use-cases.types').Acceptance[] | null} */
 let ACS = null;
-/** @type {import('../template/use-cases.types').Mismatch[]} */
+/** @type {import('../assets/use-cases.types').Mismatch[]} */
 let MMS = [];
 try {
     const src = fs.readFileSync(file, 'utf8');
@@ -49,8 +49,8 @@ try {
     }
 } catch (e) { errors.push(`${file} is missing or not strict JSON: ${e.message}`); }
 
-/** Field names of one interface in template/use-cases.types.d.ts, the one source for which fields exist. */
-const TYPES = fs.readFileSync(path.join(__dirname, '../template/use-cases.types.d.ts'), 'utf8');
+/** Field names of one interface in assets/use-cases.types.d.ts, the one source for which fields exist. */
+const TYPES = fs.readFileSync(path.join(__dirname, '../assets/use-cases.types.d.ts'), 'utf8');
 function fieldsOf(name) {
     const body = TYPES.match(new RegExp(`interface ${name} \\{([\\s\\S]*?)\\n\\}`));
     if (!body) throw new Error(`use-cases.types.d.ts has no interface ${name}`);

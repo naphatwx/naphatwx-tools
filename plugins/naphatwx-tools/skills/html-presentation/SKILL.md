@@ -42,7 +42,7 @@ The output **must** keep all of these:
 
 ### 1. Copy the template
 
-- Read `template/index.html` from this skill folder.
+- Read `assets/index.html` from this skill folder.
 - This file already satisfies every hard rule. Do not rewrite it from scratch.
 
 ### 2. Fill in content

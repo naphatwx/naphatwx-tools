@@ -93,8 +93,8 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 | [references/profile.md](references/profile.md) | The project profile and how to detect it |
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
 | [references/plan.md](references/plan.md) | Phase 1: number, explore, grilling and auto-answer, draft, spec verify, plan stop |
-| [references/plan-template.md](references/plan-template.md) | The full shape of `plan.md` |
-| [references/plan-template-fix.md](references/plan-template-fix.md) | The small shape, for a bug fix with one cause |
+| [assets/plan-template.md](assets/plan-template.md) | The full shape of `plan.md` |
+| [assets/plan-template-fix.md](assets/plan-template-fix.md) | The small shape, for a bug fix with one cause |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
 

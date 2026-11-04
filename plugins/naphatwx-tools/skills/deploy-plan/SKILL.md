@@ -18,7 +18,7 @@ input ─► get the change (MR diff, branch diff, spec)
       ─► resolve "check" items with read-only tools
       ─► re-read every step against the rules
       ─► confirm the gaps left with the user
-      ─► fill template/deploy-plan-template.html ─► one HTML file
+      ─► fill assets/deploy-plan-template.html ─► one HTML file
 ```
 
 ## User Input
@@ -150,7 +150,7 @@ Wait for answers. If the user says go on, keep those steps marked `check`.
 
 ## 8. Write the HTML
 
-1. Copy `template/deploy-plan-template.html` to `deploy-plans/<YYYY-MM-DD>-<slug>.html` at the repo root, unless the repo already has a place for deploy docs.
+1. Copy `assets/deploy-plan-template.html` to `deploy-plans/<YYYY-MM-DD>-<slug>.html` at the repo root, unless the repo already has a place for deploy docs.
    - The page is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers.
 2. Replace `/*__PLAN_DATA__*/null` with the plan JSON below. Change nothing else in the file.
 3. Escape `</` as `<\/` inside JSON strings, so the script tag stays closed.

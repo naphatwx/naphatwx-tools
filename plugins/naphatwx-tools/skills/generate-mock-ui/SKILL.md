@@ -39,7 +39,7 @@ mock/
     └── states.js           pages list + entity, permissions and upstream faults per mock state
 ```
 
-`template/` already has this layout working on a placeholder domain: copy it and replace the domain, don't rebuild it. Its pages read `../use-cases.js`, which is this skill's `use-cases.js` (preview data only; never copy it).
+`assets/` already has this layout working on a placeholder domain: copy it and replace the domain, don't rebuild it. Its pages read `../use-cases.js`, which is this skill's `use-cases.js` (preview data only; never copy it).
 
 ## User Input
 
@@ -102,7 +102,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 
 ### 3. Copy the template
 
-- Copy `template/` → `<output>/mock/`.
+- Copy `assets/` → `<output>/mock/`.
 - Rename `page/example.html` to the first real screen; add one page per screen from the same skeleton. Register each in `States.PAGES`.
 - The template's "Thing" domain is a placeholder — replace all of it, including `screenUrl()` in `index.html` (the URL the real app would show) and `FakeApi.STORE` (`naphatwx:mock:<feature-slug>`).
 

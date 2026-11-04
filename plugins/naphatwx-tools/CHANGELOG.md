@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.289
+
+**Skill folders: scripts, references, assets**
+
+- Every skill uses the Agent Skills folder names: `scripts/` (code the agent runs), `references/` (docs loaded when needed), `assets/` (files that go into the output or the repo).
+- `template/` → `assets/` in deploy-plan, design-feature, e2e-test, generate-diagram, generate-mock-ui, generate-use-case, html-document, html-presentation, play-scenarios and smoke-test.
+- multi-column-sort: `reference/` → `assets/`.
+- copy-reports: `copy-reports.sh` → `scripts/copy-reports.sh`.
+- work-flow: `plan-template.md` and `plan-template-fix.md` → `assets/`.
+- No change in behaviour.
+
 ## 1.9.288
 
 **work-flow plan: section order**

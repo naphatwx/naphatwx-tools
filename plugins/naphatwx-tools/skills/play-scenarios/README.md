@@ -177,9 +177,9 @@ Output:
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
 | [scripts/check-live.js](scripts/check-live.js) | Checks `live/` against `use-cases.js`: one entry per scenario in order, a prompt for every `mcp` / `api` / `job` scenario; warns on tooltip / hover steps and on roles whose permissions no step names; `--run-seeds` picks every seeded scenario twice |
-| [template/](template/) | The `live/` folder, working against a stand-in app; copied and filled in per feature |
-| [template/README.md](template/README.md) | Ships as `live/README.md` |
-| [template/preview/](template/preview/) | Stand-in app and fake API for the template; not copied |
+| [assets/](assets/) | The `live/` folder, working against a stand-in app; copied and filled in per feature |
+| [assets/README.md](assets/README.md) | Ships as `live/README.md` |
+| [assets/preview/](assets/preview/) | Stand-in app and fake API for the template; not copied |
 | [use-cases.js](use-cases.js) | Example use cases for the template preview; never copied |
 
 ## Related skills

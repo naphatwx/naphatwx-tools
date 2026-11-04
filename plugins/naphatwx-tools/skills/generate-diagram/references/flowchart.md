@@ -66,7 +66,7 @@ Every label, detail line and condition a reader sees:
 
 ## Manual mode
 
-- Start from `template/flowchart/01-example-flow.html`. Keep its `theme:` blocks, its classes, the `<title>` / `<desc>`, the marker and the scripts at the end (Export PDF, label fitting, the embed contract). Change the `<title>`, `.eyebrow`, `<h1>` and the `<svg>`. Several parts of one flow → one `<h2>` + `<div class="diagram">` per part.
+- Start from `assets/flowchart/01-example-flow.html`. Keep its `theme:` blocks, its classes, the `<title>` / `<desc>`, the marker and the scripts at the end (Export PDF, label fitting, the embed contract). Change the `<title>`, `.eyebrow`, `<h1>` and the `<svg>`. Several parts of one flow → one `<h2>` + `<div class="diagram">` per part.
 - Size shapes to the detail line (about 8.5px per mono character, on the wide side, plus 12px each side): boxes and pills ≥ 160 wide, diamonds ≥ 240 wide; a 28-char detail line needs a 260-wide box.
 - Keep it compact so more of the flow fits on one screen: pills 44 tall, boxes 52, diamonds 96; about 30px of connector between shapes, 12–16px margin around the drawing.
 - Set the `viewBox` to fit, and `width` / `height` on the `<svg>` to the same numbers: a host page draws it at that 1:1 size, never scaled, so its text renders at its own size (a wider drawing scrolls sideways). Lay nodes on a grid, main path top to bottom, branches to the sides; no line crosses a node.

@@ -15,7 +15,7 @@ const print = (text) => process.stdout.write(text + '\n');
 const printError = (text) => process.stderr.write(text + '\n');
 
 // Mock screens and their shared code use the target app's own design system, not this theme.
-const IGNORE = [/\/mock\/(page|shared|contract)\//, /\/generate-mock-ui\/template\/(page|shared|contract)\//];
+const IGNORE = [/\/mock\/(page|shared|contract)\//, /\/generate-mock-ui\/assets\/(page|shared|contract)\//];
 
 // CRLF to LF: a Windows checkout has CRLF sources, and a bare '\r' line would get indented.
 const stripHeader = (css) => css.replace(/\r\n/g, '\n').replace(/^\/\*[\s\S]*?\*\/\s*/, '').trimEnd();
@@ -67,7 +67,7 @@ const MARK = /^([ \t]*)\/\* theme:([\w-]+):start \*\/[\s\S]*?\/\* theme:\2:end \
 let synced = 0;
 for (const file of walk(SKILLS)) {
     const relativePath = relative(ROOT, file).split(sep).join('/');
-    if (!relativePath.includes('/template/') || IGNORE.some((pattern) => pattern.test(relativePath))) continue;
+    if (!relativePath.includes('/assets/') || IGNORE.some((pattern) => pattern.test(relativePath))) continue;
     const source = readFileSync(file, 'utf8');
 
     const next = source.replace(MARK, (whole, indent, name) => {
@@ -92,17 +92,17 @@ for (const file of walk(SKILLS)) {
 
 // ---- preview copies: design-feature's template previews files the other skills own ----
 // Each [preview, source] dir pair must match file for file; the generator is the source of truth.
-const DESIGN_FEATURE = 'design-feature/template/';
+const DESIGN_FEATURE = 'design-feature/assets/';
 const PREVIEWS = [
-    [DESIGN_FEATURE + 'mock', 'generate-mock-ui/template'],
-    [DESIGN_FEATURE + 'sequence-diagram', 'generate-diagram/template/sequence-diagram'],
-    [DESIGN_FEATURE + 'flowchart', 'generate-diagram/template/flowchart'],
-    [DESIGN_FEATURE + 'database/er-diagram.html', 'generate-diagram/template/er/er-diagram.html'],
+    [DESIGN_FEATURE + 'mock', 'generate-mock-ui/assets'],
+    [DESIGN_FEATURE + 'sequence-diagram', 'generate-diagram/assets/sequence-diagram'],
+    [DESIGN_FEATURE + 'flowchart', 'generate-diagram/assets/flowchart'],
+    [DESIGN_FEATURE + 'database/er-diagram.html', 'generate-diagram/assets/er/er-diagram.html'],
 ];
 // Preview files that differ on purpose: design-feature's own example data, or diagram-design stand-ins.
 const OWN = new Set([DESIGN_FEATURE + 'mock/shared/scenario-play.js', DESIGN_FEATURE + 'mock/shared/states.js', DESIGN_FEATURE + 'flowchart/02-example-flow.html', DESIGN_FEATURE + 'sequence-diagram/02-example-flow.html']);
 // Source files the preview doesn't need: the overview embeds the diagrams, not the standalone viewer.
-const SOURCE_ONLY = new Set(['generate-diagram/template/sequence-diagram/index.html']);
+const SOURCE_ONLY = new Set(['generate-diagram/assets/sequence-diagram/index.html']);
 // OWN and SOURCE_ONLY use '/'; relative() returns '\' on Windows.
 const skillPath = (path) => relative(SKILLS, path).split(sep).join('/');
 const filesOf = (path) => (statSync(path).isDirectory()
@@ -136,7 +136,7 @@ for (const [preview, source] of PREVIEWS) {
 // ---- whole-file copies: the use-cases.js type, next to every use-cases.js a skill ships or reads ----
 const TYPES_HEADER = '// Synced from theme/use-cases.d.ts by theme/sync.mjs. Do not edit here.\n';
 const TYPES = TYPES_HEADER + readFileSync(join(ROOT, 'theme/use-cases.d.ts'), 'utf8').replace(/\r\n/g, '\n');
-const TYPES_COPIES = ['generate-use-case/template', 'generate-mock-ui', 'play-scenarios', 'design-feature/template', 'e2e-test/template']
+const TYPES_COPIES = ['generate-use-case/assets', 'generate-mock-ui', 'play-scenarios', 'design-feature/assets', 'e2e-test/assets']
     .map((dir) => `${dir}/use-cases.types.d.ts`);
 for (const copy of TYPES_COPIES) {
     let have = null;

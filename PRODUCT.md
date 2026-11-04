@@ -36,7 +36,7 @@ web
 - Minimal design: the user turned down expressive themed directions (transit map, film bench, broadcast rundown).
 
 ## Evidence on Hand
-- Template: `plugins/naphatwx-tools/skills/design-feature/template/`. Content there is placeholder; no real feature data ships with the skill.
+- Template: `plugins/naphatwx-tools/skills/design-feature/assets/`. Content there is placeholder; no real feature data ships with the skill.
 
 ## Product Principles
 1. The meeting path comes first: walking use cases in order must be effortless on a shared screen.

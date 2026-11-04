@@ -59,8 +59,8 @@ The user turns it on with "auto-answer" (or "auto") in the input or in any grill
 Write `<work folder>/NNN-<slug>/plan.md` from a template. Keep its section order.
 
 - **Pick the size.**
-  - A bug fix with one cause → [plan-template-fix.md](plan-template-fix.md). Grow it into the full shape only when the fix needs a decision, a contract change or a migration.
-  - Anything else → [plan-template.md](plan-template.md).
+  - A bug fix with one cause → [plan-template-fix.md](../assets/plan-template-fix.md). Grow it into the full shape only when the fix needs a decision, a contract change or a migration.
+  - Anything else → [plan-template.md](../assets/plan-template.md).
 - **Required sections** (full shape): header, Goal, Status, Accept, Decisions, Tasks. Every other section and every `Data / API` sub-section is written only when it has content; delete it otherwise. Never write `- None.`
 - **One fact, one place.** A changed fact is replaced where it lives, with `(supersedes "<old>")`. Never keep old text, rounds or history.
 - **No restating.** A section never repeats another one in other words. When the task folder has `plan/api/` or `plan/database/` files, `Data / API` links them and keeps only what they lack.
