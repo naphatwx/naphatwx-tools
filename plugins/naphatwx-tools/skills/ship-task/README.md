@@ -1,4 +1,4 @@
-# work-flow
+# ship-task
 
 Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the same phases on every project.
 
@@ -7,7 +7,7 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 - You start a feature, bug fix or hotfix and want a fixed flow: plan, code, your review, tests, AI review, docs, pre-merge gate.
 - Needs Matt Pocock's `grilling` skill: `/plugin install mattpocock-skills@claude-plugins-official`.
 - You want sub-agents to write the code, one per app, and fresh sub-agents to review it.
-- Run: `/work-flow add CSV export to the users page` (add `auto-answer` to skip the grill after scope), or `/work-flow 127` to resume task 127, or `/work-flow` for status.
+- Run: `/ship-task add CSV export to the users page` (add `auto-answer` to skip the grill after scope), or `/ship-task 127` to resume task 127, or `/ship-task` for status.
 - Slash only. The agent never starts it by itself.
 
 | You want | Use instead |
@@ -21,7 +21,7 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 
 ```mermaid
 flowchart TD
-    START([/work-flow]) --> SU[Setup: create .work/ at the repo root, add it to .gitignore]
+    START([/ship-task]) --> SU[Setup: create .work/ at the repo root, add it to .gitignore]
     SU --> P0
     subgraph P0["Phase 1 - Plan (edits nothing but the plan)"]
         GR{{grilling: YOU answer, or auto-answer after scope}} --> DR[draft .work/NNN-slug/plan.md]

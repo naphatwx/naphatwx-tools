@@ -1,4 +1,4 @@
-# user-guide
+# write-user-guide
 
 Writes a markdown user guide for a feature, in plain words for end users, from its docs and UI code.
 
@@ -10,8 +10,8 @@ Writes a markdown user guide for a feature, in plain words for end users, from i
 
 | You want | Use instead |
 |----------|-------------|
-| A styled HTML docs page with sidebar and search | `html-document` |
-| A slide deck | `html-presentation` |
+| A styled HTML docs page with sidebar and search | `generate-html-docs` |
+| A slide deck | `generate-html-slides` |
 | A changelog of an MR | `generate-changelog` |
 | The feature's use cases and scenarios as data | `generate-use-case` |
 
@@ -68,5 +68,5 @@ docs/features/<feature-domain>/
 
 ## Related skills
 
-- `html-document`: turns the guide into a styled HTML page.
-- `html-presentation`: the same content as slides.
+- `generate-html-docs`: turns the guide into a styled HTML page.
+- `generate-html-slides`: the same content as slides.

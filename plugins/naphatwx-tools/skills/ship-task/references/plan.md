@@ -110,4 +110,4 @@ Then wait.
 - "implement" → set the status line to `Phase: 2` and go to Phase 2.
 - Changes → a new decision goes back to the grill for that question, a wording or scope fix back to step 4;
   run spec verify again only for the apps the change touches, then stop here again.
-- `/work-flow <number>` on a task at this stop shows the summary again and waits.
+- `/ship-task <number>` on a task at this stop shows the summary again and waits.

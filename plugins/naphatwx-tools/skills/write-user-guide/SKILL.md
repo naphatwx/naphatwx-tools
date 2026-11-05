@@ -1,6 +1,6 @@
 ---
-name: user-guide
-description: Write a markdown user guide for a feature, in plain words for end users, from its docs and UI code. Use when the user says "write a user guide for X" or "explain this feature to users". Shows it in chat or saves a .md; a styled HTML page is html-document.
+name: write-user-guide
+description: Write a markdown user guide for a feature, in plain words for end users, from its docs and UI code. Use when the user says "write a user guide for X" or "explain this feature to users". Shows it in chat or saves a .md; a styled HTML page is generate-html-docs.
 ---
 
 # User Guide Generator

@@ -21,12 +21,12 @@
 - Export PDF: `theme/pdf.css` (print rules, `.no-print`) syncs into `/* theme:pdf:start */ … end */`; `theme/pdf.js` (`addExportPdf(target, prepare)`) syncs into `/* theme:pdf-js:start */ … end */` inside a `<script>` or `.js` file. Every HTML template has both and calls `addExportPdf` once. With no target, Export PDF goes into the bottom-right `.float-bar` (one long box); put page tools in a `<div class="float-bar no-print">` before it. Page-specific print layout goes in its own `@media print`, outside the markers.
 - Diagrams: `theme/diagram-labels.js` (`fitDiagramLabels`: each `.edge-label` box fits its rendered text) syncs into `/* theme:diagram-labels-js:start */ … end */`; `theme/diagram-embed.js` (Export PDF, 1:1 SVGs, the iframe embed contract) into `/* theme:diagram-embed-js:start */ … end */`. generate-diagram's `assets/embed.html` holds both, for diagram-design files.
 - Opt-in shared blocks, each synced into `/* theme:<name>:start */ … end */` only where a page has the marker:
-  - `report.css` (`report`): deploy-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.command code`.
+  - `report.css` (`report`): deployment-plan, smoke-test and e2e-test page shell, `.pill` + `.tone-*`, `.tools`, `.command code`.
   - `disclosure.css` (`disclosure`) + `slide.js` (`slide-js`, `slide(panel, open, instant)`): the `.disclosure` / `.disclosure-head` card and its 220ms slide. Used by the report pages and the mock and play scenario lists.
   - `scenario.css` (`scenario`): generate-mock-ui and play-scenarios index chrome (use-case rows, collapsible scenario list, frame, results).
   - `scenario-filter.css` (`scenario-filter`) + `scenario-filter.js` (`scenario-filter-js`, `addScenarioFilter(anchor, { rows, groups, storageKey, statuses, status, flag, title, sort, after })`): the sticky search + Status / Type / Kind / Core filter bar of the e2e report, the mock and play players and the design-feature overview. Rows carry `data-surface`, `data-kind`, `data-core`.
   - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
-  - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview, the generate-diagram viewer and the html-document template.
+  - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview, the generate-diagram viewer and the generate-html-docs template.
 - `theme/use-cases.d.ts` is the type of `use-cases.js` (`UseCase`, `Scenario`, `Acceptance`). `node theme/sync.mjs` copies it whole, as `use-cases.types.d.ts`, next to every `use-cases.js` a skill ships or reads (`TYPES_COPIES`). generate-use-case's `check.js` reads its field names and rejects any other field. Add or rename a field there first.
 - `.scenario-kind`, `.core-pill` and `.references-chip` live in `base.css`; their print rules in `pdf.css`.
 - Scenario badge order, on every page that lists scenarios: status → surface (channel) tag → title → kind → core → refs chip. Skip a badge the page does not show; never reorder.
@@ -34,7 +34,7 @@
   - After the title: traits, always-shown (kind) before optional (core). Buttons (refs chip) go last.
   - Each page-making `SKILL.md` that lists scenarios repeats this order.
 - Radii: use `--radius` (6px), `--radius-md` (8px), `--radius-lg` (10px), `--radius-xl` (12px), never a raw px value.
-- Change marks: `theme/diff.css` syncs into `/* theme:diff:start */ … end */`. One class set for every table or message card, HTML and SVG: `.table-card` (+ `.add` / `.drop` / `.change` / `.external`), `.table-card-head` (name first, then `.tag`), `.row` (+ `.add` / `.change` / `.drop`) with `.column`, `.type`, `.key`. Used by the design-feature overview, the API contracts page, the ER diagram and the html-document template.
+- Change marks: `theme/diff.css` syncs into `/* theme:diff:start */ … end */`. One class set for every table or message card, HTML and SVG: `.table-card` (+ `.add` / `.drop` / `.change` / `.external`), `.table-card-head` (name first, then `.tag`), `.row` (+ `.add` / `.change` / `.drop`) with `.column`, `.type`, `.key`. Used by the design-feature overview, the API contracts page, the ER diagram and the generate-html-docs template.
 - Every page with a `.float-bar` gets bottom padding from `theme/pdf.css` (`--float-space`), so the bar never hides the last line. A full-window page sets it back to 0 in its own CSS.
 - Text size picker: `theme/font-size.css` syncs into `/* theme:font-size:start */ … end */` and `theme/font-size.js` (`addFontSize(target)`) into `/* theme:font-size-js:start */ … end */`, right after the pdf blocks. Every page that calls `addExportPdf` calls `addFontSize` just before it, so Export PDF stays last. Diagram pages show it only when opened on their own.
   - Sizes live in `theme/tokens.css` under `:root[data-fs]`. Only role tokens change: Small / Large set `--fs-body`, `--fs-meta`, `--fs-code`; Large also `--fs-tag`, `--fs-dia`, `--fs-dia-sub`. So templates size text by role, not by step (`--fs-sm`).
@@ -47,7 +47,7 @@
 - Template CSS uses `var(--token)` only. Standalone `.svg` files use the theme hex values.
 - Exception: mock screens (`mock/page|shared|contract`) use the target app's own design system.
 - Review layout changes in `theme/gallery/index.html`: every template, live at 1300, 1920 and 2560px.
-- The deploy-plan, smoke and e2e examples are built from `theme/gallery/data/`. Run `node theme/gallery/build.mjs` after changing those templates.
+- The deployment-plan, smoke and e2e examples are built from `theme/gallery/data/`. Run `node theme/gallery/build.mjs` after changing those templates.
 
 ## Manifests
 

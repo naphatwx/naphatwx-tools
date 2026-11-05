@@ -12,7 +12,7 @@ Checks after a deploy that every service in a real flow still reaches the next o
 | You want | Use instead |
 |----------|-------------|
 | Browser tests of the UI, with screenshots | `e2e-test` |
-| The steps to do before and after a deploy | `deploy-plan` |
+| The steps to do before and after a deploy | `deployment-plan` |
 | A feature's scenarios played by hand on the running app | `play-scenarios` |
 | Why a Jenkins build failed | `check-job` |
 
@@ -141,7 +141,7 @@ Plus a chat summary: overall status, one line per flow, every failed hop with it
 
 ## Related skills
 
-- `deploy-plan`: lists the post-deploy steps; a smoke run is one of them.
+- `deployment-plan`: lists the post-deploy steps; a smoke run is one of them.
 - `e2e-test`: checks the UI in a browser; its report has the same layout.
 - `check-job`: explains a failed Jenkins build.
 - `play-scenarios`: plays a feature's scenarios by hand on the running app.

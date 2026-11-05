@@ -8,7 +8,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const skills = join(here, '../../plugins/naphatwx-tools/skills');
 
 const REPORTS = [
-    { out: 'deploy-plan.html', template: 'deploy-plan/assets/deploy-plan-template.html', marker: '/*__PLAN_DATA__*/null', data: 'deploy-plan.json' },
+    { out: 'deploy-plan.html', template: 'deployment-plan/assets/deploy-plan-template.html', marker: '/*__PLAN_DATA__*/null', data: 'deploy-plan.json' },
     { out: 'smoke-report.html', template: 'smoke-test/assets/report-template.html', marker: '/*__SMOKE_DATA__*/null', data: 'smoke-report.json' },
     { out: 'e2e-report.html', template: 'e2e-test/assets/e2e-report-template.html', marker: '/*__E2E_DATA__*/null', data: 'e2e-report.json' },
 ];

@@ -1,6 +1,6 @@
 ---
-name: html-document
-description: Generate a single-file HTML docs page in the naphatwx theme (the same look as design-feature's overview), with a numbered section rail and search, from files or a topic. Use when the user says "make HTML docs for X" or "turn this markdown into a docs page". Slides are html-presentation; a markdown user guide is user-guide.
+name: generate-html-docs
+description: Generate a single-file HTML docs page in the naphatwx theme (the same look as design-feature's overview), with a numbered section rail and search, from files or a topic. Use when the user says "make HTML docs for X" or "turn this markdown into a docs page". Slides are generate-html-slides; a markdown user guide is write-user-guide.
 ---
 
 # HTML Documentation Generator

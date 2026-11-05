@@ -12,7 +12,7 @@ Rewrites a GitLab merge request's title and description from its diff, then save
 |----------|-------------|
 | A copy-paste changelog, MR left alone | `generate-changelog` |
 | A code review of the MR | `review-code` |
-| A commit message for staged changes | `commit` |
+| A commit message for staged changes | `commit-staged-changes` |
 
 ## How it works
 

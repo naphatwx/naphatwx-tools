@@ -8,7 +8,7 @@ Each skill folder has a `README.md` with diagrams of how it works.
 
 | Skill | What it does |
 |-------|--------------|
-| [work-flow](plugins/naphatwx-tools/skills/work-flow/) | Carry one task from idea to a merge-ready branch: spec, code, your review, tests, AI review, docs, pre-merge gate |
+| [ship-task](plugins/naphatwx-tools/skills/ship-task/) | Carry one task from idea to a merge-ready branch: spec, code, your review, tests, AI review, docs, pre-merge gate |
 | [design-feature](plugins/naphatwx-tools/skills/design-feature/) | Plan a feature as a browsable HTML folder: acceptance criteria, use cases, diagrams, scenarios, database and API changes |
 | [generate-use-case](plugins/naphatwx-tools/skills/generate-use-case/) | Write a feature's use cases and scenarios to one `use-cases.js` file |
 | [generate-diagram](plugins/naphatwx-tools/skills/generate-diagram/) | Draw one flowchart, sequence diagram or ER diagram as a local file |
@@ -16,18 +16,18 @@ Each skill folder has a `README.md` with diagrams of how it works.
 | [play-scenarios](plugins/naphatwx-tools/skills/play-scenarios/) | Play a feature's scenarios by hand on the real running app, with Pass / Fail |
 | [e2e-test](plugins/naphatwx-tools/skills/e2e-test/) | Test every scenario of a feature (UI in the browser, API by request, MCP by an AI agent), with a fresh-agent review and one HTML report |
 | [smoke-test](plugins/naphatwx-tools/skills/smoke-test/) | Check after a deploy that every service in a real flow still reaches the next one |
-| [deploy-plan](plugins/naphatwx-tools/skills/deploy-plan/) | Build a deployment plan as a clickable HTML checklist, split into Pre-deploy and Post-deploy |
-| [copy-reports](plugins/naphatwx-tools/skills/copy-reports/) | Copy e2e, smoke and deploy-plan output from a worktree into the main checkout |
+| [deployment-plan](plugins/naphatwx-tools/skills/deployment-plan/) | Build a deployment plan as a clickable HTML checklist, split into Pre-deploy and Post-deploy |
+| [copy-reports](plugins/naphatwx-tools/skills/copy-reports/) | Copy e2e, smoke and deployment-plan output from a worktree into the main checkout |
 | [review-code](plugins/naphatwx-tools/skills/review-code/) | Review only the changed lines of staged changes, files or a GitLab MR |
 | [get-mr-diffs](plugins/naphatwx-tools/skills/get-mr-diffs/) | Helper: fetch a GitLab MR diff, local git first, else GitLab MCP |
 | [generate-changelog](plugins/naphatwx-tools/skills/generate-changelog/) | Write a short changelog from a GitLab MR diff, as one copy-paste code block |
 | [update-merge-request](plugins/naphatwx-tools/skills/update-merge-request/) | Rewrite a GitLab MR's title and description from its diff, and save them |
-| [commit](plugins/naphatwx-tools/skills/commit/) | Commit staged changes with a conventional commit message written from the diff |
+| [commit-staged-changes](plugins/naphatwx-tools/skills/commit-staged-changes/) | Commit staged changes with a conventional commit message written from the diff |
 | [check-job](plugins/naphatwx-tools/skills/check-job/) | Watch a Jenkins build until it ends, then explain any failure |
-| [weekly-work-log](plugins/naphatwx-tools/skills/weekly-work-log/) | Sum up your git commits into up to 5 weekly achievement items |
-| [user-guide](plugins/naphatwx-tools/skills/user-guide/) | Write a markdown user guide for a feature, in plain words for end users |
-| [html-document](plugins/naphatwx-tools/skills/html-document/) | Make a single-file HTML docs page in the naphatwx theme, with a numbered section rail and search |
-| [html-presentation](plugins/naphatwx-tools/skills/html-presentation/) | Make a single-file full-window HTML slide deck |
+| [summarize-weekly-work](plugins/naphatwx-tools/skills/summarize-weekly-work/) | Sum up your git commits into up to 5 weekly achievement items |
+| [write-user-guide](plugins/naphatwx-tools/skills/write-user-guide/) | Write a markdown user guide for a feature, in plain words for end users |
+| [generate-html-docs](plugins/naphatwx-tools/skills/generate-html-docs/) | Make a single-file HTML docs page in the naphatwx theme, with a numbered section rail and search |
+| [generate-html-slides](plugins/naphatwx-tools/skills/generate-html-slides/) | Make a single-file full-window HTML slide deck |
 | [list-plugins](plugins/naphatwx-tools/skills/list-plugins/) | List installed Claude Code plugins and marketplaces |
 
 ---

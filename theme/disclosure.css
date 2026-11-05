@@ -1,4 +1,4 @@
-/* Heading-plus-button disclosure card (.disclosure / .disclosure-head, .open when expanded): deploy-plan, smoke-test and
+/* Heading-plus-button disclosure card (.disclosure / .disclosure-head, .open when expanded): deployment-plan, smoke-test and
    e2e-test rows, and the mock and play scenario lists. slide.js animates its panel. */
 /* Disclosure is h2 (or h3) > button, not <summary>: a summary flattens any heading inside it for screen readers. */
 .disclosure { border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 6px; background: var(--surface); overflow: hidden; }

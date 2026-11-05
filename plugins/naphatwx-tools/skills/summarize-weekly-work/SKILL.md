@@ -1,5 +1,5 @@
 ---
-name: weekly-work-log
+name: summarize-weekly-work
 description: Summarize the user's git commits into up to 5 weekly achievement items, ready to paste. Use when the user says "log my work" or "weekly achievements for last week".
 ---
 

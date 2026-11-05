@@ -1,17 +1,17 @@
-# commit
+# commit-staged-changes
 
 Commits your staged changes with a conventional commit message written from the diff. Never pushes.
 
 ## When to use it
 
 - You ran `git add` and want a clean commit message without writing it.
-- Run it by name only: `/commit`. The agent never starts it on its own.
+- Run it by name only: `/commit-staged-changes`. The agent never starts it on its own.
 
 | You want | Use instead |
 |----------|-------------|
 | A review of the staged changes first | `review-code` |
 | A new title and description for an MR | `update-merge-request` |
-| Your commits summed up as weekly achievements | `weekly-work-log` |
+| Your commits summed up as weekly achievements | `summarize-weekly-work` |
 
 ## How it works
 
@@ -22,7 +22,7 @@ sequenceDiagram
     actor U as You
     participant A as Agent
     participant G as Local git
-    U->>A: /commit
+    U->>A: /commit-staged-changes
     A->>G: git diff --staged
     alt empty
         Note over A: stop silently

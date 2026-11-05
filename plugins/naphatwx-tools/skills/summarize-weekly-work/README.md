@@ -1,4 +1,4 @@
-# weekly-work-log
+# summarize-weekly-work
 
 Turns your git commits for one week into up to 5 achievement items, each 140 characters or less, ready to paste.
 
@@ -11,7 +11,7 @@ Turns your git commits for one week into up to 5 achievement items, each 140 cha
 | You want | Use instead |
 |----------|-------------|
 | A changelog for one merge request | `generate-changelog` |
-| A commit message for staged changes | `commit` |
+| A commit message for staged changes | `commit-staged-changes` |
 
 ## How it works
 

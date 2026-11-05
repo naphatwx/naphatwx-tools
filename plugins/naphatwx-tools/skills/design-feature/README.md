@@ -16,7 +16,7 @@ Plans a feature as a browsable HTML folder: acceptance criteria with the scenari
 | A mock alone, for a plan that already exists | `generate-mock-ui` |
 | Only the use cases and scenarios | `generate-use-case` |
 | Play the scenarios on the real running app | `play-scenarios` |
-| A styled docs page from files or a topic | `html-document` |
+| A styled docs page from files or a topic | `generate-html-docs` |
 
 ## How it works
 

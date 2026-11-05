@@ -12,7 +12,7 @@ Watches one Jenkins build from its URL until it ends, then explains any failure 
 |----------|-------------|
 | A review of the code before it builds | `review-code` |
 | Checks that services reach each other after a deploy | `smoke-test` |
-| Steps to do before and after a deploy | `deploy-plan` |
+| Steps to do before and after a deploy | `deployment-plan` |
 
 ## How it works
 

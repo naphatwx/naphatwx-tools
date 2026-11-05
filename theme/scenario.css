@@ -33,7 +33,7 @@ a.panel:hover { background: var(--hover); }
 .scenario-list { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 8px 8px; }
 /* room under the last card, so a picked card can scroll to the top of the list (--tail, set by scrollToTop()) */
 .scenario-list::after { content: ""; display: block; height: var(--tail, 0px); }
-/* One scenario: a disclosure card (disclosure.css), the same as deploy-plan, smoke-test and e2e-test rows.
+/* One scenario: a disclosure card (disclosure.css), the same as deployment-plan, smoke-test and e2e-test rows.
    Line one: status disc and title; line two: kind, Core and surface. The open one's panel holds its details. */
 .scenario-number { display: grid; place-items: center; flex: none; width: 24px; height: 24px; font-family: var(--mono); font-size: var(--fs-tag); font-weight: 400; color: var(--text-3); border: 1.5px solid var(--line-3); border-radius: 50%; }
 .scenario-number svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }

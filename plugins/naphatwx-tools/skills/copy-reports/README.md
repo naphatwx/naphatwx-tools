@@ -1,10 +1,10 @@
 # copy-reports
 
-Copies report output and work-flow tasks from a git worktree into the main checkout, so it is not lost when the worktree is deleted. The worktree copy is never deleted.
+Copies report output and ship-task work from a git worktree into the main checkout, so it is not lost when the worktree is deleted. The worktree copy is never deleted.
 
 ## When to use it
 
-- You are done with a worktree and want to keep its e2e-test, smoke-test or deploy-plan output, or its work-flow tasks.
+- You are done with a worktree and want to keep its e2e-test, smoke-test or deployment-plan output, or its ship-task work.
 - Run it by hand: `/copy-reports`. Agents never start it on their own.
 
 ## What it copies
@@ -13,8 +13,8 @@ Copies report output and work-flow tasks from a git worktree into the main check
 |--------|---------|
 | `**/e2e-results/` | `e2e-test` |
 | `scripts/smoke/results/` | `smoke-test` |
-| `deploy-plans/` | `deploy-plan` |
-| `.work/` | `work-flow` |
+| `deploy-plans/` | `deployment-plan` |
+| `.work/` | `ship-task` |
 | any extra folder you name | you |
 
 ## Options

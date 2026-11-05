@@ -1,5 +1,5 @@
 ---
-name: deploy-plan
+name: deployment-plan
 description: Build a production deployment plan as a clickable HTML checklist (merge into the default branch, cut a version, deploy it to production, then Post-deploy and Rollback steps) from a GitLab MR, a branch, a spec or a described release. Use when the user says "deployment plan for this MR" or "what do I need to do before and after deploy". Plans only; it never deploys or changes anything. Post-deploy service checks are smoke-test.
 argument-hint: "<MR url | !iid | branch | spec path | description>"
 ---

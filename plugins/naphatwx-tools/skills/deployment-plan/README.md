@@ -1,4 +1,4 @@
-# deploy-plan
+# deployment-plan
 
 Builds a production deployment plan as one clickable HTML checklist, split into Pre-deploy, Deploy, Post-deploy and Rollback steps, from an MR, a branch, a spec or a described release.
 

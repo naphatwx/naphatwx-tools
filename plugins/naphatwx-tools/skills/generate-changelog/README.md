@@ -12,7 +12,7 @@ Turns a GitLab merge request diff into a short changelog, grouped by spec or are
 |----------|-------------|
 | The MR's title and description rewritten and saved | `update-merge-request` |
 | A code review of the MR | `review-code` |
-| Your own commits as weekly achievements | `weekly-work-log` |
+| Your own commits as weekly achievements | `summarize-weekly-work` |
 
 ## How it works
 

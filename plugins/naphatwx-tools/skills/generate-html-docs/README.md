@@ -1,4 +1,4 @@
-# html-document
+# generate-html-docs
 
 Generates one self-contained HTML docs page, dark only, in the naphatwx theme (the same look as design-feature's overview), from files or a topic.
 
@@ -10,8 +10,8 @@ Generates one self-contained HTML docs page, dark only, in the naphatwx theme (t
 
 | You want | Use instead |
 |----------|-------------|
-| A slide deck, one click per slide | `html-presentation` |
-| A plain-words guide for end users, in markdown | `user-guide` |
+| A slide deck, one click per slide | `generate-html-slides` |
+| A plain-words guide for end users, in markdown | `write-user-guide` |
 | A full feature plan: use cases, flows, database and API changes | `design-feature` |
 | One flowchart, sequence or ER diagram | `generate-diagram` |
 
@@ -70,6 +70,6 @@ Output:
 
 ## Related skills
 
-- `html-presentation`: the same theme, as slides.
-- `user-guide`: an end-user guide in markdown, which this skill can turn into a page.
+- `generate-html-slides`: the same theme, as slides.
+- `write-user-guide`: an end-user guide in markdown, which this skill can turn into a page.
 - `design-feature`: a browsable plan folder for a feature.

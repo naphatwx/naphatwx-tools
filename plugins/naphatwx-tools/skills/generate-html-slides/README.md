@@ -1,4 +1,4 @@
-# html-presentation
+# generate-html-slides
 
 Creates one self-contained HTML slide deck, dark only, that fills the window and moves one slide per click.
 
@@ -10,8 +10,8 @@ Creates one self-contained HTML slide deck, dark only, that fills the window and
 
 | You want | Use instead |
 |----------|-------------|
-| A scrolling docs page with a sidebar and search | `html-document` |
-| A plain-words guide for end users, in markdown | `user-guide` |
+| A scrolling docs page with a sidebar and search | `generate-html-docs` |
+| A plain-words guide for end users, in markdown | `write-user-guide` |
 | A clickable mock of app screens | `generate-mock-ui` |
 | One flowchart, sequence or ER diagram | `generate-diagram` |
 
@@ -74,5 +74,5 @@ Output:
 
 ## Related skills
 
-- `html-document`: the same theme, as a scrolling docs page.
-- `user-guide`: an end-user guide in markdown.
+- `generate-html-docs`: the same theme, as a scrolling docs page.
+- `write-user-guide`: an end-user guide in markdown.

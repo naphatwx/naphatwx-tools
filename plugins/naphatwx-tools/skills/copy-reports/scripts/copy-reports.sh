@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copies report output (e2e-test, smoke-test, deploy-plan) and work-flow tasks (.work/) from a git worktree into the main checkout.
+# Copies report output (e2e-test, smoke-test, deployment-plan) and ship-task work (.work/) from a git worktree into the main checkout.
 # Never deletes anything in the worktree.
 # e2e-results/, scripts/smoke/results/ and .work/ hold one folder per spec or task: on a clash the newer copy wins.
 # Usage: copy-reports.sh [--dry-run] [extra report folder ...]   (folders are repo-relative)

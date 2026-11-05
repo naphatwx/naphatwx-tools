@@ -1,4 +1,4 @@
-/* Report page shell shared by deploy-plan, smoke-test and e2e-test: layout, title, pills, tools and command chips.
+/* Report page shell shared by deployment-plan, smoke-test and e2e-test: layout, title, pills, tools and command chips.
    The disclosure card they use is disclosure.css. */
 body { font-size: var(--fs-body); line-height: 1.5; }
 [hidden] { display: none !important; }

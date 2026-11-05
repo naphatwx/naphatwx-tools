@@ -12,7 +12,7 @@ Draws one flowchart, sequence diagram or ER diagram as a local file that a brows
 |----------|-------------|
 | A full feature plan: use cases, flows, database, API, open questions | `design-feature` |
 | A clickable mock of the screens | `generate-mock-ui` |
-| A slide deck or docs page | `html-presentation` / `html-document` |
+| A slide deck or docs page | `generate-html-slides` / `generate-html-docs` |
 
 | Type | Shows |
 |------|-------|

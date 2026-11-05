@@ -14,7 +14,7 @@ Reviews only the changed lines of staged changes, files or a GitLab merge reques
 | Just the MR diff, no review | `get-mr-diffs` |
 | A copy-paste changelog of the MR | `generate-changelog` |
 | A new MR title and description | `update-merge-request` |
-| To commit the staged changes | `commit` |
+| To commit the staged changes | `commit-staged-changes` |
 
 ## How it works
 
@@ -81,5 +81,5 @@ When a spec folder matches the branch, a copy is also saved:
 ## Related skills
 
 - `get-mr-diffs`: fetches the MR diff in MR mode.
-- `commit`: commits the staged changes once the review passes.
+- `commit-staged-changes`: commits the staged changes once the review passes.
 - `update-merge-request`: rewrites the MR text after review.

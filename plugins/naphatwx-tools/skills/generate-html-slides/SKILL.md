@@ -1,6 +1,6 @@
 ---
-name: html-presentation
-description: Create a single-file full-window HTML slide deck, one click per slide, from a topic. Use when the user says "make HTML slides about X", "build a presentation" or "make a slideshow". Slides only; a scrolling docs page is html-document, an end-user guide is user-guide.
+name: generate-html-slides
+description: Create a single-file full-window HTML slide deck, one click per slide, from a topic. Use when the user says "make HTML slides about X", "build a presentation" or "make a slideshow". Slides only; a scrolling docs page is generate-html-docs, an end-user guide is write-user-guide.
 ---
 
 # HTML Presentation Generator

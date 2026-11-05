@@ -1,6 +1,6 @@
 ---
-name: work-flow
-description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (grilling, with an optional auto-answer), a plan stop, code, a stop for the user, tests, review, docs, pre-merge gate. The plan is saved as .work/NNN-slug/plan.md. Works on any project. Run it as "/work-flow <what you want>", or "/work-flow <number>" to resume. Slash only.
+name: ship-task
+description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (grilling, with an optional auto-answer), a plan stop, code, a stop for the user, tests, review, docs, pre-merge gate. The plan is saved as .work/NNN-slug/plan.md. Works on any project. Run it as "/ship-task <what you want>", or "/ship-task <number>" to resume. Slash only.
 argument-hint: <what-you-want | task number [phase] | (empty = status)>
 disable-model-invocation: true
 ---

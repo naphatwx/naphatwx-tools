@@ -10,8 +10,8 @@ Lists the installed Claude Code plugins and marketplaces, with versions, skills 
 
 | You want | Use instead |
 |----------|-------------|
-| A styled HTML page about a topic | `html-document` |
-| A user guide for a feature | `user-guide` |
+| A styled HTML page about a topic | `generate-html-docs` |
+| A user guide for a feature | `write-user-guide` |
 
 ## How it works
 
