@@ -15,7 +15,6 @@ A deploy plan always means: merge the change into the default branch (`master` o
 |----------|-------------|
 | Check after the deploy that services still reach each other | `smoke-test` |
 | A short changelog of the MR | `generate-changelog` |
-| An announcement of the change for users | `announce` |
 | A review of the diff itself | `review-code` |
 | Why a Jenkins build failed | `check-job` |
 
@@ -121,4 +120,3 @@ Output: one HTML file, at the repo root unless the repo already has a place for 
 - `get-mr-diffs`: fetches the MR diff this skill reads.
 - `smoke-test`: the post-deploy service check; the plan adds a smoke step only when `scripts/smoke/features/` or `scripts/smoke/review/` covers the change.
 - `generate-changelog`: the changelog a user-facing step can link.
-- `announce`: the announcement a user-facing step can link.

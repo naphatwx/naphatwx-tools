@@ -11,7 +11,6 @@ Rewrites a GitLab merge request's title and description from its diff, then save
 | You want | Use instead |
 |----------|-------------|
 | A copy-paste changelog, MR left alone | `generate-changelog` |
-| A Thanos announcement for platform users | `announce` |
 | A code review of the MR | `review-code` |
 | A commit message for staged changes | `commit` |
 

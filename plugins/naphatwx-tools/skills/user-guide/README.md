@@ -12,7 +12,6 @@ Writes a markdown user guide for a feature, in plain words for end users, from i
 |----------|-------------|
 | A styled HTML docs page with sidebar and search | `html-document` |
 | A slide deck | `html-presentation` |
-| An announcement of a merged change | `announce` |
 | A changelog of an MR | `generate-changelog` |
 | The feature's use cases and scenarios as data | `generate-use-case` |
 
@@ -71,4 +70,3 @@ docs/features/<feature-domain>/
 
 - `html-document`: turns the guide into a styled HTML page.
 - `html-presentation`: the same content as slides.
-- `announce`: tells users about a change when it ships.

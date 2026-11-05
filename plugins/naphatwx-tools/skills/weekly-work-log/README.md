@@ -11,7 +11,6 @@ Turns your git commits for one week into up to 5 achievement items, each 140 cha
 | You want | Use instead |
 |----------|-------------|
 | A changelog for one merge request | `generate-changelog` |
-| A record of one problem and its fix | `issue-log` |
 | A commit message for staged changes | `commit` |
 
 ## How it works
@@ -66,4 +65,3 @@ Output: a chat reply.
 ## Related skills
 
 - `generate-changelog`: the same kind of summary, for one merge request.
-- `issue-log`: a daily log of problems, where this one is a weekly log of wins.

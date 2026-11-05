@@ -13,7 +13,6 @@ Watches one Jenkins build from its URL until it ends, then explains any failure 
 | A review of the code before it builds | `review-code` |
 | Checks that services reach each other after a deploy | `smoke-test` |
 | Steps to do before and after a deploy | `deploy-plan` |
-| A record of the problem and its fix | `issue-log` |
 
 ## How it works
 
@@ -72,4 +71,3 @@ Next step
 
 - `review-code`: catches problems before the build runs.
 - `smoke-test`: checks the services after the build deploys.
-- `issue-log`: saves the cause and fix once you know them.

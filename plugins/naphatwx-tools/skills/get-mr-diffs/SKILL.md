@@ -1,6 +1,6 @@
 ---
 name: get-mr-diffs
-description: "Helper: fetch a GitLab merge request diff, local git first, else GitLab MCP. Called by review-code, generate-changelog, announce and update-merge-request. Not for direct use."
+description: "Helper: fetch a GitLab merge request diff, local git first, else GitLab MCP. Called by review-code, generate-changelog and update-merge-request. Not for direct use."
 user-invocable: false
 ---
 
@@ -8,7 +8,7 @@ user-invocable: false
 
 Resolve a GitLab merge request reference and get its **actual changes (diffs)**.
 This is the single shared flow for `/update-merge-request`,
-`/generate-changelog`, `/announce`, and `/review-code` (MR mode).
+`/generate-changelog` and `/review-code` (MR mode).
 
 The calling command may add overrides (e.g. noise-file filters, or "never
 exclude test files"). Apply them on top of this flow.

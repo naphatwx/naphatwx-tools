@@ -5,7 +5,7 @@ Helper that fetches a GitLab merge request's real diff: local git first, else th
 ## When to use it
 
 - Not for direct use. Other skills call it when they need an MR's changes.
-- Called by `review-code`, `generate-changelog`, `announce` and `update-merge-request`.
+- Called by `review-code`, `generate-changelog` and `update-merge-request`.
 - The caller may add its own rules on top, e.g. noise-file filters or "never exclude test files".
 
 | You want | Use instead |
@@ -13,7 +13,6 @@ Helper that fetches a GitLab merge request's real diff: local git first, else th
 | A review of the MR's changed lines | `review-code` |
 | A copy-paste changelog of the MR | `generate-changelog` |
 | A new MR title and description, saved to the MR | `update-merge-request` |
-| A Thanos announcement drafted from the MR | `announce` |
 
 ## How it works
 
@@ -88,4 +87,3 @@ Output: no file. The MR metadata, commits, changed files and diffs, handed back 
 - `review-code`: reviews the diff this skill fetches (MR mode).
 - `generate-changelog`: turns the diff into a changelog.
 - `update-merge-request`: rewrites the MR title and description from the diff.
-- `announce`: drafts a Thanos announcement from the diff.

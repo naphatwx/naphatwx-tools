@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.292
+
+**Remove four skills**
+
+- Removed announce, issue-log, multi-column-sort and run-parallel.
+- Other skills no longer point to announce or issue-log.
+
 ## 1.9.291
 
 **Reruns never lose content**

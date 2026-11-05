@@ -22,16 +22,12 @@ Each skill folder has a `README.md` with diagrams of how it works.
 | [get-mr-diffs](plugins/naphatwx-tools/skills/get-mr-diffs/) | Helper: fetch a GitLab MR diff, local git first, else GitLab MCP |
 | [generate-changelog](plugins/naphatwx-tools/skills/generate-changelog/) | Write a short changelog from a GitLab MR diff, as one copy-paste code block |
 | [update-merge-request](plugins/naphatwx-tools/skills/update-merge-request/) | Rewrite a GitLab MR's title and description from its diff, and save them |
-| [announce](plugins/naphatwx-tools/skills/announce/) | Draft a Thanos markdown announcement from a GitLab MR diff |
 | [commit](plugins/naphatwx-tools/skills/commit/) | Commit staged changes with a conventional commit message written from the diff |
 | [check-job](plugins/naphatwx-tools/skills/check-job/) | Watch a Jenkins build until it ends, then explain any failure |
-| [issue-log](plugins/naphatwx-tools/skills/issue-log/) | Log a troubleshooting issue to today's private log, or show today's log |
 | [weekly-work-log](plugins/naphatwx-tools/skills/weekly-work-log/) | Sum up your git commits into up to 5 weekly achievement items |
 | [user-guide](plugins/naphatwx-tools/skills/user-guide/) | Write a markdown user guide for a feature, in plain words for end users |
 | [html-document](plugins/naphatwx-tools/skills/html-document/) | Make a single-file HTML docs page in the naphatwx theme, with a numbered section rail and search |
 | [html-presentation](plugins/naphatwx-tools/skills/html-presentation/) | Make a single-file full-window HTML slide deck |
-| [multi-column-sort](plugins/naphatwx-tools/skills/multi-column-sort/) | Add multi-column table sorting with a three-state header toggle |
-| [run-parallel](plugins/naphatwx-tools/skills/run-parallel/) | Split a task into independent sub-tasks and run them with several sub-agents |
 | [list-plugins](plugins/naphatwx-tools/skills/list-plugins/) | List installed Claude Code plugins and marketplaces |
 
 ---

@@ -11,7 +11,6 @@ Turns a GitLab merge request diff into a short changelog, grouped by spec or are
 | You want | Use instead |
 |----------|-------------|
 | The MR's title and description rewritten and saved | `update-merge-request` |
-| A Thanos announcement for platform users | `announce` |
 | A code review of the MR | `review-code` |
 | Your own commits as weekly achievements | `weekly-work-log` |
 
@@ -60,4 +59,3 @@ Output: one short chat note (which MR, its state), then one code block in chat, 
 
 - `get-mr-diffs`: fetches the MR diff.
 - `update-merge-request`: writes the same facts into the MR itself.
-- `announce`: turns the same diff into a user-facing announcement.
