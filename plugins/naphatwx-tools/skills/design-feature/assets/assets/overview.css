@@ -218,7 +218,7 @@ body:has(.float-bar) { --float-space: 76px; padding-bottom: var(--float-space); 
 /* Layout widths. Font sizes use the theme's role tokens (--fs-body / meta / code / tag, --fs-dia / dia-sub). */
 :root {
     --measure: var(--page-w);
-    --rail-w: 320px;
+    --rail-w: 400px;
 }
 
 * { margin: 0; padding: 0; }
