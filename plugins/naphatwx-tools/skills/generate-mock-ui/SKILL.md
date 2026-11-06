@@ -206,10 +206,16 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 - Follow [references/mock-review.md](references/mock-review.md): two fresh review-only agents (UI fidelity, functional) in parallel, then one fresh fix agent, then step 7 and step 8 again.
 - Run by the design-feature skill → skip it here; design-feature runs the review as its step 6b, after its own checks.
 
+### 8c. Review the layout (always)
+
+- Follow [references/layout-review.md](references/layout-review.md): one fresh sub-agent per HTML file this run wrote, all in parallel. Each opens its file in a browser and fixes broken layout.
+- Run by the design-feature skill → skip it here; design-feature reviews every file as its step 6c.
+
 ### 9. Confirm
 
 - Output: `✅ Mock created at: {output}/mock/index.html`
 - Scenarios per use case, the total and how many play in the mock (the rest show "No mock"), copied from `check-scenarios.js` output — never counted by eye.
 - The review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
+- The layout review: files reviewed, count per verdict, and each problem not fixed.
 - List the pages and mock states, and what could not be copied from the real design system (logos, images, fonts), plus the CDNs the pages need.
 - Remind the user: open `mock/index.html` directly; no server or build is needed.

@@ -216,6 +216,10 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
 - Open the page in a headless browser when one is available and pick every playable scenario: no console errors, the "Creating data…" cover clears, the frame shows the right screen signed in as the right role. After each seed, every `{key}` in the steps and the prompt shows a value, not `[…: filled in after the seed]`. Look at the screenshots.
 - Grep for absolute local paths and secrets, and remove them.
 
+### 7b. Review the layout (always)
+
+- Follow [references/layout-review.md](references/layout-review.md): one fresh sub-agent per HTML file this run wrote, all in parallel. Each opens its file in a browser and fixes broken layout. The page is the plugin's template, so problems in it are reported, not patched.
+
 ### 8. Play the AI scenarios
 
 Do this after step 7 with the app up and `server.mjs` running, or when the user later asks to "play the AI scenarios" of a plan. Local only (Hard Rule 1).
@@ -240,6 +244,7 @@ Do this after step 7 with the app up and `server.mjs` running, or when the user 
 ### 9. Confirm
 
 - Output: `✅ Play page created at: <plan>/live/index.html`
+- The layout review: files reviewed, count per verdict, and each problem not fixed.
 - Counts copied from `check-live.js`: scenarios (by surface), playable live, by the AI (recorded pass, fail), skipped, seed commands.
 - The AI's FAILs from `ai-results.md`, each with the call and the answer. For each, open its scenario's `evidence.expect` line: when the code there gives the answer the AI got, the scenario has drifted (run `generate-use-case` verify), not the app.
 - The open `MISMATCHES` from `use-cases.js`, one line each, so a tester knows which spec lines the app doesn't follow on purpose or yet.

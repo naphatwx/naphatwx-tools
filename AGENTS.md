@@ -28,6 +28,7 @@
   - `page-head.css` (`page-head`): header row, `h1`, `.subtitle`, `.actions`, `.button` of the API contracts and ER pages.
   - `seq.css` (`seq`): sequence-diagram SVG parts, for the design-feature overview, the generate-diagram viewer and the generate-html-docs template.
 - `theme/use-cases.d.ts` is the type of `use-cases.js` (`UseCase`, `Scenario`, `Acceptance`). `node theme/sync.mjs` copies it whole, as `use-cases.types.d.ts`, next to every `use-cases.js` a skill ships or reads (`TYPES_COPIES`). generate-use-case's `check.js` reads its field names and rejects any other field. Add or rename a field there first.
+- `theme/layout-review.md` is the layout review brief (one fresh sub-agent per HTML file, in parallel). `node theme/sync.mjs` copies it whole into `references/layout-review.md` of every skill that writes HTML (`REVIEW_COPIES`). A new HTML skill gets added there and a "Review the layout" step before its reply.
 - `.scenario-kind`, `.core-pill` and `.references-chip` live in `base.css`; their print rules in `pdf.css`.
 - Scenario badge order, on every page that lists scenarios: status → surface (channel) tag → title → kind → core → refs chip. Skip a badge the page does not show; never reorder.
   - Before the title: badges about the whole row (did it pass, which channel).

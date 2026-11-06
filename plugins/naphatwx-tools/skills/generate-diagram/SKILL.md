@@ -92,9 +92,15 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Each label's text is centered on its line, its box fits the text, and its step badge sits left of the box.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
+### 4b. Review the layout (always)
+
+- Follow [references/layout-review.md](references/layout-review.md): one fresh sub-agent per HTML file this run wrote, all in parallel. Each opens its file in a browser and fixes broken layout.
+- Run by the design-feature skill → skip it here; design-feature reviews every file as its step 6c.
+
 ### 5. Reply
 
 - The mode used and each file written.
+- The layout review: files reviewed, count per verdict, and each problem not fixed.
 - The embed snippet for each file (a caller pastes it as-is):
 
 | Type · mode | Embed |

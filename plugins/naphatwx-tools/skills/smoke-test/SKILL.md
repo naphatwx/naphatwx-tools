@@ -144,10 +144,13 @@ Open the HTML file named on the last line of the output (`report: <path>`). It h
 | `HTTP 404` on the trigger | The probe endpoint is not deployed in this version. This is a blocker, not a failed smoke. |
 | Hop missing from the store but found on the service | The report-to-store call is failing. The link itself works. |
 
+Then review the report's layout with [references/layout-review.md](references/layout-review.md) (one fresh sub-agent). The report is built from the plugin's template, so it reports problems and doesn't patch the file.
+
 Reply with:
 - the overall status
 - one line per flow, with the hop chain
 - every failed hop, with its likely cause
+- the layout review verdict and each problem found
 - the full path of the HTML report
 
 ---

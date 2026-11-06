@@ -113,7 +113,12 @@ The output **must** keep all of these:
 - No topic → `docs.html`.
 - Custom: write to the path the user gave.
 
+### 4b. Review the layout (always)
+
+- Follow [references/layout-review.md](references/layout-review.md): one fresh sub-agent per HTML file this run wrote, all in parallel. Each opens its file in a browser and fixes broken layout.
+
 ### 5. Confirm
 
 - Output: `✅ Docs created at: {path}`
+- The layout review: files reviewed, count per verdict, and each problem not fixed.
 - Remind the user: `/` searches the rail, `[` hides it.

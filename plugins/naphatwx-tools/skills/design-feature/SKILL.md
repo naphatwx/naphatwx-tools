@@ -259,6 +259,11 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Don't run the reviewers again unless the fix agent reports a finding it could not apply.
 - No mock → skip.
 
+### 6c. Review the layout (always)
+
+- Follow [references/layout-review.md](references/layout-review.md): one fresh sub-agent per HTML file this run wrote, all in parallel. Each opens its file in a browser and fixes broken layout. It covers `overview.html`, every diagram, ER and API page, and the mock's pages.
+- Run after step 6b, before step 8.
+
 ### 7. Confirm
 
 - Output: `✅ Plan created at: {output}/overview.html`
@@ -268,11 +273,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Acceptance criteria: the summary line from `acceptance-section.js` (`N criteria · M covered on every channel · K gaps`), then each gap as `US<n> · AC<m>: no <channel> scenario`, and each `n/a` channel with its reason, one line each.
 - Spec vs code: each mismatch the script printed, one line each (`M1 FR-017 (fix the spec): …`). They need the user's decision. Say how many scenarios are from the spec only (`check.js` evidence line) when there are any.
 - Mock review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
+- The layout review: files reviewed, count per verdict, and each problem not fixed.
 - Remind the user: each diagram is edited in its own file under `flowchart/`, `sequence-diagram/` or `database/`; the overview picks up the change on reload.
 
 ### 8. Publish as a claude.ai Artifact (only when asked)
 
-Publish only after step 6b (when a mock exists). Publish from a copy, never the plan folder itself. Two things break inside claude.ai:
+Publish only after step 6c. Publish from a copy, never the plan folder itself. Two things break inside claude.ai:
 
 - A `target="_blank"` link opens the artifact's internal frame URL in a new tab, which claude.ai refuses (`ERR_BLOCKED_BY_RESPONSE`). The copy drops `target` / `rel` from every link.
 - The entry page is published as `index.html`, so links back to `overview.html` (`../overview.html` from the ER diagram's `← Overview` and the mock's `← Feature plan`) must point at `index.html` in the copy.

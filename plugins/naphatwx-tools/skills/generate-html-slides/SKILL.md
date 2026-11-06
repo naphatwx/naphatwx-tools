@@ -62,7 +62,12 @@ The output **must** keep all of these:
     - No topic → use `presentation.html`.
 - Custom: write to the path the user gave.
 
+### 3b. Review the layout (always)
+
+- Follow [references/layout-review.md](references/layout-review.md): one fresh sub-agent per HTML file this run wrote, all in parallel. Each opens its file in a browser and fixes broken layout. Step through every slide.
+
 ### 4. Confirm
 
 - Output: `✅ Presentation created at: {path}`
+- The layout review: files reviewed, count per verdict, and each problem not fixed.
 - Remind the user: click left or right to move, arrow keys also work.

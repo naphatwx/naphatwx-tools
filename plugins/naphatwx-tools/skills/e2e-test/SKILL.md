@@ -213,6 +213,8 @@ node <e2e-dir>/reporters/build-report.mjs <run> --use-cases <plan>/use-cases.js 
 
 It merges the run folder into `<run>/e2e-report.html` (screenshots embedded; the same file every run), prints one line per use case and `E2E report: <path>`. Open the file and check: the tree matches `use-cases.js`, every `ui` step has a screenshot, every other step has a request and response, flagged steps show the note.
 
+Then review the layout of `e2e-report.html` with [references/layout-review.md](references/layout-review.md) (one fresh sub-agent). The report is built from the plugin's template, so it reports problems and doesn't patch the file.
+
 Reply with:
 - the domain folder, and the spec files and `.ai-tests.json` files written
 - per file: the tests updated, added and (after the user agreed) removed, by scenario id, and the previous `use-cases.js` used in step 2c
@@ -222,6 +224,7 @@ Reply with:
 - findings for the app owner: missing selectors, routes or tools, code / scenario mismatches, scenarios to fix with `generate-use-case`
 - the open `MISMATCHES` from `use-cases.js`, one line each (`M1 FR-017 (fix the code): …`), so the spec-vs-code decisions stay in view
 - whether cleanup is confirmed
+- the layout review verdict and each problem found
 - the **full path** of the HTML report
 
 ---

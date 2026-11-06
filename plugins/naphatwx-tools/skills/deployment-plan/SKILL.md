@@ -197,10 +197,15 @@ Wait for answers. If the user says go on, keep those steps marked `check`.
 - `phases`: `pre`, `deploy` and `post` are required. Add `rollback` when there is a way back.
 - Step fields: `text` is required. `detail`, `cmd`, `tag` (`db`, `env`, `infra`, `flag`, `api`, `data`, `comms`, `check`), `risk` (`high` only), `source` and `check` are optional.
 
+## 8b. Review the layout (always)
+
+- Follow [references/layout-review.md](references/layout-review.md): one fresh sub-agent per HTML file this run wrote, all in parallel. Each opens its file in a browser and fixes broken layout.
+
 ## 9. Report
 
 Reply with:
 - the default branch, the version to cut and the order of deploy
 - the number of steps per phase, and the high-risk ones
 - the steps still marked `check`
+- the layout review: files reviewed, count per verdict, and each problem not fixed
 - the full path of the HTML file
