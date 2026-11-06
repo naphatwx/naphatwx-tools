@@ -252,7 +252,7 @@ td .aside { color: var(--text-2); font-size: var(--fs-meta); font-weight: 400; }
     border-right: 1px solid var(--line);
     overflow: hidden auto;
 }
-.rail-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail-label { min-width: 0; overflow-wrap: anywhere; }
 
 .rail-brand {
     display: flex; align-items: center; gap: 12px;

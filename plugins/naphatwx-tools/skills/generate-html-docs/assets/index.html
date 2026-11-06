@@ -254,7 +254,7 @@
             border-right: 1px solid var(--line);
             overflow: hidden auto;
         }
-        .rail-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rail-label { min-width: 0; overflow-wrap: anywhere; }
         .rail-brand {
             display: flex; align-items: center; gap: 12px;
             padding: 0 18px 0 19px; margin-bottom: 18px;
@@ -854,7 +854,6 @@ example init</code></pre>
                 railLink.classList.toggle("active", railLink === link);
                 if (railLink === link) railLink.setAttribute("aria-current", "location"); else railLink.removeAttribute("aria-current");
             });
-            railTitles(); // the active link is bold, so its label may now be cut short
         }
         function spy() {
             if (pinnedLink) return;
@@ -867,14 +866,6 @@ example init</code></pre>
         ["wheel", "touchstart", "keydown"].forEach(eventName => addEventListener(eventName, () => { pinnedLink = null; }, { passive: true }));
         addEventListener("scroll", spy, { passive: true });
 
-        // a rail label cut short by the ellipsis shows in full on hover
-        function railTitles() {
-            rail.querySelectorAll(".rail-label").forEach(label => {
-                const link = label.closest("a") || label;
-                if (label.scrollWidth > label.clientWidth) link.title = label.textContent.trim(); else link.removeAttribute("title");
-            });
-        }
-        addEventListener("resize", railTitles);
         spy();
 
         // ===== Keys: "[" hides the rail, "/" searches it =====

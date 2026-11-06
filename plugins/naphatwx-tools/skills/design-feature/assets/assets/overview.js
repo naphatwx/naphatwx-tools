@@ -274,7 +274,6 @@ function setActive(link) {
         railLink.classList.toggle("active", railLink === link);
         if (railLink === link) railLink.setAttribute("aria-current", "location"); else railLink.removeAttribute("aria-current");
     });
-    railTitles(); // the active link is bold, so its label may now be cut short
 }
 function spy() {
     if (pinnedLink) return;
@@ -681,18 +680,9 @@ lightbox.addEventListener("close", () => {
 lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
 lightbox.addEventListener("click", (e) => { if (e.target === lightbox) lightbox.close(); });
 
-// a rail label cut short by the ellipsis shows in full on hover
-function railTitles() {
-    rail.querySelectorAll(".rail-label").forEach(label => {
-        const link = label.closest("a") || label;
-        if (label.scrollWidth > label.clientWidth) link.title = label.textContent.trim(); else link.removeAttribute("title");
-    });
-}
-addEventListener("resize", railTitles);
 
 document.addEventListener("DOMContentLoaded", () => {
     document.body.append(lightbox);
-    railTitles();
     diagramBoxes.push(...document.querySelectorAll(".flowchart, .sequence"));
     diagramBoxes.forEach(makeZoomable);
     // sequence diagrams have drawn by now, so section offsets are final
