@@ -5,7 +5,7 @@ the grill, and the plan summary at the end. Code starts only when the user says 
 
 ## 1. Number and folder
 
-- Folder: the profile's `Work folder`, else `.work/`. Task folder: `<work folder>/NNN-<slug>/`.
+- Folder: the profile's `Work folder`, else `tasks/`. Task folder: `<work folder>/NNN-<slug>/`.
   Slug: 2–4 words, like `bucket-csv-export`. The number is how the user refers to the task ("continue 195").
 - **Next number** = 1 + the highest `NNN` in the work folder of every place below. Missing folder → skip it.
   1. This checkout.

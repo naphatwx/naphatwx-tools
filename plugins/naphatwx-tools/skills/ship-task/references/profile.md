@@ -18,7 +18,7 @@ The profile tells the flow what this project has. Read it once at start.
 | api | apps/api | apps/api/AGENTS.md | api-specialist |
 | web | apps/web | apps/web/AGENTS.md | - |
 
-- Work folder: `.work/` (tasks go in `NNN-<slug>/plan.md`) | .work/
+- Work folder: `tasks/` (tasks go in `NNN-<slug>/plan.md`) | tasks/
 - Other checkouts: `../thanos-2` (separate clones whose task numbers count too; worktrees are found by git) | none
 - Run checks: `docker compose run --rm dev` | host
 - Gate per app:
@@ -56,7 +56,7 @@ The profile tells the flow what this project has. Read it once at start.
 | Gate commands | `Makefile` targets, `package.json` scripts, `nx.json`, CI files (`.gitlab-ci.yml`, `.github/workflows/`, `Jenkinsfile`) |
 | Run checks | the guide says "run in Docker" or a compose service runs the toolchain |
 | Integration tests | a `tests/integration`, `e2e` or `features` folder, or an `integration` script |
-| Work folder | a `.work/` folder |
+| Work folder | a `tasks/` folder |
 | Numbered folders | folders whose entries start with a number, like `000123_x.up.sql` or `127-foo/` |
 | Docs | `docs/` structure the guide describes |
 

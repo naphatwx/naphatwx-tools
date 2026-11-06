@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Copies report output (e2e-test, smoke-test, deployment-plan) and ship-task work (.work/) from a git worktree into the main checkout.
+# Copies report output (e2e-test, smoke-test, deployment-plan) and ship-task work (tasks/) from a git worktree into the main checkout.
 # Never deletes anything in the worktree.
-# e2e-results/, scripts/smoke/results/ and .work/ hold one folder per spec or task: on a clash the newer copy wins.
+# e2e-results/, scripts/smoke/results/ and tasks/ hold one folder per spec or task: on a clash the newer copy wins.
 # Usage: copy-reports.sh [--dry-run] [extra report folder ...]   (folders are repo-relative)
 set -euo pipefail
 
@@ -27,7 +27,7 @@ cd "$top"
 folders=()
 [ -d deploy-plans ] && folders+=(deploy-plans)
 [ -d scripts/smoke/results ] && folders+=(scripts/smoke/results)
-[ -d .work ] && folders+=(.work)
+[ -d tasks ] && folders+=(tasks)
 while IFS= read -r dir; do folders+=("${dir#./}"); done < <(
   find . -type d \( -name node_modules -o -name .git \) -prune -o -type d -name e2e-results -print 2>/dev/null
 )
@@ -53,8 +53,8 @@ newest() {
     find "$1" -type f -exec stat -c %Y {} + | sort -n | tail -1
 }
 
-# e2e-results/ and scripts/smoke/results/ hold one folder per spec (or _adhoc), .work/ one per task: the newer copy wins.
-one_per_spec() { [ "$1" = scripts/smoke/results ] || [ "$1" = .work ] || [ "$(basename "$1")" = e2e-results ]; }
+# e2e-results/ and scripts/smoke/results/ hold one folder per spec (or _adhoc), tasks/ one per task: the newer copy wins.
+one_per_spec() { [ "$1" = scripts/smoke/results ] || [ "$1" = tasks ] || [ "$(basename "$1")" = e2e-results ]; }
 
 copied=0 same=0 renamed=0 replaced=0 kept=0 skipped=0
 for folder in ${folders[@]+"${folders[@]}"}; do

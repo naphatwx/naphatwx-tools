@@ -1,6 +1,6 @@
 ---
 name: ship-task
-description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (grilling, with an optional auto-answer), a plan stop, code, a stop for the user, tests, review, docs, pre-merge gate. The plan is saved as .work/NNN-slug/plan.md. Works on any project. Run it as "/ship-task <what you want>", or "/ship-task <number>" to resume. Slash only.
+description: Carry one feature, bug fix or hotfix from idea to a merge-ready branch in fixed phases - plan (grilling, with an optional auto-answer), a plan stop, code, a stop for the user, tests, review, docs, pre-merge gate. The plan is saved as tasks/NNN-slug/plan.md. Works on any project. Run it as "/ship-task <what you want>", or "/ship-task <number>" to resume. Slash only.
 argument-hint: <what-you-want | task number [phase] | (empty = status)>
 disable-model-invocation: true
 ---
@@ -21,7 +21,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Phases
 
 ```text
-Setup               .work/ at the project root
+Setup               tasks/ at the project root
 Phase 1  Plan       grilling (YOU, or auto-answer) → draft plan.md → spec verify
    ■ PLAN STOP: summary of the plan; "implement" to go on
 Phase 2  Code       tasks by app tag, contract owner first; code only: no test files, no checks
@@ -43,7 +43,7 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
 
 ## Start
 
-1. **Setup**, before anything else. Work folder: the `Work folder` in a saved `## Flow profile`, else `.work/`, at the repo root (`git rev-parse --show-toplevel`).
+1. **Setup**, before anything else. Work folder: the `Work folder` in a saved `## Flow profile`, else `tasks/`, at the repo root (`git rev-parse --show-toplevel`).
    - Missing → create it and say so in one line.
 2. **Parse the input.**
    - Empty → list every `<work folder>/*/plan.md` not at `Phase: done`, with its number, phase and next step; ask which to pick up. Stop.
