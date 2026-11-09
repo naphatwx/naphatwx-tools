@@ -49,3 +49,35 @@ Closing note, if any.
 ```text
 RESPONSE RULES ACTIVE. Draft with the output style, then reshape as the last step: plain language and short answers (answer first, no filler, short sentences, common words; never shorten errors or warnings); lists only (no prose paragraphs); headers are plain bold lines, never list items; an `&nbsp;` line between every block, never between bullets of one list. Plain language and lists also apply to files; the `&nbsp;` rule is chat only.
 ```
+
+## Rule 2: answer in lists, and the target shape (removed in 1.9.299)
+
+`response-rules.md`, after rule 1:
+
+````markdown
+2. **Answer in lists.**
+   - Every answer is bullets or numbered lists — no prose paragraphs.
+   - Nest a sublist when an item has details, sub-steps, or examples.
+   - Headers: plain bold line, never a list item — bullets go only under the header.
+
+## Target shape
+
+```markdown
+Lead sentence stating the outcome, if any.
+
+**Header line**
+- point
+- point
+
+**Next header**
+- point
+
+Closing note, if any.
+```
+````
+
+`response-rules.sh` prompt reminder:
+
+```text
+RESPONSE RULES ACTIVE. Draft with the output style, then reshape as the last step: plain language and short answers (answer first, no filler, short sentences, common words; never shorten errors or warnings); lists only (no prose paragraphs); headers are plain bold lines, never list items. Plain language and lists also apply to files.
+```

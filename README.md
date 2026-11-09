@@ -106,7 +106,7 @@ All three are off by default.
 
 ## 🧩 Response Rules Hook
 
-The plugin ships a hook that injects chat formatting rules (plain language, lists only). It is **off by default** and works in Claude Code only.
+The plugin ships a hook that injects chat formatting rules (plain language, short answers). It is **off by default** and works in Claude Code only.
 
 To turn it on, add this to your `~/.claude/settings.json` and start a new session:
 
