@@ -43,10 +43,12 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
 
 ## Start
 
-1. **Setup**, before anything else. Work folder: the `Work folder` in a saved `## Flow profile`, else `tasks/`, at the repo root (`git rev-parse --show-toplevel`).
-   - Missing → create it and say so in one line.
+1. **Setup**, before anything else.
+   1. `tasks/` at the repo root (`git rev-parse --show-toplevel`). Missing → create it and say so in one line.
+   2. Next number = 1 + the highest `NNN` in `tasks/` of this repo, its worktrees (`git worktree list`) and the profile's `Other checkouts` (001 when none). Skip a missing folder.
+      A new task uses it; say it in one line: "Next: 195 (highest 194 in ../thanos-2)".
 2. **Parse the input.**
-   - Empty → list every `<work folder>/*/plan.md` not at `Phase: done`, with its number, phase and next step; ask which to pick up. Stop.
+   - Empty → list every `tasks/*/plan.md` not at `Phase: done`, with its number, phase and next step; ask which to pick up. Stop.
    - A task number (`195`) or a task folder → resume at the phase in its `plan.md` status line. A phase name after it (`plan`, `code`, `tests`, `review`, `docs`, `pre-merge`) re-runs that phase, only if the task already reached it.
    - Anything else → a new task. The whole input is what the user wants.
 3. **Load the project profile** (`references/profile.md`). Missing parts → ask once, then go on.
@@ -93,7 +95,7 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 - **Phases 1–5 run no checks and no tests.** No build, lint, typecheck, unit test or integration test. The only automatic gate is in Phase 6.
 - **A gate the user asks for runs at any time.** Report the result and stop. Do not fix unless asked.
 - **Phase 2 never creates or edits a test file.** Tests come in Phase 3, after the user confirms the behavior.
-- **The main agent orchestrates.** App code is changed by an app owner sub-agent (`references/roles.md`), even a one-line edit. The main agent edits only the work folder, root config and docs.
+- **The main agent orchestrates.** App code is changed by an app owner sub-agent (`references/roles.md`), even a one-line edit. The main agent edits only `tasks/`, root config and docs.
 - **Keep it flat.** Only the main agent starts sub-agents. Owners, reviewers and gate runners never start their own.
 - **A reviewer is always a fresh instance.** The instance that wrote the code never reviews it or verifies its plan.
 - **One code round per phase.** Plan every edit across every app, then start all owners at once.

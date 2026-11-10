@@ -5,13 +5,8 @@ the grill, and the plan summary at the end. Code starts only when the user says 
 
 ## 1. Number and folder
 
-- Folder: the profile's `Work folder`, else `tasks/`. Task folder: `<work folder>/NNN-<slug>/`.
+- Task folder: `tasks/NNN-<slug>/`, with the next number from Setup (`SKILL.md` → Start).
   Slug: 2–4 words, like `bucket-csv-export`. The number is how the user refers to the task ("continue 195").
-- **Next number** = 1 + the highest `NNN` in the work folder of every place below. Missing folder → skip it.
-  1. This checkout.
-  2. Every worktree of the repo: `git worktree list --porcelain` (the `worktree <path>` lines).
-  3. The profile's `Other checkouts`.
-- Say it in one line: "Next: 195 (highest 194 in ../thanos.worktrees/foo)".
 
 ## 2. Explore
 
@@ -56,7 +51,7 @@ The user turns it on with "auto-answer" (or "auto") in the input or in any grill
 
 ## 4. Draft
 
-Write `<work folder>/NNN-<slug>/plan.md` from a template. Keep its section order.
+Write `tasks/NNN-<slug>/plan.md` from a template. Keep its section order.
 
 - **Pick the size.**
   - A bug fix with one cause → [plan-template-fix.md](../assets/plan-template-fix.md). Grow it into the full shape only when the fix needs a decision, a contract change or a migration.
