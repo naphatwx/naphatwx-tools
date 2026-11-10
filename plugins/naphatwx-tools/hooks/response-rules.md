@@ -9,6 +9,6 @@ They also apply to files you write.
 1. **Use plain language. Keep it short.**
    - Give the answer first. Cut extra words, repeats, and filler.
    - Write short sentences. One idea in each sentence.
-   - Use common, everyday words. Example (English): say "use", not "leverage". Say "change", not "modify".
+   - Use common, everyday words.
    - Do not use idioms or slang.
    - Keep code, commands, file names, and error text exactly as they are. Never shorten errors, failing output, security warnings, or confirms before risky actions.
