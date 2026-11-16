@@ -25,9 +25,8 @@ Turn a spec, ticket or idea into a plan folder people can open in a browser.
 │   └── contracts.html         every related API with its full request and response, opened from the API section
 ├── use-cases.js               use cases, scenarios and acceptance criteria, by the generate-use-case skill; the Acceptance criteria
 │                              section and each use case's Scenarios view are generated from it
-└── mock/                      optional, standalone mock by the generate-mock-ui skill
+└── mock/                      optional mock by the generate-mock-ui skill
     └── shared/scenario-play.js   how to play each scenario; adds the Play links
-                               (in-project mock lives in the app instead)
 ```
 
 Scripts in this skill's `scripts/` (Node, no install):
@@ -223,11 +222,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 5. Offer the mock
 
-- Ask which mock to build (use AskUserQuestion when the agent has it). Skip the question when the feature has no UI.
-    - **In project** (recommended when the frontend app is found): mock pages inside the real app at `<routes-root>/mock/<spec-slug>/` (e.g. `apps/<web-app>/app/(main)/mock/login-flow/`), built from its real components and types, with local data and no API / RPC calls. The user manages the branch and ignores the folder.
-    - **Standalone HTML**: `<output>/mock/`, opens from disk, no app needed.
+- Ask whether to build the mock (use AskUserQuestion when the agent has it). Skip the question when the feature has no UI.
+    - **Mock**: `<output>/mock/`, plain HTML that opens from disk, no app needed, with a free-play mode.
     - **No mock**.
-- In project / Standalone → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder and the chosen mode (`in-project` / `standalone`). It reads `<output>/use-cases.js`, writes the mock with `mock/shared/scenario-play.js` (how to play each scenario) and re-runs `scripts/scenarios-panels.js`, which adds the Play links and "Open the mock ↗".
+- Mock → run the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code) with `<output>` as its plan folder. It reads `<output>/use-cases.js`, writes the mock with `mock/shared/scenario-play.js` (how to play each scenario) and re-runs `scripts/scenarios-panels.js`, which adds the Play links and "Open the mock ↗".
 - After it returns, re-run `node <this skill dir>/scripts/scenarios-panels.js <output>` yourself if you changed any use case block since (it is safe to re-run), and keep its printed counts for step 7.
 - No mock → nothing to do: each use case's Scenarios view already lists its scenarios, without Play links.
 
@@ -243,7 +241,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Each use case keeps one name everywhere: rail, use case index, `data-title`, its `<h3>` and its `USE_CASES` title. Its Scenarios panel lists scenarios of that use case only.
 - Run the generate-use-case skill's `scripts/check.js <output>/use-cases.js` and fix every error it reports (re-run the generate-use-case skill for a missing scenario). Keep its acceptance coverage line for step 7.
 - Run `node <this skill dir>/scripts/acceptance-section.js <output>` again. Its printed coverage matches `check.js`; every gap it lists is either fixed or reported in step 7. Every `#sc-<id>` link in the section resolves to a Scenarios row.
-- Mock built (standalone) → run the generate-mock-ui skill's `scripts/check-scenarios.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, every ui scenario has one play entry with a real state (in `states.js`) and page, and no mcp / api / job scenario has one (those show "No mock" in the mock). Then check each use case's Scenarios count and Play links match `use-cases.js` (re-run `scenarios-panels.js` if not).
+- Mock built → run the generate-mock-ui skill's `scripts/check-scenarios.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, every ui scenario has one play entry with a real state (in `states.js`) and page, and no mcp / api / job scenario has one (those show "No mock" in the mock). Then check each use case's Scenarios count and Play links match `use-cases.js` (re-run `scenarios-panels.js` if not).
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
 - Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws. Open the API contracts board: every method block and card draws. Each page's `← Overview` link works.
 - Presentation mode, in the same browser at 1440×900, 1280×720 and 1024×768: press `P` and step through every step; on each, the page is no wider than the window (`document.documentElement.scrollWidth <= innerWidth`), the step's diagram or tables show whole across, the diagram box ends above the bar, every diagram label renders at its set size, 14px or 12px (not scaled up or down), and a box that scrolls shows the `continues ↓` cue.
@@ -268,7 +266,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 - Output: `✅ Plan created at: {output}/overview.html`
 - Say the diagram mode (diagram-design or manual).
-- List the use cases (one line each), the ER diagram page(s), and which mock was built (standalone, in-project with its folder, or none).
+- List the use cases (one line each), the ER diagram page(s), and whether the mock was built.
 - Scenarios: the total, the count per use case and channel and how many are playable, copied from the script output, plus the path of `use-cases.js` (play-scenarios and e2e-test read it too).
 - Acceptance criteria: the summary line from `acceptance-section.js` (`N criteria · M covered on every channel · K gaps`), then each gap as `US<n> · AC<m>: no <channel> scenario`, and each `n/a` channel with its reason, one line each.
 - Spec vs code: each mismatch the script printed, one line each (`M1 FR-017 (fix the spec): …`). They need the user's decision. Say how many scenarios are from the spec only (`check.js` evidence line) when there are any.

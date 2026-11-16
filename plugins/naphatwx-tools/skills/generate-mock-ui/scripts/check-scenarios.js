@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Checks a standalone mock against the plan's scenarios (<mock-dir>/../use-cases.js): every ui scenario has one play
 // entry with a real state and page; mcp / api / job scenarios have none (they show as "No mock"). Syntax-checks all scripts.
+// Free play covers every scenario: each preset is built from the drawer's data, role and faults, each page is in the nav.
 // Usage: node check-scenarios.js <mock-dir> [--use-cases <file>] [--json]. Exit 1 on any error.
 
 const fs = require('fs');
@@ -63,19 +64,19 @@ catch (e) { errors.push(`shared/scenario-play.js is missing or not strict JSON: 
 // The merged view the pages see: each scenario plus its play entry.
 const SCS = CORE.map(s => ({ ...s, ...(PLAY.find(p => p.id === s.id) || {}) }));
 
-/** states.js in a VM (location stubbed), for its state ids. */
-function stateIdsOf() {
+/** states.js in a VM (location stubbed): its preset ids and nav pages. Throws on a preset the drawer can't pick. */
+function statesOf() {
     const ctx = { URLSearchParams, location: { search: '', pathname: '/page/x.html', hash: '' } };
     vm.createContext(ctx);
     for (const f of ['contract/rules.js', 'shared/states.js']) {
         // top-level const/let would stay script-scoped; var makes them reachable from runInContext
         vm.runInContext(read(f).replace(/^(const|let) (\w+) =/gm, 'var $2 ='), ctx, { filename: f });
     }
-    return vm.runInContext('States.LIST.map(s => s.id)', ctx);
+    return vm.runInContext('({ ids: States.LIST.map(s => s.id), pages: States.PAGES.map(p => p.file) })', ctx);
 }
 
-let stateIds = [];
-try { stateIds = stateIdsOf(); }
+let stateIds = [], navPages = null;
+try { ({ ids: stateIds, pages: navPages } = statesOf()); }
 catch (e) { errors.push(`could not load shared/states.js: ${e.message}`); }
 
 const SURFACES = ['ui', 'mcp', 'api', 'job'];
@@ -105,6 +106,7 @@ for (const s of SCS) {
     for (const k of ['state', 'page', 'steps']) if (s[k] == null || s[k] === '' || (k === 'steps' && !s[k].length)) errors.push(`${s.id}: missing ${k}`);
     if (stateIds.length && !stateIds.includes(s.state)) errors.push(`${s.id}: state ${s.state} is not in states.js`);
     if (!fs.existsSync(path.join(dir, 'page', `${s.page}.html`))) errors.push(`${s.id}: page/${s.page}.html does not exist`);
+    else if (navPages && !navPages.includes(`page/${s.page}.html`)) errors.push(`${s.id}: page/${s.page}.html is not in States.PAGES, so free play can't reach it`);
 }
 USE_CASES.forEach(c => { if (!CORE.some(s => s.useCase === c.id) && !c.none) errors.push(`use case ${c.id} has no scenario and no "none" sentence`); });
 

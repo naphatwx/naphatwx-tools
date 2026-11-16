@@ -24,6 +24,19 @@ mock/page/<screen>.html?state=<state id>
 
 The pink, dashed **Mock state** panel on that screen switches states. It is mock-only, not part of the product.
 
+## Free play
+
+Click **Free play →** at the top of `index.html`. You use the screens like the real app:
+
+- The app's nav moves between every screen. Data you create on one screen shows on the others.
+- The pink **Free play** drawer changes what you play with. The screen reloads with your pick.
+    - **Preset**: one of the mock states the scenarios use. It sets the three fields below.
+    - **Data**: the data set the screens open on.
+    - **Role**: who you are signed in as, with that role's permissions.
+    - **Faults**: upstream failures to turn on.
+    - **Reset mock data**: drop what you created.
+- Every scenario can be reached from here with the right pick.
+
 ## Using it
 
 ```mermaid
@@ -60,10 +73,10 @@ graph TD
 | `contract/rules.js` | The spec's rules and screen texts; the screens and their data run them |
 | `contract/data.js` | Mock data in the real upstream shapes |
 | `shared/scenario-play.js` | How to play each screen scenario: state, page, steps |
-| `shared/states.js` | The screens, and each mock state's data, permissions and faults |
+| `shared/states.js` | The screens (the nav), the data sets, roles and faults, and each mock state's pick of them |
 | `shared/fake-api.js` | Local data for the screens: the real operation names, request and answer shapes |
 | `shared/components.js` | The app's component class strings |
-| `shared/shell.js` | The app's chrome, plus the mock-only state / scenario panel |
+| `shared/shell.js` | The app's chrome and nav, plus the mock-only state / scenario / free-play panel |
 | `../use-cases.js` | The use cases and scenarios this mock plays |
 
 ## When it fails

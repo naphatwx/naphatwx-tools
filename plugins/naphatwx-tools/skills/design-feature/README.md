@@ -31,8 +31,8 @@ graph TD
     M2 --> CP
     CP --> S3[3. fan out section agents, in parallel]
     S3 --> S4["4. merge .parts/ into overview.html, run scenarios-panels.js + acceptance-section.js"]
-    S4 --> S5{"5. which mock?"}
-    S5 -->|in project or standalone| GM[generate-mock-ui]
+    S4 --> S5{"5. build the mock?"}
+    S5 -->|yes| GM[generate-mock-ui]
     S5 -->|no mock, or no UI| S6
     GM --> S6[6. verify links, diagrams, presentation mode]
     S6 --> S6b["6b. mock review: two fresh reviewers, one fix agent"]
@@ -118,10 +118,9 @@ Output:
 ├── api/
 │   └── contracts.html         one block per method: its request and response, side by side
 ├── use-cases.js               use cases, scenarios and acceptance criteria, by generate-use-case
-└── mock/                      optional standalone mock, by generate-mock-ui
+└── mock/                      optional mock, by generate-mock-ui
 ```
 
-An in-project mock lives in the app instead, at `<routes-root>/mock/<spec-slug>/`.
 
 Step 8 (only when asked) writes a publish copy outside the plan folder: `overview.html` becomes `index.html`, and links lose `target="_blank"`.
 

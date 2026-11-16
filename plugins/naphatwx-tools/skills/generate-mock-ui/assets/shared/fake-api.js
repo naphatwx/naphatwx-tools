@@ -1,7 +1,7 @@
 // Mock-only stand-in for the operations the screens call, named exactly as in contract/types.ts.
 // Serves contract/data.js through contract/rules.js, so screens get real answer shapes; swap for the real client.
 // Writes and the side-effect log persist in sessionStorage under STORE, so they survive page changes;
-// index.html clears every STORE key when a scenario starts, so each one starts clean.
+// index.html clears every STORE key when a scenario starts, so each one starts clean; free play keeps them until Reset.
 
 var FakeApi = (function () {
     const D = MOCK_DATA, st = States.current;

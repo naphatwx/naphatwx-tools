@@ -412,7 +412,10 @@
     <div class="float-bar no-print"><button type="button" onclick="clearAll()" title="Clear every Pass / Fail and note, to test again">Clear all</button></div>
     <div class="page py-6 space-y-8">
         <header>
-            <a href="../overview.html#use-cases" class="link">← Feature plan</a>
+            <div class="flex gap-6">
+                <a href="../overview.html#use-cases" class="link">← Feature plan</a>
+                <a id="free-play" class="link">Free play →</a>
+            </div>
             <h1 class="font-bold mt-2">Mock UI · Feature name</h1>
         </header>
 
@@ -681,6 +684,7 @@
         const playableOf = useCaseId => scenariosOf(useCaseId).filter(isPlayable);
         const SURFACE = { mcp: 'MCP', api: 'API', job: 'Job' };
         const stateOf = scenario => States.LIST.find(s => s.id === scenario.state);
+        document.getElementById('free-play').href = `${States.PAGES[0].file}?free=1`;
         const isCore = scenario => scenario.core === true;
         const kindPill = scenario => scenario.kind ? `<span class="scenario-kind ${UI.esc(scenario.kind)}">${UI.esc(scenario.kind)}</span>` : '';
         const corePill = scenario => isCore(scenario) ? '<span class="core-pill" title="Core: play first">Core</span>' : '';

@@ -47,9 +47,9 @@ Agent: general-purpose.
 Question: **"Does every scenario behave as the spec says?"**
 
 - Only `ui` scenarios play in the mock. `mcp`, `api` and `job` ones show "No mock" and are not reviewed here.
-- Standalone mock: open each `ui` scenario's screen in a headless browser and follow its steps, or load the mock's JS into a Node `vm` (stub `location`, `sessionStorage`, `window`; `scripts/check-scenarios.js` loads `states.js` this way).
+- Open each `ui` scenario's screen in a headless browser and follow its steps, or load the mock's JS into a Node `vm` (stub `location`, `sessionStorage`, `window`; `scripts/check-scenarios.js` loads `states.js` this way).
     - Call the operations the screen calls (`fake-api.js`) with the params it sends, and check the data supports each step (the MR, version or row the step names exists, the filter returns what `expect` says).
-- In-project mock: read `_mock/use<Screen>.ts` and `rules.ts`, and trace each scenario through them.
+- Free play (`page/<first screen>.html?free=1`): reach each `ui` scenario from the nav and the drawer alone, without its deep link. Report a scenario that can't be reached that way.
 - Compare every code and exact message with `spec.md` and `contracts/`.
 - Read the screen logic for dead buttons, wrong or ignored query params, and state leaking between frames (storage keys the index does not clear).
 - List every acceptance scenario, edge case and refusal row in the spec that has **no** scenario in `<plan>/use-cases.js`, and every `ui` scenario with no play entry.
