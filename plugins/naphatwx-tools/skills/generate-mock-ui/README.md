@@ -82,7 +82,7 @@ Free play. Every mock state is one pick of data, role and faults, so every scena
 
 ```mermaid
 graph LR
-    IDX["index.html: Free play →"] --> PG["page/first-screen.html?free=1"]
+    IDX["index.html: Free play ↗"] --> PG["page/first-screen.html?free=1"]
     PG -->|nav: States.PAGES| PG2[other screens]
     PG2 --> PG
     DR["pink drawer: preset, data, role, faults"] -->|reload with the new pick| PG

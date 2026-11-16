@@ -10,7 +10,7 @@ Build `<plan>/mock/` — a clickable mock of a planned feature that opens straig
 
 - Its index shows the same tree as every skill that plays or tests the feature: each **use case**, then its **scenarios** in file order, each with a small surface tag (`ui` / `mcp` / `api` / `job`) and a **Core** pill on core scenarios. The picked scenario's title shows its kind (`basic`, `alternate`, `exception`) and the Core pill. One sticky search bar (title search, Type, Kind, Core only) narrows every list.
 - A `ui` scenario plays on the real screen in a frame.
-- **Free play** (always built): `page/<first screen>.html?free=1`, linked as "Free play →" from the index. The app's nav links every screen, data written on one screen shows on the others, and a pink drawer changes the data set, role and faults live. Every mock state is one pick of those three, so every `ui` scenario can be reached by playing freely.
+- **Free play** (always built): `page/<first screen>.html?free=1`, linked as "Free play ↗" from the index. The app's nav links every screen, data written on one screen shows on the others, and a pink drawer changes the data set, role and faults live. Every mock state is one pick of those three, so every `ui` scenario can be reached by playing freely.
 - An `mcp`, `api` or `job` scenario stays in the tree, greyed. Picking it shows an empty frame with "No mock". There is no fake API call, console or request / response play for it: the `play-scenarios` and `e2e-test` skills cover those.
 
 The use cases and scenarios are not written here. They live in `<plan>/use-cases.js`, written by the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code). It is the one source for every skill that plays or tests the feature. This skill only adds how to play each `ui` scenario. A mock **state** (`shared/states.js`) is not a scenario: it is the data, permissions and faults a screen starts with, and several scenarios can share one.
@@ -160,7 +160,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 
 Keep the template's layout; only change the header text and `screenUrl()`. What it does, so you keep it working:
 
-- The header links "← Feature plan" and "Free play →" (the first screen in `States.PAGES`, `?free=1`).
+- The header links "← Feature plan" and "Free play ↗" (the first screen in `States.PAGES`, `?free=1`, in a new tab).
 
 - One block per use case, in plan order. Head, one line: `UC<n> <use case name>`, a `N refs` chip (click shows the trace IDs on the same line; Export PDF prints them) and a `plan` link (`../overview.html#uc-NN`). The head sits in the centered text column, above its use case row (not inside the list).
 - Every scenario of the use case gets a row in the list, in `use-cases.js` order. An `mcp`, `api` or `job` row is greyed (dashed disc). Opening it shows the frame with no screen: "No mock" and one line naming its surface ("MCP scenario — play it with play-scenarios or test it with e2e-test"); its details show only "What it should do" (`expect`), with no Pass / Fail. A use case with no scenario shows its `none` sentence.
@@ -200,7 +200,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
   `npx -y -p typescript@5 tsc --noEmit --allowJs --checkJs --strict --lib es2022,dom contract/types.ts contract/rules.js contract/data.js`
 - Open `index.html` and every page × state in a headless browser when one is available (`--allow-file-access-from-files`). Check the console for errors and look at the screenshots: each frame shows its screen scaled to fit, `#sc-<id>` opens the right scenario, a non-ui scenario shows "No mock", core rows show the Core pill, and the search bar (title text, Type, Kind, Core only) gives the right "n of N".
 - Play each `ui` scenario's steps in its frame and compare the screen with its `expect`, quoted texts word for word. A mismatch → read the code for the real text, then fix `rules.js`, the data or the page.
-- Free play: open "Free play →", move between every screen with the nav, and check data created on one screen shows on the others. Pick each preset in the drawer, then change data, role and each fault one at a time: the screen reloads with the new pick and the right controls show or hide.
+- Free play: open "Free play ↗", move between every screen with the nav, and check data created on one screen shows on the others. Pick each preset in the drawer, then change data, role and each fault one at a time: the screen reloads with the new pick and the right controls show or hide.
 - Check every relative `href` / `src` resolves to a file.
 - Grep for absolute local paths and remove them.
 
@@ -221,4 +221,4 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 - The review: both verdicts, findings by severity, how many were fixed, and each conflict with the side that won.
 - The layout review: files reviewed, count per verdict, and each problem not fixed.
 - List the pages and mock states, and what could not be copied from the real design system (logos, images, fonts), plus the CDNs the pages need.
-- Remind the user: open `mock/index.html` directly; no server or build is needed. "Free play →" in its header opens the free-play mode.
+- Remind the user: open `mock/index.html` directly; no server or build is needed. "Free play ↗" in its header opens the free-play mode.

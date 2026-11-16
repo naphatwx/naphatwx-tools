@@ -26,7 +26,7 @@ The pink, dashed **Mock state** panel on that screen switches states. It is mock
 
 ## Free play
 
-Click **Free play →** at the top of `index.html`. You use the screens like the real app:
+Click **Free play ↗** at the top of `index.html`. It opens in a new tab. You use the screens like the real app:
 
 - The app's nav moves between every screen. Data you create on one screen shows on the others.
 - The pink **Free play** drawer changes what you play with. The screen reloads with your pick.
