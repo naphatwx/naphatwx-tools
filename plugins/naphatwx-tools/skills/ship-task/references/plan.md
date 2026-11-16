@@ -1,6 +1,6 @@
 # Phase 1: Plan
 
-The main agent writes the plan straight to the task folder. It edits nothing but the plan. Two stops:
+The main agent writes the plan files straight to the task folder. It edits nothing but them. Two stops:
 the grill, and the plan summary at the end. Code starts only when the user says "implement".
 
 ## 1. Number and folder
@@ -28,10 +28,10 @@ only the user can start. Rounds go on until no decision is left open.
   list. A question the list does not cover but a lookup could → one read-only sub-agent checks the guides,
   the ADRs and similar code, for all such questions in the round.
   - Priority: a written rule (guide, ADR) beats a code pattern. Check the written rules first.
-  - Answered → don't ask. Write it under Decisions as `(rule: <file:line or guide section>)`.
+  - Answered → don't ask. Write it in `decisions.md` as `(rule: <file:line or guide section>)`.
   - Otherwise → ask. Two sources of the same rank that disagree don't answer it.
   - Show the settled ones at the top of the round, each with its source, so the user can overrule one.
-- Write each answer under Decisions as `D# <question> → <answer> (user | auto)`.
+- Write each answer in `decisions.md` as `D# <question> → <answer> (user | auto)`.
 - The user may defer a question ("answer later"). Write it under Open questions with who decides and the
   phase or task it blocks. Only the user can defer; the decider never does.
 - The grill ends when `grilling` asks to confirm shared understanding and gets a yes. That yes ends the
@@ -51,26 +51,39 @@ The user turns it on with "auto-answer" (or "auto") in the input or in any grill
 
 ## 4. Draft
 
-Write `tasks/NNN-<slug>/plan.md` from a template. Keep its section order.
+Write the task folder `tasks/NNN-<slug>/` from the templates. Keep each template's section order.
 
 - **Pick the size.**
-  - A bug fix with one cause → [plan-template-fix.md](../assets/plan-template-fix.md). Grow it into the full shape only when the fix needs a decision, a contract change or a migration.
-  - Anything else → [plan-template.md](../assets/plan-template.md).
-- **Required sections** (full shape): header, Goal, Status, Accept, Decisions, Tasks. Every other section and every `Data / API` sub-section is written only when it has content; delete it otherwise. Never write `- None.`
-- **One fact, one place.** A changed fact is replaced where it lives, with `(supersedes "<old>")`. Never keep old text, rounds or history.
-- **No restating.** A section never repeats another one in other words. When the task folder has `plan/api/` or `plan/database/` files, `Data / API` links them and keeps only what they lack.
+  - A bug fix with one cause → [plan-template-fix.md](../assets/plan-template-fix.md): one file, `plan.md`, with its tasks inside. Grow it into the full shape only when the fix needs a decision, a contract change or a migration.
+  - Anything else → the full shape, one file per kind of fact:
+
+    | File | Holds | Template |
+    |---|---|---|
+    | `plan.md` | header, Goal, Status, Open questions, Rules check, Accept, Edge cases, Out of scope, Risks, Changes per app, Verify locally, Release & rollback | [plan-template.md](../assets/plan-template.md) |
+    | `tasks.md` | Tasks | [tasks-template.md](../assets/tasks-template.md) |
+    | `decisions.md` | Decisions | [decisions-template.md](../assets/decisions-template.md) |
+    | `contracts.md` | Data / API | [contracts-template.md](../assets/contracts-template.md) |
+    | `research.md` | Context: facts checked, findings | [research-template.md](../assets/research-template.md) |
+    | `log.md` | dated history that git does not hold | none: `- YYYY-MM-DD {what changed}`, newest last |
+
+- **`plan.md` is the only file read on every resume.** It links the other files on its `Files:` line; drop the link of a file that is not written. No other file links a third one.
+- **Required** (full shape): `plan.md` with header, Goal, Status and Accept; `tasks.md`; `decisions.md`. Every other file, section and `contracts.md` sub-section is written only when it has content; delete it otherwise. Never write `- None.`
+- **One fact, one place.** A changed fact is replaced where it lives. Never write struck text (`~~…~~`) and never keep old text or rounds; what changed goes to `log.md` as one line, like `D160 replaced the live check in A7`.
+- **A decision that changes an older one** edits that D# in place. The new D# is one line: `D160 → see D158`.
+- **No restating.** A section never repeats another one in other words. When the task folder has `plan/api/` or `plan/database/` files, `contracts.md` links them and keeps only what they lack.
+- **A change after `Phase: done`** is a new task folder that cites the old one, not more lines in the old one.
 - **IDs:** A# accept, E# edge case, D# decision, Q# open question, R# risk, T# task. IDs never change once given; a dropped item keeps its number free.
 - **Accept:** each line is testable and names the role when it matters. A refusal gives its reason and exact message. Tag each line `(new)`, `(changed)` or `(removed)` against what the app does today; a `(changed)` line says `Before: …`.
 - **Edge cases:** failure paths, outside systems that refuse or time out, two users at once, data that is missing.
 - **Out of scope:** everything the grill left out, every "not in v1" and every known gap, with its source.
-- **Context:** facts the design rests on (counts, sizes, limits, current code behaviour, outside systems it relies on), each with the date and where it was checked. Facts go here, not in Decisions.
+- **Research:** facts the design rests on (counts, sizes, limits, current code behaviour, outside systems it relies on), each with the date and where it was checked. Facts go here, not in Decisions.
 - **Decisions:** grouped by topic, one line each, with a source: `(user | auto | rule: <source> | spec verify: <app> | decider)`. Mark a decision that needs a decision record `[ADR]` and add one line `why: … · rejected: …`; write `rejected: not recorded` rather than guess.
 - **Open questions:** only a question the user chose to defer. Each says who decides and the phase or task it blocks.
 - **Rules check:** only the project rules (the profile's `Rules check`, plus the Rules that apply list) not yet settled by a Decision, each saying when it gets checked. A settled rule lives on its decision as `(rule: …)`; delete its line here.
 - **Changes per app:** paths, marked `(new)` or `(edit)` when known.
 - **Status flow:** every entity with a status gets one diagram with every move and its trigger.
 - **Risks:** each ends in `→ mitigation: …` or `→ accepted (<who, date>)`.
-- **Tasks:** grouped by phase. Each task names one app, cites the A#, D# and E# it covers, and ends `· after: T###` when it waits on another; `after:` is the only record of order. Test tasks carry `[TEST]`; Phase 2 skips them, Phase 3 does them.
+- **Tasks:** grouped by phase. Each task names one app, cites the A#, D# and E# it covers, and ends `· after: T###` when it waits on another; `after:` is the only record of order. Test tasks carry `[TEST]`; Phase 2 skips them, Phase 3 does them. A ticked task is cut to one line: its id, app, a title of a few words and the IDs it cites.
 - **Verify locally:** the steps the user runs at the checkpoint, each citing the A# it shows.
 - **Release & rollback:** what must exist before deploy, merge order across repos, the first check after deploy, and how to undo it.
 - Every A# and E# has at least one code task and one test task.
@@ -84,7 +97,7 @@ the grill settled those.
 
 1. Start one fresh **spec verifier** per changed app (`roles.md`), all at once. They only read.
 2. A plan that touches another repo → one more verifier per repo.
-3. The main agent applies every fix to the plan itself and notes it under Decisions. A finding it disagrees with → the decider.
+3. The main agent applies every fix to the plan files itself and notes it under Decisions. A finding it disagrees with → the decider.
 4. A finding that changes scope or a user decision → back to the grill for that one question.
 5. A verifier never becomes that app's owner later.
 
@@ -92,7 +105,7 @@ the grill settled those.
 
 Set the status line to `Phase: 1 · … · Next: say "implement"` and fill `## Status`, then stop and end the turn. Report:
 
-- The plan path.
+- The task folder and the files written in it.
 - What will be built: the goal and the Accept lines, in short.
 - What changes per app, and the task count per app.
 - The decisions the user did not make (auto, spec verify, decider).

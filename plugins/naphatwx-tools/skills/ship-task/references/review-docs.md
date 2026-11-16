@@ -8,8 +8,8 @@
    - Names that cross apps (queues, topics, events, routes, permissions) match and follow the guide's naming rules.
    - Env vars and config flow through every layer that needs them.
    - The profile's `Cross-app checks`.
-   - Every A# and E# in the plan has code and a test behind it.
-   - Every `(rule: …)` decision still holds in the code, and every Rules check line is now settled.
+   - Every A# and E# in `plan.md` has code and a test behind it (`tasks.md` cites them).
+   - Every `(rule: …)` decision in `decisions.md` still holds in the code, and every Rules check line is now settled.
 3. **Collect all findings first.** Drop the ones that are wrong, and say why.
 4. **Fix in one batch.** Send each app's confirmed findings to its owner, `MODE: fix`, all at once.
 5. **Re-review only the fixed parts**, with a fresh reviewer. No gate runs here; Phase 6 covers the fixes.
@@ -20,7 +20,7 @@
 
 Main agent. Skip a step the profile does not list.
 
-1. **Project docs** (the profile's `Docs`): update the existing domain folder the feature belongs to. Create a new one only for a truly new domain. Follow the guide's doc rules (diagrams, decision records). Write one decision record per `[ADR]` decision in the plan, from its `why` and `rejected` lines.
+1. **Project docs** (the profile's `Docs`): update the existing domain folder the feature belongs to. Create a new one only for a truly new domain. Follow the guide's doc rules (diagrams, decision records). Write one decision record per `[ADR]` decision in `decisions.md`, from its `why` and `rejected` lines.
 2. **User docs** if the profile lists them. A page that needs new code goes to that app's owner. Run the user docs `after edit` command when it is set.
 3. **Final summary**, in chat:
    - What was built.

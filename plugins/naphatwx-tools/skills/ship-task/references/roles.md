@@ -12,7 +12,7 @@ Writes code and tests for one app. Runs codegen. Runs no checks.
 ```text
 ROLE: owner of <app> (<folder>). MODE: code | tests | fix.
 Read first: <app guide>, <root guide>.
-Task: <tasks from the plan, with ids>, and the A#, D# and E# lines they cite, pasted in full. Plan: <path to plan.md> (open it only for a fact the pasted lines lack).
+Task: <tasks from the plan, with ids>, and the A#, D# and E# lines they cite, pasted in full. Task folder: <path> (open `plan.md` or `contracts.md` there only for a fact the pasted lines lack).
 Rules:
 - Edit only files under <folder>. Need a change elsewhere → report it, do not edit.
 - MODE code: no test files. MODE tests: tests only, for the files listed. MODE fix: fix the listed errors; you may re-run only the failing test files.
@@ -28,7 +28,7 @@ Same agent type as the owner, a new instance. Reads only.
 
 ```text
 ROLE: reviewer of <app>. MODE: review only - do not edit.
-Read: <app guide>, <root guide>, the plan <path to plan.md>.
+Read: <app guide>, <root guide>, and in the task folder <path>: `plan.md`, `tasks.md`, `contracts.md`.
 Review: git diff <base>...HEAD -- <folder>  (plus uncommitted changes).
 Check: the diff against the guide's rules and the plan's tasks; bugs; missing edge cases; code that repeats existing helpers.
 Report numbered findings: severity (CRITICAL/HIGH/MEDIUM/LOW), file:line, the problem, the exact fix. No praise, no summary of the diff.
@@ -40,7 +40,7 @@ When the `review-code` skill is installed, the reviewer may follow it for the di
 
 ```text
 ROLE: spec verifier for <app>. MODE: review only - do not edit.
-Review the draft plan <path to the plan file> against <app guide>, <root guide> and the current code under <folder>.
+Review the draft plan (every file in the task folder <path>, `plan.md` first) against <app guide>, <root guide> and the current code under <folder>.
 Verify every fact the plan claims: file paths, symbols, field names, enum style, APIs, patterns cited as an example.
 Find edits that no task owns, and tasks that break a guide rule.
 Report numbered findings: severity (CRITICAL/HIGH/MEDIUM/LOW), the claim, what the code really has, the exact fix to the plan.
@@ -81,11 +81,11 @@ For each new test, it confirms the test fails when the code under test is broken
 
 ## Decider
 
-Settles a spec verify finding the main agent disputes in Phase 1. Answers grill rounds only when the user turned on auto-answer, and never the scope question (`plan.md` → Auto-answer). A question a project rule already answers is never put to it. Use the profile's `Decider agent` when it names one.
+Settles a spec verify finding the main agent disputes in Phase 1. Answers grill rounds only when the user turned on auto-answer, and never the scope question (`references/plan.md` → Auto-answer). A question a project rule already answers is never put to it. Use the profile's `Decider agent` when it names one.
 
 ```text
 ROLE: decider. You replace the user for this decision. Never defer back.
-Read: <root guide>, <app guides>, the plan <path>.
+Read: <root guide>, <app guides>, and in the task folder <path>: `plan.md`, `decisions.md`.
 Decide: <the finding and both positions>.
 Order of priority: security, project rules, the simplest working option, current best practice (search the web when the answer can go stale).
 Report per item:

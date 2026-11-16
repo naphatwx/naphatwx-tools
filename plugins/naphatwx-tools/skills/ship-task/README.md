@@ -24,7 +24,7 @@ flowchart TD
     START([/ship-task]) --> SU[Setup: create tasks/ at the repo root]
     SU --> P0
     subgraph P0["Phase 1 - Plan (edits nothing but the plan)"]
-        GR{{grilling: YOU answer, or auto-answer after scope}} --> DR[draft tasks/NNN-slug/plan.md]
+        GR{{grilling: YOU answer, or auto-answer after scope}} --> DR[draft the tasks/NNN-slug/ files]
         DR --> VER[spec verify: plan vs project rules, agent fixes]
         VER --> PS{{PLAN STOP: summary; you say implement}}
         PS -->|changes| GR
@@ -70,18 +70,26 @@ Output:
 
 ```
 tasks/NNN-<slug>/
-└── plan.md   always: status lines, Goal, Status, Accept (A#, new/changed/removed), Decisions (D#, [ADR]), Tasks
-              when needed: Edge cases (E#), Out of scope, Context, Open questions, Rules check (open only),
-              Changes, Data/API (links plan/ files), Risks, Verify locally, Release & rollback
+├── plan.md        always: status lines, Goal, Status, Accept (A#, new/changed/removed)
+│                  when needed: Open questions, Rules check (open only), Edge cases (E#), Out of scope,
+│                  Risks, Changes, Verify locally, Release & rollback
+├── tasks.md       always: open tasks in full, done tasks cut to one line
+├── decisions.md   always: D# by topic, [ADR], the last answer only
+├── contracts.md   when needed: Data/API (links plan/ files)
+├── research.md    when needed: facts checked, findings
+└── log.md         when needed: dated history that git does not hold
 ```
 
-- A bug fix with one cause gets a small plan: Goal (bug and cause), Status, Accept, Tasks.
-- A section with nothing to say is left out. Order lives only in each task's `after:`.
-- One fact lives in one place. A changed fact is replaced, marked `(supersedes …)`; no history piles up.
+- `plan.md` is the only file read on every resume. It links the others; they are read only when a step needs them.
+- A bug fix with one cause gets one small `plan.md`: Goal (bug and cause), Status, Accept, Tasks.
+- A file or section with nothing to say is left out. Order lives only in each task's `after:`.
+- One fact lives in one place. A changed fact is replaced, with one line in `log.md`; no struck text, no history in the plan.
+- A decision that changes an older one edits that D# in place; the new D# is one line, `D160 → see D158`.
+- A change after `Phase: done` is a new task folder that cites the old one.
 - Each owner agent gets its tasks plus the A#, D# and E# lines they cite, not the whole plan.
 - Tasks cite the A#, D# and E# they cover, so review can check every requirement has code and a test.
-- `## Status` is updated at every phase end, so a new session picks up from the file alone.
-- An older plan without these sections is moved to the new shape only when you say yes.
+- `## Status` is a snapshot, replaced at every phase end, so a new session picks up from `plan.md` alone.
+- An older plan (no IDs, or everything in one `plan.md`) is moved to the new files only when you say yes.
 
 Plus the code, tests and docs changes on the working branch. Nothing is committed unless you ask.
 
@@ -94,6 +102,7 @@ Plus the code, tests and docs changes on the working branch. Nothing is committe
 | [references/roles.md](references/roles.md) | Prompts for owner, reviewer, spec verifier, gate runner, decider |
 | [references/plan.md](references/plan.md) | Phase 1: number, explore, grilling and auto-answer, draft, spec verify, plan stop |
 | [assets/plan-template.md](assets/plan-template.md) | The full shape of `plan.md` |
+| `assets/tasks-template.md`, `decisions-template.md`, `contracts-template.md`, `research-template.md` | The other task files |
 | [assets/plan-template-fix.md](assets/plan-template-fix.md) | The small shape, for a bug fix with one cause |
 | [references/review-docs.md](references/review-docs.md) | Phases 4–5 |
 | [references/pre-merge.md](references/pre-merge.md) | Phase 6 and gates on request |
