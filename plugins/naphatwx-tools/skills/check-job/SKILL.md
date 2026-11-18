@@ -28,9 +28,11 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Never edit files, run git, or "try a fix". Explain only.
 - Never guess a cause the logs do not support. Say "not enough log evidence"
   instead.
+- Use the user's Jenkins MCP server, whatever its name. If there are several,
+  use the one the repo guide (`AGENTS.md`, `CLAUDE.md`) names, else the one
+  whose host matches the build URL. Still unclear → ask the user.
 - If the MCP returns an authentication error, tell the user the Jenkins MCP
-  needs credentials (`--jenkins-url`, `--jenkins-username`,
-  `--jenkins-password`) and stop.
+  needs credentials (Jenkins URL, user, API token) and stop.
 
 ## Workflow
 

@@ -35,7 +35,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## Rules
 
-- **Read the target repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, per-app guides). Their naming, permission, routing and "who edits what" rules win over this skill. If the repo routes app edits to specialist agents, send the code changes to them.
+- **Read the target repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, per-app guides). Their naming, permission, routing and "who edits what" rules win over this skill. If the repo routes app edits to specialist agents, send the code changes to them. A step needs a fact they don't give (the services, how they talk, the probe route) and the code doesn't show it → ask the user. Never guess.
 - **No real work on the smoke path**: no business writes, no notifications, no real builds, no git writes (`references/probe-contract.md` → Safety rules).
 - **Secrets never appear in plain text**, not in code, flow files, reports or chat. Only env var names and `sha256:<8 hex>` are shown.
 - **One HTML report per run.** Never hand over raw logs instead of it.

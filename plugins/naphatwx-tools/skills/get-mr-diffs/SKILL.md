@@ -35,7 +35,8 @@ One MR reference:
 ### 2. Fetch MR metadata (MCP)
 
 Use the user's GitLab MCP server, whatever its name. If there are several,
-pick the one whose host matches the MR URL or `origin`.
+use the one the repo guide (`AGENTS.md`, `CLAUDE.md`) names, else the one
+whose host matches the MR URL or `origin`. Still unclear → ask the user.
 
 Call `get_merge_request` (project_id + merge_request_iid). Note:
 

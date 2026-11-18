@@ -97,6 +97,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 2. Scan the app
 
+Read the repo's guide files first (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`). They often name the start command, roles, sign-in, the API that creates data and the MCP endpoint, and they win over this skill. A fact neither the guide nor the code shows → ask the user. Never guess.
+
 Delegate to a read-only sub-agent when the agent can. Ask for concrete answers with `file:line`:
 
 - **Start**: how the repo starts locally, as its docs say (`docker compose up -d`, `make dev`, `npm run dev`). Follow the repo's rules (e.g. "everything runs in Docker"). The web port, the API origin, a health route.

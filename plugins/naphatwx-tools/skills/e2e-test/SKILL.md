@@ -37,7 +37,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ## Rules
 
-- **Read the target repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, per-app guides). Their rules for where tests live, how to run tools and who edits app code win over this skill.
+- **Read the target repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, per-app guides). Their rules for where tests live, how to run tools and who edits app code win over this skill. A step needs a fact they don't give (roles, how to create test data, the MCP server) and the code doesn't show it → ask the user. Never guess.
 - **Test source is the latest version, by domain; reports are by spec.** Tests live in `<e2e-dir>/<domain>/` and always match the latest code. Each round (a new spec on the same domain) edits them in place: never a spec folder name or a `UC<n>` in a test file name, because `UC<n>` restarts in every `use-cases.js`. The spec's own record is its `use-cases.js` and its report folder, `e2e-results/<spec>/` (one per spec, updated by every run). A repo guide with its own layout wins.
 - **`use-cases.js` is the one source.** Read it directly; never another skill's output (no mock, no play-scenarios files). Never write your own test cases or scenarios. A missing or wrong scenario is a finding: fix it with the `generate-use-case` skill (`naphatwx-tools:generate-use-case` in Claude Code), then test again.
 - **One test per scenario**, same id, in file order. Every surface is tested: `ui`, `api`, `mcp`, `job`. The surface only picks the runner.
