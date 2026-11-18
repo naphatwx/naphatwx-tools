@@ -1,6 +1,6 @@
 # setup-device
 
-Installs the MCP servers and plugins the naphatwx skills use, on a new or existing machine. You paste the secrets yourself.
+Installs the runtimes, MCP servers and plugins the naphatwx skills use, on a new or existing machine. You paste the secrets yourself.
 
 ## When to use it
 
@@ -9,6 +9,15 @@ Installs the MCP servers and plugins the naphatwx skills use, on a new or existi
 - Say: "set up this device", "install my tools", "update my MCP servers".
 
 ## What it installs
+
+| Runtime | Through | Version |
+|---------|---------|---------|
+| Node + npm | nvm | 24 LTS |
+| Python | uv | 3.14 |
+| Java | SDKMAN | 25 LTS (Temurin) |
+| uv | its own installer | latest |
+
+It installs a missing version manager first, and only adds versions: it never removes one or touches the OS Python.
 
 | Tool | Kind | Used by |
 |------|------|---------|
@@ -24,11 +33,11 @@ Installs the MCP servers and plugins the naphatwx skills use, on a new or existi
 
 ```mermaid
 graph TD
-    A[check: versions, mcp list, plugin list] --> B{mode}
+    A[check: runtimes, MCP name + status, plugin list] --> B{mode}
     B -->|check| R[report table]
-    B -->|install| Q[ask: tools, envs, hosts, connections]
+    B -->|install| Q[ask: tools, envs, hosts, connections, defaults]
     B -->|update| U[run each tool's update command]
-    Q --> P[prerequisites: ask before installing Node / uv / Python]
+    Q --> P[runtimes: manager first nvm / uv / SDKMAN, then the version]
     P --> I[install plugins, add MCP servers with PASTE_ placeholders]
     I --> S[you paste secrets into ~/.claude.json]
     S --> V[grep PASTE_ count, mcp list] --> R
@@ -37,12 +46,13 @@ graph TD
 
 - MCP servers are named `<tool>-<env>-mcp` at user scope: `gitlab-prod-mcp`, `jenkins-prod-mcp`, `omnisql-local-mcp`.
 - It never sees your tokens. It never overwrites a server or plugin you already have.
+- It reads `claude mcp list` as name and status only, so a token in a server's args never shows.
 - The Jenkins token goes in an env var, not in the command args, so `ps` does not show it.
 
 ## Input → output
 
 ```
-setup-device [all | <tool> ...] [check | update]
+setup-device [all | <tool or runtime> ...] [check | update]
 ```
 
 Output: a table per tool (installed, already there, updated, needs secret, skipped, failed) and the steps left for you.

@@ -1,7 +1,7 @@
 ---
 name: setup-device
-description: Install the MCP servers and plugins these skills and the user rely on (GitLab, Jenkins and OmniSQL MCP; diagram-design, mattpocock-skills, ui-ux-pro-max and impeccable plugins) on a new or existing machine. Secrets are left as placeholders for the user to paste. Use when the user says "set up this device", "install my tools" or "update my MCP servers".
-argument-hint: "[all | <tool> ...] [check | update]"
+description: Install the runtimes (Node via nvm, Python via uv, Java via SDKMAN), MCP servers and plugins these skills and the user rely on (GitLab, Jenkins and OmniSQL MCP; diagram-design, mattpocock-skills, ui-ux-pro-max and impeccable plugins) on a new or existing machine. Secrets are left as placeholders for the user to paste. Use when the user says "set up this device", "install my tools" or "update my MCP servers".
+argument-hint: "[all | <tool or runtime> ...] [check | update]"
 disable-model-invocation: true
 ---
 
@@ -17,7 +17,7 @@ $ARGUMENTS
 
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the user's message.
 
-- Tool names (`gitlab`, `jenkins`, `omnisql`, `diagram-design`, `mattpocock-skills`, `ui-ux-pro-max`, `impeccable`), or `all` (default).
+- Tool names (`gitlab`, `jenkins`, `omnisql`, `diagram-design`, `mattpocock-skills`, `ui-ux-pro-max`, `impeccable`), runtime names (`node`, `python`, `java`, `uv`), or `all` (default).
 - `check`: report only, change nothing.
 - `update`: update what is installed; add nothing new.
 
@@ -27,7 +27,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - **Never overwrite or remove** an existing server or plugin. Same name already there → skip it and say so. Replace only when the user asks, and confirm first.
 - **MCP names**: `<tool>-<env>-mcp` at user scope, e.g. `gitlab-prod-mcp`, `omnisql-local-mcp`. One server per env.
 - **Hosts, user names and connection names come from the user.** Never guess them, never write them into any file of this plugin.
-- **Install system runtimes only with a yes.** Missing Node, `uv` or Python → show the install command and ask.
+- **Runtimes go through a version manager**: Node via nvm, Python via uv, Java via SDKMAN. Never install a runtime with `brew` or a system installer. Missing manager → install it first, with a yes.
+- **Only add versions.** Never remove a runtime version, and never touch the OS Python. Changing a default version needs a yes.
 - The commands are for Claude Code. For another agent, use the Codex or "other agents" line in `references/tools.md`; none listed → tell the user.
 - No filler text in the reply.
 
@@ -35,8 +36,15 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 Run and keep the results (names and versions only):
 
-- `claude --version`, `node -v`, `npm -v`, `uv --version`, `python3 --version`
-- `claude mcp list`: server names and status. Never `claude mcp get`: it prints env values.
+- `claude --version`
+- Runtimes and managers: the "Check" lines in `references/tools.md` → Runtimes.
+- MCP servers, name and status only. The raw `claude mcp list` prints each server's command, and a token passed as an argument would show:
+
+  ```bash
+  claude mcp list | perl -ne 'print "$1 - $2\n" if /^(.*?): .* - ([✔✘!].*)$/'
+  ```
+
+  Never run plain `claude mcp list` or `claude mcp get`: they print args and env values.
 - `claude plugin list`: installed plugins and versions.
 
 `check` mode → go to step 6.
@@ -45,13 +53,22 @@ Run and keep the results (names and versions only):
 
 Use AskUserQuestion when the agent has it; else ask in one message.
 
-- Which tools, when `$ARGUMENTS` named none. Default: all that are missing.
+- Which tools and runtimes, when `$ARGUMENTS` named none. Default: all that are missing or older than the recommended version.
+- Whether to make each new runtime version the default (nvm alias, uv `--default`, SDKMAN default).
 - For each MCP tool: its envs (`prod`, `dev`, `local`, …). Per env, the non-secret values `references/tools.md` lists under "Ask" (API URL, Jenkins URL and user, allowed connections, read only or not).
 - Existing servers of that tool: show their names and offer to keep them.
 
-## 3. Prerequisites
+## 3. Runtimes
 
-Per tool, check its "Needs" line. Missing → show the install command (e.g. `brew install uv`), ask, run it on a yes, else skip that tool.
+Follow `references/tools.md` → Runtimes, in its order (uv, Node, Python, Java):
+
+1. Manager missing → show its install command, ask, run it on a yes. No → skip that runtime and the tools that need it.
+2. Recommended version missing → install it through the manager.
+3. Default change → only on a yes from step 2.
+
+Every new shell must load nvm and SDKMAN first (the "Load" line); a plain `nvm` or `sdk` call fails in a non-interactive shell.
+
+Per tool, check its "Needs" line against the result. Still missing → skip that tool and say why.
 
 ## 4. Install
 
@@ -73,13 +90,13 @@ For each server with a placeholder, tell the user:
 3. Where to make that secret (from `references/tools.md`).
 4. Restart the agent, or reconnect with `/mcp`.
 
-Then wait. Check without reading values: `grep -c PASTE_ ~/.claude.json` (0 when done) and `claude mcp list`.
+Then wait. Check without reading values: `grep -c PASTE_ ~/.claude.json` (0 when done) and the filtered MCP list from step 1.
 
 ## 6. Report
 
 One table, one row per tool and server:
 
-| Tool | Server / plugin | Status | Next step |
-|------|-----------------|--------|-----------|
+| Tool | Server / plugin / version | Status | Next step |
+|------|---------------------------|--------|-----------|
 
-Status: installed, already there, updated, needs secret, skipped (why), failed (error). Then the one-time steps the user still has (e.g. `/setup-matt-pocock-skills` in each repo).
+Runtimes get rows too (manager, version, default). Status: installed, already there, updated, needs secret, skipped (why), failed (error). Then the one-time steps the user still has (e.g. `/setup-matt-pocock-skills` in each repo).

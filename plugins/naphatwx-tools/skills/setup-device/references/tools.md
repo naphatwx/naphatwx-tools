@@ -3,6 +3,49 @@
 One section per tool. `<env>` is the name the user picks (`prod`, `dev`, `local`, `shared`).
 Values in `<angle brackets>` come from the user. `PASTE_<VAR>` is a placeholder the user replaces by hand.
 
+## Runtimes
+
+Each runtime goes through its version manager. Install the manager first when it is missing. Order: uv, Node, Python, Java.
+
+| Runtime | Manager | Recommended | Needed by |
+|---------|---------|-------------|-----------|
+| uv | itself | latest | Jenkins MCP (`uvx`), Python |
+| Node + npm | nvm | 24 LTS | GitLab MCP (20+), OmniSQL MCP (`^22.15` or 24+), `npx` installs |
+| Python | uv | 3.14 | ui-ux-pro-max script, diagram-design PNG export |
+| Java | SDKMAN | 25 LTS, Temurin | the user's own projects (no tool here needs it) |
+
+Update the "Recommended" column when a new LTS line is out (Node: even majors, LTS each October; Java: LTS every 2 years).
+
+### uv
+
+- Check: `uv --version`
+- Install manager: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- Update: `uv self update` (installer copy). Installed with `brew` → `brew upgrade uv`.
+
+### Node (nvm)
+
+- Load: `export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"`
+- Check: `nvm --version`, `nvm ls`, `node -v`, `npm -v`
+- Install manager: run `install.sh` of the latest release tag at https://github.com/nvm-sh/nvm (`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/<tag>/install.sh | bash`).
+- Install: `nvm install 24`
+- Default (with a yes): `nvm alias default 24`
+- npm comes with Node. Global npm packages belong to one Node version: after a new default, run `npm i -g omnisql-mcp@latest` again.
+
+### Python (uv)
+
+- Check: `uv python list --only-installed`
+- Install: `uv python install 3.14`
+- Default (with a yes): `uv python install 3.14 --default`. It adds `python` and `python3` to `~/.local/bin`. Older uv asks for `--preview` too.
+- Never change or remove the OS Python (`/usr/bin/python3`) or a `brew` Python.
+
+### Java (SDKMAN)
+
+- Load: `. "$HOME/.sdkman/bin/sdkman-init.sh"`
+- Check: `sdk version`, `sdk current java`, `ls ~/.sdkman/candidates/java`
+- Install manager: `curl -s "https://get.sdkman.io" | bash`
+- Install: find the newest `25.*-tem` id in `sdk list java`, then `sdk install java <id>`. SDKMAN asks to make it default: answer with the user's choice.
+- Keep older versions: projects may need them.
+
 ## MCP servers
 
 Server name: `<tool>-<env>-mcp`, user scope. One server per env.
@@ -50,7 +93,7 @@ claude mcp add jenkins-<env>-mcp --transport stdio --scope user \
 
 - Repo: https://github.com/srthkdev/omnisql-mcp (npm `omnisql-mcp`)
 - Needs: Node `^22.15` or 24+ (`node -v`). DuckDB needs the `duckdb` CLI; RDS IAM needs the `aws` CLI.
-- Install the binary once: `npm i -g omnisql-mcp@latest`
+- Install the binary once per Node version: `npm i -g omnisql-mcp@latest`
 - Connections: read from the DBeaver workspace, or from a JSON file set by `OMNISQL_CONFIG_FILE`. The user sets them up there; this skill never reads them.
 - Ask: the connection names each server may use (`<connections>`, comma separated), and whether it may write.
 - Secret: none in the MCP config. In JSON mode, the env vars that each connection's `passwordEnv` / `urlEnv` names.
