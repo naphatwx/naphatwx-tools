@@ -5,8 +5,6 @@ description: Commit your staged changes with a conventional commit message writt
 allowed-tools: Bash
 ---
 
-Commit staged changes with a conventional commit message.
-
 ## Steps
 
 1. Run `git diff --staged`. If empty → stop silently.
@@ -42,5 +40,4 @@ Parse short hash and diffstat from `git commit` output. Use the message you gene
 
 Rules:
 
-- Wrap message in a fenced block, no language tag, preserve blank lines.
-- Include trailers exactly as committed. No leading `> ` quote.
+- Include trailers exactly as committed.

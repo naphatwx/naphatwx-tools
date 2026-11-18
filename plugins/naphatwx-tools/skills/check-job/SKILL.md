@@ -4,14 +4,10 @@ description: Watch a Jenkins build from its URL until it ends, then explain any 
 argument-hint: <jenkins-build-url>
 context: fork
 background: false
-allowed-tools: Bash(sleep:*), mcp__jenkins__get_item, mcp__jenkins__get_build, mcp__jenkins__get_build_failure_excerpt, mcp__jenkins__get_build_console_tail, mcp__jenkins__get_build_console_chunk, mcp__jenkins__search_build_console, mcp__jenkins__get_build_test_report
+allowed-tools: Bash(sleep:*)
 ---
 
 # Check Jenkins Job
-
-Poll one Jenkins build until it finishes, verify the result, and explain any
-failure in plain words. This command is **read-only**. It reports; the user
-decides what to do next.
 
 ## User Input
 
@@ -30,8 +26,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
   instead.
 - Use the user's Jenkins MCP server, whatever its name. If there are several,
   use the one the repo guide (`AGENTS.md`, `CLAUDE.md`) names, else the one
-  whose host matches the build URL. Still unclear → ask the user.
-  `allowed-tools` pre-approves only a server named `jenkins`; others prompt.
+  whose host matches the build URL. Still unclear → name the servers found
+  and stop.
 - Tool names below are the first choice. If the server lacks one, use its
   full console output tool (e.g. `get_build_console_output`) and search it
   yourself.
@@ -105,17 +101,13 @@ found, mention it as a warning.
 Gather evidence in this order. Stop early once the cause is clear.
 
 1. `get_build_failure_excerpt` - first failing block and failing tests.
-   No such tool → read the full console output and find the first failing
-   block yourself.
-2. `search_build_console` with targeted queries, `context_lines: 5`
-   (no such tool → search the full console output, 5 lines around each hit):
+2. `search_build_console` with targeted queries, `context_lines: 5`:
    - `ERROR`, `FAILED`, `Quality Gate`, `exit code`, `panic:`, `Exception`
    - the name of the failing stage if known
 3. `get_build_test_report` (or the server's test-failures tool, e.g.
    `get_build_test_failures`) when the failure is in a test stage or
    `result` is `UNSTABLE`.
-4. `get_build_console_tail` (`max_bytes: 8000`) as the last fallback
-   (no such tool → the last ~8000 bytes of the full console output).
+4. `get_build_console_tail` (`max_bytes: 8000`) as the last fallback.
 
 Do not dump whole logs. Quote only the lines that prove the cause.
 
@@ -144,17 +136,12 @@ Use this shape:
 
 **Next step**
 - End with: "Review the evidence above before any fix is made."
-- Do not propose a patch. If the user asks for one afterwards, that is a
-  separate request.
 
 ## Common Failure Patterns
 
 - **SonarQube Quality Gate `Failed`**: coverage on new code below threshold,
   new issues, or duplicated lines. Point to the Sonar project for the module.
-- **Test stage red**: list failing test names from the test report, plus the
-  first assertion message.
 - **Build / compile error**: quote the compiler line with file and line
   number.
 - **Docker / image build error**: quote the failing `RUN` step.
 - **Timeout or agent lost**: say the pipeline was cut off. Not a code issue.
-- **`ABORTED`**: report the user or trigger that stopped it.

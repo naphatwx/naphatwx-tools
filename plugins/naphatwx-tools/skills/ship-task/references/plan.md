@@ -1,8 +1,5 @@
 # Phase 1: Plan
 
-The main agent writes the plan files straight to the task folder. It edits nothing but them. Two stops:
-the grill, and the plan summary at the end. Code starts only when the user says "implement".
-
 ## 1. Number and folder
 
 - Task folder: `tasks/NNN-<slug>/`, with the next number from Setup (`SKILL.md` → Start).
@@ -71,7 +68,6 @@ Write the task folder `tasks/NNN-<slug>/` from the templates. Keep each template
 - **One fact, one place.** A changed fact is replaced where it lives. Never write struck text (`~~…~~`) and never keep old text or rounds; what changed goes to `log.md` as one line, like `D160 replaced the live check in A7`.
 - **A decision that changes an older one** edits that D# in place. The new D# is one line: `D160 → see D158`.
 - **No restating.** A section never repeats another one in other words. When the task folder has `plan/api/` or `plan/database/` files, `contracts.md` links them and keeps only what they lack.
-- **A change after `Phase: done`** is a new task folder that cites the old one, not more lines in the old one.
 - **IDs:** A# accept, E# edge case, D# decision, Q# open question, R# risk, T# task. IDs never change once given; a dropped item keeps its number free.
 - **Accept:** each line is testable and names the role when it matters. A refusal gives its reason and exact message. Tag each line `(new)`, `(changed)` or `(removed)` against what the app does today; a `(changed)` line says `Before: …`.
 - **Edge cases:** failure paths, outside systems that refuse or time out, two users at once, data that is missing.

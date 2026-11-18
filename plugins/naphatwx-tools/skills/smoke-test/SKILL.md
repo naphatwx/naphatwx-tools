@@ -10,16 +10,6 @@ A smoke test answers one question after a deploy: **can every service in a real 
 
 It does this with a **simulation probe**. One API/RPC call sends a marked message down the real path, through the real clients, transports and credentials. Every service records that it got the message and which env vars it used, passes it on, and skips the real side effect. A runner script in the repo triggers the probe and checks each hop from outside.
 
-```text
-setup (once per flow)                         run (after each deploy)
-─────────────────────                         ───────────────────────
-quick map ─► pick flows                        read scripts/smoke/flows/*.json
-   ─► 1 explore agent per flow (parallel)      ─► node scripts/smoke/run.mjs <env>
-   ─► design + confirm                         ─► 1 HTML report
-   ─► build the probe in each service          ─► sum it up in chat
-   ─► write scripts/smoke/ (runner, flows)
-```
-
 ## User Input
 
 ```text
@@ -83,15 +73,9 @@ Merge the tables, as `references/explore-agent.md` → Merging describes. Then s
 ### S4. Build
 
 1. **Probe code** in each service, following `references/probe-contract.md`. Use the repo's own patterns:
-   - Handlers: put the new endpoints next to the existing ones.
-   - Messages: put the marker in the existing message header or metadata slot.
-   - Store: use what the entry service already has.
-   - Permissions: follow the repo's permission rules.
 2. **Runner** in `scripts/smoke/` (layout in `references/flow-map.md`):
    - Copy `assets/run.mjs` and `assets/report-template.html` unchanged. Run mode copies them again on every run (R1).
    - Copy `assets/README.md` to `scripts/smoke/README.md` unchanged: how teammates run it and read failures.
-   - The report is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
-   - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
    - Write `envs.json`, using the base URLs the repo's config files show for each env. Ask for any you cannot find.
    - Write one `flows/<flow>.json` per flow, filled from the hop table, with `mapVersion`.
    - Add `scripts/smoke/results/` and `scripts/smoke/.env` to `.gitignore`. Write `scripts/smoke/.env.example` with `SMOKE_ENV=` and `SMOKE_SPEC=`, no values.
@@ -118,7 +102,7 @@ Report:
 - `scripts/smoke/envs.json` and `flows/*.json` exist. If not, say "run `smoke-test setup` first" and stop.
 - Copy `assets/run.mjs` and `assets/report-template.html` over `scripts/smoke/`, unchanged, on every run, so the runner and the report are the plugin's newest. Never run an old copy as it is. List the files the copy changed (`git status`) in the reply.
 - `<env>` (argument, else `SMOKE_ENV`) is a key in `envs.json`. If not, list the known envs and ask.
-- No env given anywhere → use the repo's shared non-production env from `envs.json` (a dev or staging key), and say which. Never pick a production env on your own: a production smoke is never required, so run one only when the user names it.
+- No env given anywhere → use the repo's shared non-production env from `envs.json` (a dev or staging key), and say which.
 - The auth env vars named in the flow files are set. Check the names only, never print values. If any are missing, list them and stop.
 - **Deployed?** If the services expose a version or health endpoint, read it and say which version is under test.
 
@@ -130,19 +114,9 @@ node scripts/smoke/run.mjs <env> [flow ...] [--spec <spec>]
 
 - One report folder per spec, no timestamps: `scripts/smoke/results/<spec>/smoke-report-<env>.html`, or `results/_adhoc/` with no spec. Each env keeps one report there; its next run replaces it. `--out <dir>` overrides the folder.
 
-All flows run in parallel. In each flow the hops are checked in order, and each hop is polled until its own timeout. A hop that is never observed is `timed-out`. After the first failed or timed-out hop, the rest of that flow are `not-reached`, never red.
-
 ### R3. Read the report and sum it up
 
-Open the HTML file named on the last line of the output (`report: <path>`). It has the same layout as the e2e-test report: failed / passed counts and an All / Failed / Passed filter in the header, then one closed row per flow, failed flows first. Only one flow is open at a time: expanding one collapses the others. An opened failed flow shows its verdict and a copyable rerun command. For each failed flow, find the first failed hop and give a likely cause from its detail:
-
-| Detail | Likely cause |
-|---|---|
-| `NAME = used (expected want)` | Env var mismatch: the service runs with a different value than the flow map expects (a wrong queue name, URL or key). The detail already names the var and both values (secrets as `sha256:`). |
-| `not observed within N ms · K polls, last HTTP S` (timed out) | The message never arrived: wrong exchange, queue or route, consumer down, or a crash before the hop recorded. The hop shows the polled URL and its last answer: 404 on the store means the probe id is unknown there (wrong store, expired, or another replica). |
-| `HTTP 401/403` | A wrong or expired credential on that link. |
-| `HTTP 404` on the trigger | The probe endpoint is not deployed in this version. This is a blocker, not a failed smoke. |
-| Hop missing from the store but found on the service | The report-to-store call is failing. The link itself works. |
+Open the HTML file named on the last line of the output (`report: <path>`). For each failed flow, find the first failed hop and give a likely cause from its detail, using the "When it fails" table in `scripts/smoke/README.md`.
 
 Then review the report's layout with [references/layout-review.md](references/layout-review.md) (one fresh sub-agent). The report is built from the plugin's template, so it reports problems and doesn't patch the file.
 

@@ -1,13 +1,10 @@
 ---
 name: generate-changelog
 description: Generate a short changelog from a GitLab merge request diff, as one copy-paste code block grouped by spec or area. Use when the user says "changelog for this MR" or "what changed in !123". Output only; it never edits the MR (update-merge-request does).
-allowed-tools: Skill, Bash, Read, Glob, Grep, mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__list_merge_requests
+allowed-tools: Skill, Bash, Read, Glob, Grep
 ---
 
 # Changelog Writer
-
-Turn a GitLab merge request into a short changelog, ready to copy from one code
-block.
 
 ## User Input
 
@@ -17,19 +14,7 @@ $ARGUMENTS
 
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
 
-`$ARGUMENTS` is the MR to summarize, plus optional flags. Accepted forms:
-
-| Input | Meaning |
-|-------|---------|
-| Full MR URL | `https://gitlab.example.com/<group>/<project>/-/merge_requests/123` |
-| `<project_id>!<iid>` | e.g. `my-group/my-project!123` or `456!123` |
-| `!<iid>` or `<iid>` | MR in the current repo (resolve project from `git remote`) |
-
-Optional flags (anywhere in `$ARGUMENTS`):
-
-- `--tiny` — one bullet per area, no sub-bullets (shortest form).
-- `--full` — one section per area with sub-bullets (longest form).
-- Default (no flag) — one bullet per area with a short detail line.
+`$ARGUMENTS` is the MR to summarize (any form the `get-mr-diffs` skill accepts), plus an optional `--tiny` or `--full` flag anywhere (step 4).
 
 If `$ARGUMENTS` is empty, print usage and stop:
 
@@ -49,14 +34,7 @@ Strip the flags from `$ARGUMENTS`; keep the MR reference.
 
 ### 2. Fetch the MR changes
 
-Invoke the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code) with the MR reference. It
-resolves the project/IID, fetches metadata, and gets the diff (local git
-first, MCP fallback).
-
-Command-specific rules:
-
-- Do NOT use the MR title or description as a summarizing source — the diff is
-  the ONLY source for changelog content.
+Invoke the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code) with the MR reference. The diff is the only source for the changelog.
 
 ### 3. Summarize
 
@@ -91,7 +69,5 @@ labels that would get copied by accident.
 
 ## Notes
 
-- Reads a real MR over a GitLab MCP server (any server name works); if it is not authorized,
-  tell the user and ask them to paste the MR diff or changed-file list, then
-  continue from step 3.
+- The user pasted the diff instead (MCP not authorized) → continue from step 3.
 - One MR → one changelog.

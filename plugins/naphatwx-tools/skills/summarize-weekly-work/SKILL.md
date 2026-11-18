@@ -5,16 +5,12 @@ description: Summarize the user's git commits into up to 5 weekly achievement it
 
 # Work Log — Weekly Achievements from Git History
 
-Turn the user's git commits across all work repos into short achievement items
-ready to paste into a weekly report or achievements form.
-
 ## Inputs
 
 - **Date range** (optional): parse from the user's message (e.g., "29 June - 5 July",
   "last week", "week 28"). If absent, use the current week, Monday through Sunday.
-- Resolve relative dates against today's date. Weeks run Mon-Sun.
-- **Repos** (optional): if the user names one or more repos (e.g., "only api",
-  "api and web"), scan only those. Otherwise auto-discover.
+- Resolve relative dates against today's date.
+- **Repos** (optional): only the repos the user names (e.g., "only api", "api and web"); see below.
 - **Limits** (optional): item count and character cap from the user's message
   (e.g., "max 3 items, 200 chars"). Defaults: 5 items, 140 characters.
 
@@ -78,5 +74,4 @@ If the user named specific repos, resolve each name against the current director
 ## Notes
 
 - If no repo has commits in range, say so briefly — do not fabricate items.
-- If the user asks for fewer/more items, regenerate accordingly;
-  the character cap always applies.
+- If the user asks for fewer/more items, regenerate accordingly.

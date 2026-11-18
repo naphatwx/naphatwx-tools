@@ -6,20 +6,7 @@ argument-hint: "<MR url | !iid | branch | spec path | description>"
 
 # Deploy Plan
 
-Read what is being released, find every step it needs around the deploy, and write one HTML checklist.
-
 A deploy plan always means: merge the change into the default branch (`master` or `main`), cut a version, then deploy that version to production. Never ask which branch, env, promotion path or scope.
-
-```text
-input ─► get the change (MR diff, branch diff, spec)
-      ─► read the code behind each deploy-relevant change
-      ─► find the default branch and the next version
-      ─► build Pre-deploy, Deploy, Post-deploy and Rollback steps
-      ─► resolve "check" items with read-only tools
-      ─► re-read every step against the rules
-      ─► confirm the gaps left with the user
-      ─► fill assets/deploy-plan-template.html ─► one HTML file
-```
 
 ## User Input
 
@@ -48,7 +35,6 @@ Why: a plan that looks right but names the wrong table or the wrong order fails 
 - **Short by default.** Each step is one line. Add `detail` only when the step cannot be done without it: a value, a warning, a side effect. At most 2 short sentences. No filler, no restating `text` or `source`.
 - **Steps are actions.** Start each with a verb: "Run", "Set", "Check", "Tell". One action per step.
 - **Secrets never appear in plain text.** Name the env var, never its value.
-- **One HTML file per plan.**
 - **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## 1. Scope and target
@@ -132,19 +118,11 @@ Use read-only operations only. Read a tool's input schema first when it has one.
 
 ## 6. Re-read every step
 
-Before you show the plan, go through each step and fix what fails:
-1. Source: does it come from code, a migration, a script, a doc or a tool result?
-2. Timing: can it be done at this phase? Does it check something the release adds before the deploy?
-3. Command: are the names, tables, flags and log lines the exact ones in the code?
-4. Rollback: switch first; down migrations with the new image when the app migrates at boot; data loss named.
-5. Check items: did you try a read-only tool?
-6. Smoke: is there a smoke file for this change? If not, is the smoke step gone?
-7. Fixed and common steps: does Pre-deploy start with merge and cut version? Does each common step apply and can it be done as written?
-8. Length: one line, `detail` only when needed, at most 2 short sentences.
+Before you show the plan, check each step against the Rules and steps 3–5 (source, timing, exact names, rollback, check items, smoke, fixed steps, length) and fix what fails.
 
 ## 7. Confirm gaps
 
-Ask only about steps still marked `"check": true` that no read-only tool could answer. Never ask about branches, env, promotion path or scope. If no such step is left, skip this step.
+Ask only about steps still marked `"check": true` that no read-only tool could answer. If no such step is left, skip this step.
 
 Wait for answers. If the user says go on, keep those steps marked `check`.
 
@@ -152,10 +130,8 @@ Wait for answers. If the user says go on, keep those steps marked `check`.
 
 1. Copy `assets/deploy-plan-template.html` to `deploy-plans/<YYYY-MM-DD>-<slug>.html` at the repo root, unless the repo already has a place for deploy docs.
    - Updating a plan made earlier → write to the old file's path (keep its name and date): read its plan JSON first, copy the template over it, put the JSON back with the same `id` (the ticks are saved in the browser under it); never edit the old file in place. This keeps an old page from holding an old design: its theme blocks and page code come from the plugin's newest template every time.
-   - The page is dark only. Its styles come from the synced theme block: don't edit between the `theme:` markers.
 2. Replace `/*__PLAN_DATA__*/null` with the plan JSON below. Change nothing else in the file.
 3. Escape `</` as `<\/` inside JSON strings, so the script tag stays closed.
-4. The page has an **Export PDF** button (synced `theme:pdf` blocks). It opens the print dialog; pick "Save as PDF". The PDF shows every step with its current tick. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
 
 ```json
 {

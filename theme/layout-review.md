@@ -1,6 +1,6 @@
 # Layout review
 
-One fresh sub-agent per HTML file checks its layout in a browser and fixes what is broken. Run it after the skill's own Verify step, before the reply.
+One fresh sub-agent per HTML file checks its layout in a browser and fixes what is broken. Run it after the skill's own checks (its Verify step, when it has one), before the reply.
 
 Why fresh agents: the agent that wrote the page reads its own intent into it. A reviewer that only sees the rendered page sees what the user will see.
 
@@ -10,7 +10,7 @@ files written + verified
    ├── layout agent: file 2 ─┤  (in parallel, one per file)
    └── layout agent: file N ─┤
                              ▼
-        main agent fixes shared files, re-runs Verify
+        main agent fixes shared files, re-runs checks
 ```
 
 ## 1. List the files
@@ -52,5 +52,5 @@ files written + verified
 
 - Fix each `NEEDS MAIN` problem once, in the shared file.
 - The cause is a `theme:*` block or a template the skill copies unchanged → don't patch the output; tell the user it needs a fix in the plugin.
-- Anything changed → re-run the skill's Verify step.
+- Anything changed → re-run the skill's checks (its Verify step, when it has one).
 - Reply: files reviewed, count per verdict, and each problem not fixed.

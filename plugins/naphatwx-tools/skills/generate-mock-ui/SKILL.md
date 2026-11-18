@@ -8,7 +8,7 @@ argument-hint: <plan-folder | spec-folder> [frontend-app-path]
 
 Build `<plan>/mock/` — a clickable mock of a planned feature that opens straight from disk and doubles as the frontend contract. The mock is **only an interactive UI**: the app's real design system, with data shaped like the real API answers.
 
-- Its index shows the same tree as every skill that plays or tests the feature: each **use case**, then its **scenarios** in file order, each with a small surface tag (`ui` / `mcp` / `api` / `job`) and a **Core** pill on core scenarios. The picked scenario's title shows its kind (`basic`, `alternate`, `exception`) and the Core pill. One sticky search bar (title search, Type, Kind, Core only) narrows every list.
+- Its index shows the same tree as every skill that plays or tests the feature: each **use case**, then its **scenarios** in file order, each with a small surface tag (`ui` / `mcp` / `api` / `job`) and a **Core** pill on core scenarios.
 - A `ui` scenario plays on the real screen in a frame.
 - **Free play** (always built): `page/<first screen>.html?free=1`, linked as "Free play ↗" from the index. The app's nav links every screen, data written on one screen shows on the others, and a pink drawer changes the data set, role and faults live. Every mock state is one pick of those three, so every `ui` scenario can be reached by playing freely.
 - An `mcp`, `api` or `job` scenario stays in the tree, greyed. Picking it shows an empty frame with "No mock". There is no fake API call, console or request / response play for it: the `play-scenarios` and `e2e-test` skills cover those.
@@ -63,13 +63,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 8. **Mock-only UI is obvious**: the state / scenario / free-play panel stays pink and dashed. Nothing mock-only uses product styling.
 9. Wrap every `sessionStorage` / `localStorage` call in `try/catch`; the mock must still work when storage is blocked.
 10. No absolute local paths in any file. Code comments max 3 lines.
-11. **Use cases and scenarios are data, owned by `<plan>/use-cases.js`.** Never add, remove or rename one here; when one is wrong or missing, fix it with the `generate-use-case` skill. The mock adds only `shared/scenario-play.js`: one entry per `ui` scenario id, a strict-JSON array (double quotes, no trailing commas, no comments inside) so other tools can parse it after stripping `var NAME = `. Each use case's Scenarios view in the overview is generated from both files by a script — never typed by hand — so the plan can't drift from the mock.
+11. **Use cases and scenarios are data, owned by `<plan>/use-cases.js`.** Never add, remove or rename one here; when one is wrong or missing, fix it with the `generate-use-case` skill. The mock adds only `shared/scenario-play.js`: one entry per `ui` scenario id, a strict-JSON array (double quotes, no trailing commas, no comments inside) so other tools can parse it after stripping `var NAME = `.
 12. **Only `ui` scenarios play.** `mcp`, `api` and `job` scenarios get no play entry, no page, no console and no fake call. The index shows them greyed with "No mock".
-13. **Every count you report is computed** (by `scripts/check-scenarios.js`), never estimated: scenarios per use case, total, playable.
-14. **Controls follow the spec, then the real app.**
+13. **Controls follow the spec, then the real app.**
     - No permission → do what the real app does: a control the app hides is **hidden** in the mock too.
     - Shown unavailable with a reason only where the spec says so (e.g. an archived owner, a locked record). Show the reason where the spec puts it: a line under the control, or a tooltip. Use `aria-disabled="true"`, not native `disabled`: a disabled button gets no hover or focus, so its tooltip never shows.
-15. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
+14. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 
@@ -142,45 +141,17 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 - `components.js`: the helpers the pages need, with the app's real class strings.
 - `shell.js`: the app's real chrome around `#page`, plus the mock-only panel as-is:
     - The chrome's nav lists `States.PAGES` with the app's real nav-item classes (active and not). Links go through `States.href()`, so they keep the state or the free pick.
-    - `?embed=1` (inside a scenario card) → no panel; the card already shows the steps.
-    - `?sc=<id>` without embed → the panel shows that scenario's steps and expect, with `← All scenarios` back to `../index.html#sc-<id>`.
-    - `?free=1` → the free-play drawer: Preset (sets all three), Data, Role, Faults, Reset mock data.
-    - Otherwise → the state picker.
 
 ### 6. Write the pages
 
 - Each page: the same `<head>` (CSS stack + the scripts in template order), `Shell.mount()`, a small state object, `load()` via `fake-api.js`, `render()`.
 - Show every state the real screen has: loading skeleton, error with retry, empty, filtered-empty, success toast, refusal alert, outcome-unknown.
 - Deep links: support every query param a scenario needs (`?status=FAILED` pre-sets a filter, `?modal=…` opens a form), so each scenario opens on the exact state.
-- Load `../../use-cases.js`, then `../shared/scenario-play.js`, before `shell.js` on every page (the index loads `../use-cases.js` and `shared/scenario-play.js`).
-- Controls follow the spec's control rules (Hard Rule 14).
 - Expose page state as `window.S` (or similar) so a test harness can drive it.
 
 ### 6b. The index (`index.html`)
 
-Keep the template's layout; only change the header text and `screenUrl()`. What it does, so you keep it working:
-
-- The header links "← Feature plan" and "Free play ↗" (the first screen in `States.PAGES`, `?free=1`, in a new tab).
-
-- One block per use case, in plan order. Head, one line: `UC<n> <use case name>`, a `N refs` chip (click shows the trace IDs on the same line; Export PDF prints them) and a `plan` link (`../overview.html#uc-NN`). The head sits in the centered text column, above its use case row (not inside the list).
-- Every scenario of the use case gets a row in the list, in `use-cases.js` order. An `mcp`, `api` or `job` row is greyed (dashed disc). Opening it shows the frame with no screen: "No mock" and one line naming its surface ("MCP scenario — play it with play-scenarios or test it with e2e-test"); its details show only "What it should do" (`expect`), with no Pass / Fail. A use case with no scenario shows its `none` sentence.
-- Per use case, one row breaks out of the text column (`.use-case-row`, `100vw − 2 × gutter − 12px`, centered) with two columns:
-    - Right: the `.frame`, at `min(1920px, 75% of the row, row − 20rem − 24px)`, so the list never drops under 20rem.
-    - Left: the sticky `.scenarios` card fills the rest. It matches the frame's height (`--frame-h`, set by `fit()`); a long list scrolls inside.
-    - Under 1000px the list stacks above the frame, at its full height.
-- The list is an accordion of disclosure cards, the same design and slide as the deployment-plan, smoke-test and e2e-test rows (synced `theme:disclosure` and `theme:slide-js` blocks). Each `.scenario.disclosure` holds a `.disclosure-head` and a `.scenario-details` panel:
-    - Head, one line: an `h3 > button` (`aria-expanded`, `aria-controls`) with a status disc, the `surface` tag, then the full title (no `+` / `−` mark; wraps, never cut), then, inside the title's text after its last word (inline, so each pill wraps on its own like a word, also after a 2-line title): the kind pill (`.scenario-kind`: outlined, tinted `--ok` basic / `--neutral` alternate / `--bad` exception) and a **Core** pill when `core` is true (solid `--accent`, tooltip "Core: play first"). Badge order: status → surface → title → kind → core → refs. The whole head is a mouse target.
-    - The disc shows the number in an outline until the reviewer marks the scenario, then a solid `--ok` check or `--bad` cross (SVG, with the number and result in `sr-only` text). The list heading shows `N pass · N fail · N left` (at `--fs-meta`, the label's size) once anything is marked.
-    - Clicking a card picks it and opens it: `.picked` gets a 2px accent ring, a blue head (22% `--accent` over `--surface`), an `--accent-fill` panel and a bold title, folded or open. Its panel slides open and its screen loads in the frame. The last picked card shuts at once. Only one card is picked per use case. The list then scrolls (smoothly, only the list, not the page) so the picked card sits at its top; `--tail` room under the last card lets any card get there, trimmed once the card has slid open.
-    - Clicking the picked card slides its panel shut or open; the screen stays.
-- **Filter bar** under the page title (`#scenario-filter`, filled by `addScenarioFilter()` from the synced `theme:scenario-filter-js` block): a sticky bar centered in the column: a search field (type to match scenario titles; `/` jumps in; matches are marked) and a live "n of N" count. Focus opens the groups as pills with live counts: Type (ui / api / mcp / job), Kind (basic / alternate / exception), Core only. A group shows only the values the page has, and hides when it has one value. Values in one group combine with OR; groups combine with AND. Picked values show as chips in the field (click to remove; Backspace removes the last); Clear resets. The open panel floats over the rows; a click outside or Escape closes it. Hidden rows keep their order and number; a use case with nothing left shows "No scenario matches the filter". The choice is kept in `localStorage` (`<STORE>:filter`). Keep the call, the `data-surface` / `data-kind` / `data-core` attributes on each `.scenario` row and the title in `.scenario-name`.
-- The open scenario's details: one line with the story as a `N refs` chip and the state label, then "Result" (Pass / Fail toggles and a note), "How to play" (ol) and "What you should see" (ul), under `.label` headings. The `.frame`: a browser bar (three dots, the URL the real app would show — `localhost:<port>/<route>?…`, or `MCP · no screen` for a non-ui scenario — `<P>% of 1920 px`, Restart) and the screen in an iframe at 1920×1080 (16:9), transform-scaled by a `ResizeObserver` and a window `resize` listener to fit the frame width; the height follows at 16:9, so a short window scrolls the page. No border.
-- The text column (page title, filter, results, audit log, contract) is centered at `--page-w`, the same width as the design-feature plan; dark only. The index chrome uses the synced theme block (Quiet Sheet tokens such as `--surface`, `--text-3`, `--accent`): style it with the template's CSS classes, never Tailwind gray/purple or `dark:` classes. Don't edit between the `theme:*` markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`. Tailwind stays loaded for layout utilities.
-- The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
-- `#sc-<id>` opens that scenario in its use case and scrolls to it; opening a scenario updates the hash.
-- Store: clear every `FakeApi.STORE` key on page load, on every scenario pick and on Restart, so each scenario starts clean. Without it, rows written in one card leak into every other card after a reload.
-- Results: each reviewer's Pass / Fail and note per `ui` scenario, in `localStorage` under `<STORE>:results` (never cleared with the store, so marks survive Restart and reloads). A Results table above the audit log counts them, shows core results apart ("Core: 18/20 pass") and has "Copy as Markdown". **Clear** (in each use case's scenario list) and **Clear all** (bottom right, beside Export PDF) drop only those marks and notes, to test again. Keep it as the template has it.
-- Audit log at the bottom polls storage, since the screens write it from inside their frames. Contract cards (types.ts, rules.js, data.js) stay.
+Keep the template's layout; only change the header text and `screenUrl()`. Don't edit between the `theme:*` markers. Scenario badge order: status → surface → title → kind → core → refs.
 
 ### 7. Link the plan (when a plan folder exists)
 
@@ -188,14 +159,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
 
 ### 8. Verify
 
-- `node <this skill dir>/scripts/check-scenarios.js <output>/mock`. It:
-    - runs `node --check` on every `.js` file and the inline `<script>` of every page;
-    - reads `<plan>/use-cases.js` (`--use-cases <file>` for another path) and `shared/scenario-play.js`: both strict JSON, every `surface` is `ui`, `mcp`, `api` or `job`;
-    - every `ui` scenario has exactly one play entry with one `state`, `page` and `steps`, no `parts`; every `state` is in `states.js` and every `page` exists;
-    - `mcp`, `api` and `job` scenarios have no play entry, and every play entry matches a scenario;
-    - free play covers every scenario: each mock state's data, role and faults exist in the drawer lists, and each scenario's page is in `States.PAGES`;
-    - prints the scenarios per use case, the total and how many play in the mock.
-    - Exit code 0 before you go on. A scenario that is wrong in `use-cases.js` → report it for the `generate-use-case` skill; don't edit it here.
+- `node <this skill dir>/scripts/check-scenarios.js <output>/mock` (`--use-cases <file>` for another path). Exit code 0 before you go on. A scenario that is wrong in `use-cases.js` → report it for the `generate-use-case` skill; don't edit it here.
 - Type-check the contract when Node is available (a temporary install is fine):
   `npx -y -p typescript@5 tsc --noEmit --allowJs --checkJs --strict --lib es2022,dom contract/types.ts contract/rules.js contract/data.js`
 - Open `index.html` and every page × state in a headless browser when one is available (`--allow-file-access-from-files`). Check the console for errors and look at the screenshots: each frame shows its screen scaled to fit, `#sc-<id>` opens the right scenario, a non-ui scenario shows "No mock", core rows show the Core pill, and the search bar (title text, Type, Kind, Core only) gives the right "n of N".

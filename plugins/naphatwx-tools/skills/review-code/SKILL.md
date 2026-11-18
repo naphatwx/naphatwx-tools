@@ -2,7 +2,7 @@
 name: review-code
 description: Review only the changed lines of staged changes, files or a GitLab merge request against the repo's guidelines. Use when the user says "review my staged changes" or "review this MR". Reports only, never edits code. Fetching the diff alone is get-mr-diffs.
 argument-hint: "[staged | <merge-request-url> | file paths...]"
-allowed-tools: Skill, Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), Bash(git fetch:*), Bash(git status:*), Bash(git -C:*), mcp__gitlab__get_merge_request, mcp__gitlab__get_merge_request_diffs, mcp__gitlab__list_merge_request_changed_files, mcp__gitlab__get_merge_request_file_diff, mcp__gitlab__get_file_contents
+allowed-tools: Skill, Read, Write, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git remote:*), Bash(git branch:*), Bash(git fetch:*), Bash(git status:*), Bash(git -C:*)
 ---
 
 # Code Review Agent
@@ -41,12 +41,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 **B. GitLab merge request** — `$ARGUMENTS` contains an MR URL like
 `https://<host>/<group>/<project>/-/merge_requests/<iid>`:
-- Invoke the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code) with the MR URL. It resolves
-  the project/IID, fetches metadata, and gets the diff (local git first, MCP
-  fallback).
-- Command-specific rule: do NOT exclude test files from the diff — the review
-  must see them.
-- If the diff is large, read it file by file — do NOT dump the whole diff.
+- Invoke the `get-mr-diffs` skill (`naphatwx-tools:get-mr-diffs` in Claude Code) with the MR URL. Keep test files in the diff.
 
 **C. Files / directories** — `$ARGUMENTS` contains file paths or directory
 names:
@@ -109,7 +104,7 @@ The user wants clean code: if something reusable exists, the change must use it.
 1. **List what the change adds**: new functions, methods, components, hooks,
    classes, types, constants, regexes, SQL queries, styles, and any added
    block of 5+ lines of logic.
-2. **Search the repo for an existing equivalent** of each item (Grep / Glob):
+2. **Search the repo for an existing equivalent** of each item:
    - The same or a similar name (synonyms too: `format`/`render`,
      `get`/`fetch`/`load`, `is`/`has`/`check`).
    - Key lines of its body (a distinctive call, literal, regex or query).
@@ -160,7 +155,6 @@ Check the changed lines for:
 - Missing indexes (for database changes)
 
 #### Best Practices
-- DRY violations (see Reuse & Duplication above)
 - SOLID principles
 - Proper abstraction levels
 - Test coverage considerations
@@ -177,9 +171,8 @@ Walk the draft findings and, for each one:
 
 1. Confirm its `file:line` is in that file's added/changed set from step 2.
 2. Confirm the quoted code is text this change actually introduced.
-3. If either fails → **delete the finding**, unless it is a real ripple effect
-   or a newly reachable pre-existing bug. Then rewrite it anchored to the
-   changed line that causes it and prefix the title with `[pre-existing]`.
+3. If either fails → **delete the finding**, unless the Golden Rule allows it
+   as `[pre-existing]`.
 
 Report the count in the output (`Findings dropped as out-of-scope: <n>`).
 
@@ -253,16 +246,13 @@ folder **if one exists**:
 ## Review Severity Levels
 
 - **CRITICAL**: Security vulnerabilities, data loss risks, breaking changes, violations of project guidelines (AGENTS.md, CONTRIBUTING.md, or any loaded docs)
-- **WARNING**: Bugs, performance issues, minor inconsistencies, duplicated code, re-built helpers or components that already exist
+- **WARNING**: Bugs, performance issues, minor inconsistencies (reuse: see step 4)
 - **SUGGESTION**: Style improvements, refactoring opportunities
 
 ## Out of Scope — Never Report
 
-- Style, naming, or structure of untouched code.
 - "Missing" features, tests, or docs unrelated to what changed.
 - Rewrites of whole files or modules the change only touched lightly.
-- Pre-existing issues the change neither worsens nor exposes.
-- Any finding whose line number is not in the changed-lines map.
 
 ## Special Rules by Language
 
@@ -284,7 +274,3 @@ folder **if one exists**:
 - Check for resource management (`with` statements)
 - Follow PEP 8 conventions
 
-### General (all languages)
-- Verify that all guidelines from loaded `CONTRIBUTING.md` and `AGENTS.md` are followed
-- Flag any pattern that contradicts the loaded docs as **CRITICAL**
-- Apply every check above to changed lines only (see Golden Rule)

@@ -139,7 +139,7 @@ Plus a `playwright.config.*` and login setup when the repo had none.
 
 | Path | What |
 |------|------|
-| [SKILL.md](SKILL.md) | The agent's instructions and the file formats |
+| [SKILL.md](SKILL.md) | The agent's instructions |
 | [references/data-helper-agent.md](references/data-helper-agent.md) | Prompt for the data helper agent: seed copies, naming, sweep, runner |
 | [references/writer-agent.md](references/writer-agent.md) | Prompt for each writer agent: per-surface rules, selectors, data, waits |
 | [references/ai-tester-agent.md](references/ai-tester-agent.md) | Prompt for the AI tester: plays mcp and job scenarios, records each call |

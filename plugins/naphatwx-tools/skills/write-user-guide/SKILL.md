@@ -5,8 +5,6 @@ description: Write a markdown user guide for a feature, in plain words for end u
 
 # User Guide Generator
 
-Generate user-friendly documentation for a given feature.
-
 ## User Input
 
 ```text
@@ -31,11 +29,9 @@ Options:
 3. "Save to custom path" - I will specify the path
 ```
 
-If output path was provided in arguments, skip this step.
-
 ### 1. Read Feature Documentation
 
-Use Glob and Grep to find and read relevant docs for the feature domain:
+Find and read the relevant docs for the feature domain:
 
 - README, architecture, spec, or any markdown files under `docs/`
 - Frontend UI files related to the feature
@@ -111,7 +107,5 @@ _Show: [what to highlight and where]_
 
 ### 4. Save the Guide
 
-- **Display as text:** Output in chat
-- **Default location:** Save to `docs/features/{feature-domain}/user-guide.md`
-- **Custom path:** Ask for path, then save there
+- Deliver it as picked in step 0, or to the path given in the arguments. Custom path → ask for it, then save there.
 - Always confirm with: "✅ User guide created at: {path}"

@@ -6,8 +6,6 @@ argument-hint: <flowchart | sequence | er> <source> [output-path] [mode=diagram-
 
 # Diagram Generator
 
-Draw one diagram (or one set of the same type) into a file a browser can open or another page can embed.
-
 | Type | Shows | diagram-design mode | Manual mode |
 |------|-------|---------------------|-------------|
 | `flowchart` | A flow's logic: steps, yes / no decisions, loops, end states | `NN-<slug>.html` (its Flowchart type) | `NN-<slug>.html` from `assets/flowchart/` |
@@ -36,7 +34,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 3. Budgets: at most 12 nodes per flowchart and 7 participants per sequence diagram; more → split into several diagrams and say so. In diagram-design mode its own, tighter budgets win.
 4. Dark only, in the shared theme: no light palette, theme toggle or second palette, in either mode.
     - Manual mode: every template's `<style>` holds the synced theme block (`theme:tokens` and `theme:base` markers). Keep it as-is and style only with its tokens (`var(--surface)`, `var(--accent)`, `var(--mono)`…).
-    - **Every diagram file has one Export PDF button**, the same everywhere: the `.float-bar` at the bottom right, made by `addExportPdf()` from the synced `theme:pdf` / `theme:pdf-js` blocks. It opens the print dialog and prints only that diagram, fitted to the page width, without the button. The page keeps room under its last line (`theme:pdf` pads the body), so the button never covers the drawing, also inside a host's iframe.
+    - **Every diagram file has one Export PDF button**, the same everywhere: the `.float-bar` at the bottom right, made by `addExportPdf()` from the synced `theme:pdf` / `theme:pdf-js` blocks.
         - Manual templates (flowchart, sequence viewer, ER) already have it: keep the `theme:` blocks and the `addExportPdf(...)` call.
         - The text size picker sits in the same bar (`theme:font-size` blocks, `addFontSize(...)`). Keep it. Embedded, a diagram hides it and follows the host page's size.
         - diagram-design files get it from the page kit, `assets/embed.html` (step 3). Never copy or restyle the button.
@@ -76,19 +74,15 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 </g>
 ```
 
-- The text centers on `data-cx`; the box fits the rendered text plus 6px each side, centered on the same x; the step badge (`.edge-label-number`, optional) moves to just left of the box, outside it. The label itself never moves for the badge.
 - `data-cx` per type: a message arrow → `(x1 + x2) / 2`; a self-call loop → the middle of the loop's horizontal span; a flowchart edge → the middle of the segment it labels (above a level segment, on a vertical one, the box hiding the line behind it); an ER relationship → the middle of its line or level stub.
 - Lay out room for the widest label and its badge (about 8.6px per 14px mono character, on the wide side); the script only fits the box and moves the badge.
 - diagram-design mode, every type: paste `assets/embed.html` (the page kit) just before `</body>` of every saved `.html`, unchanged. It adds the Export PDF button and label fitting, and keeps the contract with a host page that embeds the file in an `<iframe class="diagram-frame">` (design-feature's `overview.html`):
-    - Size: it posts `diagram-height` with `height` and `width` on every resize. The height includes the body's bottom padding, so the host's iframe keeps the room under the drawing where the Export PDF button sits. The host sizes the iframe to the height (no fixed height); its lightbox uses the width to show the whole drawing, scaled.
     - Heading: embedded, it adds class `embedded` to `<html>`, which hides the file's own `.eyebrow` and `<h1>` (the host already titles it). Keep the diagram-design title in those two elements.
-    - Width: each SVG draws at exactly its viewBox width (1:1, so labels render at their own size) and scrolls sideways in a narrow window instead of overflowing the page. A taller one is scrolled by the host. In print it shrinks to the page width.
 
 ### 4. Verify
 
 - Run the checks at the end of the type's reference.
 - Open each file in a headless browser when one is available: it draws, labels are not clipped, and the console has no `[seq]` or `[er]` warnings.
-    - Each file has one Export PDF button, and scrolled to the end, the last line and the legend sit fully above it.
     - Each label's text is centered on its line, its box fits the text, and its step badge sits left of the box.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 

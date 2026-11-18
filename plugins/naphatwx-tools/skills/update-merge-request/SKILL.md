@@ -7,9 +7,6 @@ argument-hint: <merge-request-url-or-iid>
 
 # Update MR Title & Description
 
-Generate a clean, updated **title** and **description** for a GitLab merge request,
-then apply them to the MR automatically.
-
 Target MR: `$ARGUMENTS`
 
 If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the text the user gave with this request as the input.
@@ -17,8 +14,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ## Steps
 
 1. **Get the MR data and diff** — invoke the `get-mr-diffs` skill
-   (`naphatwx-tools:get-mr-diffs` in Claude Code) with `$ARGUMENTS` as the MR reference. It resolves the project/IID,
-   fetches metadata, and gets the diff (local git first, MCP fallback).
+   (`naphatwx-tools:get-mr-diffs` in Claude Code) with `$ARGUMENTS` as the MR reference.
    Note from its result: current title/description, Draft status, and the
    commits + changed files in `base_sha..head_sha`.
 
@@ -37,8 +33,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
      - `## Scope` — In vs Out (call out phases or follow-up slices).
      - `## Testing` — tests added/how it was verified.
      - Link the spec folder if there is one.
-   - Scope everything to what is in `base_sha..head_sha` only. If the branch has
-     later commits not in the MR head, mention that they are not yet part of the MR.
+   - If the branch has later commits not in the MR head, mention that they are
+     not yet part of the MR.
 
 4. **Present** the title and description as two code blocks, each under a bold label:
 

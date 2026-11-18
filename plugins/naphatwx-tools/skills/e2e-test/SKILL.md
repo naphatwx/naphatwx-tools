@@ -6,21 +6,6 @@ argument-hint: "<plan folder | spec folder> [--core] [--mock] [--no-watch] [--en
 
 # E2E Test
 
-```text
-1 read      <plan>/use-cases.js ─► UC1 → its scenarios, UC2 → … (every surface; surface only picks the runner)
-2 harness   once per repo: Playwright config + login · every run: copy step.ts, run-data reporter, build-report.mjs from assets/
-  helper    1 agent writes <domain>/helpers/<feature>.ts (seed copies, sweep) and proves it
-  match     find the domain's existing tests by scenario id ─► update / add / ask before removing
-3 write     1 writer agent per use case, in parallel ─► <domain>/<goal>.e2e.spec.ts (ui + api) and <goal>.ai-tests.json (mcp + job)
-4 run       only this source's scenario ids, --core first: Playwright runs ui + api ─► e2e-results/<spec>/ (one folder per spec)
-            then 1 AI tester per use case, one after another, runs mcp + job ─► ai-results-<UC>.json   (same folder)
-            fix test-side failures, re-run
-5 review    1 FRESH reviewer agent checks every step ─► review.json
-            test problem ─► fix the test, re-run those files once, review again · product problem ─► finding
-            then the full run into the same folder, and a review of the rest
-6 report    build-report.mjs ─► one HTML: UC → scenario (surface + kind tags) → steps (screenshot or request / response, review notes)
-```
-
 ## User Input
 
 ```text
@@ -46,6 +31,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - **Own your data.** Each test works on its own copies of the seed records its scenario names, made by the feature's data helper (step 2b), deletes them after and checks they are gone. Never touch records you did not create. No play-scenarios seeds.
 - **One HTML report per spec**, `e2e-results/<spec>/e2e-report.html`, rebuilt from the spec's one run folder after every run. No timestamps: every run of the spec updates the tests it ran and keeps the rest. Raw Playwright output is not a substitute.
 - Never run against production unless the user named it for this run.
+- **No sub-agents** → do each agent step yourself, in order, with the same prompt (the reviewer after the run).
 - **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ---
@@ -86,10 +72,7 @@ Look for an existing Playwright setup: `playwright.config.*`, an `e2e/` folder, 
 
 Copy these files from this skill's `assets/` on **every run**, unchanged, so the repo always runs the plugin's newest version. A copy the repo already has (search `<e2e-dir>` for `step.ts` and `run-data-reporter.ts`, e.g. `support/step.ts`) is overwritten at its own path; never add a second copy. Never reuse an old copy as it is: it may miss fixes and the newest report layout. After copying, run the repo's typecheck, because older specs' tests import `step.ts` too, and list the files the copy changed (`git status`) in the reply:
 
-- `<e2e-dir>/support/step.ts`:
-    - `step(page, title, body)` wraps `test.step` and attaches a JPEG screenshot (quality 60) of how the step ended, pass or fail.
-    - `apiStep(request, title, { method, url, data?, headers? }, check)` sends one request, attaches the masked request and response, then runs `check(response, body)`. It returns the parsed body.
-    - `reveal(locator)` scrolls the element into view below any sticky header or footer, in the page's own scroll container too.
+- `<e2e-dir>/support/step.ts`: `step`, `apiStep` and `reveal` (see the file).
 - `<e2e-dir>/reporters/run-data-reporter.ts`: writes the run folder (`run-data.json` + `shots/`), not HTML.
 - `<e2e-dir>/reporters/build-report.mjs` and `reporters/e2e-report-template.html`: build the one HTML (step 6). Node only, no dependencies.
 - `<e2e-dir>/reporters/use-cases.types.d.ts`: the type of `use-cases.js`, for `build-report.mjs`.
@@ -113,32 +96,17 @@ workers: <number of spec files, max 4>,
 ```
 
 - `outputDir` is relative to the folder that holds the Playwright config. Add `e2e-results/` to `.gitignore`.
-- `E2E_SPEC=<spec>` (the spec folder name) makes the reporter write into `<outputDir>/<spec>/`; unset → `<outputDir>/_adhoc/`. A value that is not a plain folder name (letters, digits, `.`, `_`, `-`) stops the run.
-- That folder is reused by every run: a run replaces the tests it ran (each entry keeps its own `startedAt`), keeps the rest, and deletes screenshots nothing points to. Delete the folder for a clean start.
+- `E2E_SPEC=<spec>` → the reporter writes into `<outputDir>/<spec>/`; unset → `<outputDir>/_adhoc/`. Every run reuses that folder; delete it for a clean start.
 - `E2E_RUN_DIR=<dir>` is an override for an odd folder. It must be inside `outputDir`, given from the repo root or from the config folder; any other path stops the run before anything is written.
 - **Login**: sign in once in a global setup and save `storageState`; every test reuses it. A scenario with another role signs in as that role in its own `test.use({ storageState })` or fixture. Use the repo's login helper or dev login. Read credentials from env vars, never from a file. The sign-in helper closes product tours and "what's new" overlays and marks them seen, so no shot shows them.
 
-The report keeps these features; keep them when you touch the template:
-
-- Tree: use cases in `use-cases.js` order, then each scenario with a surface tag, its kind (`basic`, `alternate`, `exception`) and a Core pill on core scenarios, then its steps. Badge order: status → surface → title → kind → core. Core scenarios come first in each use case, then the rest, each group in file order. The header shows "Core: N/M passed". Tests with no known scenario go last under "Other tests". A scenario with no result shows as "not run".
-- Steps paged like slides: Prev / Next, the numbered step list, ← / →, or click the right or left half of the screenshot (works on scrolling full-page shots too). A `ui` step without a screenshot shows a "No screenshot for this step" image. A full-page shot (taller than 1.5× its width) scrolls inside the viewer.
-- `api`, `mcp`, `job` steps show the call target, the request and the response in place of the screenshot.
-- `mcp` tests open as a chat: the role's prompt on the left, each tool call as a card (Refused or Failed ones in red, full request and response one click away), the AI agent's reply on the right. Setup and cleanup steps fold into "Setup" / "Clean up · N steps behind the scenes". "Show as steps" switches to the step viewer.
-- A step the reviewer flagged shows ⚑ in the step list and the reviewer's note above the screenshot. Header count and a "Has review flags" filter.
-- One test open at a time; every test starts closed; re-opening keeps the last step seen. A failed step shows its error.
-- One sticky search bar under the header, the same one the mock and play pages use: a search field (type to match scenario titles; `/` jumps in; matches are marked) and a live "n of N" count. Focus opens the groups as pills with live counts: Status (Failed, Flaky, Passed, Skipped, Not run), Type (ui / api / mcp / job), Kind (basic / alternate / exception), Review (has review flags), Core only. A group shows only the values the page has, and hides when it has one value. Values in one group combine with OR; groups combine with AND. Picked values show as chips in the field (click to remove; Backspace removes the last); Clear resets. The open panel floats over the rows; a click outside or Escape closes it. Status uses Playwright's own outcome, so it matches its summary. A use case with no test left hides its heading. The choice is kept in `localStorage`. A "Failed first" toggle in the bar lifts failures to the top of each use case; the default is file order.
-- Retries: the final attempt shows, earlier ones sit under "Earlier attempts", a test that passed on retry is flaky. A skipped test shows its `skip` / `fixme` reason.
-- A failed Playwright test has a copyable rerun command, and a `npx playwright show-trace <path>` command when a trace was saved.
-- Dark only. Styles come from the synced theme block: don't edit between the `theme:` markers; change `theme/` in this plugin repo and run `node theme/sync.mjs`.
-- **Export PDF** button: opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
+The report template is copied unchanged. Its scenario badge order: status → surface → title → kind → core.
 
 ## 2b. Data helper (once per feature, before the writers)
 
 Pick `<domain>` first: the folder under `<e2e-dir>` whose tests cover this feature's pages (the repo's guide or README may list them). None fits → a new kebab-case folder named for the domain, never for the spec. Unsure between two → ask once.
 
 The domain already has a helper for this feature (`<e2e-dir>/<domain>/helpers/*.ts`) → reuse it; the agent only adds what the new scenarios need. Otherwise spawn **one** agent with the prompt in `references/data-helper-agent.md`. It writes `<e2e-dir>/<domain>/helpers/<feature>.ts` (seed copies, settle, `sweep`) and one setup / cleanup runner for mcp and job scenarios, proves both with a throwaway spec, and deletes that spec. The writers import the helper; none writes its own data code.
-
-Agents with no sub-agents write it themselves with the same prompt, before step 3.
 
 ## 2c. Match the domain's existing tests
 
@@ -160,8 +128,6 @@ Spawn one agent per use case **in one message**, with the prompt in `references/
 - `<e2e-dir>/<domain>/<goal>.ai-tests.json`: the ordered calls or commands for each `mcp` and `job` scenario, plus its `runner` block and the one setup / cleanup command it names. Skip both when the use case has none.
 
 `<goal>` is the use case title, kebab-case, with no `UC<n>`: `create-a-thing`. The file exists → the writer edits it: it updates and adds its scenarios' tests and leaves every other test in the file as it is. A matched test that sits in another file is updated there. Writers run nothing.
-
-Agents with no sub-agents write the use cases one after another with the same prompt.
 
 When they are done:
 - Every scenario in `use-cases.js` has exactly one test, with the same id, in one of the two files.
@@ -192,7 +158,7 @@ PLAYWRIGHT_DASHBOARD=1 E2E_SPEC=<spec> PW_BASE_URL=<url> npx playwright test <e2
 - `--grep` lists only this source's scenario ids, because the domain folder also holds other specs' tests. The title is `<id> <scenario title>`, so the spaces around the group stop one id from matching a longer one.
 - From the repo root, add `--config <path to the Playwright config>`.
 - Core pass → list only the core ids (writers also tag every core test `@core`), and give each AI tester only its core scenarios.
-- Run it the way the repo's guide says to run tools (for example in its Docker service). Spec files run on parallel workers; tests inside a file run in order.
+- Run it the way the repo's guide says to run tools (for example in its Docker service).
 - After Playwright, spawn one **AI tester** per use case that has a `.ai-tests.json`, with the prompt in `references/ai-tester-agent.md`, **one after another, never in parallel**: they share one stack, and parallel testers time out on setup and mix up each other's results. Each writes `<run>/ai-results-<UC>.json`. The tester needs the MCP server of the app under test (local, not production) and a shell for `job` steps.
 - A failure caused by the environment (server down, cold compile timeout, expired session, MCP server not connected) is not a product failure. Fix the environment and re-run only the failed files or scenarios once, into the same `<run>`.
 - A real failure: keep it. Never bend an assertion to pass.
@@ -209,8 +175,6 @@ Then, per flagged step:
 | `test` (shot too early, wrong wait, weak assertion, wrong role) | Fix the test or the `.ai-tests.json`. Re-run only those files or scenarios once, into the same `<run>`. Spawn a fresh reviewer for just those scenarios; it writes `<run>/review-2.json`. |
 | `product` | Keep it as a finding. Don't touch the test. |
 | `unsure` | List it for the user to check by hand. |
-
-Agents with no sub-agents do the review themselves, step by step, against the same checklist, after the run.
 
 When the code's message, status or list differs from a scenario's `expect` and the code is right (e.g. 200 vs 201, an RBAC refusal string), list it for `generate-use-case` to update the scenario (its verify mode re-checks the evidence); don't flag it `product`. A scenario listed in a `MISMATCHES` entry with `"fix": "code"` follows today's code: the gap is known, not a new finding.
 
@@ -256,59 +220,3 @@ Runs the same steps on the mock UI of the `generate-mock-ui` skill (`naphatwx-to
 | 5 Review | Same. A mock that does not do what `expect` says is a finding for `generate-mock-ui` (fix the mock), not `product`. |
 | 6 Report | Add `--mock`. The report is `<plan>/mock/e2e/e2e-results/<spec>/e2e-report.html`. |
 
----
-
-## File formats
-
-All strict JSON. Paths inside are relative to the run folder.
-
-`<run>/run-data.json` (written by the reporter; the top-level `stamp` / `startedAt` / `ms` describe the newest run, each test's `startedAt` the run that produced it):
-
-```json
-{ "name": "create-a-thing", "stamp": "20261008-110000", "startedAt": "2026-10-08T04:00:00.000Z", "ms": 48200, "baseURL": "http://localhost:3000",
-  "tests": [ { "key": "create-thing", "scenario": "create-thing", "useCase": "UC2", "title": "create-thing from thing-alpha",
-    "file": "things/create-a-thing.e2e.spec.ts:18", "project": "chromium", "status": "failed", "outcome": "unexpected", "ms": 15800, "retry": 0, "error": "…", "startedAt": "2026-10-08T04:00:00.000Z",
-    "steps": [ { "title": "Fill the name", "status": "passed", "ms": 600, "shot": "shots/<id>-r0-2.jpg" },
-               { "title": "POST the thing", "status": "passed", "ms": 90, "call": { "target": "POST /api/things", "request": {}, "response": { "status": 201, "body": {} } } } ],
-    "finalShot": "shots/<id>-r0-final.png", "trace": "test-results/…/trace.zip", "annotations": [], "attempts": [] } ] }
-```
-
-`<e2e-dir>/<domain>/<goal>.ai-tests.json` (written by the writer, read by the AI tester):
-
-```json
-{ "useCase": "UC2",
-  "runner": { "setup": "npx tsx e2e/things/create-a-thing.data.mts setup", "cleanup": "npx tsx e2e/things/create-a-thing.data.mts cleanup",
-              "prints": "JSON map of seed name → copy, e.g. { \"thing-alpha\": { \"name\": \"thing-alpha-e2e2-k7q2\", \"id\": 9001 } }" },
-  "tests": [
-  { "scenario": "mcp-create-thing", "surface": "mcp", "role": "EDITOR", "prompt": "create a copy of thing-alpha",
-    "steps": [ { "title": "Copy thing-alpha", "setup": true, "command": "npx tsx e2e/things/create-a-thing.data.mts setup thing-alpha" },
-               { "title": "Create a thing from thing-alpha", "call": "create_thing", "params": { "sourceId": "<from step 1: thing-alpha.id>" }, "expect": "thing thing-alpha-2, status PENDING" },
-               { "title": "Delete the thing-alpha copy", "cleanup": true, "command": "npx tsx e2e/things/create-a-thing.data.mts cleanup" } ] },
-  { "scenario": "backfill-rerun", "surface": "job",
-    "steps": [ { "title": "Run the backfill twice", "command": "node scripts/backfill.mjs", "expect": "prints \"backfill: updated=0 skipped=3\"" } ] } ] }
-```
-
-`<run>/ai-results-<UC>.json` (written by the AI tester):
-
-```json
-{ "useCase": "UC2", "tests": [
-  { "scenario": "mcp-create-thing", "role": "EDITOR", "status": "passed", "ms": 4100, "error": "only when failed", "reason": "only when skipped",
-    "prompt": "create a copy of thing-alpha", "reply": "Created thing-alpha-2. It is PENDING.",
-    "steps": [ { "title": "Create a thing", "status": "passed", "ms": 2900,
-      "call": { "target": "create_thing", "request": { "sourceId": 9001 }, "response": { "name": "thing-alpha-2", "status": "PENDING" } } },
-               { "title": "Run the backfill", "status": "passed", "ms": 5200,
-      "call": { "target": "$ node scripts/backfill.mjs", "request": "node scripts/backfill.mjs", "response": "exit 0\nbackfill: updated=0 skipped=3" } } ] } ] }
-```
-
-- `status`: `passed` | `failed` | `skipped`. A later file replaces an earlier one for the same scenario.
-- mcp only: `prompt` (from the test file) and `reply` (the tester's answer to that user) feed the chat view. A step keeps `setup` / `cleanup` from the test file; `call.refused: true` marks a call the server rejected.
-
-`<run>/review.json` (written by the reviewer; `review-2.json` after a re-run replaces the notes of the scenarios it covers):
-
-```json
-{ "reviewer": "fresh agent", "steps": [
-  { "scenario": "thing-load-error", "step": 2, "flag": "test", "check": "spinner", "note": "Shot shows the loading skeleton, not \"Could not load\"; wait for the message." },
-  { "scenario": "list-things", "step": 1, "flag": "ok", "note": "Things tab, 20 rows." } ] }
-```
-
-- `step` is 1-based, the index in the test's `steps` (the page-at-failure shot is not a step). `flag`: `ok` | `test` | `product` | `unsure`. `check`: the checklist item that failed (short words).

@@ -5,11 +5,7 @@ description: Generate a single-file HTML docs page in the naphatwx theme (the sa
 
 # HTML Documentation Generator
 
-Generate a single-file HTML docs page from a bundled template, in the naphatwx theme.
-
 - Layout: the same as design-feature's overview. A numbered rail on the left (`01`, `02` …, sub-sections `2.1`, `2.2` …) with search, a round edge button that hides it, and a centered sheet of sections.
-- Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
-- The floating bar at the bottom right holds the text size picker and **Export PDF** (opens the print dialog; pick "Save as PDF"). Keep the `theme:pdf`, `theme:pdf-js`, `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize()` + `addExportPdf()` calls.
 
 ## User Input
 
@@ -46,12 +42,11 @@ The output **must** keep all of these:
 
 ### 1. Read the source
 
-- Use Glob and Grep to find and read the files the user pointed to.
+- Read the files the user pointed to.
 - Extract:
     - Topic and overview.
     - Main sections and sub-sections.
     - Steps, code samples, terms, tables, and warnings.
-- No source → ask where it is, or use placeholder content.
 
 ### 2. Copy the template
 
@@ -109,9 +104,7 @@ The output **must** keep all of these:
 
 ### 4. Write the file
 
-- Default: `<topic>.html` at the project root, file name in kebab-case.
-- No topic → `docs.html`.
-- Custom: write to the path the user gave.
+- Write to the output path from User Input.
 
 ### 4b. Review the layout (always)
 

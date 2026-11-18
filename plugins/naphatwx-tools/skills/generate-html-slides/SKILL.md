@@ -5,11 +5,6 @@ description: Create a single-file full-window HTML slide deck, one click per sli
 
 # HTML Presentation Generator
 
-Create a single-file HTML slide presentation from a bundled template.
-
-The template uses a minimal, dark-only style. Colors and element defaults come from the synced theme block (Quiet Sheet) between the `theme:*` markers in the `<style>`. Don't edit between the markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`.
-The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call. The PDF has one 16:9 page per slide.
-
 ## User Input
 
 ```text
@@ -29,14 +24,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 The output **must** keep all of these:
 
-1. The stage fills the whole window: no max width, no letterbox.
-2. Click left area → previous slide. Click right area → next slide.
-3. Fade transition when changing slides.
-4. First slide → cannot go to previous.
-5. Last slide → cannot go to next.
-6. Single self-contained file. No external CSS, JS, or images.
-7. Dark only. Add no light theme, theme toggle, or other palette.
-8. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
+1. The template's navigation and layout: the stage fills the whole window, click left / right moves, slides fade, and neither end wraps around.
+2. Single self-contained file. No external CSS, JS, or images.
+3. Dark only. Add no light theme, theme toggle, or other palette.
+4. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 
@@ -49,7 +40,6 @@ The output **must** keep all of these:
 ### 2. Fill in content
 
 - If the user gave a topic, replace the slide content with that topic.
-- If not, keep the placeholder random content.
 - Keep 4-6 slides unless the user asks otherwise.
 - Only edit text inside `<section class="slide">` blocks.
 - Keep the minimal style. Color with the theme tokens, never new hex values.
@@ -57,10 +47,7 @@ The output **must** keep all of these:
 
 ### 3. Write the file
 
-- Default: `<topic>.html` at the project root.
-    - Use the topic as the file name, in kebab-case.
-    - No topic → use `presentation.html`.
-- Custom: write to the path the user gave.
+- Write to the output path from User Input.
 
 ### 3b. Review the layout (always)
 

@@ -6,19 +6,7 @@ argument-hint: [verify] <spec-folder | plan-folder | use-cases.js | feature desc
 
 # Use Case Generator
 
-Turn a spec into one `use-cases.js` file: what a user can do with the feature, on every channel they use (the UI and, more and more, an AI agent over MCP), and what the real code shows them. The spec says which goals to cover and what was intended; the code says what happens. It is the one source for use cases and scenarios. Every skill that plays or tests the feature reads it directly, never another skill's output, and shows the same tree:
-
-```
-spec + code ─► generate-use-case ─► <plan>/use-cases.js          UC1 Read things
-                                        │                          ├─ read-list        ui
-                                        │                          └─ mcp-list         mcp
-                                        │                         UC2 Create a thing
-                                        │                          └─ ...
-                                        ├─► design-feature      Acceptance criteria section + each use case's Scenarios view
-                                        ├─► generate-mock-ui    ui scenarios as mock screens; others show "No mock"
-                                        ├─► play-scenarios      every scenario on the running app (ui by hand, mcp / api / job by an AI agent)
-                                        └─► e2e-test            every scenario as an automated test, one report in the same tree
-```
+Turn a spec into one `use-cases.js` file: what a user can do with the feature, on every channel they use (the UI and, more and more, an AI agent over MCP), and what the real code shows them. The spec says which goals to cover and what was intended; the code says what happens. It is the one source for use cases and scenarios. Every skill that plays or tests the feature reads it directly, never another skill's output.
 
 The words, used the same way in every skill:
 
@@ -27,12 +15,7 @@ The words, used the same way in every skill:
 | Feature | what the spec delivers | a noun | Things |
 | Use case | one goal a user wants to reach, with every path to it | verb + object | Create a thing |
 | Scenario | one rule or outcome of a use case, on one channel; other values, clicks or views of the same rule are its examples, not more scenarios | the condition or the result | Archived owner |
-| Kind | how a scenario ends: `basic` (the main path to the goal, one per use case and channel), `alternate` (another path that still reaches the goal), `exception` (the goal is not reached: refusal, error, timeout) | the `kind` value | exception |
-| Core | a scenario to play first: every `basic`, plus the main alternates and the errors users hit most | `"core": true` | Core |
-| Channel | where a user reaches it: `ui` (a screen), `mcp` (an AI agent calling MCP tools), `api` (REST / gRPC called directly), `job` (a script or scheduled job) | the `surface` value | mcp |
 | Acceptance criterion | one Given / When / Then from the spec | `US<n> · AC<m>` | US1 · AC3 |
-| Evidence | where a scenario lives in the code: its entry point, the gate that lets the actor in or stops them, and the code behind each `expect` line, as repo-relative `path:line` | `evidence` | `apps/web/lib/routes.ts:41` |
-| Mismatch | one place where the spec and the code disagree. The scenario follows the code; the mismatch says which side to fix | `MISMATCHES` entry | M1 |
 | Flow diagram | the steps of a use case, drawn as its flowchart and sequence diagram (not a "flow" in the basic / alternate flow sense: that is a scenario) | a diagram, not a list item | the flowchart of Create a thing |
 
 The file holds real example values but no mock wiring and no selectors, so it works for features with no UI too.
@@ -72,17 +55,13 @@ Where the file goes (`<plan>`):
 3. **Every scenario carries evidence.** `evidence.entry` is where the actor starts on that channel. `evidence.gate` is the check that lets them in or stops them. `evidence.expect` holds one ref per `expect` line: the code that produces that line. Refs are repo-relative `path:line` or `path:from-to`. `check.js` fails on a missing entry, a missing file or a line out of range.
 4. **Quoted text is copied from the code.** In `expect`, double quotes hold only text the code holds: messages, labels, statuses, error reasons. Copy them from the source, never from the spec. Write user input and example values without quotes (name Third thing, owner 1204). `check.js` searches the repo for each quoted string and fails when it is not there. Values inside a quote may differ from the code's placeholders (`"Third thing was created."` matches `` `${name} was created.` ``).
 5. **Spec and code disagree → keep the code, list the gap.** The scenario describes the code. The gap goes in `MISMATCHES` with the spec ref, both texts, the code evidence and the side to fix. Never resolve it silently, either way. No code yet (design phase) → write the scenario from the spec with `"source": "spec"` and no evidence. `check.js` warns, and verify mode must pass before play-scenarios or e2e-test use it.
-6. **Roles and permissions come from data**: seed migrations, role-permission tables and permission constants (`evidence.roles`). Never from spec prose ("only QA can …").
-7. **Every scenario carries a concrete, true example** (step 2, "Examples"). A reviewer playing it must be able to tell pass from fail by comparing the screen with the text. Prose alone ("The user is not allowed", "the tooltip explains why") is not enough.
-8. **No mock or test details.** No mock state ids, pages, query params or selectors. Example values (names, counts, ids, statuses the seed creates) are welcome; mock wiring is not. It belongs to the mock (`scenario-play.js`) and the test file.
-9. **Ids are stable.** Use cases are `UC1`, `UC2`, … (numbered per file). Scenarios are kebab-case and unique, and keep their id across specs while the rule is the same. Never reuse an id for another meaning. Other files link to `#sc-<scenario id>`.
-10. Every count you report comes from `scripts/check.js`, never an estimate.
-11. No absolute local paths in the file.
-12. **Every channel is covered.** A use case lists every channel users reach it on (`channels`). Each rule or outcome (acceptance scenario, edge case, refusal) gets one scenario per channel of its use case, citing the same story ref. When a channel truly can't reach an outcome, the scenario says why in `na` instead (e.g. `"na": { "mcp": "ListThings has no status filter." }`). Never drop the MCP side because the UI side exists.
-13. **Fewest scenarios that cover every rule.** Each scenario costs a reviewer time to play and a test to keep up. One scenario per rule or outcome, never one per click, view or value (step 2, "Split and merge").
-14. **One scenario = one screen = one result.** A scenario plays as one start state on one screen. Never split it into parts. A path that needs another screen, seed or data setup is its own scenario.
-15. **Core is the only priority.** Mark the scenarios to play first with `"core": true`. No other priority field (no frequency, impact, priority or P0 / P1 / P2).
-16. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
+6. **Every scenario carries a concrete, true example** (step 2, "Examples"). A reviewer playing it must be able to tell pass from fail by comparing the screen with the text. Prose alone ("The user is not allowed", "the tooltip explains why") is not enough.
+7. **No mock or test details.** No mock state ids, pages, query params or selectors. Example values (names, counts, ids, statuses the seed creates) are welcome; mock wiring is not. It belongs to the mock (`scenario-play.js`) and the test file.
+8. **Ids are stable.** Use cases are `UC1`, `UC2`, … (numbered per file). Scenarios are kebab-case and unique, and keep their id across specs while the rule is the same. Never reuse an id for another meaning. Other files link to `#sc-<scenario id>`.
+9. No absolute local paths in the file.
+10. **Every channel is covered.** A use case lists every channel users reach it on (`channels`). Each rule or outcome (acceptance scenario, edge case, refusal) gets one scenario per channel of its use case, citing the same story ref. When a channel truly can't reach an outcome, the scenario says why in `na` instead (e.g. `"na": { "mcp": "ListThings has no status filter." }`). Never drop the MCP side because the UI side exists.
+11. **Core is the only priority.** Mark the scenarios to play first with `"core": true`. No other priority field (no frequency, impact, priority or P0 / P1 / P2).
+12. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
 
@@ -113,7 +92,6 @@ For each use case and channel, find the entry point and follow it to every outco
 - **Branches → scenarios.** Every reachable branch with a distinct outcome (another result, error code, message or screen) is a scenario candidate. Then merge by the rules in step 2.
 - **Reachability first.** Before you write a scenario, prove the actor reaches its first step on that channel: route permission, nav visibility, button permission, API / MCP permission map, and the role seed. Can't reach it → the scenario is the refusal the actor really gets there (e.g. the Forbidden page, 403 `PERMISSION_DENIED` "…"), with that gate as `evidence.gate`, or an `na` reason that cites the gate: `"na": { "ui": "VIEWER cannot open Create thing: the route needs things.create (apps/web/lib/routes.ts:41)." }`. A spec outcome behind a gate the actor can't pass is never their scenario.
 - **Roles from data.** When the repo guide (`AGENTS.md`, `CLAUDE.md`) says where roles and permissions are defined, start there. Not found in the guide or the code → ask the user. Which roles hold each permission: read the seed migrations, role-permission tables and permission constants (`evidence.roles`). `VIEWER: has things.read, not things.create`. Note any upstream rule too (`the owner is archived`).
-- **Strings.** Copy every message, label, status, error reason and HTTP code the scenario quotes from the code at its `evidence.expect` line. For text built at run time (`fmt.Sprintf`, template strings), copy what the user sees with the example values filled in.
 - **Example data**: what the dev seed or fixtures really create (names, counts, ids, statuses), and what a real request returns.
 - **Controls**: read each control as the component renders it now. A tooltip replaced by inline text is inline text; never write "tooltip" or "hover" without seeing it in the component.
 - **Mismatches.** Every place the spec's intent or text differs from the code's (behaviour, gate, message, status, field): one `MISMATCHES` entry (step 2). Suggest `fix: "spec"` when the code looks deliberate (newer, tested, consistent with the rest), `fix: "code"` when the code looks like a bug or an unbuilt requirement.
@@ -230,18 +208,8 @@ Before and after:
 
 ### 3. Check
 
-- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks strict JSON, `UC<n>` use case ids, required fields, no field outside `use-cases.types.d.ts`, unique kebab-case scenario ids, every `useCase` in `USE_CASES`, a known `kind` with at most one `basic` per use case and channel, every `basic` marked `"core": true`, a known `surface` that is in its use case's `channels`, every channel with at least one scenario, every acceptance criterion covered on each of its `channels`, no scenario titled like its use case, no mock fields in a scenario (`state`, `page`, `parts`, `steps`, …), and that every use case has a scenario or a `none` sentence. It prints the scenario count per use case and channel, the count per kind, the core count per use case and channel, and the acceptance coverage.
-- It warns when more than 30% of the scenarios are core. Keep core for every basic, the main alternates and the errors users hit most.
-- It warns when an `expect` line starts with "Part 1", "Part 2", …. Split each part into its own scenario.
-- It warns when a scenario has no `kind`, or a channel of a use case has no `basic` scenario. Add the kind.
-- It warns when two scenarios share use case, channel, kind and story ref (and, for exceptions, the first quoted message), and when a use case has more than 12 scenarios on one channel. Merge them (step 2b), or say in the reply why they stay apart.
-- It warns when a scenario has no twin (same story ref) on another channel of its use case and no `na` reason, when an `api` scenario talks about MCP, and when an acceptance criterion skips a channel of its use case with no `na`. Add the twin, or the reason.
-- It fails on a code scenario with no `evidence`, an evidence or `na` ref whose file is missing or whose line is out of range, an absolute path, and `evidence.expect` not holding one ref per `expect` line. Fix the ref, or trace again: a moved line is drift.
-- It fails when a quoted string in a code scenario's `expect` is not in the code (outside `specs/`, `docs/`, tests and the spec folder). Copy the code's text; put the spec's text in `MISMATCHES`; take user input and example values out of the quotes.
-- It checks `MISMATCHES` fields, refs and scenario ids, and prints each entry.
-- It warns on every `"source": "spec"` scenario (`--strict` makes it an error; play-scenarios and e2e-test run it so), and on a scenario that names a permission with no `evidence.roles`.
-- It finds the repo root by walking up from the file to `.git`. Pass `--root <repo>` when the file is outside the repo.
-- It also warns (exit code stays 0) when a scenario's `expect` has no quoted message, number or identifier, and when a scenario that talks about a role, a permission or "not allowed" names no permission string. Fix each warning by adding the example from step 1b; leave one only when the scenario truly has no value to show, and say why in the reply.
+- `node <this skill dir>/scripts/check.js <plan>/use-cases.js`. It checks the file against the hard rules and step 2, and prints the counts and the acceptance coverage. Fix every error. Fix each warning, or say in the reply why it stays.
+- It finds the repo root by walking up from the file to `.git`. Pass `--root <repo>` when the file is outside the repo. `--strict` makes `"source": "spec"` warnings errors (play-scenarios and e2e-test run it so).
 - Fix every error and re-run until it exits 0.
 - Every acceptance scenario, edge case and refusal row in the source has a scenario. List any you left out, with why.
 

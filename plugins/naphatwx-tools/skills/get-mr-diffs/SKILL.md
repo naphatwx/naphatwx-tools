@@ -6,29 +6,15 @@ user-invocable: false
 
 # Get MR Diffs (shared helper)
 
-Resolve a GitLab merge request reference and get its **actual changes (diffs)**.
-This is the single shared flow for the `update-merge-request`,
-`generate-changelog`, `review-code` (MR mode) and `deployment-plan` skills.
-
 The calling skill may add overrides (e.g. noise-file filters, or "never
 exclude test files"). Apply them on top of this flow.
-
-## Input
-
-One MR reference:
-
-| Input | Meaning |
-|-------|---------|
-| Full MR URL | `https://<host>/<group>/<project>/-/merge_requests/<iid>` |
-| `<project_id>!<iid>` | e.g. `my-group/my-project!123` or `456!123` |
-| `!<iid>` or `<iid>` | MR in the current repo (resolve project from `git remote`) |
 
 ## Steps
 
 ### 1. Resolve project and IID
 
-- Full URL → `project_id = <group>/<project>`, `merge_request_iid = <iid>`.
-- `project!iid` → split on `!`.
+- Full URL (`https://<host>/<group>/<project>/-/merge_requests/<iid>`) → `project_id = <group>/<project>`, `merge_request_iid = <iid>`.
+- `project!iid` (`my-group/my-project!123`, `456!123`) → split on `!`.
 - Bare `iid` / `!iid` → `git remote get-url origin` to derive the project path.
 - If either cannot be resolved, report what is missing and stop.
 

@@ -1,7 +1,5 @@
 # Project Profile
 
-The profile tells the flow what this project has. Read it once at start.
-
 ## Where to find it
 
 1. A `## Flow profile` section in the root `AGENTS.md` or `CLAUDE.md`.

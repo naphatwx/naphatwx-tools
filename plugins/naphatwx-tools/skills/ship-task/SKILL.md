@@ -7,7 +7,6 @@ disable-model-invocation: true
 
 # Work Flow
 
-Take one task from idea to a merge-ready branch. Same phases on every project.
 The project's own rules come from its guide files and its **flow profile**.
 
 ## User Input
@@ -107,10 +106,6 @@ Then wait. "continue" / "review" → Phase 3. Change requests → same owners, b
 
 ## Decisions without the user
 
-- Spec verify findings: the main agent fixes them itself. One it disagrees with → the **decider** (`roles.md`), whose call is final.
-- Never leave an open question in the plan: the grill asks it. Only the user can defer one; it goes under `## Open questions` with what it blocks.
-- The project's rules answer convention questions (guides, ADRs, existing patterns). The grill never asks them; the plan marks them `(rule: <source>)`.
-- Auto-answer: the decider answers grill rounds after the user settles scope (`references/plan.md`).
 - A step that fails or loops more than 3 times → stop and report the blocker.
 
 ## Agents without sub-agents

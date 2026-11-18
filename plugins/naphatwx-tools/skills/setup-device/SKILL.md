@@ -38,13 +38,11 @@ Run and keep the results (names and versions only):
 
 - `claude --version`
 - Runtimes and managers: the "Check" lines in `references/tools.md` → Runtimes.
-- MCP servers, name and status only. The raw `claude mcp list` prints each server's command, and a token passed as an argument would show:
+- MCP servers, name and status only. Never run plain `claude mcp list` or `claude mcp get`: they print args and env values, tokens included.
 
   ```bash
   claude mcp list | perl -ne 'print "$1 - $2\n" if /^(.*?): .* - ([✔✘!].*)$/'
   ```
-
-  Never run plain `claude mcp list` or `claude mcp get`: they print args and env values.
 - `claude plugin list`: installed plugins and versions.
 
 `check` mode → go to step 6.
@@ -56,7 +54,6 @@ Use AskUserQuestion when the agent has it; else ask in one message.
 - Which tools and runtimes, when `$ARGUMENTS` named none. Default: all that are missing or older than the recommended version.
 - Whether to make each new runtime version the default (nvm alias, uv `--default`, SDKMAN default).
 - For each MCP tool: its envs (`prod`, `dev`, `local`, …). Per env, the non-secret values `references/tools.md` lists under "Ask" (API URL, Jenkins URL and user, allowed connections, read only or not).
-- Existing servers of that tool: show their names and offer to keep them.
 
 ## 3. Runtimes
 
@@ -64,7 +61,6 @@ Follow `references/tools.md` → Runtimes, in its order (uv, Node, Python, Java)
 
 1. Manager missing → show its install command, ask, run it on a yes. No → skip that runtime and the tools that need it.
 2. Recommended version missing → install it through the manager.
-3. Default change → only on a yes from step 2.
 
 Every new shell must load nvm and SDKMAN first (the "Load" line); a plain `nvm` or `sdk` call fails in a non-interactive shell.
 
@@ -76,7 +72,6 @@ Run the commands from `references/tools.md`, one tool at a time, with the user's
 
 - Plugins: add the marketplace (skip when `claude plugin marketplace list` has it), then install.
 - MCP: run `claude mcp add` per env, with `PASTE_<VAR>` for each secret.
-- OmniSQL: `npm i -g omnisql-mcp@latest` once, before its servers.
 - A command fails → show its error in full, skip that tool, go on.
 
 `update` mode → run each installed tool's "Update" line instead.

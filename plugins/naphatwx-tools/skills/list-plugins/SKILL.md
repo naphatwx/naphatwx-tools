@@ -4,8 +4,6 @@ description: List installed Claude Code plugins and marketplaces with versions, 
 allowed-tools: Bash, Read, Glob
 ---
 
-Show details of all installed Claude Code plugins and marketplaces.
-
 ## Steps
 
 1. **Read the installed plugins registry:**
@@ -14,7 +12,7 @@ Show details of all installed Claude Code plugins and marketplaces.
 
 2. **List all registered marketplaces:**
     - List directories in `~/.claude/plugins/marketplaces/`
-    - For each marketplace, read its `README.md` (if exists) to get the source URL
+    - Get each one's source (`source.repo` or `source.url`) from `~/.claude/plugins/known_marketplaces.json`
 
 3. **For each installed plugin, list its contents:**
     - List files recursively in `~/.claude/plugins/cache/{marketplace}/{plugin}/{version}/`
@@ -52,4 +50,3 @@ Show details of all installed Claude Code plugins and marketplaces.
     | {name} | {description} |
     ```
 
-5. Repeat for all installed plugins.

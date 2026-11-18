@@ -44,7 +44,7 @@ Every diagram is drawn by the `generate-diagram` skill (`naphatwx-tools:generate
 | diagram-design | the `diagram-design` skill is available | `flowchart/NN-<slug>.html` | `sequence-diagram/NN-<slug>.html` | `<iframe class="diagram-frame">` |
 | manual | no `diagram-design` skill | `flowchart/NN-<slug>.html` | `sequence-diagram/NN-<slug>.js` | `<iframe class="diagram-frame">` / `render.js` |
 
-The ER diagram is its own page in both modes (`database/er-diagram.html`), opened from the Database section. So is the API contracts board (`api/contracts.html`), opened from the API section. Sections are built by parallel sub-agents after the source is read (step 3).
+The ER diagram is its own page in both modes (`database/er-diagram.html`), opened from the Database section. So is the API contracts board (`api/contracts.html`), opened from the API section.
 
 ## User Input
 
@@ -66,17 +66,12 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 1. `overview.html` starts from `assets/overview.html`. Its styles and script live in `assets/assets/overview.css` and `overview.js`: copy them unchanged, and keep the rail, its search, the rail edge button, the floating tools, the presentation bar and the shortcut sheet (`#keys`) markup. Pages are always dark, in the Quiet Sheet theme: its colors are the `/* theme:tokens */` block at the top of `overview.css` (one blue accent; green, amber and red only mark the diffs + ~ −). Use `var(--token)`, never a hex. Don't edit between the `theme:` markers: change `theme/` in this plugin's repo and run `node theme/sync.mjs`. Dark only: add no light theme, theme toggle or other palette. The floating tools hold an **Export PDF** button (synced `theme:pdf` blocks): it loads every diagram frame, then opens the print dialog; the PDF shows every section and every use case view. Diagrams use the same palette and paper (the generate-diagram skill sets it).
     - Rail: always open on the left, numbered `01`–`08`, with use cases, changed tables and changed APIs nested as `UC<n>` / `5.N` / `6.N`. The round edge button or `[` hides it; `/` focuses its search.
-    - Floating tools (bottom right of the page, top right on phones): `Open all` shows every use case view stacked; `Zoom` makes every `.flowchart` and `.sequence` zoomable (wheel zooms at the cursor, drag pans, a `↺` button at the top right resets; off by default); `Present` (or `P`) starts presentation mode; `?` opens the shortcut sheet (`#keys` dialog: `1`–`4`, `P`, `←`/`→`, `Esc`, `[`, `/`, `?`).
     - Keep the skip link (`.skip` → `#sheet`) as the first element of `<body>`.
-    - Each diagram has a border and a `⛶` button at its top right that opens it in a lightbox: the page dims behind, the diagram sits in a frame 80% of the window's width and 90% of its height, fitted whole inside it, with its use case name and view as a caption below. Zoom works there even with the switch off (`✕`, Esc or a backdrop click closes it).
-    - Presentation mode shows one step per screen with a `← N / M · label →` bar: each use case gives one step per view, the API section an intro step plus one per `.api[data-part]`, every other `.slide` one step. A long step scrolls down; nothing scrolls sideways. A diagram draws at 1:1, never scaled (labels 14px, secondary lines 12px); its box ends above the bar, and a taller one scrolls inside its box with a `continues ↓` cue on the bottom edge; refs chips stay closed. `←` / `→` / Space step, Esc leaves. Full schema stays out of it.
-    - The browser remembers each viewer's settings (`localStorage`): rail collapse, zoom and Open all. Per page, a reload also reopens the open use case views, "more" blocks, refs chips and lightbox, and returns to the same scroll spot.
 2. **Every use case has both diagrams** (they draw its flow): `flowchart/NN-<slug>` (its logic) and `sequence-diagram/NN-<slug>` (how its services talk), same `NN-<slug>`. Never paste SVG into `overview.html`.
 3. Each use case is one `<section class="slide use-case" id="uc-NN" data-title="UC<n> · <name>">` with four view buttons (disclosure buttons in a `role="group"` `.views` row: Flowchart, Sequence, Rules, Scenarios, each `aria-expanded` + `aria-controls`) and their four panels (`role="region"`), all closed by default (`aria-expanded="false"`, every `.panel` `hidden`). A click opens one panel at a time; a second click closes it.
     - Diagrams show real values, not generic words: every decision, call, write and error node names its permission key, field value, RPC, table op or code from the brief (see the `generate-diagram` flowchart reference), in simple words, not symbols (`not in`, not `∉`; `and 2 more`, not `+2`).
     - Manual mode: the flowchart is an `<iframe class="diagram-frame">`; every sequence file calls `SeqDiagrams.define()`, is loaded by a `<script src>` at the end of `overview.html`, and is drawn into `<div class="sequence" data-flow="NN-<slug>">`.
     - diagram-design mode: each `.html` is embedded by an `<iframe class="diagram-frame">`. Its page kit (the `generate-diagram` skill adds it) hides the file's own eyebrow and title inside the frame and draws the diagram at 1:1.
-    - Every iframed diagram keeps its own Export PDF button, at the bottom right of the frame, under the drawing: the frame's height includes the room for it, so it never covers the diagram.
     - Step details never sit inside a diagram: they go on the page right after the `.sequence` box (manual: `render.js` adds them).
 4. Every rail link `href="#id"` (`.rail-list a`, nested ones included) matches a real `id` on the page, and every `.slide` has a `data-title` (presentation mode labels its steps with it).
 5. Every mock link (into `mock/`) opens in a new tab: `target="_blank" rel="noopener"`. This is for the local folder; the published copy drops it (step 8).
@@ -94,7 +89,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 1. Read the source
 
-- Use Glob, Grep and Read on the spec folder: spec, plan, data model, contracts, research, decisions.
+- Read the spec folder: spec, plan, data model, contracts, research, decisions.
 - Extract:
     - Summary, key decisions, in scope / out of scope.
     - **Use cases**: each goal a user wants to reach, named verb + object ("Create a thing"). A step shared by several goals ("Open the form") or a refusal / timeout path is not a use case: it is a scenario of the goal it belongs to.
@@ -154,13 +149,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Sections, in order, each a `<section class="slide" id="…" data-title="…">` with its number in `<span class="section-number">` (`02`–`08` in the `<h2>`, `01` at the start of the Overview kicker; use cases `UC<n>`). Always keep every section and its rail link. When a section has no content, replace its body with one sentence saying so (e.g. "This feature has no database changes.").
     1. **Overview**: the `<h1>`, a one-sentence `.lead` + a `<dl class="facts">` of 3–4 key facts (key decision, data impact, API impact, UI impact or eligibility/scale), each `<dd>` one short line; a fact about data or API ends with a link to its section.
     2. **Scope**: the `.scope` block, full width: `<h3 class="label">In scope</h3>` with its bullet list, then `<h3 class="label">Out of scope</h3>` with its bullet list below it. Each out-of-scope item ends with its reason in `<span class="aside">— why</span>`.
-    3. **Acceptance criteria** (`id="acceptance"`): keep the template's `<h2>` and its two markers; leave the body to the script. Once `use-cases.js` exists, run `node <this skill dir>/scripts/acceptance-section.js <output>`. It writes:
-        - A summary line: `N criteria · M covered on every channel · K gaps · J n/a`.
-        - A table with one row per `ACCEPTANCE` entry, in file order (`id="ac-us1-ac3"`): its id, then Given / when / then in one sentence.
-        - Per channel of the criterion, a `.channel-tag` and the scenarios that cite it (through their `story`, `US1 · AC2–4` included), each a link to its row `#sc-<id>` in the Scenarios view (a click opens that view). A channel with no citing scenario shows an amber `gap` line; an `na` channel shows its reason, muted.
-        - No `ACCEPTANCE` list, or an empty one → one line saying so, pointing to the generate-use-case skill.
-        - When `MISMATCHES` has entries: a "Spec vs code (N)" table after the criteria (`id="spec-vs-code"`), one row per entry: id and spec ref, what differs, the code refs, the side to fix, links to its scenarios.
-        - Re-run it after `use-cases.js` changes; it is safe to re-run.
+    3. **Acceptance criteria** (`id="acceptance"`): keep the template's `<h2>` and its two markers; leave the body to the script. Once `use-cases.js` exists, run `node <this skill dir>/scripts/acceptance-section.js <output>`. Re-run it after `use-cases.js` changes; it is safe to re-run.
     4. **Use cases**: an `ol.use-case-index` with one row per use case (`UC<n>` + name, link to `#uc-NN`, user story and priority on the right, which `overview.js` folds into a `N refs` chip). Then one block per use case (copy the block between the `one block per use case` comments):
         - `<header class="use-case-head">`: `<h3>` with `<span class="section-number">UC<n></span>` + the use case name, then `<p class="references">` with its tags (user story, requirement ids joined by ` · `; no file names). `overview.js` turns the line into a `N refs` chip on the title line; a click shows the IDs, and Export PDF prints them all.
         - `<p class="use-case-line">`: the user's goal in one sentence, then `<span class="aside">Starts from <trigger>.</span>`.
@@ -169,11 +158,10 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - Sequence panel (`.panel.wide`): manual → `<div class="sequence" data-flow="NN-<slug>">` with the `.sequence-legend` line inside it; diagram-design → `<div class="sequence">` + the returned `<iframe class="diagram-frame">`, then the returned `<div class="sequence-steps">` right after the `.sequence` box, not inside it.
             - Rules panel (`.panel`, not wide): 3–5 bullets from the spec.
             - Scenarios button and panel (`.panel`, not wide, always last in the block): leave them out of the fragment. `node <this skill dir>/scripts/scenarios-panels.js <output>`, run once the use case blocks are in, writes them from `use-cases.js`:
-                - Button `Scenarios (K)`, K = the use case's scenario count.
                 - A `.table-wrap` table, one row per scenario with `id="sc-<id>"`: Scenario (its channel as a `.channel-tag` — ui, mcp, api or job — the title, its kind, a solid `.core-pill` "Core" (tooltip "Core: play first") when `core` is true, its story as a `N refs` chip (badge order: channel → title → kind → core → refs), the first expect line in `.aside`, then one muted `.aside.not-applicable` line per `na` reason) | with a mock, `Play ↗` → `mock/index.html#sc-<id>` (new tab) for a ui scenario in the mock, "not in the mock" for a ui one it skips, "No mock" for mcp / api / job. A use case with no scenario → one `.muted` line with its `none` sentence.
-                - The first expect line carries the scenario's example (generate-use-case writes it so), so the panel shows real values with no extra work. Re-run the script after `use-cases.js` changes.
+                - Re-run the script after `use-cases.js` changes.
                 - With a mock, it also adds `.side-link` "Open the mock ↗" (new tab) to the Use cases `<h2>`.
-                - Under the Use cases `<h2>`: `#scenario-filter`, with no legend line. `overview.js` fills it from the synced `theme:scenario-filter-js` block: a sticky bar over every Scenarios view with a search field (type to match scenario titles; `/` jumps in; matches are marked) and a live "n of N" count. Focus opens the groups as pills with live counts: Type (ui / api / mcp / job), Kind (basic / alternate / exception), Core only. A group shows only the values the page has, and hides when it has one value. Values in one group combine with OR; groups combine with AND. Picked values show as chips in the field (click to remove; Backspace removes the last); Clear resets. The open panel floats over the rows; a click outside or Escape closes it. Hidden rows keep their order; a view with nothing left says "No scenario matches the filter". The choice is kept in `localStorage`. Rows keep `data-surface` / `data-kind` / `data-core` and the title in `.scenario-name`.
+                - Under the Use cases `<h2>`: `#scenario-filter`, with no legend line (`overview.js` fills it from the synced filter block).
     5. **Database changes**: the ER diagram link, the facts, the changes, then the full schema hidden in a closed `<details class="more">` (copy the Database block).
         - **ER diagram ↗** link, inside the `<h2 id="database">` right after its text: `<a class="side-link" href="database/er-diagram.html" target="_blank" rel="noopener">`. Split by area → one link per page (`ER diagram · catalog ↗`). No related table → no page and no link.
         - **Facts** (`dl.facts`): `Migration`, `Changed` (each table + `new` / `altered`), `Left alone` (tables read but not changed, each with why). Name indexes and constraints here too.
@@ -186,7 +174,6 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
         - **Full schema** (hidden, summary `Full schema` + `<span class="aside">every related table, all columns</span>`): every table the feature reads or writes, with all its columns.
             - Tags: `new table` / `altered` + `.table-card.change` (changed rows keep their marks), `read` for a table only read or only written to without a schema change, `external` + `.table-card.external` for a table another service owns.
             - `.relation` lines for every relation between the listed tables.
-        - No related table at all → keep the section with one sentence: "This feature has no database changes."
     6. **API changes**: the API contracts link, the facts, then one block per changed API (copy the API block).
         - Source: the proto / OpenAPI / GraphQL schema / DTO diff in the spec's contracts. "API" means one RPC, REST endpoint or GraphQL operation; "message" means its request or response body (REST: path and query params count as request fields).
         - **API contracts ↗** link, inside the `<h2 id="api">` right after its text: `<a class="side-link" href="api/contracts.html" target="_blank" rel="noopener">`. No related API → no page and no link.
@@ -209,7 +196,6 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - One `apis` entry per API, in the order of the API blocks, then the ones only called: `id` (the `api-<kebab-name>` slug), `name`, `tag` (`new` / `changed` / `behaviour` / `called, unchanged`), `route`, `perm` (`none · system caller` when it has none), `ext: true` when another service owns it.
             - `req` and `res`: the message `name`, its `tag` (`new message` / `altered` / `removed message` / `unchanged`) and every field in contract order (protobuf: field-number order) as `[name, type, number, mark?]`; `number` is `""` when the contract has none. The type is the type only (`int32`, `optional string`, `repeated ThingResponse`): no notes, no ` · `, no doc comments copied in. Changed fields keep their marks (`add` / `change` / `drop`, number `+ N` / `~ N` / `− N`, or `+` / `~` / `−` without numbers, type `old → new`). No request or response message → leave it out (the board shows `no message`).
             - `types`: the shared enums and nested messages, the same shape. They form the last numbered block, `Shared types`.
-        - No related API at all → keep the section with one sentence: "This feature has no API changes."
     7. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
     8. **Open questions**: a `<p class="blocker-line"><strong class="blocker">Blocker:</strong> …</p>` per blocker (a tinted amber band with the label), then an `ol.questions` with one `<li><p>question</p><span class="who">Owner: …</span></li>` each (leave out `.who` when no owner is known). None → one sentence saying there are no open questions.
 - Manual mode: add one `<script src="sequence-diagram/NN-<slug>.js">` per use case before the final `SeqDiagrams.renderAll()` line.
@@ -231,29 +217,25 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 6. Verify
 
-- Every rail link hash, nested ones included, matches an id on the page; every `.slide` has a `data-title`; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
+- Every `href="#…"` on the page (rail, nested ones included, use case index) matches an id; every `.slide` has a `data-title`; every `data-flow`, `<img src>` and `<iframe src>` points to a file that exists.
 - Every use case has both a flowchart and a sequence diagram file; every view button has `aria-expanded="false"`, every `.panel` is `hidden` and every `details.more` is closed by default.
 - Every flowchart decision, call, write and error node shows a real value from the brief (or `TBD`); no sequence note or `alt` says only `guards` / `checks`.
 - Database "Full schema" lists every table in the sequence diagrams; the API contracts board lists every API in them.
 - Every table in the Full schema appears on an ER diagram page, and every ER and API contracts link points to a page that exists.
 - `.parts/` is deleted.
-- Every `href="#…"` on the page (rail, use case index) resolves to an id.
 - Each use case keeps one name everywhere: rail, use case index, `data-title`, its `<h3>` and its `USE_CASES` title. Its Scenarios panel lists scenarios of that use case only.
 - Run the generate-use-case skill's `scripts/check.js <output>/use-cases.js` and fix every error it reports (re-run the generate-use-case skill for a missing scenario). Keep its acceptance coverage line for step 7.
 - Run `node <this skill dir>/scripts/acceptance-section.js <output>` again. Its printed coverage matches `check.js`; every gap it lists is either fixed or reported in step 7. Every `#sc-<id>` link in the section resolves to a Scenarios row.
-- Mock built → run the generate-mock-ui skill's `scripts/check-scenarios.js <output>/mock` and fix every error it reports: `node --check` on every mock `.js` file and inline `<script>`, every ui scenario has one play entry with a real state (in `states.js`) and page, and no mcp / api / job scenario has one (those show "No mock" in the mock). Then check each use case's Scenarios count and Play links match `use-cases.js` (re-run `scenarios-panels.js` if not).
+- Mock built → run the generate-mock-ui skill's `scripts/check-scenarios.js <output>/mock` and fix every error it reports. Then check each use case's Scenarios count and Play links match `use-cases.js` (re-run `scenarios-panels.js` if not).
 - Each `generate-diagram` run did its own checks; re-run it for any diagram that fails below.
-- Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), labels are not clipped, each iframe ends at its diagram (no cut-off, no empty space below), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws. Open the API contracts board: every method block and card draws. Each page's `← Overview` link works.
+- Open `overview.html` in a headless browser when one is available, and press `Open all`, then check each diagram draws (no "Missing diagram file" text, no broken image or empty iframe), with `Zoom` switched on, the wheel zooms each diagram and its `↺` button resets it, its `⛶` button opens it in the lightbox and fits the whole diagram, and the console has no `[seq]` warnings. Open each ER diagram page too: every table and FK line draws. Open the API contracts board: every method block and card draws. Each page's `← Overview` link works.
 - Presentation mode, in the same browser at 1440×900, 1280×720 and 1024×768: press `P` and step through every step; on each, the page is no wider than the window (`document.documentElement.scrollWidth <= innerWidth`), the step's diagram or tables show whole across, the diagram box ends above the bar, every diagram label renders at its set size, 14px or 12px (not scaled up or down), and a box that scrolls shows the `continues ↓` cue.
 - Grep the output for absolute local paths (`/Users/`, `/home/`, `C:\`) and remove them.
 
 ### 6b. Review the mock (always, when a mock exists)
 
-- Run after step 6 passes, before step 8. Follow the generate-mock-ui skill's `references/mock-review.md`:
-    - two **fresh**, review-only agents in one message, in parallel: a UI fidelity reviewer ("Would a user think this IS the real app?") and a functional reviewer ("Does every scenario behave as the spec says?");
-    - merge their reports; settle each conflict against the spec first, then the real code, and note which won;
-    - one **fresh** fix agent applies every fix (never a reviewer);
-    - then `node <this skill dir>/scripts/scenarios-panels.js <output>` (and `acceptance-section.js` if `use-cases.js` changed) and re-run step 6.
+- Run after step 6 passes, before step 8. Follow the generate-mock-ui skill's `references/mock-review.md`,
+    then `node <this skill dir>/scripts/scenarios-panels.js <output>` (and `acceptance-section.js` if `use-cases.js` changed) and re-run step 6.
 - Don't run the reviewers again unless the fix agent reports a finding it could not apply.
 - No mock → skip.
 
@@ -276,15 +258,11 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 ### 8. Publish as a claude.ai Artifact (only when asked)
 
-Publish only after step 6c. Publish from a copy, never the plan folder itself. Two things break inside claude.ai:
-
-- A `target="_blank"` link opens the artifact's internal frame URL in a new tab, which claude.ai refuses (`ERR_BLOCKED_BY_RESPONSE`). The copy drops `target` / `rel` from every link.
-- The entry page is published as `index.html`, so links back to `overview.html` (`../overview.html` from the ER diagram's `← Overview` and the mock's `← Feature plan`) must point at `index.html` in the copy.
+Publish only after step 6c. Publish from a copy, never the plan folder itself.
 
 Steps:
 
-- `node <this skill dir>/scripts/publish-copy.js <output> <copy-dir>`, with `<copy-dir>` outside the plan folder (the agent's scratchpad, e.g. `<scratchpad>/<feature-slug>-artifact/`). It makes both fixes and prints `file_path`, `root` and `files`.
+- `node <this skill dir>/scripts/publish-copy.js <output> <copy-dir>`, with `<copy-dir>` outside the plan folder (the agent's scratchpad, e.g. `<scratchpad>/<feature-slug>-artifact/`). It fixes the links for claude.ai and prints `file_path`, `root` and `files`.
 - Publish with the Artifact tool when the agent has it: `file_path` = the printed `index.html`, `root` + `files` = the printed values (every file goes through `files`; `types.ts` is sent as `text/plain`). First publish also needs an `icon`.
 - Republish → rebuild the copy at the **same** `<copy-dir>` and publish the same `file_path`, so the URL stays.
-- Keep Hard Rule 5 for the local folder: only the copy loses `target="_blank"`.
 - No Artifact tool → stop after the copy and tell the user where it is.
