@@ -123,7 +123,7 @@ These are not always added. Add each one only when it applies to this change and
 Before you ask the user, try to answer each `check` item with a read-only tool the agent has. Turn the answer into a concrete step, or drop the step if it is already done.
 
 Examples:
-- The config / env-var platform's tool, if the repo has one: whether a global or app key exists in the env, and which apps it is linked to. "Check the key exists" becomes "Link GLOBAL_X to api" or goes away.
+- The config / env-var platform's tool, if the repo has one: whether the key is already set for the service in that env. "Check the key exists" becomes "Set FOO_URL on api" or goes away.
 - The feature-flag service's tool, if the repo has one: whether a toggle already exists.
 - GitLab MCP (any server name works): the default branch; the latest version tag; the pipeline status of the merge commit.
 - A read-only SQL tool: the current migration version in the migrations table you found in step 3.

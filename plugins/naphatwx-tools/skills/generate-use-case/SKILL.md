@@ -188,7 +188,7 @@ Start from `assets/use-cases.js`. Copy `assets/use-cases.types.d.ts` next to it,
 | `mcp` / `api` | a short request → answer: "ListThings {ownerId 1204, page 1, limit 20} → 20 things, total 32" |
 | `job` | the command and the script's real output line: "backfill: updated=1 skipped=2" |
 
-Before and after, from a real plan:
+Before and after:
 
 | Field | Prose only | With an example |
 |-------|-----------|-----------------|

@@ -282,7 +282,7 @@ All strict JSON. Paths inside are relative to the run folder.
   "tests": [
   { "scenario": "mcp-create-thing", "surface": "mcp", "role": "EDITOR", "prompt": "create a copy of thing-alpha",
     "steps": [ { "title": "Copy thing-alpha", "setup": true, "command": "npx tsx e2e/things/create-a-thing.data.mts setup thing-alpha" },
-               { "title": "Create a thing from thing-alpha", "call": "ThingService · CreateThing", "params": { "sourceId": "<from step 1: thing-alpha.id>" }, "expect": "thing thing-alpha-2, status PENDING" },
+               { "title": "Create a thing from thing-alpha", "call": "create_thing", "params": { "sourceId": "<from step 1: thing-alpha.id>" }, "expect": "thing thing-alpha-2, status PENDING" },
                { "title": "Delete the thing-alpha copy", "cleanup": true, "command": "npx tsx e2e/things/create-a-thing.data.mts cleanup" } ] },
   { "scenario": "backfill-rerun", "surface": "job",
     "steps": [ { "title": "Run the backfill twice", "command": "node scripts/backfill.mjs", "expect": "prints \"backfill: updated=0 skipped=3\"" } ] } ] }
@@ -295,7 +295,7 @@ All strict JSON. Paths inside are relative to the run folder.
   { "scenario": "mcp-create-thing", "role": "EDITOR", "status": "passed", "ms": 4100, "error": "only when failed", "reason": "only when skipped",
     "prompt": "create a copy of thing-alpha", "reply": "Created thing-alpha-2. It is PENDING.",
     "steps": [ { "title": "Create a thing", "status": "passed", "ms": 2900,
-      "call": { "target": "ThingService · CreateThing", "request": { "sourceId": 9001 }, "response": { "name": "thing-alpha-2", "status": "PENDING" } } },
+      "call": { "target": "create_thing", "request": { "sourceId": 9001 }, "response": { "name": "thing-alpha-2", "status": "PENDING" } } },
                { "title": "Run the backfill", "status": "passed", "ms": 5200,
       "call": { "target": "$ node scripts/backfill.mjs", "request": "node scripts/backfill.mjs", "response": "exit 0\nbackfill: updated=0 skipped=3" } } ] } ] }
 ```

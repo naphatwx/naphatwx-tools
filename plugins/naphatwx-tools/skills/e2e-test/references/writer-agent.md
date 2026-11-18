@@ -90,12 +90,12 @@ mcp and job scenarios (.ai-tests.json, played later by an AI tester agent)
       "tests": [ { "scenario": "<id>", "surface": "mcp" | "job", "role": "<role>",
         "prompt": "<what this role would type to their AI agent>",                  ← mcp only
         "steps": [ { "title": "<plain sentence>", "setup"?: true, "cleanup"?: true,
-                     "call": "<Service> · <Operation>", "params": { ... },     ← mcp
+                     "call": "<tool>", "params": { ... },                    ← mcp
                      "command": "<shell command>",                             ← job
                      "expect": "<what this step must show, from the scenario>" } ] } ] }
 17. Ship one setup / cleanup command for the use case, written in the one runner pattern given above,
     and document it in `runner`. Setup prints the copies it made; cleanup deletes them and sweeps.
-18. mcp: read the MCP tool list and each operation's request shape from the code (tool registry, proto).
+18. mcp: read the MCP tool list and each operation's request shape from the code (tool registry, schema).
     One step per tool call, in order: who-am-I check first when the server has one, then the setup
     command, the scenario's `when`, the checks of `expect`, then the cleanup command. A value from an
     earlier step is written "<from step N: field>".

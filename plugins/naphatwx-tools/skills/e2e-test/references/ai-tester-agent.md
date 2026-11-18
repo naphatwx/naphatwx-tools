@@ -46,7 +46,7 @@ Record
        "prompt"?: "<the test's prompt, as given>", "reply"?: "<your answer to that user>",
        "steps": [ { "title": "<from the test file>", "status": "passed" | "failed", "ms": <n>, "error"?: "<mismatch>",
                     "setup"?: true, "cleanup"?: true,
-                    "call": { "target": "<Service> · <Operation>" | "$ <command>", "refused"?: true,
+                    "call": { "target": "<tool>" | "$ <command>", "refused"?: true,
                               "request": <params object, or the command string>,
                               "response": <response object, or "exit <code>\n<output>"> } } ] } ] }
    - mcp tests: copy `prompt` from the test file. `reply` is what you would tell that user after the calls:

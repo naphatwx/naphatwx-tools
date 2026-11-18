@@ -26,17 +26,16 @@ What the helper exports
 4. `sweep(request, uc)`: deletes leftovers of aborted runs for that use case, found by the `-e2e<N>-`
    marker. It must never match a name without the marker.
 5. State that only a background worker would set: the helper sets it itself after a short,
-   configurable wait (env var, default about 10 s, not 90 s).
-6. A record stuck in a pending state: move it on to its next state first; cancel it only if that fails.
-7. Copy through the app's API (REST, or the MCP-backed route). Read routes and request shapes from the code.
+   configurable wait (env var, short default).
+6. Copy through the app's API (REST, GraphQL, RPC or an MCP-backed route). Read routes and request shapes from the code.
 
 Runner for mcp and job scenarios
-8. Pick ONE way to run setup / cleanup outside Playwright, the same for every use case (e.g. a small
+7. Pick ONE way to run setup / cleanup outside Playwright, the same for every use case (e.g. a small
    `.mts` script run with `npx tsx` that imports this helper, `setup <seed names…>` prints the copies as
    JSON, `cleanup` deletes them and sweeps). Give the writers the exact pattern.
 
 Prove it
-9. Write a throwaway spec that builds a fixture, checks the copies and their names, runs sweep, and
+8. Write a throwaway spec that builds a fixture, checks the copies and their names, runs sweep, and
    cleans up. Run it once, fix until it passes, then delete it. Run the runner's setup and cleanup once too.
 
 Return:

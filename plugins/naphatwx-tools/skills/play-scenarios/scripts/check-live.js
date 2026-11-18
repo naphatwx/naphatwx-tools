@@ -99,7 +99,7 @@ function valueKeys(file) {
     return keys;
 }
 // a value the seed knows is written as {key}; a secret keeps its <placeholder>
-const VAGUE = /\b(?:that|the newest|the latest) (?:merge request|MR|repo(?:sitory)?|branch|version|tag|project|ticket|user|owner|pipeline|build)\b(?! named\b)|<(?![^>]*(?:token|secret|password|key\b|pat\b))[^<>\n]+>|\b[a-z]+-(?:…|\.\.\.)/i;
+const VAGUE = /\b(?:that|the newest|the latest) (?:thing|item|record|entry|user|owner|project|order|file)\b(?! named\b)|<(?![^>]*(?:token|secret|password|key\b|pat\b))[^<>\n]+>|\b[a-z]+-(?:…|\.\.\.)/i;
 
 const SURFACES = ['ui', 'mcp', 'api', 'job'];
 CORE.forEach(s => { if (!PLAY.some(p => p.id === s.id)) errors.push(`scenario ${s.id}: no entry in live.js`); });
