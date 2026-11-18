@@ -27,7 +27,7 @@ A reader should see *what exactly* is checked or called without opening the spec
 
 | Node | Detail line holds | Example |
 |------|-------------------|---------|
-| Permission diamond | the permission key | `thing.edit` |
+| Permission diamond | the permission key | `things.update` |
 | State / type diamond | the field and the values that pass | `status = ACTIVE`, `type in A, B, C` |
 | Validation diamond | the rule | `name max 64 chars` |
 | Feature flag / config diamond | the flag or key | `FF_NEW_FLOW` |
@@ -51,7 +51,7 @@ Every label, detail line and condition a reader sees:
 |------------|-------|
 | `∈` / `∉` | `in` / `not in` |
 | `⊆` | `all in` |
-| `≠`, `!=` | `not` (`status not AVAILABLE`) |
+| `≠`, `!=` | `not` (`status not ACTIVE`) |
 | `≠ ''`, `!= null` | `not empty`, `is set` |
 | `≤` / `≥` | `at most` / `at least` |
 | `&&` / `\|\|` | `and` / `or` |

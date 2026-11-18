@@ -8,7 +8,7 @@ export type ThingStatus = 'PENDING' | 'READY' | 'FAILED';
 
 // ---------------------------------------------------------------- new operations (one request/response pair each)
 
-export interface GetThingsRequest {
+export interface ListThingsRequest {
   ownerId: number;
   /** 1-based. */
   page: number;
@@ -24,7 +24,7 @@ export interface ThingResponse {
   createdAt: string;
 }
 
-export interface GetThingsResponse {
+export interface ListThingsResponse {
   entities: ThingResponse[];
   totalPages: number;
   page: number;

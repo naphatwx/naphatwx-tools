@@ -147,7 +147,7 @@ if (fs.existsSync(resultsFile)) {
         if (!CORE.some(s => s.id === id)) errors.push(`results.js ${id}: no scenario with this id in use-cases.js`);
         if (!['pass', 'fail', ''].includes(r.status)) errors.push(`results.js ${id}: status must be pass, fail or "" (got "${r.status}")`);
         (r.calls || []).forEach((c, i) => {
-            if (!c.lookup && !c.command && !(c.tool && (c.arguments || c.operation))) errors.push(`results.js ${id} call ${i + 1}: needs tool + arguments, command, or lookup`);
+            if (!c.lookup && !c.command && !(c.tool && c.arguments)) errors.push(`results.js ${id} call ${i + 1}: needs tool + arguments, command, or lookup`);
         });
     }
 } else if (PLAY.some(p => p.prompt)) errors.push('results.js is missing: start it as `var PLAYED_RESULTS = {};`');

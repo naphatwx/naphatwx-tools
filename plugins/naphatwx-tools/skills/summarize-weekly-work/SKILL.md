@@ -1,6 +1,6 @@
 ---
 name: summarize-weekly-work
-description: Summarize the user's git commits into up to 5 weekly achievement items, ready to paste. Use when the user says "log my work" or "weekly achievements for last week".
+description: Summarize the user's git commits into up to 5 weekly achievement items by default, ready to paste. Use when the user says "log my work" or "weekly achievements for last week".
 ---
 
 # Work Log — Weekly Achievements from Git History
@@ -77,6 +77,6 @@ If the user named specific repos, resolve each name against the current director
 
 ## Notes
 
-- If a repo has zero commits in range, say so briefly — do not fabricate items.
+- If no repo has commits in range, say so briefly — do not fabricate items.
 - If the user asks for fewer/more items, regenerate accordingly;
   the character cap always applies.

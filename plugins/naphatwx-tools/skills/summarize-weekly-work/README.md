@@ -52,7 +52,7 @@ Output: a chat reply.
 <item 1, nothing else, so one click copies it>
 ```
 
-**2.** ... up to **5.**
+**2.** ... up to **5.** (default)
 
 <1-2 sentence week overview>
 ````

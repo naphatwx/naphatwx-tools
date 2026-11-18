@@ -9,19 +9,19 @@ var PLAYED_RESULTS = {
   "note": "Claude over MCP, 2026-10-14: 2 things, Second thing PENDING then First thing READY.",
   "calls": [
    { "role": "EDITOR", "tool": "list_things", "arguments": { "ownerId": 1202 }, "isError": false,
-     "response": { "things": [{ "id": 1205, "name": "Second thing", "status": "PENDING" }, { "id": 1204, "name": "First thing", "status": "READY" }], "total": 2 } }
+     "response": { "things": [{ "id": 1204, "name": "Second thing", "status": "PENDING" }, { "id": 1203, "name": "First thing", "status": "READY" }], "total": 2 } }
   ]
  },
  "mcp-create": {
   "status": "pass",
   "by": "Claude over MCP on the local app",
   "at": "2026-10-14",
-  "note": "Claude over MCP, 2026-10-14: PENDING, audit \"created thing #1207\".",
+  "note": "Claude over MCP, 2026-10-14: PENDING, audit \"created thing #1205\".",
   "calls": [
    { "role": "EDITOR", "tool": "create_thing", "arguments": { "ownerId": 1202, "name": "Third thing" }, "isError": false,
-     "response": { "id": 1207, "name": "Third thing", "status": "PENDING" } },
-   { "role": "EDITOR", "tool": "get_audit_logs", "arguments": { "thingId": 1207, "limit": 1 }, "isError": false,
-     "response": { "entities": [{ "message": "created thing #1207" }], "total": 1 } }
+     "response": { "id": 1205, "name": "Third thing", "status": "PENDING" } },
+   { "role": "EDITOR", "tool": "get_audit_logs", "arguments": { "thingId": 1205, "limit": 1 }, "isError": false,
+     "response": { "entities": [{ "message": "created thing #1205" }], "total": 1 } }
   ]
  },
  "mcp-create-empty-name": {
@@ -32,7 +32,7 @@ var PLAYED_RESULTS = {
   "calls": [
    { "role": "EDITOR", "tool": "create_thing", "arguments": { "ownerId": 1210, "name": "" }, "isError": true,
      "response": "Invalid argument: name is required." },
-   { "lookup": "The owner id 1210 came from ▶ Seed (the seed's vars)." },
+   { "lookup": "The owner id 1210 came from ▶ Seed (the seed's values)." },
    { "role": "EDITOR", "tool": "list_things", "arguments": { "ownerId": 1210 }, "isError": false,
      "response": { "things": [{ "id": 1212 }, { "id": 1211 }], "total": 2 } }
   ]

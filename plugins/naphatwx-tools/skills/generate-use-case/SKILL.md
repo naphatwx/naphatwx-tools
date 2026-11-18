@@ -74,7 +74,7 @@ Where the file goes (`<plan>`):
 5. **Spec and code disagree → keep the code, list the gap.** The scenario describes the code. The gap goes in `MISMATCHES` with the spec ref, both texts, the code evidence and the side to fix. Never resolve it silently, either way. No code yet (design phase) → write the scenario from the spec with `"source": "spec"` and no evidence. `check.js` warns, and verify mode must pass before play-scenarios or e2e-test use it.
 6. **Roles and permissions come from data**: seed migrations, role-permission tables and permission constants (`evidence.roles`). Never from spec prose ("only QA can …").
 7. **Every scenario carries a concrete, true example** (step 2, "Examples"). A reviewer playing it must be able to tell pass from fail by comparing the screen with the text. Prose alone ("The user is not allowed", "the tooltip explains why") is not enough.
-8. **No mock or test details.** No mock state ids, pages, query params or selectors. Example values (versions, counts, ids, names the seed creates) are welcome; mock wiring is not. It belongs to the mock (`scenario-play.js`) and the test file.
+8. **No mock or test details.** No mock state ids, pages, query params or selectors. Example values (names, counts, ids, statuses the seed creates) are welcome; mock wiring is not. It belongs to the mock (`scenario-play.js`) and the test file.
 9. **Ids are stable.** Use cases are `UC1`, `UC2`, … (numbered per file). Scenarios are kebab-case and unique, and keep their id across specs while the rule is the same. Never reuse an id for another meaning. Other files link to `#sc-<scenario id>`.
 10. Every count you report comes from `scripts/check.js`, never an estimate.
 11. No absolute local paths in the file.
@@ -114,7 +114,7 @@ For each use case and channel, find the entry point and follow it to every outco
 - **Reachability first.** Before you write a scenario, prove the actor reaches its first step on that channel: route permission, nav visibility, button permission, API / MCP permission map, and the role seed. Can't reach it → the scenario is the refusal the actor really gets there (e.g. the Forbidden page, 403 `PERMISSION_DENIED` "…"), with that gate as `evidence.gate`, or an `na` reason that cites the gate: `"na": { "ui": "VIEWER cannot open Create thing: the route needs things.create (apps/web/lib/routes.ts:41)." }`. A spec outcome behind a gate the actor can't pass is never their scenario.
 - **Roles from data.** When the repo guide (`AGENTS.md`, `CLAUDE.md`) says where roles and permissions are defined, start there. Not found in the guide or the code → ask the user. Which roles hold each permission: read the seed migrations, role-permission tables and permission constants (`evidence.roles`). `VIEWER: has things.read, not things.create`. Note any upstream rule too (`the owner is archived`).
 - **Strings.** Copy every message, label, status, error reason and HTTP code the scenario quotes from the code at its `evidence.expect` line. For text built at run time (`fmt.Sprintf`, template strings), copy what the user sees with the example values filled in.
-- **Example data**: what the dev seed or fixtures really create (project names, versions, row counts, ids), and what a real request returns.
+- **Example data**: what the dev seed or fixtures really create (names, counts, ids, statuses), and what a real request returns.
 - **Controls**: read each control as the component renders it now. A tooltip replaced by inline text is inline text; never write "tooltip" or "hover" without seeing it in the component.
 - **Mismatches.** Every place the spec's intent or text differs from the code's (behaviour, gate, message, status, field): one `MISMATCHES` entry (step 2). Suggest `fix: "spec"` when the code looks deliberate (newer, tested, consistent with the rest), `fix: "code"` when the code looks like a bug or an unbuilt requirement.
 - **e2e run vs scenario**: when an e2e-test run shows the code's message, status or list differs from a scenario (e.g. 200 vs 201, an RBAC refusal string), update the scenario to the code's text and its evidence.
@@ -194,7 +194,7 @@ Before and after, from a real plan:
 |-------|-----------|-----------------|
 | `given` | The user is not allowed. | The user is VIEWER: has things.read but not things.create (only EDITOR and ADMIN hold it). |
 | `expect` | Create is disabled; its tooltip says why. | Create is disabled; under it: "This owner is archived. Things cannot be created." |
-| `expect` | The version is created. | Toast: "Third thing was created."; Third thing tops the list as PENDING. |
+| `expect` | The thing is created. | Toast: "Third thing was created."; Third thing tops the list as PENDING. |
 
 - **Kind.** Ask: did the user reach the goal?
     - On the main path, with nothing special → `basic`. Exactly one per use case and channel.
@@ -210,7 +210,7 @@ Before and after, from a real plan:
 **Split and merge.** One scenario = one outcome = one screen. A scenario is one rule or outcome, not one interaction, and it plays as one start state on one screen. Other values of the same rule are examples inside it, like the rows of a Gherkin examples table.
 
 - Merge into one scenario only when the variations share the same screen and the same data, and differ by a click or a value on that screen. List each variation with its example in `expect`:
-    - the same rule with other values (another version, another count, another refused role with the same message)
+    - the same rule with other values (another name, another count, another refused role with the same message)
     - another click, view, tab or sort from the same start state, with the same kind of result (e.g. open tab A or tab B of one form)
     - exceptions with the same error code and message from the same start state: name each trigger in `when` ("e.g. an empty name, or one over 64 characters")
 - Keep apart when one of these changes:
@@ -219,7 +219,7 @@ Before and after, from a real plan:
     - the error code or the user-facing message
     - the screen, the seed or the data setup (`given`): a path that needs any of them is its own scenario, with its own id, title, `given`, `when` and `expect`
 - Never write parts. An `expect` line never starts with "Part 1", "Part 2", …; `check.js` warns when one does. Split it into scenarios instead.
-- A spec scenario with two different outcomes is two scenarios. A title with "and" or "or" that joins two rules is two scenarios ("No changelog", "No previous version"); one that joins two values of one rule is fine.
+- A spec scenario with two different outcomes is two scenarios. A title with "and" or "or" that joins two rules is two scenarios ("Empty name", "Archived owner"); one that joins two values of one rule is fine.
 - Each channel merges by these rules on its own. MCP may keep apart two refusals the screen shows with one message, or the other way round.
 
 ### 2b. Merge pass
@@ -254,7 +254,7 @@ Before and after, from a real plan:
 - **Channel gaps**: every `na` reason, one line each, so the user can disagree.
 - **Mismatches**: every `MISMATCHES` entry, one line each: `M1 · FR-017 · fix the spec: <differs> (<evidence>)`. They need a decision, so put them last before next steps. Say "none found" when there are none, or "no code yet: N scenarios from the spec" when `source: "spec"` was used.
 - **Evidence**: the evidence line from `check.js` (`evidence: N of M scenarios; …`).
-- "Scenarios name seed records; e2e-test runs them on copies named `<seed name>-e2e<N>-<tag>`.
+- Scenarios name seed records; e2e-test runs them on copies named `<seed name>-e2e<N>-<tag>`.
 - Next steps, one line each: design-feature shows the acceptance criteria and each use case's scenarios, generate-mock-ui mocks the `ui` scenarios, play-scenarios plays every scenario on the running app, e2e-test runs every scenario as an automated test.
 
 ## Verify mode

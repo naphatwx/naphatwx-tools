@@ -458,11 +458,11 @@
                         ["id", "int64", "1"], ["name", "string", "2"], ["legacyFlag", "bool", "− 4", "drop"],
                         ["count", "int32 → int64", "~ 9", "change"], ["source", "ThingSource", "+ 17", "add"],
                     ] } },
-                { id: "get-things", name: "GetThings", tag: "behaviour", route: "GET /api/v1/things", perm: "things.read",
-                    req: { name: "GetThingsRequest", tag: "unchanged", fields: [
+                { id: "list-things", name: "ListThings", tag: "behaviour", route: "GET /api/v1/things", perm: "things.read",
+                    req: { name: "ListThingsRequest", tag: "unchanged", fields: [
                         ["source", "optional ThingSource", "1"], ["page", "int32", "2"],
                     ] },
-                    res: { name: "GetThingsResponse", tag: "unchanged", fields: [
+                    res: { name: "ListThingsResponse", tag: "unchanged", fields: [
                         ["items", "repeated ThingResponse", "1"], ["total", "int64", "2"],
                     ] } },
                 { id: "get-owner", name: "GetOwner", tag: "called, unchanged", ext: true, route: "GET /api/v1/owners/{id}", perm: "none · system caller",

@@ -17,7 +17,7 @@ A runner that checks, after a deploy, that every service in each flow still reac
     ```
 
     - `<env>` is a key in `envs.json`, e.g. `local` or `dev`. Leave it out when `SMOKE_ENV` is set in `scripts/smoke/.env` (copy `.env.example`; git-ignored). Set `SMOKE_ENV` to a non-production env; smoke on production is optional.
-    - Add flow names to run only those: `node scripts/smoke/run.mjs dev deploy-ticket`.
+    - Add flow names to run only those: `node scripts/smoke/run.mjs dev thing-create`.
     - `--spec <spec>` (or `SMOKE_SPEC`) files the report under the spec: `results/<spec>/smoke-report-<env>.html`. No spec → `results/_adhoc/`. Each env keeps one report; its next run replaces it.
     - `--out <dir>` writes the report somewhere else.
 

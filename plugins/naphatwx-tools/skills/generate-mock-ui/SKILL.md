@@ -107,7 +107,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 - `contract/data.js` (`// @ts-check`, global `MOCK_DATA`, typed `@type {import('./types').MockData}`):
     - Realistic names, ids, dates and volumes (enough rows to page).
     - Data in the **upstream** shape, so `rules.js` does the mapping as the real service will.
-    - One entity per state that needs different data (never released, ineligible, …). Keep ids consistent with the plan's diagrams.
+    - One entity per state that needs different data (empty, archived, …). Keep ids consistent with the plan's diagrams.
     - Generate large data with a throwaway script, then commit the literal result.
 
 ### 4b. Write how to play each ui scenario (`shared/scenario-play.js`)
@@ -126,7 +126,7 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 
 - `title`, `story`, `surface` and `expect` come from `use-cases.js`; the file's last lines merge both lists into `SCENARIOS` for the pages and define `isPlayable()`. Keep those lines as the template has them.
 - Steps name what is on screen, not how the code works. A reviewer who never read the spec should be able to follow them.
-- Pick mock data that gives the scenario's example values (versions, counts, names), so "What you should see" matches the frame.
+- Pick mock data that gives the scenario's example values (names, counts, dates), so "What you should see" matches the frame.
 - A state with other permissions → the first step names them: "You are signed in as VIEWER: has things.read, not things.create."
 - Write "tooltip" or "hover" only when the page really has one; an inline reason is read, not hovered.
 - A scenario you can't play as written (its `expect` doesn't match the spec or the screen) → report it; don't change `use-cases.js`.

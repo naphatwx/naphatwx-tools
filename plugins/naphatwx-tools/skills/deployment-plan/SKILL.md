@@ -43,7 +43,7 @@ Why: a plan that looks right but names the wrong table or the wrong order fails 
 
 ## Rules
 
-- **Read the repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, deploy or runbook docs). Their deploy steps, tools and names win over this skill. A step needs a fact they don't give (the env-var or feature-flag tool, the migrations table, branch names) and the code doesn't show it → ask the user. Never guess.
+- **Read the repo's guide files first** (`CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, deploy or runbook docs). Their deploy steps, tools and names win over this skill. A step needs a fact they don't give (the env-var or feature-flag tool, the migrations table), the code doesn't show it and no read-only tool answers it (step 5) → ask the user. Never guess.
 - **Plan only.** Never run a migration, set an env var, deploy, or call a write tool. Read-only tools are fine and expected (step 5).
 - **Short by default.** Each step is one line. Add `detail` only when the step cannot be done without it: a value, a warning, a side effect. At most 2 short sentences. No filler, no restating `text` or `source`.
 - **Steps are actions.** Start each with a verb: "Run", "Set", "Check", "Tell". One action per step.

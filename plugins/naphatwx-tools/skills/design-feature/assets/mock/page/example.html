@@ -29,7 +29,7 @@
 
         async function load() {
             S.loading = true; S.error = null; render();
-            try { S.res = await FakeApi.GetThings({ ownerId: owner.id, page: S.page, limit: 10, ...(S.status && { status: S.status }) }); } catch (e) { S.error = e; }
+            try { S.res = await FakeApi.ListThings({ ownerId: owner.id, page: S.page, limit: 10, ...(S.status && { status: S.status }) }); } catch (e) { S.error = e; }
             S.loading = false; render();
         }
         function setStatus(v) { S.status = v; load(); }

@@ -24,7 +24,7 @@ var FakeApi = (function () {
 
     // ---------------------------------------------------------------- operations (real names)
 
-    async function GetThings(req) {
+    async function ListThings(req) {
         await wait(LATENCY);
         if (!D.owners.some(o => o.id === req.ownerId)) fail({ code: 'NotFound', message: 'owner not found' });
         if (st.faults.readUnavailableOnce && ++mem.reads === 1) fail(Rules.UNREACHABLE);
@@ -49,7 +49,7 @@ var FakeApi = (function () {
     }
 
     return {
-        GetThings, CreateThing, STORE,
+        ListThings, CreateThing, STORE,
         owner: () => D.owners.find(o => o.id === st.ownerId),
         // read from storage, not memory: screens in other frames write it too
         log: () => load('log', mem.log),

@@ -65,6 +65,7 @@ graph TD
 | `reporters/run-data-reporter.ts` | Writes the run folder: `run-data.json` + `shots/` |
 | `reporters/build-report.mjs` | Merges the run folder into one HTML |
 | `reporters/e2e-report-template.html` | The report page; dark theme, Export PDF |
+| `reporters/use-cases.types.d.ts` | Type of `use-cases.js`, for `build-report.mjs` |
 | `e2e-results/<spec>/` | One folder per spec (`_adhoc/` when none) with the latest result of each test and `e2e-report.html`; gitignored |
 | `playwright.config.*` | Base URL, viewport, workers, reporters, login state |
 

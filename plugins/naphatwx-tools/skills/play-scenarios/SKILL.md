@@ -93,7 +93,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Each scenario's `evidence` names its code: `entry` (the route, RPC, tool or command), `gate` (the check on the role) and the line behind each `expect`. Start the scan (step 2) there instead of searching.
 - When `<plan>/mock/shared/scenario-play.js` exists, it has each scenario's screen, params and steps. Start from it; names and values change to the seeded ones.
 - List per scenario: the screen and route, the data it needs, whether it **writes** (creates or changes data) or only reads, and the role it runs as with the permissions that matter (the scenario's `given` names them).
-- A scenario with no screen (surface `mcp`, `api` or `job`) is an **AI scenario**: list the MCP tool and operation (`mcp`), the REST or gRPC call (`api`), or the job command (`job`) it plays, and the ids it needs from a seed.
+- A scenario with no screen (surface `mcp`, `api` or `job`) is an **AI scenario**: list the MCP tool and its arguments (`mcp`), the REST or gRPC call (`api`), or the job command (`job`) it plays, and the ids it needs from a seed.
 
 ### 2. Scan the app
 
@@ -108,7 +108,7 @@ Delegate to a read-only sub-agent when the agent can. Ask for concrete answers w
 - **Roles**: the permissions each of those roles holds, from the seed or permission map, as exact strings (`VIEWER: things.read`, no `things.create`).
 - **Routes**: the URL of each screen, and the params that set a filter, tab or open a form.
 - **Framing**: `X-Frame-Options` or CSP `frame-ancestors` in dev.
-- **MCP**: the local MCP endpoint (e.g. `http://localhost:3003/mcp`), its transport, how a client authenticates (a personal token made on a local page or API), and the tool names. Does a tool describe its own fields (e.g. a schema or describe tool)?
+- **MCP**: the local MCP endpoint (e.g. `http://localhost:3000/mcp`), its transport, how a client authenticates (a personal token made on a local page or API), and the tool names. Does a tool describe its own fields (e.g. a schema or describe tool)?
 - **Jobs**: how an operator runs each job scenario (a command and where it runs, or an API trigger) and what it prints.
 - **Existing seed tools**: when the repo has one that works over the API, reading it shows the right calls; reuse its patterns, but the play seeds stay in `live/seeds/`.
 
@@ -187,7 +187,7 @@ One entry per scenario in `<plan>/use-cases.js`, same `id`, same order:
     - Names the scenario's `evidence.entry` (`path:line`), so the agent can read the handler when an answer surprises it.
     - Ends by asking for the values `expect` checks ("Tell me the new thing's status and the audit message, and the second call's error").
     - A value MCP can't give (e.g. a number only the screen shows) → the seed returns it in `values`. With no seed, a `{key}` the viewer types, and a `lookup` line in the recorded calls saying where it came from.
-- An AI scenario's `steps`: for `mcp`, connect the agent to the local MCP server once (the exact `claude mcp add` command, the token's source; never a token); for `api`, where the agent gets the API token. Then press ▶ Seed, copy the prompt into the agent and approve its calls, check its answer against What you should see.
+- An AI scenario's `steps`: for `mcp`, connect the agent to the local MCP server once (the agent's add-MCP-server command, e.g. `claude mcp add …`, the token's source; never a token); for `api`, where the agent gets the API token. Then press ▶ Seed, copy the prompt into the agent and approve its calls, check its answer against What you should see.
 - A scenario whose `expect` doesn't match what the app should do → report it; don't change `use-cases.js`.
 
 ### 5b. List the secrets (`.env.example`)

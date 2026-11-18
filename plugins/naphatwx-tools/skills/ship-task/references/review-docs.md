@@ -20,7 +20,7 @@
 
 Main agent. Skip a step the profile does not list.
 
-1. **Project docs** (the profile's `Docs`): update the existing domain folder the feature belongs to. Create a new one only for a truly new domain. Follow the guide's doc rules (diagrams, decision records). Write one decision record per `[ADR]` decision in `decisions.md`, from its `why` and `rejected` lines.
+1. **Project docs** (the profile's `Docs`): update the existing `<area>` folder the feature belongs to. Create a new one only for a truly new area. Follow the guide's doc rules (diagrams, decision records). Write one decision record per `[ADR]` decision in `decisions.md`, from its `why` and `rejected` lines.
 2. **User docs** if the profile lists them. A page that needs new code goes to that app's owner. Run the user docs `after edit` command when it is set.
 3. **Final summary**, in chat:
    - What was built.

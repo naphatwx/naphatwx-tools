@@ -9,7 +9,7 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 - Labels are the name only, ≤ 40 chars: RPC (`CreateThing`), endpoint (`POST /things`), table op (`INSERT schema.thing`), queue (`publish thing.created`), job (`build thing-worker`), status or error code (`FAILED_PRECONDITION`).
 - Arguments, example values, messages and reasons go in `detail`. It shows on hover and in the "Step details" list on the page after the diagram, never inside it.
-- Notes and `alt` / `else` conditions are a short phrase that names the real value, not a generic word: `permission thing.edit`, not `guards`; `status not ACTIVE`, not `thing unavailable`. Use simple words, not symbols (`not in`, never `∉` or `!=`; see the table in the flowchart reference). The full rule goes in `detail` or in the caller's rules list.
+- Notes and `alt` / `else` conditions are a short phrase that names the real value, not a generic word: `permission things.update`, not `guards`; `status not ACTIVE`, not `thing unavailable`. Use simple words, not symbols (`not in`, never `∉` or `!=`; see the table in the flowchart reference). The full rule goes in `detail` or in the caller's rules list.
 - Every `detail` holds real values from the source: field names, permission keys, enum values, config keys, timeouts. Never a vague summary like `permission check, validation`. Same words-not-symbols rule.
 - Mark only writes that leave the service or must be audited as side effects (`hot`), so readers can scan for them.
 - Each message label is an `.edge-label` group (SKILL.md step 3): the text centers on the arrow's midpoint, `(x1 + x2) / 2`, never on the label and step number together. The step number badge sits just left of the label's box, outside it.
@@ -23,7 +23,7 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 ```html
 <div class="sequence-steps"><p class="label sequence-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>
     <li><span class="number">6</span><code>CreateThing</code> name, ownerId</li>
-    <li><span class="number">·</span><code>permission thing.view</code> needs permission thing.view</li>
+    <li><span class="number">·</span><code>permission things.read</code> needs permission things.read</li>
 </ol></div>
 ```
 
@@ -40,7 +40,7 @@ SeqDiagrams.define("01-edit-thing", {
         ["phase", "1 · Open the form"],
         ["call", "user", "api", "GetThing", "thingId 42"],
         ["ret", "api", "user", "ThingResponse", "status ACTIVE"],
-        ["note", "api", "permission thing.edit", null, "needs permission thing.edit; the thing must be ACTIVE"],
+        ["note", "api", "permission things.update", null, "needs permission things.update; the thing must be ACTIVE"],
         ["alt", "upstream accepts"], ["hot", "api", "db", "INSERT schema.audit_log"], ["else", "refused"], ["ret", "api", "user", "reason"], ["end"],
     ],
 });

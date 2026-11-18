@@ -892,8 +892,7 @@
         /** One recorded call: an MCP tools/call, a command (a job), or a lookup note. */
         function callHtml(call, i) {
             if (call.lookup) return `<div class="api-lookup code-text">${escapeHtml(call.lookup)}</div>`;
-            call = call.arguments || call.command ? call : { ...call, arguments: { operation: call.operation, params: call.params } }; // older shape
-            const what = call.command ? '$ ' + call.command : [call.tool, call.arguments?.operation].filter(Boolean).join(' · ');
+            const what = call.command ? '$ ' + call.command : call.tool;
             const request = call.command ? '' : `<div><div class="label">Request · tools/call</div><pre>${escapeHtml(pretty({ name: call.tool, arguments: call.arguments }))}</pre></div>`;
             return `<details class="call"><summary><span class="meta">${i + 1}</span><span>${escapeHtml(what)}</span>${call.role ? `<span class="meta">as ${escapeHtml(call.role)}</span>` : ''}<span class="${call.isError ? 'error' : 'ok'}">${call.isError ? '✗ error' : '✓ answer'}</span></summary>
               <div>${request}<div><div class="label">${call.command ? 'Output' : 'Response'}${call.isError ? ' · isError true' : ''}</div><pre>${escapeHtml(pretty(call.response))}</pre></div></div></details>`;

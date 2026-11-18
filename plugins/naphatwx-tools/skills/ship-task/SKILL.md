@@ -46,10 +46,10 @@ Phases 2–3 and the checkpoint are below. For the others, read **only the refer
 1. **Setup**, before anything else.
    1. `tasks/` at the repo root (`git rev-parse --show-toplevel`). Missing → create it and say so in one line.
    2. Next number = 1 + the highest `NNN` in `tasks/` of this repo, its worktrees (`git worktree list`) and the profile's `Other checkouts` (001 when none). Skip a missing folder.
-      A new task uses it; say it in one line: "Next: 195 (highest 194 in ../my-repo-2)".
+      A new task uses it; say it in one line: "Next: 043 (highest 042 in ../my-repo-2)".
 2. **Parse the input.**
    - Empty → list every `tasks/*/plan.md` not at `Phase: done`, with its number, phase and next step; ask which to pick up. Stop.
-   - A task number (`195`) or a task folder → resume at the phase in its `plan.md` status line. A phase name after it (`plan`, `code`, `tests`, `review`, `docs`, `pre-merge`) re-runs that phase, only if the task already reached it.
+   - A task number (`043`) or a task folder → resume at the phase in its `plan.md` status line. A phase name after it (`plan`, `code`, `tests`, `review`, `docs`, `pre-merge`) re-runs that phase, only if the task already reached it.
    - Anything else → a new task. The whole input is what the user wants.
 3. **Load the project profile** (`references/profile.md`). Missing parts → ask once, then go on.
 4. **Status**: at the end of every phase, update three things in `plan.md`:

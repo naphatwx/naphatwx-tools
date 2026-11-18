@@ -1,6 +1,6 @@
 ---
 name: get-mr-diffs
-description: "Helper: fetch a GitLab merge request diff, local git first, else GitLab MCP. Called by review-code, generate-changelog and update-merge-request. Not for direct use."
+description: "Helper: fetch a GitLab merge request diff, local git first, else GitLab MCP. Called by review-code, generate-changelog, update-merge-request and deployment-plan. Not for direct use."
 user-invocable: false
 ---
 
@@ -8,9 +8,9 @@ user-invocable: false
 
 Resolve a GitLab merge request reference and get its **actual changes (diffs)**.
 This is the single shared flow for the `update-merge-request`,
-`generate-changelog` and `review-code` (MR mode) skills.
+`generate-changelog`, `review-code` (MR mode) and `deployment-plan` skills.
 
-The calling command may add overrides (e.g. noise-file filters, or "never
+The calling skill may add overrides (e.g. noise-file filters, or "never
 exclude test files"). Apply them on top of this flow.
 
 ## Input
@@ -43,7 +43,7 @@ Call `get_merge_request` (project_id + merge_request_iid). Note:
 - `diff_refs.base_sha` and `diff_refs.head_sha`
 - state, Draft status, source/target branch
 - current title/description (metadata only — NOT a content source unless the
-  calling command explicitly says so)
+  calling skill explicitly says so)
 
 If the fetch fails (bad URL, no access), report the error and stop — do not
 guess another target.
@@ -74,7 +74,7 @@ whole diff.
 Use only if the repo was not found locally, or fetch/SHAs fail:
 
 - `get_merge_request_diffs` — pass `excluded_file_patterns` only
-  if the calling command asks for noise filtering.
+  if the calling skill asks for noise filtering.
 - Still too large → `list_merge_request_changed_files`, then
   `get_merge_request_file_diff` on the files that matter.
 

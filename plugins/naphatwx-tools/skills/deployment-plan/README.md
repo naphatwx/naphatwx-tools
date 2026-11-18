@@ -43,7 +43,8 @@ graph TD
     RR --> Q[ask only about check steps no read-only tool could answer]
     Q --> W{user answers}
     W --> H["copy the template, replace /*__PLAN_DATA__*/null with the plan JSON"]
-    H --> R[reply: default branch, version, order, steps per phase, high-risk, still-check steps, file path]
+    H --> LR[a fresh sub-agent opens the page and fixes broken layout]
+    LR --> R[reply: default branch, version, order, steps per phase, high-risk, still-check steps, layout review, file path]
 ```
 
 The plan JSON the page reads:
@@ -106,7 +107,7 @@ Output: one HTML file, at the repo root unless the repo already has a place for 
 ```
 
 - Ticks are saved in the browser under the plan's `id`, so a reopened page keeps them.
-- Plus a chat reply: default branch, version to cut, deploy order, steps per phase, high-risk steps, steps still marked check, the file path.
+- Plus a chat reply: default branch, version to cut, deploy order, steps per phase, high-risk steps, steps still marked check, the layout review result, the file path.
 
 ## Files in the skill folder
 
@@ -114,6 +115,7 @@ Output: one HTML file, at the repo root unless the repo already has a place for 
 |------|------|
 | [SKILL.md](SKILL.md) | The agent's instructions |
 | [assets/deploy-plan-template.html](assets/deploy-plan-template.html) | The checklist page; the agent fills in the plan JSON and changes nothing else |
+| [references/layout-review.md](references/layout-review.md) | The layout review brief, given to a fresh sub-agent for the HTML file |
 
 ## Related skills
 

@@ -79,7 +79,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Every iframed diagram keeps its own Export PDF button, at the bottom right of the frame, under the drawing: the frame's height includes the room for it, so it never covers the diagram.
     - Step details never sit inside a diagram: they go on the page right after the `.sequence` box (manual: `render.js` adds them).
 4. Every rail link `href="#id"` (`.rail-list a`, nested ones included) matches a real `id` on the page, and every `.slide` has a `data-title` (presentation mode labels its steps with it).
-5. Every mock link (into `mock/`, or the app's `/mock/<spec-slug>` route) opens in a new tab: `target="_blank" rel="noopener"`. This is for the local folder; the published copy drops it (step 8).
+5. Every mock link (into `mock/`) opens in a new tab: `target="_blank" rel="noopener"`. This is for the local folder; the published copy drops it (step 8).
 6. No external scripts, styles or fonts in `overview.html` or the diagram files: text uses the OS font. `assets/`, `render.js` and the diagram files are local.
 7. Every name (RPC, endpoint, table, field, job) comes from the source. Unknown → write `TBD`.
 8. Only the main agent edits `overview.html`. Sub-agents write their own files plus an HTML fragment under `<output>/.parts/`; the main agent merges the fragments and deletes `.parts/`.
@@ -105,8 +105,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Error mapping: cause → code → what the user sees.
     - Acceptance scenarios, edge cases and refusal rows, each with its story / AC id (or FR / decision id) and the exact user-facing message. They become the scenarios (step 3). Keep each acceptance scenario's Given / When / Then too: it becomes an acceptance criterion.
     - Channels: every way a user reaches each use case: a screen (`ui`), an MCP tool an AI agent calls (`mcp`), a REST / gRPC call made directly (`api`), a script or job (`job`).
-    - **Roles and permissions**: each role the feature touches and the exact permission strings it holds or lacks, read from the seed or permission map (`VIEWER: things.read, not things.create`), plus any upstream rule (`legacy role X, screen Y read-only`). Scenarios name them.
-    - **Examples**: real values a scenario can show — versions, counts, ids, names the dev seed creates, a request and its answer. Each scenario carries one.
+    - **Roles and permissions**: each role the feature touches and the exact permission strings it holds or lacks, read from the repo guide (`AGENTS.md` / `CLAUDE.md`), the seed or the permission map (`VIEWER: things.read, not things.create`), plus any upstream rule (`legacy role X, screen Y read-only`). None says → mark `TBD` and list it under Open questions. Scenarios name them.
+    - **Examples**: real values a scenario can show — versions, counts, ids, names the dev seed creates (from the repo guide, the seed or the permission map; none says → `TBD`, listed under Open questions), a request and its answer. Each scenario carries one.
     - **Messages from the code**: when the code exists, copy each user-facing message verbatim from it (`file:line`), because the spec drifts. List every place the spec's text and the code's differ.
     - Control rules: which control is hidden and which is shown unavailable with a reason, as the spec says. No permission → whatever the real app does today (usually hidden). How the reason shows (tooltip or inline text), read from the component when it exists.
     - Blockers and open questions.

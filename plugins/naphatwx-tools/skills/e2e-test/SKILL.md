@@ -172,7 +172,7 @@ When they are done:
 
 Order, always: **core pass** (`--core` run → fix test-side failures → re-run → review, step 5), then the **full run** into the same `<run>` and a review of the scenarios not yet reviewed. With `--core`, stop after the core pass. The run folder keeps the latest attempt of each test; the reviewer reviews that.
 
-The run folder `<run>` = `e2e-results/<spec>/`. `<spec>` is the spec folder name (`remove-announcement-dismiss`); a source with no spec folder (plan folder, feature description) has none, so the run goes to `_adhoc/`. Every run of the spec, first or re-run, this round or a later one, uses the same command and folder.
+The run folder `<run>` = `e2e-results/<spec>/`. `<spec>` is the spec folder name (`add-thing-archive`); a source with no spec folder (plan folder, feature description) has none, so the run goes to `_adhoc/`. Every run of the spec, first or re-run, this round or a later one, uses the same command and folder.
 
 ```bash
 PLAYWRIGHT_DASHBOARD=1 E2E_SPEC=<spec> PW_BASE_URL=<url> npx playwright test <e2e-dir>/<domain>/ --grep " (<id>|<id>|…) "
@@ -307,8 +307,8 @@ All strict JSON. Paths inside are relative to the run folder.
 
 ```json
 { "reviewer": "fresh agent", "steps": [
-  { "scenario": "legacy-unreachable", "step": 2, "flag": "test", "check": "spinner", "note": "Shot shows the loading skeleton, not \"Could not load\"; wait for the message." },
-  { "scenario": "newest-first", "step": 1, "flag": "ok", "note": "Versions tab, 20 rows." } ] }
+  { "scenario": "thing-load-error", "step": 2, "flag": "test", "check": "spinner", "note": "Shot shows the loading skeleton, not \"Could not load\"; wait for the message." },
+  { "scenario": "list-things", "step": 1, "flag": "ok", "note": "Things tab, 20 rows." } ] }
 ```
 
 - `step` is 1-based, the index in the test's `steps` (the page-at-failure shot is not a step). `flag`: `ok` | `test` | `product` | `unsure`. `check`: the checklist item that failed (short words).

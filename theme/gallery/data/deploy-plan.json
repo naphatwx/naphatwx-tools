@@ -1,19 +1,19 @@
 {
   "id": "gallery-example-production",
-  "title": "Release !123 · add deploy status",
+  "title": "Release !123 · add thing owner",
   "env": "production",
-  "source": "https://gitlab.example.com/group/repo/-/merge_requests/123",
-  "createdAt": "2026-10-08T10:00:00+07:00",
+  "source": "https://gitlab.example.com/my-group/my-project/-/merge_requests/123",
+  "createdAt": "2026-10-08T03:00:00Z",
   "services": [
-    "thanos-grpc",
-    "thanos-worker",
-    "thanos-web"
+    "api",
+    "worker",
+    "web"
   ],
-  "order": "thanos-grpc, then thanos-worker, then thanos-web",
+  "order": "api, then worker, then web",
   "notes": [
     "Migration 0042 is not reversible. Take a snapshot first.",
-    "thanos-web needs the new RPC, so it goes last.",
-    "master also gets 3 other MRs from dev00, incl. migration 0041."
+    "web needs the new owner field from api, so it goes last.",
+    "develop also brings 3 other MRs, incl. migration 0041."
   ],
   "phases": [
     {
@@ -21,30 +21,29 @@
       "title": "Pre-deploy",
       "steps": [
         {
-          "text": "Merge into master and check its pipeline is green"
+          "text": "Merge into develop and check its pipeline is green"
         },
         {
           "text": "Cut version v1.86.0",
           "cmd": "git tag v1.86.0 && git push origin v1.86.0"
         },
         {
-          "text": "Take a snapshot of the infra database",
+          "text": "Take a snapshot of the main database",
           "detail": "Migration 0042 drops a column. The snapshot is the only way back.",
-          "cmd": "aws rds create-db-snapshot --db-instance-identifier infra-production --db-snapshot-identifier pre-0042",
+          "cmd": "aws rds create-db-snapshot --db-instance-identifier main-production --db-snapshot-identifier pre-0042",
           "tag": "db",
           "risk": "high",
           "check": false
         },
         {
-          "text": "Set DEPLOY_STATUS_TTL on thanos-grpc",
-          "detail": "New key read in apps/thanos-grpc/config.go. Default is 300.",
-          "cmd": "thanos env set thanos-grpc production DEPLOY_STATUS_TTL 300",
+          "text": "Set THING_CACHE_TTL on api",
+          "detail": "New key read in apps/api/config.go. Default is 300.",
           "tag": "env",
-          "source": "apps/thanos-grpc/config.go",
+          "source": "apps/api/config.go",
           "check": false
         },
         {
-          "text": "Turn off the deploy-status flag",
+          "text": "Turn off the thing-owner flag",
           "detail": "The screen stays hidden until the backend is live.",
           "tag": "flag",
           "check": false
@@ -61,13 +60,13 @@
       "title": "Deploy",
       "steps": [
         {
-          "text": "Deploy v1.86.0 of thanos-grpc to production"
+          "text": "Deploy v1.86.0 of api to production"
         },
         {
-          "text": "Deploy v1.86.0 of thanos-worker to production"
+          "text": "Deploy v1.86.0 of worker to production"
         },
         {
-          "text": "Deploy v1.86.0 of thanos-web to production"
+          "text": "Deploy v1.86.0 of web to production"
         }
       ]
     },
@@ -80,22 +79,22 @@
           "cmd": "make migrate ENV=production",
           "tag": "db",
           "risk": "high",
-          "source": "migrations/0042_deploy_status.sql",
+          "source": "migrations/0042_thing_owner.sql",
           "check": false
         },
         {
-          "text": "Turn on the deploy-status flag",
+          "text": "Turn on the thing-owner flag",
           "tag": "flag",
           "check": false
         },
         {
-          "text": "Smoke test the deploy flow",
-          "cmd": "node smoke/run.mjs production deploy-status",
+          "text": "Smoke test the thing-create flow",
+          "cmd": "node smoke/run.mjs production thing-create",
           "tag": "check",
           "check": false
         },
         {
-          "text": "Post the release note in #thanos-release",
+          "text": "Post the release note in #releases",
           "tag": "comms",
           "check": false
         }
@@ -106,12 +105,12 @@
       "title": "Rollback",
       "steps": [
         {
-          "text": "Turn off the deploy-status flag",
+          "text": "Turn off the thing-owner flag",
           "tag": "flag",
           "check": false
         },
         {
-          "text": "Restore the infra snapshot pre-0042",
+          "text": "Restore the main database snapshot pre-0042",
           "detail": "Only if the migration broke reads.",
           "tag": "db",
           "risk": "high",

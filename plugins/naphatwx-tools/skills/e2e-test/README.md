@@ -102,9 +102,10 @@ Rules the diagrams don't show:
 
 ## Input → output
 
-Input: `<plan folder | spec folder> [--env <name>] [--base-url <url>]`
+Input: `<plan folder | spec folder> [--core] [--mock] [--no-watch] [--env <name>] [--base-url <url>]`
 
 - No `--env` or `--base-url` → the repo's local dev URL.
+- `--mock` → the harness and report go to `<plan>/mock/e2e/` instead (`e2e-results/<spec>/e2e-report.html` there).
 
 Output, in the target repo:
 
@@ -116,7 +117,8 @@ Output, in the target repo:
 ├── reporters/
 │   ├── run-data-reporter.ts              writes the run folder, no HTML
 │   ├── build-report.mjs                  run folder → one HTML
-│   └── e2e-report-template.html          the report page, dark theme, Export PDF
+│   ├── e2e-report-template.html          the report page, dark theme, Export PDF
+│   └── use-cases.types.d.ts              type of use-cases.js, for build-report.mjs
 ├── <domain>/                             latest version, edited in place by every spec
 │   ├── helpers/<feature>.ts              seed copies, name map, sweep()
 │   ├── <goal>.e2e.spec.ts                ui + api scenarios of one use case (no UC number)
@@ -142,11 +144,13 @@ Plus a `playwright.config.*` and login setup when the repo had none.
 | [references/writer-agent.md](references/writer-agent.md) | Prompt for each writer agent: per-surface rules, selectors, data, waits |
 | [references/ai-tester-agent.md](references/ai-tester-agent.md) | Prompt for the AI tester: plays mcp and job scenarios, records each call |
 | [references/reviewer-agent.md](references/reviewer-agent.md) | Prompt for the fresh reviewer: the per-step checklist and flags |
+| [references/layout-review.md](references/layout-review.md) | Layout review brief for the report HTML |
 | [assets/step.ts](assets/step.ts) | `step()`, `apiStep()` and `reveal()` |
 | [assets/run-data-reporter.ts](assets/run-data-reporter.ts) | Playwright reporter: writes `run-data.json` + `shots/` |
 | [assets/build-report.mjs](assets/build-report.mjs) | Merges the run folder into one HTML |
 | [assets/e2e-report-template.html](assets/e2e-report-template.html) | The report page the build fills in |
 | [assets/README.md](assets/README.md) | Ships as the e2e folder's `README.md` |
+| [assets/use-cases.types.d.ts](assets/use-cases.types.d.ts) | Type of `use-cases.js`, copied to `reporters/` |
 
 ## Related skills
 

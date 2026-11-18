@@ -29,7 +29,9 @@ graph TD
     B -->|yes| S[print one status line, sleep 30s] --> G
     B -->|over 30 min| R1[report still running + URL]
     B -->|no| R{result}
-    R -->|SUCCESS| Q["search console for Quality Gate, FAILED"] --> OK[report success, warn if a gate failed]
+    R -->|SUCCESS| Q{"job runs a quality gate?"}
+    Q -->|yes| QS["search console for Quality Gate, FAILED"] --> OK[report success, warn if a gate failed]
+    Q -->|no| OK
     R -->|ABORTED / NOT_BUILT| AB[report who or why, stop]
     R -->|FAILURE / UNSTABLE| I[investigate]
     I --> I1[get_build_failure_excerpt]
@@ -45,6 +47,7 @@ Rules the diagram doesn't show:
 - Quotes only the log lines that prove the cause. No log, no guess: "not enough log evidence".
 - No patch in the report. It ends with "Review the evidence above before any fix is made."
 - On an auth error from the Jenkins MCP, it says which credentials are missing and stops.
+- Works with any Jenkins MCP server. If the server lacks a named tool, it reads the full console output (e.g. `get_build_console_output`) and searches it.
 
 ## Input → output
 

@@ -25,9 +25,9 @@ What the helper exports
    those copies and checks they are gone.
 4. `sweep(request, uc)`: deletes leftovers of aborted runs for that use case, found by the `-e2e<N>-`
    marker. It must never match a name without the marker.
-5. State that only CI or a worker would set (deploys, builds): the helper sets it itself after a short,
+5. State that only a background worker would set: the helper sets it itself after a short,
    configurable wait (env var, default about 10 s, not 90 s).
-6. A record stuck in "preparing": move it on to its next state first; cancel it only if that fails.
+6. A record stuck in a pending state: move it on to its next state first; cancel it only if that fails.
 7. Copy through the app's API (REST, or the MCP-backed route). Read routes and request shapes from the code.
 
 Runner for mcp and job scenarios

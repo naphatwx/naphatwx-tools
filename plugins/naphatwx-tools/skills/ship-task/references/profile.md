@@ -15,7 +15,7 @@ The profile tells the flow what this project has. Read it once at start.
 
 | App | Folder | Guide | Owner agent |
 |-----|--------|-------|-------------|
-| api | apps/api | apps/api/AGENTS.md | api-specialist |
+| api | apps/api | apps/api/AGENTS.md | `<agent>` |
 | web | apps/web | apps/web/AGENTS.md | - |
 
 - Other checkouts: `../my-repo-2` (other clones of the repo; their task numbers count too) | none
@@ -26,10 +26,10 @@ The profile tells the flow what this project has. Read it once at start.
 - Unit tests on request: `<affected-tests command>` | same as pre-merge
 - Integration tests: `make integration` (folder: tests/integration) | none
   - At pre-merge: full | changed
-- Codegen order: api first (`make proto`), then web (`npm run proto:gen`) | none
-- Follow-up owners: web → design-specialist (look and feel) | none
+- Codegen order: api first (`<codegen command>`), then web (`<codegen command>`) | none
+- Follow-up owners: web → `<agent>` (look and feel) | none
 - Numbered folders (tracked only): migrations/sql | none
-- Hotfix branch (read only, never merged): staging | ask
+- Hotfix branch (read only, never merged): `<hotfix branch>` | ask
 - Pre-merge app steps: api: apply migrations on the local stack | none
 - Cross-app checks: <extra names that must match across apps> | none
 - Rules check: <project rules every plan ticks, e.g. naming, permissions, error texts> | from the Rules that apply list
@@ -55,7 +55,7 @@ The profile tells the flow what this project has. Read it once at start.
 | Gate commands | `Makefile` targets, `package.json` scripts, `nx.json`, CI files (`.gitlab-ci.yml`, `.github/workflows/`, `Jenkinsfile`) |
 | Run checks | the guide says "run in Docker" or a compose service runs the toolchain |
 | Integration tests | a `tests/integration`, `e2e` or `features` folder, or an `integration` script |
-| Numbered folders | folders whose entries start with a number, like `000123_x.up.sql` or `127-foo/` |
+| Numbered folders | folders whose entries start with a number, like `000123_x.up.sql` or `043-foo/` |
 | Docs | `docs/` structure the guide describes |
 
 Never guess a gate command. Missing → ask, or leave the check off.

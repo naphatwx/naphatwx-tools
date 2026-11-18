@@ -7,7 +7,7 @@ Checks after a deploy that every service in a real flow still reaches the next o
 - You deployed and want to know each service still talks to the next one: HTTP, gRPC, queue, CI, callbacks.
 - You want to catch a wrong queue name, URL or credential before a user does.
 - You want a probe and runner set up once in the repo, then rerun after every deploy.
-- Say: "smoke test staging", "set up a smoke test", "smoke-test run dev deploy-ticket".
+- Say: "smoke test staging", "set up a smoke test", "smoke-test run dev thing-create".
 
 | You want | Use instead |
 |----------|-------------|

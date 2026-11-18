@@ -131,7 +131,7 @@ Rules the diagrams don't show:
 - The spec picks the goals; the code decides what each scenario says happens. A spec outcome behind a gate the actor can't pass becomes the refusal they really get.
 - Every scenario carries evidence; `check.js` fails on a missing ref, a missing file or a line out of range.
 - No code yet → `source: "spec"`; play-scenarios and e2e-test refuse those until verify mode traces them.
-- Every scenario carries a concrete, true example: real versions, counts, ids, a request → answer, or a script's output line.
+- Every scenario carries a concrete, true example: real names, counts, ids, statuses, a request → answer, or a script's output line.
 - Quoted text is copied from the code; `check.js` searches the repo for each quoted string and fails when one is missing. Spec text that differs goes in `MISMATCHES`, which the reply lists last.
 - A role scenario names the role and its exact permission strings ("VIEWER: has things.read, not things.create"), read from seed migrations or role-permission tables, never from spec prose.
 - No mock or test details: no state ids, pages, query params or selectors. Example values are fine.
