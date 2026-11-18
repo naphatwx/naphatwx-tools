@@ -21,7 +21,7 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 - Return the step details as a fragment for the caller's page, in `render.js`'s markup, with its title line as-is. List only the steps that have a detail. `n` is the number the diagram prints on that step (so the list can read `2, ·, 6, 7, 12`), `·` for a note; when the diagram prints no numbers, number the rows 1, 2, 3 in diagram order:
 
 ```html
-<div class="sequence-steps"><p class="label sequence-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>
+<div class="sequence-steps"><p class="label sequence-steps-title">Step details</p><ol>
     <li><span class="number">6</span><code>CreateThing</code> name, ownerId</li>
     <li><span class="number">·</span><code>permission things.read</code> needs permission things.read</li>
 </ol></div>

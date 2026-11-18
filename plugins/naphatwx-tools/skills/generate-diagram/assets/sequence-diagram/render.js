@@ -100,7 +100,7 @@ var SeqDiagrams = (function () {
             svgParts.push(`<g class="actor"><rect x="${actorX[actorId] - actorWidth / 2}" y="${TOP_MARGIN}" width="${actorWidth}" height="${HEAD_HEIGHT}" rx="8"/><text x="${actorX[actorId]}" y="${TOP_MARGIN + 22}" text-anchor="middle">${escapeHtml(name)}</text><text class="subtitle" x="${actorX[actorId]}" y="${TOP_MARGIN + 41}" text-anchor="middle">${escapeHtml(subtitle)}</text></g>`);
         });
         // numbers are the diagram's own, so a list of 2, ·, 6 reads as a selection, not a gap
-        const stepList = !details.length ? '' : `<div class="sequence-steps"><p class="label sequence-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>${details.map(([number, label, detail]) =>
+        const stepList = !details.length ? '' : `<div class="sequence-steps"><p class="label sequence-steps-title">Step details</p><ol>${details.map(([number, label, detail]) =>
             `<li><span class="number">${number === 'note' ? '·' : number}</span><code>${escapeHtml(label)}</code> ${escapeHtml(detail)}</li>`).join('')}</ol></div>`;
         return [svgParts.concat(body, '</svg>').join(''), stepList];
     }

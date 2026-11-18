@@ -138,7 +138,7 @@
                 <button type="button" aria-expanded="false" aria-controls="uc-01-sc" id="uc-01-sc-tab">Scenarios (8)</button>
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-01-chart" aria-labelledby="uc-01-chart-tab" hidden>
-                <div class="flowchart"><iframe class="diagram-frame" src="flowchart/01-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
+                <div class="flowchart"><iframe class="diagram-frame" src="flowchart/01-example-flow.html" title="Flowchart: check things.update, validate the name, save with UpdateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-01-seq" aria-labelledby="uc-01-seq-tab" hidden>
                 <div class="sequence" data-flow="01-example-flow"><p class="sequence-legend"><span>call</span><span class="return">response</span><span class="hot">side effect</span></p></div>
@@ -146,7 +146,7 @@
             <div class="panel" role="region" tabindex="-1" id="uc-01-rules" aria-labelledby="uc-01-rules-tab" hidden>
                 <ul>
                     <li>The name is unique per owner; a duplicate returns <code>ALREADY_EXISTS</code>.</li>
-                    <li>Only users with <code>thing.edit</code> see the "New" button.</li>
+                    <li>Only users with <code>things.create</code> see the "New" button.</li>
                 </ul>
             </div>
             <div class="panel" role="region" tabindex="-1" id="uc-01-sc" aria-labelledby="uc-01-sc-tab" hidden>
@@ -180,13 +180,13 @@
                 <button type="button" aria-expanded="false" aria-controls="uc-02-sc" id="uc-02-sc-tab">Scenarios (8)</button>
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-02-chart" aria-labelledby="uc-02-chart-tab" hidden>
-                <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check thing.edit, validate the name, save with CreateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
+                <div class="flowchart"><iframe class="diagram-frame" src="flowchart/02-example-flow.html" title="Flowchart: check things.update, validate the name, save with UpdateThing or show INVALID_ARGUMENT and retry" loading="lazy"></iframe></div>
             </div>
             <div class="panel wide" role="region" tabindex="-1" id="uc-02-seq" aria-labelledby="uc-02-seq-tab" hidden>
                 <div class="sequence"><iframe class="diagram-frame" src="sequence-diagram/02-example-flow.html" title="Sequence diagram: GetThing, then CreateThing with the external call and audit write" loading="lazy"></iframe></div>
-                <div class="sequence-steps"><p class="label sequence-steps-title">Step details <span class="label-note">· only steps with extra detail, by their number in the diagram</span></p><ol>
+                <div class="sequence-steps"><p class="label sequence-steps-title">Step details</p><ol>
                     <li><span class="number">2</span><code>GetThing</code> id from the route</li>
-                    <li><span class="number">·</span><code>permission thing.view</code> needs permission thing.view; the id must exist, or NOT_FOUND</li>
+                    <li><span class="number">·</span><code>permission things.read</code> needs permission things.read; the id must exist, or NOT_FOUND</li>
                     <li><span class="number">6</span><code>CreateThing</code> name, ownerId</li>
                     <li><span class="number">7</span><code>POST /things</code> timeout 10 s</li>
                     <li><span class="number">12</span><code>FAILED_PRECONDITION</code> upstream reason passed through</li>

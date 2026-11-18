@@ -209,6 +209,7 @@ function findRoot() {
     }
 }
 const ROOT = findRoot();
+if (ROOT && !fs.existsSync(ROOT)) { process.stderr.write(`--root ${ROOT}: folder not found\n`); process.exit(2); }
 const lineCounts = new Map();
 /** "" when the ref is fine, else why not. */
 function badRef(ref) {

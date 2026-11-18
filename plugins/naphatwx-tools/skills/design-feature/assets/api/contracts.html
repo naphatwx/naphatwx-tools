@@ -459,8 +459,8 @@
                         ["count", "int32 → int64", "~ 9", "change"], ["source", "ThingSource", "+ 17", "add"],
                     ] } },
                 { id: "list-things", name: "ListThings", tag: "behaviour", route: "GET /api/v1/things", perm: "things.read",
-                    req: { name: "ListThingsRequest", tag: "unchanged", fields: [
-                        ["source", "optional ThingSource", "1"], ["page", "int32", "2"],
+                    req: { name: "ListThingsRequest", tag: "altered", fields: [
+                        ["source", "optional ThingSource", "+ 1", "add"], ["page", "int32", "2"],
                     ] },
                     res: { name: "ListThingsResponse", tag: "unchanged", fields: [
                         ["items", "repeated ThingResponse", "1"], ["total", "int64", "2"],

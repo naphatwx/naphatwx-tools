@@ -6,7 +6,7 @@
   "ms": 14200,
   "flows": [
     {
-      "flow": "thing-create", "description": "Create a thing: web → api → worker → search", "entry": "web", "status": "pass", "ms": 3100,
+      "flow": "thing-create", "description": "Create a thing: web → api → worker", "entry": "web", "status": "pass", "ms": 3100,
       "rerun": "node smoke/run.mjs staging thing-create", "startedAt": "2026-10-08T03:20:00Z", "probeId": "probe-7f3a",
       "trigger": { "url": "https://web.staging.example.com/api/smoke", "status": 202, "ms": 120, "body": "{\"probeId\":\"probe-7f3a\"}" },
       "hops": [
