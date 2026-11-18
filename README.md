@@ -29,6 +29,7 @@ Each skill folder has a `README.md` with diagrams of how it works.
 | [generate-html-docs](plugins/naphatwx-tools/skills/generate-html-docs/) | Make a single-file HTML docs page in the naphatwx theme, with a numbered section rail and search |
 | [generate-html-slides](plugins/naphatwx-tools/skills/generate-html-slides/) | Make a single-file full-window HTML slide deck |
 | [list-plugins](plugins/naphatwx-tools/skills/list-plugins/) | List installed Claude Code plugins and marketplaces |
+| [setup-device](plugins/naphatwx-tools/skills/setup-device/) | Install the MCP servers and plugins these skills use; you paste the secrets |
 
 ---
 
@@ -84,7 +85,7 @@ Add `-g` to install for your user instead of the current project. Drop the `-a` 
 
 ## Notes
 
-- Some skills call MCP servers (GitLab, Jenkins). Set up those servers in each tool you use.
+- Some skills call MCP servers (GitLab, Jenkins). `setup-device` installs them in Claude Code.
 - `list-plugins` reads Claude Code's plugin folders, so it is only useful in Claude Code.
 
 ---

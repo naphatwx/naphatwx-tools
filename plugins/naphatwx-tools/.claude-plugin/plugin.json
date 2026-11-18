@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.307",
+    "version": "1.9.308",
     "description": "My personal commands shared across PCs",
     "commands": [],
     "skills": [
@@ -24,7 +24,8 @@
         "./skills/e2e-test",
         "./skills/deployment-plan",
         "./skills/ship-task",
-        "./skills/copy-reports"
+        "./skills/copy-reports",
+        "./skills/setup-device"
     ],
     "hooks": {
         "SessionStart": [
