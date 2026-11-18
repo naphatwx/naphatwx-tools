@@ -14,7 +14,7 @@ var SCENARIO_PLAY = [
   { "id": "read-retry", "state": "unreachable", "page": "example",
     "steps": ["Wait for the first read to fail.", "Press Retry."] },
   { "id": "create-thing", "state": "normal", "page": "example",
-    "steps": ["You are signed in as MANAGER_DEV: has things.create.", "Press Create.", "Type Third thing in Name.", "Press Create in the form."] },
+    "steps": ["You are signed in as EDITOR: has things.create.", "Press Create.", "Type Third thing in Name.", "Press Create in the form."] },
   { "id": "create-empty-name", "state": "normal", "page": "example", "params": { "modal": "CREATE" },
     "steps": ["The Create form is open with Name empty.", "Press Create in the form."] },
   { "id": "create-read-only", "state": "read-only", "page": "example",

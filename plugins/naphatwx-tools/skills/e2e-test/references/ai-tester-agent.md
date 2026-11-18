@@ -19,12 +19,12 @@ Before you start
 2. Read the test file and, for each scenario, its given / when / expect in use-cases.js.
 
 For each scenario in the test file, in order
-3. Act as the scenario's role. When the MCP server has a who-am-I call (e.g. GetMe), call it first
+3. Act as the scenario's role. When the MCP server has a who-am-I call (e.g. a current-user call), call it first
    and record it. If the signed-in user does not hold that role and you cannot switch to it, mark the
    scenario skipped with reason "role <X> not available over MCP". Never play it as another role.
 4. Run each step in order:
    - mcp: call the named tool and operation with the params. Fill "<from step N: field>" from that
-     step's response. If the tool needs a schema call first (e.g. GetInputSchema), do it, but record
+     step's response. If the tool needs a schema call first (e.g. a schema lookup), do it, but record
      only the scenario's calls.
    - job: run the command from the repo root. Record the command, exit code and the output lines that
      matter (the summary line, the error), at most about 40 lines.

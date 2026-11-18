@@ -11,9 +11,9 @@ export type Kind = 'basic' | 'alternate' | 'exception';
 export type UseCaseId = `UC${number}`;
 /** "US1 · AC3" */
 export type AcceptanceId = `US${number} · AC${number}`;
-/** Why a channel has no twin: { "mcp": "ListThings has no status filter." }. A reachability reason cites its gate: "(apps/web/routes.ts:452)". */
+/** Why a channel has no twin: { "mcp": "ListThings has no status filter." }. A reachability reason cites its gate: "(apps/web/lib/routes.ts:41)". */
 export type NotApplicable = Partial<Record<Channel, string>>;
-/** Repo-relative "path:line" or "path:from-to": "apps/web/lib/config/routes.ts:452". */
+/** Repo-relative "path:line" or "path:from-to": "apps/web/lib/routes.ts:41". */
 export type CodeRef = `${string}:${number}` | `${string}:${number}-${number}`;
 /** code: traced in the code (the default); spec: no code yet, so not ready for play-scenarios or e2e-test until verified. */
 export type Source = 'code' | 'spec';
@@ -32,7 +32,7 @@ export interface Evidence {
 
 export interface UseCase {
     id: UseCaseId;
-    /** Verb + object ("Cut a new version"), the same everywhere. */
+    /** Verb + object ("Create a thing"), the same everywhere. */
     title: string;
     /** User story + requirement ids, joined by " · ". */
     refs: string;

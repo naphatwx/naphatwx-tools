@@ -71,7 +71,7 @@ Input: one MR reference.
 | Form | Example |
 |------|---------|
 | Full MR URL | `https://<host>/<group>/<project>/-/merge_requests/<iid>` |
-| `<project_id>!<iid>` | `avengers/thanos!123`, `456!123` |
+| `<project_id>!<iid>` | `my-group/my-project!123`, `456!123` |
 | `!<iid>` or `<iid>` | MR in the current repo, project from `git remote` |
 
 Output: no file. The MR metadata, commits, changed files and diffs, handed back to the calling skill.

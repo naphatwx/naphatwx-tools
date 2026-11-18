@@ -1,6 +1,6 @@
 # summarize-weekly-work
 
-Turns your git commits for one week into up to 5 achievement items, each 140 characters or less, ready to paste.
+Turns your git commits for one week into up to 5 achievement items, each 140 characters or less by default, ready to paste.
 
 ## When to use it
 
@@ -28,7 +28,7 @@ graph TD
     DR & RN & RO & RA --> GL["git log --all, author = repo's git user.email, --since --until --no-merges, all repos in parallel"]
     GL --> G[group by theme across repos]
     G --> F["drop noise: merges, WIP, revert pairs, .env tweaks; fold docs and chores into their feature"]
-    F --> I[at most 5 items: past-tense verb, impact first, 140 chars max]
+    F --> I[at most 5 items, 140 chars max by default: past-tense verb, impact first]
 ```
 
 Rules the diagram doesn't show:
@@ -36,11 +36,12 @@ Rules the diagram doesn't show:
 - `cd` to the repo, or to the folder that holds your repos, before you run it.
 - A theme that spans repos (web, pipeline, terraform) is one item.
 - Repos with no commits in range are left out. No commits, no made-up items.
-- Ask for more or fewer items and it rewrites them; the 140-character cap stays.
+- Ask for more or fewer items and it rewrites them; the character cap stays.
+- Change the limits in your message: "max 3 items, 200 chars".
 
 ## Input → output
 
-Input: an optional date range ("29 June - 5 July", "last week", "week 28") and optional repo names ("only thanos").
+Input: an optional date range ("29 June - 5 July", "last week", "week 28") and optional repo names ("only api").
 
 Output: a chat reply.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Checks live/live.js and live/.env.example against the plan's scenarios; WARN lines (tooltip steps, roles with no permissions,
-// {keys} no seed returns, vague names like "that merge request") keep exit 0.
+// {keys} no seed returns, vague names like "that owner") keep exit 0.
 // With --run-seeds (app and server.mjs running), picks every seeded scenario twice: both must succeed, writing ones get a new URL.
 // Usage: node check-live.js <live-dir> [--use-cases <file>] [--run-seeds [--server http://localhost:4000]]. Exit 1 on any error.
 
@@ -142,7 +142,7 @@ const resultsFile = path.join(dir, 'results.js');
 if (fs.existsSync(resultsFile)) {
     const src = fs.readFileSync(resultsFile, 'utf8');
     try { AI = parseVar(src, 'PLAYED_RESULTS'); } catch (e) { errors.push(`results.js is not strict JSON: ${e.message}`); }
-    if (/thanos_pat_\w|"(?:eyJ[\w-]+\.[\w-]+)"|Bearer [\w.-]{20,}/.test(src)) errors.push('results.js seems to hold a token: mask it in the recorded calls');
+    if (/\b[a-z]+_pat_\w|"(?:eyJ[\w-]+\.[\w-]+)"|Bearer [\w.-]{20,}/.test(src)) errors.push('results.js seems to hold a token: mask it in the recorded calls');
     for (const [id, r] of Object.entries(AI)) {
         if (!CORE.some(s => s.id === id)) errors.push(`results.js ${id}: no scenario with this id in use-cases.js`);
         if (!['pass', 'fail', ''].includes(r.status)) errors.push(`results.js ${id}: status must be pass, fail or "" (got "${r.status}")`);

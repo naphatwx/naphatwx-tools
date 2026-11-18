@@ -1,7 +1,7 @@
 ---
 name: e2e-test
-description: Write and run automated tests for every scenario in a feature's use-cases.js, on every surface (ui in the browser with a screenshot per step, api calls with request and response, mcp and job scenarios played by an AI tester), then a fresh reviewer checks every step and one HTML report shows it all. Use when the user says "e2e test this spec folder" or "test this end to end". Playing by hand is play-scenarios; service checks after a deploy are smoke-test.
-argument-hint: "<plan folder | spec folder> [--core] [--env <name>] [--base-url <url>]"
+description: Write and run automated tests for every scenario in a feature's use-cases.js, on every surface (ui in the browser with a screenshot per step, api calls with request and response, mcp and job scenarios played by an AI tester), then a fresh reviewer checks every step and one HTML report shows it all. The user watches the browsers live in the Playwright dashboard. `--mock` runs the ui scenarios on the generate-mock-ui mock instead of the real app. Use when the user says "e2e test this spec folder", "test this end to end" or "e2e test the mock". Playing by hand is play-scenarios; service checks after a deploy are smoke-test.
+argument-hint: "<plan folder | spec folder> [--core] [--mock] [--no-watch] [--env <name>] [--base-url <url>]"
 ---
 
 # E2E Test
@@ -32,6 +32,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - **Source**: a plan folder or a spec folder (any folder that holds the spec, from any tool). If none is given, ask once.
 - `--env <name>` / `--base-url <url>`: where to run. If neither is given, use the repo's local dev URL and say which one.
 - `--core`: run only the core scenarios (`"core": true` in `use-cases.js`: every basic, the main alternates and the errors users hit most). Stop after the core pass of step 4–5.
+- `--mock`: test the mock UI (`<plan>/mock/`) instead of the real app. See [Mock target](#mock-target---mock).
+- `--no-watch`: run without the live dashboard (step 4, Watch). Watch is on by default.
 
 ## Rules
 
@@ -157,7 +159,7 @@ Spawn one agent per use case **in one message**, with the prompt in `references/
 - `<e2e-dir>/<domain>/<goal>.e2e.spec.ts`: one `test()` per `ui` and `api` scenario, in file order. Skip the file when the use case has none.
 - `<e2e-dir>/<domain>/<goal>.ai-tests.json`: the ordered calls or commands for each `mcp` and `job` scenario, plus its `runner` block and the one setup / cleanup command it names. Skip both when the use case has none.
 
-`<goal>` is the use case title, kebab-case, with no `UC<n>`: `cut-a-new-version`. The file exists → the writer edits it: it updates and adds its scenarios' tests and leaves every other test in the file as it is. A matched test that sits in another file is updated there. Writers run nothing.
+`<goal>` is the use case title, kebab-case, with no `UC<n>`: `create-a-thing`. The file exists → the writer edits it: it updates and adds its scenarios' tests and leaves every other test in the file as it is. A matched test that sits in another file is updated there. Writers run nothing.
 
 Agents with no sub-agents write the use cases one after another with the same prompt.
 
@@ -173,8 +175,17 @@ Order, always: **core pass** (`--core` run → fix test-side failures → re-run
 The run folder `<run>` = `e2e-results/<spec>/`. `<spec>` is the spec folder name (`remove-announcement-dismiss`); a source with no spec folder (plan folder, feature description) has none, so the run goes to `_adhoc/`. Every run of the spec, first or re-run, this round or a later one, uses the same command and folder.
 
 ```bash
-E2E_SPEC=<spec> PW_BASE_URL=<url> npx playwright test <e2e-dir>/<domain>/ --grep " (<id>|<id>|…) "
+PLAYWRIGHT_DASHBOARD=1 E2E_SPEC=<spec> PW_BASE_URL=<url> npx playwright test <e2e-dir>/<domain>/ --grep " (<id>|<id>|…) "
 ```
+
+**Watch** (on unless `--no-watch`): the user watches every browser of the run live.
+
+- Needs `@playwright/test` 1.59 or newer (`npx playwright --version`). Older → ask once to upgrade it. No → run without watch and say so.
+- Before the first run, start the dashboard in the background: `npx -y @playwright/cli show`. It opens a window on the user's screen; `npx -y @playwright/cli show --kill` closes it. Start it once; later runs show in the same window. `show` reuses a dashboard that is already running, even one started with `--port`, so no window opens: `--kill` it first, then `show` again.
+- `PLAYWRIGHT_DASHBOARD=1` makes each worker's browser show there as `worker-<n>`, headless or not. The user can click one to watch it, take over, or open DevTools.
+- Tests run inside Docker → start the dashboard in the same container with `show --port <port> --host 0.0.0.0` and give the user the published URL. The port is not published → run without watch and say so.
+- Tell the user before the run starts: "Watch it live in the Playwright dashboard window." `--no-watch` → drop `PLAYWRIGHT_DASHBOARD=1`.
+- `mcp` and `job` scenarios have no browser. Their AI tester runs show only in the report.
 
 - A new round of the spec (a later task changed the use cases): delete `<run>/review*.json` first, so the reviewer starts fresh. Test results need no reset; the run replaces the ones it touches.
 
@@ -206,10 +217,11 @@ When the code's message, status or list differs from a scenario's `expect` and t
 ## 6. Report
 
 ```bash
-node <e2e-dir>/reporters/build-report.mjs <run> --use-cases <plan>/use-cases.js [--core]
+node <e2e-dir>/reporters/build-report.mjs <run> --use-cases <plan>/use-cases.js [--core] [--mock]
 ```
 
 - `--core` → the report keeps only the core scenarios; a core one with no result shows as "not run".
+- `--mock` → the report lists only `ui` scenarios.
 
 It merges the run folder into `<run>/e2e-report.html` (screenshots embedded; the same file every run), prints one line per use case and `E2E report: <path>`. Open the file and check: the tree matches `use-cases.js`, every `ui` step has a screenshot, every other step has a request and response, flagged steps show the note.
 
@@ -229,6 +241,23 @@ Reply with:
 
 ---
 
+## Mock target (`--mock`)
+
+Runs the same steps on the mock UI of the `generate-mock-ui` skill (`naphatwx-tools:generate-mock-ui` in Claude Code), opened from disk. It checks that the mock plays every `ui` scenario as `use-cases.js` says. No `<plan>/mock/` → run `generate-mock-ui` first.
+
+| Step | With `--mock` |
+|---|---|
+| 1 Read | Keep only `ui` scenarios. `"source": "spec"` scenarios are fine here: the mock is built from the spec, so skip the verify run. Each one's entry in `<plan>/mock/shared/scenario-play.js` (`state`, `page`, `params`, `steps`) is how to play it. A `ui` scenario with no entry is a finding for `generate-mock-ui`. |
+| 2 Harness | `<e2e-dir>` = `<plan>/mock/e2e/`. Copy the same files from `assets/`. Write `playwright.config.ts` there with the same reporter and viewport, `testDir: '.'`, `baseURL: pathToFileURL(resolve(__dirname, '..') + '/').href`, no `storageState`. `@playwright/test` 1.59+ does not resolve from that folder (`node -e "require.resolve('@playwright/test')"` run there) → add a `package.json` with it as a dev dependency and run `npm install` there. Add `.gitignore` there: `node_modules/`, `e2e-results/`, `test-results/`. |
+| 2b Data helper | Skip. Each test gets a fresh browser context, so the mock's `sessionStorage` data starts clean. |
+| 2c Match | Search `<plan>/mock/e2e/` only. |
+| 3 Write | Files are `<goal>.mock.spec.ts`. Give each writer the mock rows of `references/writer-agent.md`. |
+| 4 Run | `cd <plan>/mock/e2e && PLAYWRIGHT_DASHBOARD=1 E2E_SPEC=<spec> npx playwright test --grep " (<id>|…) "`. No AI testers. Watch works the same. |
+| 5 Review | Same. A mock that does not do what `expect` says is a finding for `generate-mock-ui` (fix the mock), not `product`. |
+| 6 Report | Add `--mock`. The report is `<plan>/mock/e2e/e2e-results/<spec>/e2e-report.html`. |
+
+---
+
 ## File formats
 
 All strict JSON. Paths inside are relative to the run folder.
@@ -236,11 +265,11 @@ All strict JSON. Paths inside are relative to the run folder.
 `<run>/run-data.json` (written by the reporter; the top-level `stamp` / `startedAt` / `ms` describe the newest run, each test's `startedAt` the run that produced it):
 
 ```json
-{ "name": "legacy-new-version", "stamp": "20261008-110000", "startedAt": "2026-10-08T04:00:00.000Z", "ms": 48200, "baseURL": "http://localhost:3000",
-  "tests": [ { "key": "patch-version", "scenario": "patch-version", "useCase": "UC2", "title": "patch-version PATCH from 2.3.2-2",
-    "file": "legacy-versions/cut-a-new-version.e2e.spec.ts:18", "project": "chromium", "status": "failed", "outcome": "unexpected", "ms": 15800, "retry": 0, "error": "…", "startedAt": "2026-10-08T04:00:00.000Z",
-    "steps": [ { "title": "Pick PATCH", "status": "passed", "ms": 600, "shot": "shots/<id>-r0-2.jpg" },
-               { "title": "POST the version", "status": "passed", "ms": 90, "call": { "target": "POST /api/versions", "request": {}, "response": { "status": 201, "body": {} } } } ],
+{ "name": "create-a-thing", "stamp": "20261008-110000", "startedAt": "2026-10-08T04:00:00.000Z", "ms": 48200, "baseURL": "http://localhost:3000",
+  "tests": [ { "key": "create-thing", "scenario": "create-thing", "useCase": "UC2", "title": "create-thing from thing-alpha",
+    "file": "things/create-a-thing.e2e.spec.ts:18", "project": "chromium", "status": "failed", "outcome": "unexpected", "ms": 15800, "retry": 0, "error": "…", "startedAt": "2026-10-08T04:00:00.000Z",
+    "steps": [ { "title": "Fill the name", "status": "passed", "ms": 600, "shot": "shots/<id>-r0-2.jpg" },
+               { "title": "POST the thing", "status": "passed", "ms": 90, "call": { "target": "POST /api/things", "request": {}, "response": { "status": 201, "body": {} } } } ],
     "finalShot": "shots/<id>-r0-final.png", "trace": "test-results/…/trace.zip", "annotations": [], "attempts": [] } ] }
 ```
 
@@ -248,13 +277,13 @@ All strict JSON. Paths inside are relative to the run folder.
 
 ```json
 { "useCase": "UC2",
-  "runner": { "setup": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts setup", "cleanup": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts cleanup",
-              "prints": "JSON map of seed name → copy, e.g. { \"delta-super\": { \"name\": \"delta-super-e2e2-k7q2\", \"id\": 9001 } }" },
+  "runner": { "setup": "npx tsx e2e/things/create-a-thing.data.mts setup", "cleanup": "npx tsx e2e/things/create-a-thing.data.mts cleanup",
+              "prints": "JSON map of seed name → copy, e.g. { \"thing-alpha\": { \"name\": \"thing-alpha-e2e2-k7q2\", \"id\": 9001 } }" },
   "tests": [
-  { "scenario": "mcp-create-version", "surface": "mcp", "role": "MANAGER_DEV", "prompt": "cut a PATCH version of delta-super",
-    "steps": [ { "title": "Copy delta-super", "setup": true, "command": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts setup delta-super" },
-               { "title": "Cut a PATCH version of delta-super", "call": "RepositoryVersionService · CreateRepositoryVersion", "params": { "repositoryId": "<from step 1: delta-super.id>", "bump": "PATCH" }, "expect": "version 2.3.3-1, status PENDING" },
-               { "title": "Delete the delta-super copy", "cleanup": true, "command": "npx tsx e2e/legacy-versions/cut-a-new-version.data.mts cleanup" } ] },
+  { "scenario": "mcp-create-thing", "surface": "mcp", "role": "EDITOR", "prompt": "create a copy of thing-alpha",
+    "steps": [ { "title": "Copy thing-alpha", "setup": true, "command": "npx tsx e2e/things/create-a-thing.data.mts setup thing-alpha" },
+               { "title": "Create a thing from thing-alpha", "call": "ThingService · CreateThing", "params": { "sourceId": "<from step 1: thing-alpha.id>" }, "expect": "thing thing-alpha-2, status PENDING" },
+               { "title": "Delete the thing-alpha copy", "cleanup": true, "command": "npx tsx e2e/things/create-a-thing.data.mts cleanup" } ] },
   { "scenario": "backfill-rerun", "surface": "job",
     "steps": [ { "title": "Run the backfill twice", "command": "node scripts/backfill.mjs", "expect": "prints \"backfill: updated=0 skipped=3\"" } ] } ] }
 ```
@@ -263,10 +292,10 @@ All strict JSON. Paths inside are relative to the run folder.
 
 ```json
 { "useCase": "UC2", "tests": [
-  { "scenario": "mcp-create-version", "role": "MANAGER_DEV", "status": "passed", "ms": 4100, "error": "only when failed", "reason": "only when skipped",
-    "prompt": "cut a PATCH version of delta-super", "reply": "Cut version 2.3.3-1 of delta-super. It is PENDING.",
-    "steps": [ { "title": "Cut a PATCH version", "status": "passed", "ms": 2900,
-      "call": { "target": "RepositoryVersionService · CreateRepositoryVersion", "request": { "repositoryId": 9001, "bump": "PATCH" }, "response": { "version": "2.3.3-1", "status": "PENDING" } } },
+  { "scenario": "mcp-create-thing", "role": "EDITOR", "status": "passed", "ms": 4100, "error": "only when failed", "reason": "only when skipped",
+    "prompt": "create a copy of thing-alpha", "reply": "Created thing-alpha-2. It is PENDING.",
+    "steps": [ { "title": "Create a thing", "status": "passed", "ms": 2900,
+      "call": { "target": "ThingService · CreateThing", "request": { "sourceId": 9001 }, "response": { "name": "thing-alpha-2", "status": "PENDING" } } },
                { "title": "Run the backfill", "status": "passed", "ms": 5200,
       "call": { "target": "$ node scripts/backfill.mjs", "request": "node scripts/backfill.mjs", "response": "exit 0\nbackfill: updated=0 skipped=3" } } ] } ] }
 ```

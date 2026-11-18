@@ -97,15 +97,15 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 - Use Glob, Grep and Read on the spec folder: spec, plan, data model, contracts, research, decisions.
 - Extract:
     - Summary, key decisions, in scope / out of scope.
-    - **Use cases**: each goal a user wants to reach, named verb + object ("Cut a new version"). A step shared by several goals ("Open the form") or a refusal / timeout path is not a use case: it is a scenario of the goal it belongs to.
-    - Decisions: each yes / no point the user or system hits (member? valid? retry?), with where each branch goes and the **real value** it checks: permission key (`redeployment.redeploy`), field + passing values (`status = AVAILABLE`), enum, flag or config key, validation rule.
+    - **Use cases**: each goal a user wants to reach, named verb + object ("Create a thing"). A step shared by several goals ("Open the form") or a refusal / timeout path is not a use case: it is a scenario of the goal it belongs to.
+    - Decisions: each yes / no point the user or system hits (member? valid? retry?), with where each branch goes and the **real value** it checks: permission key (`things.create`), field + passing values (`status = AVAILABLE`), enum, flag or config key, validation rule.
     - Per step: the real RPC / endpoint, table op, queue or job it runs, and the error code or reason constant each refusal returns. Diagrams print these on their nodes.
     - Participants: user, frontend, backend services, databases, external systems.
     - Tables read and written, relations, and any external (read-through) tables.
     - Error mapping: cause → code → what the user sees.
     - Acceptance scenarios, edge cases and refusal rows, each with its story / AC id (or FR / decision id) and the exact user-facing message. They become the scenarios (step 3). Keep each acceptance scenario's Given / When / Then too: it becomes an acceptance criterion.
     - Channels: every way a user reaches each use case: a screen (`ui`), an MCP tool an AI agent calls (`mcp`), a REST / gRPC call made directly (`api`), a script or job (`job`).
-    - **Roles and permissions**: each role the feature touches and the exact permission strings it holds or lacks, read from the seed or permission map (`DEV: repositories.versions.read, not repositories.versions.create`), plus any upstream rule (`legacy group BA, page 7 not writable`). Scenarios name them.
+    - **Roles and permissions**: each role the feature touches and the exact permission strings it holds or lacks, read from the seed or permission map (`VIEWER: things.read, not things.create`), plus any upstream rule (`legacy role X, screen Y read-only`). Scenarios name them.
     - **Examples**: real values a scenario can show — versions, counts, ids, names the dev seed creates, a request and its answer. Each scenario carries one.
     - **Messages from the code**: when the code exists, copy each user-facing message verbatim from it (`file:line`), because the spec drifts. List every place the spec's text and the code's differ.
     - Control rules: which control is hidden and which is shown unavailable with a reason, as the spec says. No permission → whatever the real app does today (usually hidden). How the reason shows (tooltip or inline text), read from the component when it exists.

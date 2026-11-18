@@ -8,7 +8,7 @@ var PLAYED_RESULTS = {
   "at": "2026-10-14",
   "note": "Claude over MCP, 2026-10-14: 2 things, Second thing PENDING then First thing READY.",
   "calls": [
-   { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "ListThings", "params": { "ownerId": 1202 } }, "isError": false,
+   { "role": "EDITOR", "tool": "list_things", "arguments": { "ownerId": 1202 }, "isError": false,
      "response": { "things": [{ "id": 1205, "name": "Second thing", "status": "PENDING" }, { "id": 1204, "name": "First thing", "status": "READY" }], "total": 2 } }
   ]
  },
@@ -18,9 +18,9 @@ var PLAYED_RESULTS = {
   "at": "2026-10-14",
   "note": "Claude over MCP, 2026-10-14: PENDING, audit \"created thing #1207\".",
   "calls": [
-   { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "CreateThing", "params": { "ownerId": 1202, "name": "Third thing" } }, "isError": false,
+   { "role": "EDITOR", "tool": "create_thing", "arguments": { "ownerId": 1202, "name": "Third thing" }, "isError": false,
      "response": { "id": 1207, "name": "Third thing", "status": "PENDING" } },
-   { "role": "MANAGER_DEV", "tool": "AuditLogService", "arguments": { "operation": "GetAuditLogs", "params": { "thingId": 1207, "limit": 1 } }, "isError": false,
+   { "role": "EDITOR", "tool": "get_audit_logs", "arguments": { "thingId": 1207, "limit": 1 }, "isError": false,
      "response": { "entities": [{ "message": "created thing #1207" }], "total": 1 } }
   ]
  },
@@ -30,10 +30,10 @@ var PLAYED_RESULTS = {
   "at": "2026-10-14",
   "note": "Claude over MCP, 2026-10-14: Invalid argument: name is required. The owner still has its 2 things.",
   "calls": [
-   { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "CreateThing", "params": { "ownerId": 1210, "name": "" } }, "isError": true,
+   { "role": "EDITOR", "tool": "create_thing", "arguments": { "ownerId": 1210, "name": "" }, "isError": true,
      "response": "Invalid argument: name is required." },
    { "lookup": "The owner id 1210 came from ▶ Seed (the seed's vars)." },
-   { "role": "MANAGER_DEV", "tool": "ThingService", "arguments": { "operation": "ListThings", "params": { "ownerId": 1210 } }, "isError": false,
+   { "role": "EDITOR", "tool": "list_things", "arguments": { "ownerId": 1210 }, "isError": false,
      "response": { "things": [{ "id": 1212 }, { "id": 1211 }], "total": 2 } }
   ]
  }

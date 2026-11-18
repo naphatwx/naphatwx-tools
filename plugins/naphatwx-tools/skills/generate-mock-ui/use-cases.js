@@ -46,7 +46,7 @@ var SCENARIOS = [
     "when": "A caller runs ListThings {ownerId 1204}.",
     "expect": ["Unavailable \"The service could not be reached. Try again.\" — never an empty list."] },
   { "id": "create-thing", "useCase": "UC2", "kind": "basic", "core": true, "title": "Valid name", "story": "US2 · AC1", "surface": "ui",
-    "given": "The user holds things.create (e.g. MANAGER_DEV).",
+    "given": "The user holds things.create (e.g. EDITOR).",
     "when": "The user creates a thing named Third thing.",
     "expect": ["Toast: \"Third thing was created.\"; Third thing tops the list as PENDING."] },
   { "id": "create-empty-name", "useCase": "UC2", "kind": "exception", "title": "Empty name", "story": "US2 · AC3", "surface": "ui",

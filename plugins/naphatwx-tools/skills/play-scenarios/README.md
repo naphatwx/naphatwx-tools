@@ -67,18 +67,18 @@ sequenceDiagram
     S->>S: read live/.env, get the API credential (apiAuth: header, command or login as the role)
     S->>D: run the scenario's seed, credential in PLAY_API_AUTH
     D->>A: ensure shared data (find, create if missing)
-    D->>A: create a new entity "pluto-cut-0412"
+    D->>A: create a new owner "owner-k3x9"
     A-->>D: id 1311
     opt the data needs a background job
         D->>A: poll until READY
     end
-    D-->>S: last line {"url": "/repositories/1311?tab=versions"}
+    D-->>S: last line {"url": "/owners/1311"}
     opt login type post
         S->>A: POST login route as the scenario's role
         A-->>S: Set-Cookie
     end
     S-->>P: { ok, url } + the same Set-Cookie
-    P->>A: frame opens localhost:3000/repositories/1311?tab=versions
+    P->>A: frame opens localhost:3000/owners/1311
     Note over P,A: cookies ignore the port, so the frame is signed in
     A-->>U: the real screen, ready to play
 ```
@@ -92,9 +92,9 @@ graph LR
         E[environment dev]
     end
     subgraph NEW["New on every pick"]
-        N1[repo pluto-cut-0412: first pick]
-        N2[repo pluto-cut-0415: Restart]
-        N3[repo pluto-cut-0420: Restart]
+        N1[owner owner-k3x9: first pick]
+        N2[owner owner-m7a2: Restart]
+        N3[owner owner-q4c8: Restart]
     end
     N1 --> O
     N2 --> O

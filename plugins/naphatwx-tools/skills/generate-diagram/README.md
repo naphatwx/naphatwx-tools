@@ -6,7 +6,7 @@ Draws one flowchart, sequence diagram or ER diagram as a local file that a brows
 
 - You want one diagram of one flow, or one schema, from a spec, a brief, migrations or a database.
 - Another skill draws several diagrams and wants them all in one style (design-feature calls it).
-- Say: "flowchart of the login flow", "sequence diagram of the redeploy flow", "ER diagram of these tables".
+- Say: "flowchart of the login flow", "sequence diagram of the checkout flow", "ER diagram of these tables".
 
 | You want | Use instead |
 |----------|-------------|

@@ -6,7 +6,7 @@ run(async () => {
         async () => (await api('GET', '/orgs?name=Astro%20Payments')).items[0],
         () => api('POST', '/orgs', { name: 'Astro Payments' }),
     );
-    const name = unique('neptune');
+    const name = unique('owner');
     const owner = await api('POST', '/owners', { orgId: org.id, name });
     done({ url: `/owners/${owner.id}`, values: { ownerId: owner.id, ownerName: name } });
 });

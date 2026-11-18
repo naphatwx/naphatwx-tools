@@ -12,7 +12,7 @@ run(async () => {
         () => api('POST', '/orgs', { name: 'Astro Payments' }),
     );
     // written by the scenario: a new one on every pick
-    const name = unique('pluto');
+    const name = unique('owner');
     const owner = await api('POST', '/owners', { orgId: org.id, name, archived: !!flag('--archived') });
     for (const [name, status] of [['First thing', 'READY'], ['Second thing', 'PENDING']]) {
         await api('POST', `/owners/${owner.id}/things`, { name, status });

@@ -37,8 +37,8 @@ graph TD
     D --> SC
     SC[scan, then read the code behind each hit: migrate config, env loader, switches, infra, queues, API callers] --> V["find the default branch and the next version (tags, release script, CI job, changelog)"]
     V --> ST["build steps: Pre starts with merge + cut version; Deploy the version to production; Post; Rollback"]
-    ST --> AL[add common steps only when they apply; smoke step only when scripts/smoke covers the change]
-    AL --> RT[resolve check items with read-only tools, e.g. Thanos MCP]
+    ST --> AL[add common steps only when they apply; smoke step only when the repo's smoke tests cover the change]
+    AL --> RT[resolve check items with read-only tools, e.g. GitLab or a config-platform tool]
     RT --> RR[re-read every step: source, timing, exact names, rollback, length]
     RR --> Q[ask only about check steps no read-only tool could answer]
     Q --> W{user answers}
@@ -84,7 +84,7 @@ Rules the diagrams don't show:
 - Each step is one line; `detail` only when needed, at most 2 short sentences.
 - Pre-deploy always starts with "Merge into <default branch> and check its pipeline is green", then "Cut version <next>". With no release mechanism in the repo, the cut-version step is marked check.
 - The Deploy phase deploys the version to production, one service per step, in dependency order.
-- If the default branch gets more than your change (e.g. other merges in `dev00`), one note names the count and the risky ones. No steps, no question.
+- If the default branch gets more than your change (e.g. other merges in `develop`), one note names the count and the risky ones. No steps, no question.
 - `pre`, `deploy` and `post` phases are required. `rollback` is added when there is a way back; a step that cannot be undone is said plainly.
 - Rollback turns the feature switch off first. When the app migrates at boot, the down migrations run with the new image before the previous version tag is redeployed, and each one says what data it deletes.
 - Secrets never appear. A step names the env var, never its value.
@@ -118,5 +118,5 @@ Output: one HTML file, at the repo root unless the repo already has a place for 
 ## Related skills
 
 - `get-mr-diffs`: fetches the MR diff this skill reads.
-- `smoke-test`: the post-deploy service check; the plan adds a smoke step only when `scripts/smoke/features/` or `scripts/smoke/review/` covers the change.
+- `smoke-test`: the post-deploy service check; the plan adds a smoke step only when the repo's smoke tests cover the change.
 - `generate-changelog`: the changelog a user-facing step can link.

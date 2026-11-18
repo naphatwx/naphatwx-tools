@@ -42,7 +42,7 @@ Gaps:
 
 ## Merging the results (main agent)
 
-- Hop ids: short `<service>-<verb>` (`grpc-publish`, `worker-consume`, `ci-build`). They must be unique within a flow.
+- Hop ids: short `<service>-<verb>` (`api-publish`, `worker-consume`, `ci-build`). They must be unique within a flow.
 - Two flows that share a hop: keep one implementation in the service, recorded under each flow's own hop id.
 - Every gap becomes a question for the user, or a hop marked `observe: http` on an infra API.
 - Fill each `flows/<flow>.json` straight from the table: `envVars` from the env var column, `observe` from the "observe from outside" column, `mapVersion` from the commit and paths.

@@ -27,14 +27,14 @@ scripts/smoke/
 {
   "local": {
     "services": {
-      "thanos-grpc": "http://localhost:3003/",
+      "api": "http://localhost:3003/",
       "rabbitmq-mgmt": "http://localhost:15672/",
       "jenkins": "http://localhost:8080/"
     },
     "hopTimeoutMs": 30000,
     "requestTimeoutMs": 10000
   },
-  "dev": { "services": { "thanos-grpc": "https://grpc.dev.example.com/" } }
+  "dev": { "services": { "api": "https://api.dev.example.com/" } }
 }
 ```
 
@@ -46,31 +46,31 @@ scripts/smoke/
 
 ```json
 {
-  "flow": "announcement-publish",
-  "description": "grpc publishes an announcement event, the worker consumes it and sends web push",
-  "mapVersion": { "commit": "5d6b8d6", "paths": ["apps/thanos-grpc/internal/service/announcement", "apps/thanos-worker/src/consumers/announcement"] },
+  "flow": "thing-create",
+  "description": "api publishes a thing-created event, the worker consumes it and notifies the owner",
+  "mapVersion": { "commit": "5d6b8d6", "paths": ["apps/api/src/thing", "apps/worker/src/consumers/thing"] },
   "entry": {
-    "service": "thanos-grpc",
+    "service": "api",
     "method": "POST",
-    "path": "api/infra/v1/smoke/probes",
+    "path": "api/smoke/probes",
     "body": {},
     "probeIdField": "probeId",
     "auth": { "type": "bearer", "env": "SMOKE_TOKEN" }
   },
   "store": {
-    "service": "thanos-grpc",
-    "path": "api/infra/v1/smoke/probes/{probeId}",
+    "service": "api",
+    "path": "api/smoke/probes/{probeId}",
     "auth": { "type": "bearer", "env": "SMOKE_TOKEN" }
   },
   "hops": [
     {
-      "id": "grpc-publish",
+      "id": "api-publish",
       "from": "runner",
-      "service": "thanos-grpc",
+      "service": "api",
       "transport": "amqp",
       "observe": { "type": "store" },
       "envVars": [
-        { "name": "RABBITMQ_EXCHANGE_ANNOUNCEMENT_PUBLISH", "expected": "infra.announcement.publish.exchange" }
+        { "name": "RABBITMQ_EXCHANGE_THING_CREATED", "expected": "thing.created.exchange" }
       ]
     },
     {
@@ -81,7 +81,7 @@ scripts/smoke/
       "observe": {
         "type": "http",
         "service": "rabbitmq-mgmt",
-        "path": "api/queues/%2F/infra.announcement.publish.queue",
+        "path": "api/queues/%2F/thing.created.queue",
         "auth": { "type": "basic", "env": "SMOKE_RABBITMQ_BASIC" },
         "expectStatus": [200],
         "expectField": { "path": "consumers" }
@@ -90,13 +90,13 @@ scripts/smoke/
     {
       "id": "worker-consume",
       "from": "rabbitmq",
-      "service": "thanos-worker",
+      "service": "worker",
       "transport": "amqp",
       "observe": { "type": "store" },
       "timeoutMs": 20000,
       "envVars": [
-        { "name": "RABBITMQ_ANNOUNCEMENT_PUBLISH_QUEUE", "expected": { "default": "infra.announcement.publish.queue" } },
-        { "name": "VAPID_PRIVATE_KEY", "secret": true }
+        { "name": "RABBITMQ_THING_CREATED_QUEUE", "expected": { "default": "thing.created.queue" } },
+        { "name": "NOTIFY_API_KEY", "secret": true }
       ]
     }
   ]

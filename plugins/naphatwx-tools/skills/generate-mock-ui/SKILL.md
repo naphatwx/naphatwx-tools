@@ -68,7 +68,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 13. **Every count you report is computed** (by `scripts/check-scenarios.js`), never estimated: scenarios per use case, total, playable.
 14. **Controls follow the spec, then the real app.**
     - No permission → do what the real app does: a control the app hides is **hidden** in the mock too.
-    - Shown unavailable with a reason only where the spec says so (e.g. an ineligible repository, a frozen environment). Show the reason where the spec puts it: a line under the control, or a tooltip. Use `aria-disabled="true"`, not native `disabled`: a disabled button gets no hover or focus, so its tooltip never shows.
+    - Shown unavailable with a reason only where the spec says so (e.g. an archived owner, a locked record). Show the reason where the spec puts it: a line under the control, or a tooltip. Use `aria-disabled="true"`, not native `disabled`: a disabled button gets no hover or focus, so its tooltip never shows.
 15. **No filler text.** Add only the parts this skill lists. No intro line, subtitle, legend or note that repeats a heading or explains what the page shows. No extra section or example block the user did not ask for.
 
 ## Workflow
@@ -119,15 +119,15 @@ This is the expensive step — delegate it to a read-only sub-agent when the age
 | `id` | the scenario's id; becomes `#sc-<id>` in links |
 | `state` | a `States.LIST` id |
 | `page` | screen file name without `.html` |
-| `params` | optional query params the screen needs (`{ "status": "FAILED" }`, `{ "modal": "NEW_VERSION" }`) |
-| `steps` | "How to play": imperative, with real values from the mock data (`Pick merge request !161`, `v2.3.3-1`); a role scenario starts with the role and its permissions |
+| `params` | optional query params the screen needs (`{ "status": "FAILED" }`, `{ "modal": "CREATE" }`) |
+| `steps` | "How to play": imperative, with real values from the mock data (`Open the list of pluto`, `Type Third thing in Name`); a role scenario starts with the role and its permissions |
 
 - **One scenario = one screen = one result.** An entry plays exactly one `state` with one `params`. Never `parts`, part buttons or a list of states; `check-scenarios.js` errors on a `parts` field. A scenario that needs a second state or screen is two scenarios: report it for the `generate-use-case` skill.
 
 - `title`, `story`, `surface` and `expect` come from `use-cases.js`; the file's last lines merge both lists into `SCENARIOS` for the pages and define `isPlayable()`. Keep those lines as the template has them.
 - Steps name what is on screen, not how the code works. A reviewer who never read the spec should be able to follow them.
 - Pick mock data that gives the scenario's example values (versions, counts, names), so "What you should see" matches the frame.
-- A state with other permissions → the first step names them: "You are signed in as DEV: has repositories.versions.read, not repositories.versions.create."
+- A state with other permissions → the first step names them: "You are signed in as VIEWER: has things.read, not things.create."
 - Write "tooltip" or "hover" only when the page really has one; an inline reason is read, not hovered.
 - A scenario you can't play as written (its `expect` doesn't match the spec or the screen) → report it; don't change `use-cases.js`.
 
@@ -174,7 +174,7 @@ Keep the template's layout; only change the header text and `screenUrl()`. What 
     - Clicking a card picks it and opens it: `.picked` gets a 2px accent ring, a blue head (22% `--accent` over `--surface`), an `--accent-fill` panel and a bold title, folded or open. Its panel slides open and its screen loads in the frame. The last picked card shuts at once. Only one card is picked per use case. The list then scrolls (smoothly, only the list, not the page) so the picked card sits at its top; `--tail` room under the last card lets any card get there, trimmed once the card has slid open.
     - Clicking the picked card slides its panel shut or open; the screen stays.
 - **Filter bar** under the page title (`#scenario-filter`, filled by `addScenarioFilter()` from the synced `theme:scenario-filter-js` block): a sticky bar centered in the column: a search field (type to match scenario titles; `/` jumps in; matches are marked) and a live "n of N" count. Focus opens the groups as pills with live counts: Type (ui / api / mcp / job), Kind (basic / alternate / exception), Core only. A group shows only the values the page has, and hides when it has one value. Values in one group combine with OR; groups combine with AND. Picked values show as chips in the field (click to remove; Backspace removes the last); Clear resets. The open panel floats over the rows; a click outside or Escape closes it. Hidden rows keep their order and number; a use case with nothing left shows "No scenario matches the filter". The choice is kept in `localStorage` (`<STORE>:filter`). Keep the call, the `data-surface` / `data-kind` / `data-core` attributes on each `.scenario` row and the title in `.scenario-name`.
-- The open scenario's details: one line with the story as a `N refs` chip and the state label, then "Result" (Pass / Fail toggles and a note), "How to play" (ol) and "What you should see" (ul), under `.label` headings. The `.frame`: a browser bar (three dots, the URL the real app would show — `localhost:3000/<route>?…`, or `MCP · no screen` for a non-ui scenario — `<P>% of 1920 px`, Restart) and the screen in an iframe at 1920×1080 (16:9), transform-scaled by a `ResizeObserver` and a window `resize` listener to fit the frame width; the height follows at 16:9, so a short window scrolls the page. No border.
+- The open scenario's details: one line with the story as a `N refs` chip and the state label, then "Result" (Pass / Fail toggles and a note), "How to play" (ol) and "What you should see" (ul), under `.label` headings. The `.frame`: a browser bar (three dots, the URL the real app would show — `localhost:<port>/<route>?…`, or `MCP · no screen` for a non-ui scenario — `<P>% of 1920 px`, Restart) and the screen in an iframe at 1920×1080 (16:9), transform-scaled by a `ResizeObserver` and a window `resize` listener to fit the frame width; the height follows at 16:9, so a short window scrolls the page. No border.
 - The text column (page title, filter, results, audit log, contract) is centered at `--page-w`, the same width as the design-feature plan; dark only. The index chrome uses the synced theme block (Quiet Sheet tokens such as `--surface`, `--text-3`, `--accent`): style it with the template's CSS classes, never Tailwind gray/purple or `dark:` classes. Don't edit between the `theme:*` markers; change `theme/` in the plugin repo and run `node theme/sync.mjs`. Tailwind stays loaded for layout utilities.
 - The page has an **Export PDF** button: it opens the print dialog; pick "Save as PDF". Keep the `theme:pdf` and `theme:pdf-js` blocks and the `addExportPdf(...)` call. Keep the text size picker too: the `theme:font-size` and `theme:font-size-js` blocks and the `addFontSize(...)` call.
 - `#sc-<id>` opens that scenario in its use case and scrolls to it; opening a scenario updates the hash.

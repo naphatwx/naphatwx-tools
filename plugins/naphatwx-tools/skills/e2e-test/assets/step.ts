@@ -39,20 +39,22 @@ export async function reveal(target: Locator): Promise<void> {
     const foot = pinned(document.elementFromPoint(middle, window.innerHeight - 2))
     const top = (head?.getBoundingClientRect().bottom ?? 0) + 8
     const bottom = (foot?.getBoundingClientRect().top ?? window.innerHeight) - 8
-    const offset = () => {
+    const offset = (from = top, to = bottom) => {
       const box = element.getBoundingClientRect()
-      if (box.top < top) {
-        return box.top - top
+      if (box.top < from) {
+        return box.top - from
       }
-      if (box.bottom > bottom) {
-        return Math.min(box.bottom - bottom, box.top - top)
+      if (box.bottom > to) {
+        return Math.min(box.bottom - to, box.top - from)
       }
       return 0
     }
-    for (let n = element.parentElement; n && offset(); n = n.parentElement) {
+    // A pane (e.g. a modal body above its footer) shows only its own box: fit the element inside that too.
+    for (let n = element.parentElement; n && n !== document.body; n = n.parentElement) {
       const overflow = getComputedStyle(n).overflowY
       if ((overflow === 'auto' || overflow === 'scroll') && n.scrollHeight > n.clientHeight) {
-        n.scrollTop += offset()
+        const pane = n.getBoundingClientRect()
+        n.scrollTop += offset(Math.max(top, pane.top + 8), Math.min(bottom, pane.bottom - 8))
       }
     }
     if (offset()) {

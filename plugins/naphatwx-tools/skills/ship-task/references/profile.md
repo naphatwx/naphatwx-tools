@@ -18,7 +18,7 @@ The profile tells the flow what this project has. Read it once at start.
 | api | apps/api | apps/api/AGENTS.md | api-specialist |
 | web | apps/web | apps/web/AGENTS.md | - |
 
-- Other checkouts: `../thanos-2` (other clones of the repo; their task numbers count too) | none
+- Other checkouts: `../my-repo-2` (other clones of the repo; their task numbers count too) | none
 - Run checks: `docker compose run --rm dev` | host
 - Gate per app:
   - api: `go build ./... && go vet ./...` · unit: `go test ./...`
@@ -35,8 +35,8 @@ The profile tells the flow what this project has. Read it once at start.
 - Rules check: <project rules every plan ticks, e.g. naming, permissions, error texts> | from the Rules that apply list
 - Extra review tracks: <agent, when it runs> | none
 - Decider agent: <agent> | general-purpose
-- Docs: docs/features/<domain>/ (README.md, architecture.md, decisions/) | none
-  - User docs: apps/web/content/ · after edit: `npm run docs:index` | none
+- Docs: docs/<area>/ | none
+  - User docs: apps/web/content/ · after edit: `<docs index command>` | none
 - Target branch fallback: ask
 ```
 

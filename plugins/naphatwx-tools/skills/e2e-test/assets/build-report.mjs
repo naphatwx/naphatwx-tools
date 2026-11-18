@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Builds the one self-contained HTML report of a run: run-data.json + ai-results*.json + review*.json, in use-cases.js order.
-// Usage: node build-report.mjs <run dir> --use-cases <plan>/use-cases.js [--core] [--template <html>] [--out <html>]
+// Usage: node build-report.mjs <run dir> --use-cases <plan>/use-cases.js [--core] [--mock] [--template <html>] [--out <html>]
 // --core: a core-only run; the report keeps only core scenarios ("core": true). Core scenarios come first in each use case.
+// --mock: a run against the mock UI; only ui scenarios can run there, so the others are not listed as "not run".
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,8 +10,9 @@ import { fileURLToPath } from 'node:url';
 const args = process.argv.slice(2);
 const option = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
 const runDirArgument = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--')));
-if (!runDirArgument) { process.stderr.write('usage: node build-report.mjs <run dir> --use-cases <use-cases.js> [--core] [--template <html>] [--out <html>]\n'); process.exit(2); }
+if (!runDirArgument) { process.stderr.write('usage: node build-report.mjs <run dir> --use-cases <use-cases.js> [--core] [--mock] [--template <html>] [--out <html>]\n'); process.exit(2); }
 const coreOnly = args.includes('--core');
+const mockOnly = args.includes('--mock');
 const runDir = resolve(runDirArgument);
 const here = dirname(fileURLToPath(import.meta.url));
 const template = readFileSync(option('--template') ?? join(here, 'e2e-report-template.html'), 'utf8');
@@ -82,7 +84,9 @@ for (const resultFile of files(/^ai-results.*\.json$/)) {
 
 // 3 Review notes, per step. A later file replaces an earlier one's notes for the same scenario.
 const review = new Map();
-for (const reviewFile of files(/^review.*\.json$/)) {
+// Plain sort puts "review-2.json" before "review.json"; order by the number instead (review.json = 1).
+const reviewRound = (file) => Number(basename(file).match(/^review-(\d+)\.json$/)?.[1] ?? 1);
+for (const reviewFile of files(/^review.*\.json$/).sort((a, b) => reviewRound(a) - reviewRound(b))) {
   const notes = readJson(reviewFile).steps ?? [];
   for (const scenarioId of new Set(notes.map((n) => n.scenario))) review.set(scenarioId, notes.filter((n) => n.scenario === scenarioId));
 }
@@ -93,7 +97,7 @@ for (const [scenarioId, notes] of review) {
 }
 
 // 4 One tree: use-cases.js order, core scenarios first in each use case, then tests with no known scenario. A scenario with no result is "not run".
-for (const scenario of SCENARIOS) if (!tests.has(scenario.id) && (!coreOnly || scenario.core === true)) tests.set(scenario.id, { scenario: scenario.id, status: 'notrun', outcome: 'notrun', ms: 0, steps: [], attempts: [], annotations: [] });
+for (const scenario of SCENARIOS) if (!tests.has(scenario.id) && (!coreOnly || scenario.core === true) && (!mockOnly || scenario.surface === 'ui')) tests.set(scenario.id, { scenario: scenario.id, status: 'notrun', outcome: 'notrun', ms: 0, steps: [], attempts: [], annotations: [] });
 const orderedTests = [...tests.values()].map((test, i) => {
   const scenario = scenarioById.get(test.scenario);
   const useCase = scenario?.useCase ?? test.useCase ?? '';

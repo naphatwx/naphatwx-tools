@@ -32,7 +32,7 @@ const takeFlag = (name) => {
 }
 const outFlag = takeFlag('--out')
 const spec = takeFlag('--spec') ?? process.env.SMOKE_SPEC ?? ''
-if (spec && !/^[A-Za-z0-9][\w.-]*$/.test(spec)) fatal(`--spec / SMOKE_SPEC must be a spec folder name (letters, digits, '.', '_', '-') like remove-announcement-dismiss, got "${spec}"`)
+if (spec && !/^[A-Za-z0-9][\w.-]*$/.test(spec)) fatal(`--spec / SMOKE_SPEC must be a spec folder name (letters, digits, '.', '_', '-') like my-feature, got "${spec}"`)
 // One folder per spec (results/<spec>/), _adhoc/ without one. Each env keeps one report there, replaced by its next run.
 const outputDirectory = outFlag ?? join(HERE, 'results', spec || '_adhoc')
 

@@ -55,7 +55,7 @@ var SCENARIOS = [
     "expect": ["Unavailable \"The service could not be reached. Try again.\" — never an empty list."],
     "evidence": {"entry": "apps/mcp/tools/things.ts:12", "gate": "apps/api/internal/authz/permissions.go:88", "expect": ["apps/api/internal/things/list.go:25"]} },
   { "id": "create-thing", "useCase": "UC2", "kind": "basic", "core": true, "title": "Valid name", "story": "US2 · AC1", "surface": "ui",
-    "given": "The user holds things.create (e.g. MANAGER_DEV).",
+    "given": "The user holds things.create (e.g. EDITOR).",
     "when": "The user creates a thing named Third thing.",
     "expect": ["Toast: \"Third thing was created.\"; Third thing tops the list as PENDING."],
     "evidence": {"entry": "apps/web/app/owners/[ownerId]/things/CreateThingButton.tsx:18", "gate": "apps/web/app/owners/[ownerId]/things/CreateThingButton.tsx:12", "roles": "db/migrations/000212_seed_things_roles.up.sql:7", "expect": ["apps/web/app/owners/[ownerId]/things/CreateThingDialog.tsx:66"]} },

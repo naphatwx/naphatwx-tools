@@ -7,8 +7,8 @@ user-invocable: false
 # Get MR Diffs (shared helper)
 
 Resolve a GitLab merge request reference and get its **actual changes (diffs)**.
-This is the single shared flow for `/update-merge-request`,
-`/generate-changelog` and `/review-code` (MR mode).
+This is the single shared flow for the `update-merge-request`,
+`generate-changelog` and `review-code` (MR mode) skills.
 
 The calling command may add overrides (e.g. noise-file filters, or "never
 exclude test files"). Apply them on top of this flow.
@@ -20,7 +20,7 @@ One MR reference:
 | Input | Meaning |
 |-------|---------|
 | Full MR URL | `https://<host>/<group>/<project>/-/merge_requests/<iid>` |
-| `<project_id>!<iid>` | e.g. `avengers/thanos!123` or `456!123` |
+| `<project_id>!<iid>` | e.g. `my-group/my-project!123` or `456!123` |
 | `!<iid>` or `<iid>` | MR in the current repo (resolve project from `git remote`) |
 
 ## Steps
@@ -34,7 +34,10 @@ One MR reference:
 
 ### 2. Fetch MR metadata (MCP)
 
-Call `mcp__gitlab__get_merge_request` (project_id + merge_request_iid). Note:
+Use the user's GitLab MCP server, whatever its name. If there are several,
+pick the one whose host matches the MR URL or `origin`.
+
+Call `get_merge_request` (project_id + merge_request_iid). Note:
 
 - `diff_refs.base_sha` and `diff_refs.head_sha`
 - state, Draft status, source/target branch
@@ -69,10 +72,10 @@ whole diff.
 
 Use only if the repo was not found locally, or fetch/SHAs fail:
 
-- `mcp__gitlab__get_merge_request_diffs` — pass `excluded_file_patterns` only
+- `get_merge_request_diffs` — pass `excluded_file_patterns` only
   if the calling command asks for noise filtering.
-- Still too large → `mcp__gitlab__list_merge_request_changed_files`, then
-  `mcp__gitlab__get_merge_request_file_diff` on the files that matter.
+- Still too large → `list_merge_request_changed_files`, then
+  `get_merge_request_file_diff` on the files that matter.
 
 ## Rules
 

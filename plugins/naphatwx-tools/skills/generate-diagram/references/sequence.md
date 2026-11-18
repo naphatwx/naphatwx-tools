@@ -7,9 +7,9 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 
 ## Labels (both modes)
 
-- Labels are the name only, ≤ 40 chars: RPC (`TriggerRedeployment`), endpoint (`POST /things`), table op (`INSERT infra.redeployment`), queue (`publish infra.redeployment.create`), job (`build app-redeployment`), status or error code (`FAILED_PRECONDITION`).
+- Labels are the name only, ≤ 40 chars: RPC (`CreateThing`), endpoint (`POST /things`), table op (`INSERT schema.thing`), queue (`publish thing.created`), job (`build thing-worker`), status or error code (`FAILED_PRECONDITION`).
 - Arguments, example values, messages and reasons go in `detail`. It shows on hover and in the "Step details" list on the page after the diagram, never inside it.
-- Notes and `alt` / `else` conditions are a short phrase that names the real value, not a generic word: `permission redeployment.redeploy`, not `guards`; `status not AVAILABLE`, not `env unavailable`. Use simple words, not symbols (`not in`, never `∉` or `!=`; see the table in the flowchart reference). The full rule goes in `detail` or in the caller's rules list.
+- Notes and `alt` / `else` conditions are a short phrase that names the real value, not a generic word: `permission thing.edit`, not `guards`; `status not ACTIVE`, not `thing unavailable`. Use simple words, not symbols (`not in`, never `∉` or `!=`; see the table in the flowchart reference). The full rule goes in `detail` or in the caller's rules list.
 - Every `detail` holds real values from the source: field names, permission keys, enum values, config keys, timeouts. Never a vague summary like `permission check, validation`. Same words-not-symbols rule.
 - Mark only writes that leave the service or must be audited as side effects (`hot`), so readers can scan for them.
 - Each message label is an `.edge-label` group (SKILL.md step 3): the text centers on the arrow's midpoint, `(x1 + x2) / 2`, never on the label and step number together. The step number badge sits just left of the label's box, outside it.
@@ -33,15 +33,15 @@ A sequence diagram shows how one flow's services talk: who calls whom, in what o
 - Write one `NN-<slug>.js` per flow. Header comment (max 3 lines): flow number, name, user story; the step format line from `assets/sequence-diagram/01-example-flow.js`.
 
 ```js
-SeqDiagrams.define("01-cut-new-version", {
-    title: "Cut a new version",
-    actors: [["eng", "Engineer", "browser"], ["api", "api-service", "VersionService"]],
+SeqDiagrams.define("01-edit-thing", {
+    title: "Edit a thing",
+    actors: [["user", "User", "browser"], ["api", "api", "ThingService"], ["db", "Postgres", "schema.*"]],
     steps: [
         ["phase", "1 · Open the form"],
-        ["call", "eng", "api", "GetBases", "repositoryId 1204"],
-        ["ret", "api", "eng", "GetBasesResponse", "latestVersion 2.3.2-1"],
-        ["note", "api", "permission version.create", null, "needs permission version.create; the base must be ACTIVE"],
-        ["alt", "upstream accepts"], ["hot", "api", "db", "INSERT audit"], ["else", "refused"], ["ret", "api", "eng", "reason"], ["end"],
+        ["call", "user", "api", "GetThing", "thingId 42"],
+        ["ret", "api", "user", "ThingResponse", "status ACTIVE"],
+        ["note", "api", "permission thing.edit", null, "needs permission thing.edit; the thing must be ACTIVE"],
+        ["alt", "upstream accepts"], ["hot", "api", "db", "INSERT schema.audit_log"], ["else", "refused"], ["ret", "api", "user", "reason"], ["end"],
     ],
 });
 ```

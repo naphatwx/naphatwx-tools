@@ -41,7 +41,7 @@ export async function poll(check, { timeoutSec = 120, everyMs = 2000, what = 'co
 }
 
 /** Last line of output, read by server.mjs: `url`, the path the frame opens relative to LIVE_CONFIG.base, and `values`:
- *  every value made at run time that a step or prompt names as {key} ({ ownerId: 1204, ownerName: 'pluto-k3x9' }). */
+ *  every value made at run time that a step or prompt names as {key} ({ ownerId: 1204, ownerName: 'owner-k3x9' }). */
 export function done(result) {
     process.stdout.write(JSON.stringify(result) + '\n');
 }

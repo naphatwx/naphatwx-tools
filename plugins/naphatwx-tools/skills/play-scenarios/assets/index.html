@@ -695,7 +695,7 @@
 
         // ---------------------------------------------------------------- where each scenario opens
         const opened = {}; // scenario id → the URL its last seed returned
-        const values = {}; // scenario id → { key: value } its last seed created (names, ids, merge request numbers), or typed by the viewer
+        const values = {}; // scenario id → { key: value } its last seed created (names, ids), or typed by the viewer
         const labelOf = key => key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase().replace(/\b(mr|id|url)\b/g, match => match.toUpperCase());
         /** {key} in a step or prompt → the value the seed created; before the seed, a marker saying the seed fills it. */
         const fill = (scenario, text) => String(text).replace(/\{(\w+)\}/g, (match, key) => values[scenario.id]?.[key] ?? (scenario.seed ? `[${labelOf(key)}: filled in after the seed]` : `[${labelOf(key)}: type it above]`));

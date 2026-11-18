@@ -56,7 +56,7 @@ Why: a plan that looks right but names the wrong table or the wrong order fails 
 - Scope: the MR, branch or spec the user gives. Plan for that change only.
 - Target: the default branch (read it from `git symbolic-ref refs/remotes/origin/HEAD` or the GitLab project), then production.
 - Next version: read the repo's release mechanism: version tags (`git tag --sort=-v:refname`), a release script, a CI release job, a changelog. Name the version it will cut. If none is found, write the step with `<next>` and mark it `"check": true`.
-- Other changes: if the default branch will receive more than the user's change (for example, the MR targets `dev00` and `dev00` holds other merges not yet in the default branch), add one `notes` line: the count of other MRs or commits, and the risky ones (migrations, new env vars). No steps for them, no question.
+- Other changes: if the default branch will receive more than the user's change (for example, the MR targets `develop` and `develop` holds other merges not yet in the default branch), add one `notes` line: the count of other MRs or commits, and the risky ones (migrations, new env vars). No steps for them, no question.
 
 ## 2. Get the change
 
@@ -71,7 +71,7 @@ Find each item below in the diff. Then read the code it touches, not only the di
 
 | Look for | Read before you write a step |
 |---|---|
-| New or changed DB migrations | The migrate config: tool, schema, migrations table (thanos: `infra.migrations`, not golang-migrate's default `schema_migrations`). Who runs them: the pipeline, a job, or the app at boot. What each down file deletes. |
+| New or changed DB migrations | The migrate config: tool, schema, migrations table (the repo may use its own, not the tool's default such as golang-migrate's `schema_migrations`). Who runs them: the pipeline, a job, or the app at boot. What each down file deletes. |
 | New env vars or config keys (`process.env`, `os.Getenv`, config loaders, `.env.example`, catalog files) | The loader: required or optional, the default, what the app logs or does when it is missing. Whether it is a shared/global key or per app. |
 | Removed or renamed env vars | Every reader of the old name. The old key is removed only once nothing reads it. |
 | Feature switches, flags or toggles | Where the switch lives (a table the release seeds, or an outside flag service), and its default. |
@@ -97,7 +97,7 @@ Pre-deploy holds only what must exist before the new code starts: env vars the n
 ### Fixed steps
 
 - Pre-deploy always starts with these two steps, in this order:
-  1. "Merge into `<default branch>` and check its pipeline is green". Name only the default branch, never the path through `dev00` or `staging`: how the change gets there is the team's process, not a plan step. Already merged → keep only the pipeline check. No pipeline in the repo → drop the check.
+  1. "Merge into `<default branch>` and check its pipeline is green". Name only the default branch, never the path through `develop` or `staging`: how the change gets there is the team's process, not a plan step. Already merged → keep only the pipeline check. No pipeline in the repo → drop the check.
   2. "Cut version `<next>`", with the command or job you found in step 1 in `cmd`.
 - Deploy phase: "Deploy `<version>` to production", one step per service in dependency order (server before client, workers after the schema they read).
 
@@ -106,7 +106,7 @@ Pre-deploy holds only what must exist before the new code starts: env vars the n
 These are not always added. Add each one only when it applies to this change and can be done as written.
 - Pre: the people who must know are told (only for a change with downtime, risk, or users who will notice).
 - Post: the deployed version matches the release; the health check passes; logs show no new errors for the services touched (quote the log lines to watch).
-- **Smoke test: only when the repo has smoke coverage for this change.** Grep `scripts/smoke/features/` and `scripts/smoke/review/` (or the repo's smoke folder) for the spec folder name, the feature name, the RPC or the page. If a feature or review file covers it, add one step that runs that file. No coverage → no smoke step. Never add a generic full-suite run.
+- **Smoke test: only when the repo has smoke coverage for this change.** Grep the repo's smoke-test folder (for example the one the `smoke-test` skill writes) for the spec folder name, the feature name, the RPC or the page. If a smoke file covers it, add one step that runs that file. No coverage → no smoke step. Never add a generic full-suite run.
 
 ### Rollback
 
@@ -123,12 +123,12 @@ These are not always added. Add each one only when it applies to this change and
 Before you ask the user, try to answer each `check` item with a read-only tool the agent has. Turn the answer into a concrete step, or drop the step if it is already done.
 
 Examples:
-- Thanos MCP `GlobalEnvVarService`: `ListGlobalEnvVarsByName` shows whether a global key exists in the env; `GetGlobalEnvVarUsage` shows which apps it is linked to. "Check the key exists" becomes "Link GLOBAL_X to thanos-grpc" or goes away.
-- Thanos MCP `AppEnvVarService`, `FeatureToggleService`: whether an app key or a toggle already exists.
-- GitLab MCP: the default branch; the latest version tag; the pipeline status of the merge commit.
+- The config / env-var platform's tool, if the repo has one: whether a global or app key exists in the env, and which apps it is linked to. "Check the key exists" becomes "Link GLOBAL_X to api" or goes away.
+- The feature-flag service's tool, if the repo has one: whether a toggle already exists.
+- GitLab MCP (any server name works): the default branch; the latest version tag; the pipeline status of the merge commit.
 - A read-only SQL tool: the current migration version in the migrations table you found in step 3.
 
-Use read-only operations only. Call `GetInputSchema` first when a tool needs it. Keep `check: true` only when no tool can answer.
+Use read-only operations only. Read a tool's input schema first when it has one. Keep `check: true` only when no tool can answer.
 
 ## 6. Re-read every step
 
@@ -138,7 +138,7 @@ Before you show the plan, go through each step and fix what fails:
 3. Command: are the names, tables, flags and log lines the exact ones in the code?
 4. Rollback: switch first; down migrations with the new image when the app migrates at boot; data loss named.
 5. Check items: did you try a read-only tool?
-6. Smoke: is there a feature or review file for this change? If not, is the smoke step gone?
+6. Smoke: is there a smoke file for this change? If not, is the smoke step gone?
 7. Fixed and common steps: does Pre-deploy start with merge and cut version? Does each common step apply and can it be done as written?
 8. Length: one line, `detail` only when needed, at most 2 short sentences.
 
@@ -162,11 +162,11 @@ Wait for answers. If the user says go on, keep those steps marked `check`.
   "id": "mr-123-production",
   "title": "Release !123 · add deploy status",
   "env": "production",
-  "source": "https://gitlab.example.com/group/repo/-/merge_requests/123",
-  "createdAt": "2026-10-08T10:00:00+07:00",
-  "services": ["thanos-grpc", "thanos-web"],
-  "order": "thanos-grpc, then thanos-web",
-  "notes": ["Migration 0042 down drops deploy_status. Take a snapshot first.", "master also gets 4 other MRs from dev00, incl. migration 0041 and new env var FOO_URL."],
+  "source": "https://gitlab.example.com/my-group/my-project/-/merge_requests/123",
+  "createdAt": "2026-10-08T03:00:00Z",
+  "services": ["api", "web"],
+  "order": "api, then web",
+  "notes": ["Migration 0042 down drops deploy_status. Take a snapshot first.", "master also gets 4 other MRs from develop, incl. migration 0041 and new env var FOO_URL."],
   "phases": [
     {
       "key": "pre",
@@ -175,17 +175,16 @@ Wait for answers. If the user says go on, keep those steps marked `check`.
         { "text": "Merge into master and check its pipeline is green" },
         { "text": "Cut version v1.86.0", "cmd": "scripts/release/cut.sh 1.86.0", "source": "scripts/release/README.md" },
         {
-          "text": "Set DEPLOY_STATUS_TTL on thanos-grpc",
-          "detail": "Required at boot; grpc exits without it.",
-          "cmd": "thanos env set thanos-grpc production DEPLOY_STATUS_TTL",
+          "text": "Set DEPLOY_STATUS_TTL on api",
+          "detail": "Required at boot; api exits without it.",
           "tag": "env",
           "risk": "high",
-          "source": "apps/thanos-grpc/config.go",
+          "source": "apps/api/config.go",
           "check": false
         }
       ]
     },
-    { "key": "deploy", "title": "Deploy", "steps": [{ "text": "Deploy v1.86.0 of thanos-grpc to production" }, { "text": "Deploy v1.86.0 of thanos-web to production" }] },
+    { "key": "deploy", "title": "Deploy", "steps": [{ "text": "Deploy v1.86.0 of api to production" }, { "text": "Deploy v1.86.0 of web to production" }] },
     { "key": "post", "title": "Post-deploy", "steps": [] },
     { "key": "rollback", "title": "Rollback", "steps": [] }
   ]

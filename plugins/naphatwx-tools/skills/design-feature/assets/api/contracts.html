@@ -456,11 +456,11 @@
                     ] },
                     res: { name: "ThingResponse", tag: "altered", fields: [
                         ["id", "int64", "1"], ["name", "string", "2"], ["legacyFlag", "bool", "− 4", "drop"],
-                        ["count", "int32 → int64", "~ 9", "change"], ["source", "RepositorySource", "+ 17", "add"],
+                        ["count", "int32 → int64", "~ 9", "change"], ["source", "ThingSource", "+ 17", "add"],
                     ] } },
                 { id: "get-things", name: "GetThings", tag: "behaviour", route: "GET /api/v1/things", perm: "things.read",
                     req: { name: "GetThingsRequest", tag: "unchanged", fields: [
-                        ["source", "optional RepositorySource", "1"], ["page", "int32", "2"],
+                        ["source", "optional ThingSource", "1"], ["page", "int32", "2"],
                     ] },
                     res: { name: "GetThingsResponse", tag: "unchanged", fields: [
                         ["items", "repeated ThingResponse", "1"], ["total", "int64", "2"],
@@ -470,8 +470,8 @@
                     res: { name: "Owner", tag: "unchanged", fields: [["id", "int32", "1"], ["displayName", "string", "2"]] } },
             ],
             types: [
-                { name: "RepositorySource", tag: "new enum", fields: [
-                    ["REPOSITORY_SOURCE_UNSPECIFIED", "", "0"], ["GITLAB", "", "1"],
+                { name: "ThingSource", tag: "new enum", fields: [
+                    ["THING_SOURCE_UNSPECIFIED", "", "0"], ["IMPORT", "", "1"],
                 ] },
             ],
         };

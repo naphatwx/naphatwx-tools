@@ -21,8 +21,8 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 
 | Input | Meaning |
 |-------|---------|
-| Full MR URL | `https://git.ntbx.tech/<group>/<project>/-/merge_requests/123` |
-| `<project_id>!<iid>` | e.g. `avengers/thanos!123` or `456!123` |
+| Full MR URL | `https://gitlab.example.com/<group>/<project>/-/merge_requests/123` |
+| `<project_id>!<iid>` | e.g. `my-group/my-project!123` or `456!123` |
 | `!<iid>` or `<iid>` | MR in the current repo (resolve project from `git remote`) |
 
 Optional flags (anywhere in `$ARGUMENTS`):
@@ -36,8 +36,8 @@ If `$ARGUMENTS` is empty, print usage and stop:
 ```text
 Usage: /generate-changelog <mr-url | project!iid | iid> [--tiny|--full]
 Examples:
-  /generate-changelog https://git.ntbx.tech/avengers/thanos/-/merge_requests/1307
-  /generate-changelog avengers/thanos!1307 --tiny
+  /generate-changelog https://gitlab.example.com/my-group/my-project/-/merge_requests/1307
+  /generate-changelog my-group/my-project!1307 --tiny
   /generate-changelog 1307 --full
 ```
 
@@ -71,7 +71,7 @@ Rules:
   diff shows one: the leading id of its folder name if it has one, else the
   folder name, e.g. `(spec 101)`, `(specs 103, 107)` or `(spec login-flow)`.
 - Plain everyday words, short lines. Cut filler.
-- Never paste raw local paths, dev sandbox names (`dev00`), or internal branch
+- Never paste raw local paths, dev sandbox names (`dev-<name>`), or internal branch
   names.
 - Do not invent changes the MR does not support.
 
@@ -91,7 +91,7 @@ labels that would get copied by accident.
 
 ## Notes
 
-- Reads a real MR over the GitLab MCP server; if that server is not authorized,
+- Reads a real MR over a GitLab MCP server (any server name works); if it is not authorized,
   tell the user and ask them to paste the MR diff or changed-file list, then
   continue from step 3.
 - One MR → one changelog.

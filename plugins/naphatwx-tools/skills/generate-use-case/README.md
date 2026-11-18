@@ -21,13 +21,13 @@ The code is the source of truth. The spec says which goals to cover; each scenar
 
 | Word | Meaning | Example |
 |------|---------|---------|
-| Use case | One goal a user wants to reach, verb + object | Cut a new version |
-| Scenario | One path through a use case, with one result, on one channel | Merge request already released |
+| Use case | One goal a user wants to reach, verb + object | Create a thing |
+| Scenario | One path through a use case, with one result, on one channel | Archived owner |
 | Kind | How a scenario ends: `basic` (the main path), `alternate` (another path to the goal), `exception` (the goal is not reached) | exception |
 | Core | Play it first: every `basic`, plus the main alternates and the errors users hit most (about 15–25% of all) | `"core": true` |
 | Channel | Where a user reaches it: `ui`, `mcp` (an AI agent), `api` (REST / gRPC), `job` | mcp |
 | Acceptance criterion | One Given / When / Then from the spec | US1 · AC3 |
-| Evidence | Where a scenario lives in the code: entry point, the gate on the actor, the code behind each expect line | `apps/web/lib/config/routes.ts:452` |
+| Evidence | Where a scenario lives in the code: entry point, the gate on the actor, the code behind each expect line | `apps/web/lib/routes.ts:41` |
 | Mismatch | One place the spec and the code disagree, with the side to fix | M1 · FR-017 · fix the spec |
 
 ## How it works
@@ -133,7 +133,7 @@ Rules the diagrams don't show:
 - No code yet → `source: "spec"`; play-scenarios and e2e-test refuse those until verify mode traces them.
 - Every scenario carries a concrete, true example: real versions, counts, ids, a request → answer, or a script's output line.
 - Quoted text is copied from the code; `check.js` searches the repo for each quoted string and fails when one is missing. Spec text that differs goes in `MISMATCHES`, which the reply lists last.
-- A role scenario names the role and its exact permission strings ("DEV: has repositories.versions.read, not repositories.versions.create"), read from seed migrations or role-permission tables, never from spec prose.
+- A role scenario names the role and its exact permission strings ("VIEWER: has things.read, not things.create"), read from seed migrations or role-permission tables, never from spec prose.
 - No mock or test details: no state ids, pages, query params or selectors. Example values are fine.
 - Ids are stable. Other files link to `#sc-<scenario id>`.
 - Every count in the reply comes from `check.js`.

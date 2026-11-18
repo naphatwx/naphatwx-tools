@@ -12,7 +12,7 @@ Write: <e2e-dir>/<domain>/helpers/<feature>.ts   (exists → add only what the n
 
 Naming
 1. Each test copies the seed records its scenario names. A copy is named `<seed name>-e2e<N>-<tag>`:
-   N = the use case number, tag = 4 base36 characters, new per fixture build. E.g. `delta-super-e2e1-k7q2`.
+   N = the use case number, tag = 4 base36 characters, new per fixture build. E.g. `thing-alpha-e2e1-k7q2`.
    Step titles then quote the scenario word for word, the screen shows a name that reads the same, and
    a cut-off name still shows the meaningful part.
 2. Before you fix the shape, read the repo's name rules (characters, length, unique keys) for every
@@ -21,7 +21,7 @@ Naming
 
 What the helper exports
 3. A fixture builder that copies the named seed records for one use case and returns them with one
-   name map, seed name → copy (e.g. `fixture.names['delta-super']`), plus a cleanup that deletes exactly
+   name map, seed name → copy (e.g. `fixture.names['thing-alpha']`), plus a cleanup that deletes exactly
    those copies and checks they are gone.
 4. `sweep(request, uc)`: deletes leftovers of aborted runs for that use case, found by the `-e2e<N>-`
    marker. It must never match a name without the marker.

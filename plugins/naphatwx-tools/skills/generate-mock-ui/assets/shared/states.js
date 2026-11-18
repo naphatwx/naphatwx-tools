@@ -12,7 +12,7 @@ var States = (function () {
         { file: 'page/example.html', label: 'Example list', icon: 'fa-list', extra: {} },
     ];
     const ROLES = [
-        { id: 'manager', label: 'MANAGER_DEV', perms: RW },
+        { id: 'editor', label: 'EDITOR', perms: RW },
         { id: 'viewer', label: 'VIEWER', perms: RO },
     ];
     /** The entity the screens open on. `blocked` = a reason the spec shows on an unavailable control (not a permission). */
@@ -37,11 +37,11 @@ var States = (function () {
 
     /** `useCase` = which plan use cases (UC<n>) this preset shows. */
     const LIST = [
-        { id: 'normal', data: 'pluto', role: 'manager', faults: [], label: 'Normal — pluto', useCase: 'UC1 · UC2', hint: 'Happy path with real-looking data.' },
-        { id: 'empty', data: 'neptune', role: 'manager', faults: [], label: 'Empty — neptune', useCase: 'UC1', hint: 'No rows yet: the empty state, not an error.' },
-        { id: 'unreachable', data: 'pluto', role: 'manager', faults: ['readUnavailableOnce'], label: 'Upstream unreachable', useCase: 'UC1', hint: 'First read fails; Retry works. Never shown as empty.' },
+        { id: 'normal', data: 'pluto', role: 'editor', faults: [], label: 'Normal — pluto', useCase: 'UC1 · UC2', hint: 'Happy path with real-looking data.' },
+        { id: 'empty', data: 'neptune', role: 'editor', faults: [], label: 'Empty — neptune', useCase: 'UC1', hint: 'No rows yet: the empty state, not an error.' },
+        { id: 'unreachable', data: 'pluto', role: 'editor', faults: ['readUnavailableOnce'], label: 'Upstream unreachable', useCase: 'UC1', hint: 'First read fails; Retry works. Never shown as empty.' },
         { id: 'read-only', data: 'pluto', role: 'viewer', faults: [], label: 'Read-only user — pluto', useCase: 'UC2', hint: 'No things.create: Create is hidden, as the real app hides it.' },
-        { id: 'archived', data: 'archived', role: 'manager', faults: [], label: 'Archived owner — pluto', useCase: 'UC2', hint: 'Create is disabled with the reason under it, as the spec says.' },
+        { id: 'archived', data: 'archived', role: 'editor', faults: [], label: 'Archived owner — pluto', useCase: 'UC2', hint: 'Create is disabled with the reason under it, as the spec says.' },
     ].map(build);
 
     const params = new URLSearchParams(location.search);

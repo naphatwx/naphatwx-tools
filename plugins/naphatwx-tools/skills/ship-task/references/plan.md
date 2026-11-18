@@ -6,7 +6,7 @@ the grill, and the plan summary at the end. Code starts only when the user says 
 ## 1. Number and folder
 
 - Task folder: `tasks/NNN-<slug>/`, with the next number from Setup (`SKILL.md` → Start).
-  Slug: 2–4 words, like `bucket-csv-export`. The number is how the user refers to the task ("continue 195").
+  Slug: 2–4 words, like `users-csv-export`. The number is how the user refers to the task ("continue 195").
 
 ## 2. Explore
 

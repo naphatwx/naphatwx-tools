@@ -10,8 +10,8 @@ var MOCK_DATA = {
     ],
     things: {
         1204: [
-            { id: 502, owner_id: 1204, name: 'Second thing', state: 'QUEUED', created_at: '2026-09-24T15:06:00+07:00' },
-            { id: 501, owner_id: 1204, name: 'First thing', state: 'DONE', created_at: '2026-09-20T11:42:00+07:00' },
+            { id: 502, owner_id: 1204, name: 'Second thing', state: 'QUEUED', created_at: '2026-09-24T08:06:00Z' },
+            { id: 501, owner_id: 1204, name: 'First thing', state: 'DONE', created_at: '2026-09-20T04:42:00Z' },
         ],
         1310: [],
     },

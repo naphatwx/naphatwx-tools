@@ -7,7 +7,9 @@ Writes and runs automated tests for every scenario in a feature's `use-cases.js`
 - You want a feature tested end to end, with proof of every step: a screenshot, or the request and response.
 - You want the MCP side tested by an AI agent, the way users reach it.
 - You want one shareable file, grouped by use case and scenario.
-- Say: "e2e test this spec folder", "test this end to end".
+- You want to watch the test browsers live while they run. The Playwright dashboard opens by default; `--no-watch` turns it off.
+- You want the mock UI checked against the `ui` scenarios: `--mock` runs the same tests on `<plan>/mock/`, opened from disk.
+- Say: "e2e test this spec folder", "test this end to end", "e2e test the mock".
 
 | You want | Use instead |
 |----------|-------------|

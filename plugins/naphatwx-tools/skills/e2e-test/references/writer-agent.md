@@ -35,11 +35,11 @@ All scenarios
 2. Own your data: make every record `given` needs only through the data helper (copies of the seed
    records the scenario names; it deletes them after). Never change data you did not create. Every
    spec file calls the helper's `sweep(request, '<uc>')` once in `beforeAll`.
-   Step titles use the scenario's names (`Open delta-super`), never fixture keys: map each seed name
-   to its copy with the helper's one name map (e.g. `fixture.names['delta-super']`).
+   Step titles use the scenario's names (`Open thing-alpha`), never fixture keys: map each seed name
+   to its copy with the helper's one name map (e.g. `fixture.names['thing-alpha']`).
    Build the data in a fixture with its own `timeout`, or call `test.setTimeout()` after it is built,
    so a slow setup never eats the steps' time.
-3. Sign in as the role in `given` (e.g. DEV, MANAGER_DEV). Never test a refusal with an admin account.
+3. Sign in as the role in `given` (e.g. VIEWER, EDITOR). Never test a refusal with an admin account.
 4. Assert exactly what `expect` says: quoted messages verbatim, numbers, statuses, ids, what is absent.
 5. A test that may skip calls `test.skip(...)` before any `step()` or `apiStep()`, so it records no step.
    Do any lookup that decides the skip in `beforeAll`.
@@ -53,7 +53,7 @@ ui scenarios (Playwright browser test)
      annotation: [{ type: 'use case', description: '<UC id>' },
      { type: 'scenario', description: '<id>' }] }, async ({ page }) => { ... })
 8. EVERY user action or check is its own `await step(page, '<plain sentence>', async () => { ... })`,
-   so each gets a screenshot. Name steps as the user sees them: "Open the Versions tab",
+   so each gets a screenshot. Name steps as the user sees them: "Open the Things tab",
    "Click Save as draft", "The draft shows under My drafts". A setup step that touches no page uses
    `test.step`, not `step()`, so it records no blank shot. Check one tab per step when the tabs don't fit on screen.
 9. Before a step ends, wait for the state its title promises (the heading, the toast, the row), so the
@@ -70,6 +70,15 @@ api scenarios (Playwright request test)
 13. Read the route and its request / response shape from the code (handler, proto, OpenAPI). A route that
     does not exist is a finding. A pure gRPC service with no HTTP / JSON route: put the scenario in the
     .ai-tests.json as a job step with `grpcurl`, and say so.
+
+mock target (only when the run is --mock; replaces rules 2, 3 and 10)
+M1. Test the mock in <plan>/mock/, not the app. File: <plan>/mock/e2e/<goal>.mock.spec.ts. No data helper,
+    no sweep, no login: the mock state sets the data and the role.
+M2. Play each scenario from its entry in <plan>/mock/shared/scenario-play.js. Open it with
+    page.goto('page/<page>.html?state=<state>&embed=1&<params as query>') (relative to the file:// baseURL),
+    then turn each line of its `steps` into one step(). Assert the scenario's `expect` from use-cases.js.
+M3. Selectors come from the mock's page and shared/*.js code (rule 6). The mock does not do what `expect`
+    says → a finding for generate-mock-ui, not a different test.
 
 Shared rules for the spec file
 14. Tests in the file must not depend on each other. Data setup and cleanup live in each test or its hooks.
@@ -91,7 +100,7 @@ mcp and job scenarios (.ai-tests.json, played later by an AI tester agent)
     command, the scenario's `when`, the checks of `expect`, then the cleanup command. A value from an
     earlier step is written "<from step N: field>".
     `prompt` is the scenario's `when` as the role would ask it, in their words, naming the real copy
-    (e.g. "cut a PATCH version of delta-super"). One sentence, no tool names.
+    (e.g. "create a copy of thing-alpha"). One sentence, no tool names.
 19. job: the exact command from the repo (package script, Makefile, scripts/), run from the repo root,
     with flags that limit it to your copies. Never a command that touches shared or production data.
     `expect` names the output line or exit code the scenario expects.

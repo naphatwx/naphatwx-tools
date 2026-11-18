@@ -52,7 +52,7 @@ Without deep reading, list:
 
 - **Services**: compose files, `apps/*`, `services/*`, k8s or Terraform service names, each with its stack.
 - **Links**: queue names, HTTP/gRPC clients, CI triggers, webhook or callback routes, outside API clients. Grep for client constructors and the queue/exchange/route constants.
-- **Candidate flows**: chains of 3 or more services that a real user action starts, for example "create deployment ticket: web → grpc → mq → worker → CI → git host → grpc callback".
+- **Candidate flows**: chains of 3 or more services that a real user action starts, for example "create thing: web → api → queue → worker → CI → git host → api callback".
 
 Show the services and the candidate flows. Ask which flows to cover. Use a multi-select question when the agent has one (AskUserQuestion in Claude Code), otherwise a numbered list. If `setup` named flows, skip the question.
 
@@ -155,17 +155,17 @@ Reply with:
 
 ---
 
-## Worked example (Thanos)
+## Worked example
 
-Flow `deploy-ticket`:
-- thanos-web → thanos-grpc: HTTP
-- thanos-grpc → RabbitMQ: `infra.<object>.<verb>.exchange`
-- RabbitMQ → thanos-worker: the consumer
-- thanos-worker → Jenkins: a no-op job with `SMOKE_PROBE_ID`
+Flow `thing-create`:
+- web → api: HTTP
+- api → RabbitMQ: `<object>.<verb>.exchange`
+- RabbitMQ → worker: the consumer
+- worker → Jenkins: a no-op job with `SMOKE_PROBE_ID`
 - Jenkins → GitLab: a read-only project `GET`
-- Jenkins → thanos-grpc: the callback
+- Jenkins → api: the callback
 
 The probe:
-- Entry and shared store: `smoke/probes` on thanos-grpc.
-- grpc and the worker report their hops and their `RABBITMQ_*` / `JENKINS_*` env vars to the store.
+- Entry and shared store: `smoke/probes` on api.
+- api and the worker report their hops and their `RABBITMQ_*` / `JENKINS_*` env vars to the store.
 - The runner also checks the queue's consumer count through the RabbitMQ management API, and the Jenkins build through the Jenkins API.

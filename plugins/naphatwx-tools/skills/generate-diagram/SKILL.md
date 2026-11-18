@@ -71,7 +71,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
 ```html
 <g class="edge-label" data-cx="616">            <!-- data-cx: the midpoint of the line it labels -->
   <rect class="edge-label-background" y="281" height="18" rx="3"/>   <!-- x and width: set by the script -->
-  <text x="616" y="295" text-anchor="middle">SELECT infra.user</text>
+  <text x="616" y="295" text-anchor="middle">SELECT schema.thing</text>
   <g class="edge-label-number"><circle cx="0" cy="290" r="11"/><text x="0" y="295" text-anchor="middle">5</text></g>
 </g>
 ```

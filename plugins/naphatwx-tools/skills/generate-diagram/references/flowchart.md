@@ -27,19 +27,19 @@ A reader should see *what exactly* is checked or called without opening the spec
 
 | Node | Detail line holds | Example |
 |------|-------------------|---------|
-| Permission diamond | the permission key | `redeployment.redeploy` |
-| State / type diamond | the field and the values that pass | `status = AVAILABLE`, `type in WEB, BACKEND, WORKER` |
+| Permission diamond | the permission key | `thing.edit` |
+| State / type diamond | the field and the values that pass | `status = ACTIVE`, `type in A, B, C` |
 | Validation diamond | the rule | `name max 64 chars` |
-| Feature flag / config diamond | the flag or key | `FF_LEGACY_REDEPLOY` |
-| Step that calls a service | the RPC or endpoint | `TriggerRedeployment`, `POST /things` |
-| Step that writes | the table op or queue | `INSERT infra.redeployment` |
-| Error / refusal step or pill | the code or reason constant | `REASON_NOT_LONG_RUNNING` |
-| Start pill | the screen, route or trigger | `/repositories/:id` |
+| Feature flag / config diamond | the flag or key | `FF_NEW_FLOW` |
+| Step that calls a service | the RPC or endpoint | `CreateThing`, `POST /things` |
+| Step that writes | the table op or queue | `INSERT schema.thing` |
+| Error / refusal step or pill | the code or reason constant | `REASON_NOT_ALLOWED` |
+| Start pill | the screen, route or trigger | `/things/:id` |
 | End pill | the resulting state | `status = QUEUED` |
 
-- Exit labels use real values too when they are not plain yes / no: `THANOS_LEGACY` / `THANOS`, `INACTIVE or FAILED`.
-- Few symbols: say it in simple words (table below). Keep only `=` and the real names themselves (dots in `infra.redeployment`, `/` in routes).
-- Several values → the most telling ones, then `and N more` (`WEB, BACKEND and 1 more`); the full list goes in the caller's rules.
+- Exit labels use real values too when they are not plain yes / no: `LEGACY` / `CURRENT`, `INACTIVE or FAILED`.
+- Few symbols: say it in simple words (table below). Keep only `=` and the real names themselves (dots in `schema.thing`, `/` in routes).
+- Several values → the most telling ones, then `and N more` (`A, B and 1 more`); the full list goes in the caller's rules.
 - No real value in the source → `TBD`, never a made-up one. A node with nothing to name (e.g. `Done`) may skip the detail line.
 - Loops (retry, forgot password → reset → back to login) route around the side, never through other nodes, and enter their target at their own point (a free edge of the shape), never joining another connector mid-shaft.
 

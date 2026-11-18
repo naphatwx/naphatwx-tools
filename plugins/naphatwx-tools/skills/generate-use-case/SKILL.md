@@ -24,16 +24,16 @@ The words, used the same way in every skill:
 
 | Word | Meaning | Named as | Example |
 |------|---------|----------|---------|
-| Feature | what the spec delivers | a noun | Legacy new version |
-| Use case | one goal a user wants to reach, with every path to it | verb + object | Cut a new version |
-| Scenario | one rule or outcome of a use case, on one channel; other values, clicks or views of the same rule are its examples, not more scenarios | the condition or the result | Merge request already released |
+| Feature | what the spec delivers | a noun | Things |
+| Use case | one goal a user wants to reach, with every path to it | verb + object | Create a thing |
+| Scenario | one rule or outcome of a use case, on one channel; other values, clicks or views of the same rule are its examples, not more scenarios | the condition or the result | Archived owner |
 | Kind | how a scenario ends: `basic` (the main path to the goal, one per use case and channel), `alternate` (another path that still reaches the goal), `exception` (the goal is not reached: refusal, error, timeout) | the `kind` value | exception |
 | Core | a scenario to play first: every `basic`, plus the main alternates and the errors users hit most | `"core": true` | Core |
 | Channel | where a user reaches it: `ui` (a screen), `mcp` (an AI agent calling MCP tools), `api` (REST / gRPC called directly), `job` (a script or scheduled job) | the `surface` value | mcp |
 | Acceptance criterion | one Given / When / Then from the spec | `US<n> · AC<m>` | US1 · AC3 |
-| Evidence | where a scenario lives in the code: its entry point, the gate that lets the actor in or stops them, and the code behind each `expect` line, as repo-relative `path:line` | `evidence` | `apps/web/lib/config/routes.ts:452` |
+| Evidence | where a scenario lives in the code: its entry point, the gate that lets the actor in or stops them, and the code behind each `expect` line, as repo-relative `path:line` | `evidence` | `apps/web/lib/routes.ts:41` |
 | Mismatch | one place where the spec and the code disagree. The scenario follows the code; the mismatch says which side to fix | `MISMATCHES` entry | M1 |
-| Flow diagram | the steps of a use case, drawn as its flowchart and sequence diagram (not a "flow" in the basic / alternate flow sense: that is a scenario) | a diagram, not a list item | the flowchart of Cut a new version |
+| Flow diagram | the steps of a use case, drawn as its flowchart and sequence diagram (not a "flow" in the basic / alternate flow sense: that is a scenario) | a diagram, not a list item | the flowchart of Create a thing |
 
 The file holds real example values but no mock wiring and no selectors, so it works for features with no UI too.
 
@@ -68,9 +68,9 @@ Where the file goes (`<plan>`):
 ## Hard Rules
 
 1. **Strict JSON inside a script.** The file sets four globals, `var USE_CASES = [...]`, `var SCENARIOS = [...]`, `var ACCEPTANCE = [...]` and `var MISMATCHES = [...]`. Each array is strict JSON (double quotes, no trailing commas, no comments inside), so a script can parse it after `var NAME = `, and a page opened from `file://` can load it with `<script src>`.
-2. **The code is the source of truth.** The spec picks the goals and says what was intended. What a scenario says happens is what the code does, traced from its entry point (step 1b), on every channel. Specs drift and get written before the code. A scenario copied from spec prose can describe a screen the actor never reaches. Example: the spec says a DEV sees "Changelog not loaded / Forbidden" on the Create ticket form, but the route needs `deployments.tickets.create`, so DEV never sees the form. Never invent behaviour. When the code does not exist yet, see rule 5.
+2. **The code is the source of truth.** The spec picks the goals and says what was intended. What a scenario says happens is what the code does, traced from its entry point (step 1b), on every channel. Specs drift and get written before the code. A scenario copied from spec prose can describe a screen the actor never reaches. Example: the spec says a VIEWER sees "Name is required." on the Create thing form, but the route needs `things.create`, so VIEWER never sees the form. Never invent behaviour. When the code does not exist yet, see rule 5.
 3. **Every scenario carries evidence.** `evidence.entry` is where the actor starts on that channel. `evidence.gate` is the check that lets them in or stops them. `evidence.expect` holds one ref per `expect` line: the code that produces that line. Refs are repo-relative `path:line` or `path:from-to`. `check.js` fails on a missing entry, a missing file or a line out of range.
-4. **Quoted text is copied from the code.** In `expect`, double quotes hold only text the code holds: messages, labels, statuses, error reasons. Copy them from the source, never from the spec. Write user input and example values without quotes (name Third thing, version 1.3.0-1). `check.js` searches the repo for each quoted string and fails when it is not there. Values inside a quote may differ from the code's placeholders (`"Version 2.3.3-1 was created."` matches `` `Version ${v} was created.` ``).
+4. **Quoted text is copied from the code.** In `expect`, double quotes hold only text the code holds: messages, labels, statuses, error reasons. Copy them from the source, never from the spec. Write user input and example values without quotes (name Third thing, owner 1204). `check.js` searches the repo for each quoted string and fails when it is not there. Values inside a quote may differ from the code's placeholders (`"Third thing was created."` matches `` `${name} was created.` ``).
 5. **Spec and code disagree → keep the code, list the gap.** The scenario describes the code. The gap goes in `MISMATCHES` with the spec ref, both texts, the code evidence and the side to fix. Never resolve it silently, either way. No code yet (design phase) → write the scenario from the spec with `"source": "spec"` and no evidence. `check.js` warns, and verify mode must pass before play-scenarios or e2e-test use it.
 6. **Roles and permissions come from data**: seed migrations, role-permission tables and permission constants (`evidence.roles`). Never from spec prose ("only QA can …").
 7. **Every scenario carries a concrete, true example** (step 2, "Examples"). A reviewer playing it must be able to tell pass from fail by comparing the screen with the text. Prose alone ("The user is not allowed", "the tooltip explains why") is not enough.
@@ -111,8 +111,8 @@ For each use case and channel, find the entry point and follow it to every outco
 | `job` | command or schedule → entry function → branches → output lines and exit code |
 
 - **Branches → scenarios.** Every reachable branch with a distinct outcome (another result, error code, message or screen) is a scenario candidate. Then merge by the rules in step 2.
-- **Reachability first.** Before you write a scenario, prove the actor reaches its first step on that channel: route permission, nav visibility, button permission, API / MCP permission map, and the role seed. Can't reach it → the scenario is the refusal the actor really gets there (e.g. the Forbidden page, 403 `PERMISSION_DENIED` "…"), with that gate as `evidence.gate`, or an `na` reason that cites the gate: `"na": { "ui": "DEV cannot open Create ticket: the route needs deployments.tickets.create (apps/web/lib/config/routes.ts:452)." }`. A spec outcome behind a gate the actor can't pass is never their scenario.
-- **Roles from data.** Which roles hold each permission: read the seed migrations, role-permission tables and permission constants (`evidence.roles`). `DEV: has repositories.versions.read, not repositories.versions.create`. Note any upstream rule too (`legacy group BA, page 7 not writable`).
+- **Reachability first.** Before you write a scenario, prove the actor reaches its first step on that channel: route permission, nav visibility, button permission, API / MCP permission map, and the role seed. Can't reach it → the scenario is the refusal the actor really gets there (e.g. the Forbidden page, 403 `PERMISSION_DENIED` "…"), with that gate as `evidence.gate`, or an `na` reason that cites the gate: `"na": { "ui": "VIEWER cannot open Create thing: the route needs things.create (apps/web/lib/routes.ts:41)." }`. A spec outcome behind a gate the actor can't pass is never their scenario.
+- **Roles from data.** Which roles hold each permission: read the seed migrations, role-permission tables and permission constants (`evidence.roles`). `VIEWER: has things.read, not things.create`. Note any upstream rule too (`the owner is archived`).
 - **Strings.** Copy every message, label, status, error reason and HTTP code the scenario quotes from the code at its `evidence.expect` line. For text built at run time (`fmt.Sprintf`, template strings), copy what the user sees with the example values filled in.
 - **Example data**: what the dev seed or fixtures really create (project names, versions, row counts, ids), and what a real request returns.
 - **Controls**: read each control as the component renders it now. A tooltip replaced by inline text is inline text; never write "tooltip" or "hover" without seeing it in the component.
@@ -132,7 +132,7 @@ Start from `assets/use-cases.js`. Copy `assets/use-cases.types.d.ts` next to it,
 | Field | What |
 |-------|------|
 | `id` | `"UC1"`, `"UC2"`, … |
-| `title` | verb + object ("Cut a new version"), the same everywhere (plan rail, use case heading, mock) |
+| `title` | verb + object ("Create a thing"), the same everywhere (plan rail, use case heading, mock) |
 | `refs` | user story + requirement ids, joined by ` · ` |
 | `channels` | every channel users reach it on: `["ui", "mcp"]`, `["job"]`, … |
 | `none` | only for a use case with no scenario: one sentence saying why |
@@ -143,14 +143,14 @@ Start from `assets/use-cases.js`. Copy `assets/use-cases.types.d.ts` next to it,
 |-------|------|
 | `id` | kebab-case, unique (`create-archived-owner`) |
 | `useCase` | a `USE_CASES` id |
-| `title` | short, the path or its result ("From a merged merge request", "Merge request already released"); never the use case title again |
+| `title` | short, the path or its result ("Valid name", "Archived owner"); never the use case title again |
 | `kind` | `"basic"`, `"alternate"` or `"exception"` (see below). Twins on other channels share it |
 | `core` | optional: `true` marks a scenario to play first (see below). Leave it out for the rest |
 | `story` | user story + acceptance ids (`"US1 · AC2–4"`), or the FR / decision id. Twins on other channels cite the same ref |
 | `surface` | the channel: `"ui"` (a screen), `"mcp"` (an AI agent calling an MCP tool), `"api"` (REST / gRPC called directly), `"job"` (a scheduled job, script or event). Must be in its use case's `channels` |
 | `na` | optional: `{ "<channel>": "<why>" }` for each channel of the use case that has no twin of this scenario |
 | `given` | optional: the start state with an example ("The owner is archived (e.g. pluto, owner 1204).") |
-| `when` | the user's action or trigger with its example input ("The user cuts a version: PATCH from 2.3.2-1.") |
+| `when` | the user's action or trigger with its example input ("The user creates a thing named Third thing.") |
 | `expect` | what the user should see, one line each, with the exact messages from the code in quotes and the real values. The first line is the key outcome with its example: the plan shows it |
 | `source` | optional: `"spec"` only when the code does not exist yet (rule 5). Left out = `"code"` |
 | `evidence` | `{ "entry": "<path:line>", "gate": "<path:line>", "roles": "<path:line>", "expect": ["<path:line>", …] }`: the entry point on this channel, the gate that lets the actor in or stops them, the seed or role row behind the actor's permission (when the scenario names one), and one ref per `expect` line, in order. Required unless `source` is `"spec"` |
@@ -173,8 +173,8 @@ Start from `assets/use-cases.js`. Copy `assets/use-cases.types.d.ts` next to it,
 |-------|------|
 | `id` | `"M1"`, `"M2"`, … |
 | `spec` | the spec's ref: `"FR-017"`, `"US1 · AC3"` |
-| `differs` | both sides, quoted: `spec says DEV sees "Changelog not loaded" with the Forbidden error on Create ticket; the code shows DEV the Forbidden page (the route needs deployments.tickets.create).` |
-| `evidence` | the code that shows it: `["apps/web/lib/config/routes.ts:452"]` |
+| `differs` | both sides, quoted: `spec says VIEWER sees "Name is required." on Create thing; the code shows VIEWER the Forbidden page (the route needs things.create).` |
+| `evidence` | the code that shows it: `["apps/web/lib/routes.ts:41"]` |
 | `fix` | `"spec"` (change the spec to match the code) or `"code"` (change the code to match the spec) |
 | `scenarios` | optional: the scenario ids that follow the code here |
 
@@ -182,19 +182,19 @@ Start from `assets/use-cases.js`. Copy `assets/use-cases.types.d.ts` next to it,
 
 | Kind | Put in the scenario |
 |------|---------------------|
-| any | real values: versions ("PATCH from 2.3.2-1 → 2.3.3-1"), counts ("32 rows, 2 pages at 20 a page"), statuses, ids, names the seed creates |
-| any | user-facing messages in quotes, verbatim from the code ("Your legacy-platform account is not allowed to cut versions."). Only code text goes in quotes |
-| role or permission | the role **and** the exact permission strings, in `given`: "DEV: has repositories.versions.read, not repositories.versions.create". Add any upstream rule ("legacy group BA, page 7 not writable") |
-| `mcp` / `api` | a short request → answer: "GetRepositoryVersions {repositoryId 1204, page 1, limit 20} → 20 entities, total 32, each source THANOS_LEGACY" |
-| `job` | the command and the script's real output line: "summary: LINKED=1 ALREADY_LINKED=0 CONFLICT=0" |
+| any | real values: ids ("owner 1204"), counts ("32 rows, 2 pages at 20 a page"), statuses, ids, names the seed creates |
+| any | user-facing messages in quotes, verbatim from the code ("This owner is archived. Things cannot be created."). Only code text goes in quotes |
+| role or permission | the role **and** the exact permission strings, in `given`: "VIEWER: has things.read, not things.create". Add any upstream rule ("the owner is archived") |
+| `mcp` / `api` | a short request → answer: "ListThings {ownerId 1204, page 1, limit 20} → 20 things, total 32" |
+| `job` | the command and the script's real output line: "backfill: updated=1 skipped=2" |
 
 Before and after, from a real plan:
 
 | Field | Prose only | With an example |
 |-------|-----------|-----------------|
-| `given` | The user is not allowed. | The user is DEV: has repositories.versions.read but not repositories.versions.create (only INFRA and QA hold it). |
-| `expect` | New Revision is disabled; its tooltip says why. | The New Revision card is disabled; under its title, in amber: "This repository has no released line yet. Cut a new version first." |
-| `expect` | The version is created. | Toast: "Version 2.3.3-1 was created."; 2.3.3-1 tops the list as PENDING. |
+| `given` | The user is not allowed. | The user is VIEWER: has things.read but not things.create (only EDITOR and ADMIN hold it). |
+| `expect` | Create is disabled; its tooltip says why. | Create is disabled; under it: "This owner is archived. Things cannot be created." |
+| `expect` | The version is created. | Toast: "Third thing was created."; Third thing tops the list as PENDING. |
 
 - **Kind.** Ask: did the user reach the goal?
     - On the main path, with nothing special → `basic`. Exactly one per use case and channel.

@@ -196,7 +196,7 @@ for (const s of SCS) {
     if (expect && !EXAMPLE.test(expect)) warnings.push(`${name}: expect has no quoted message, number or identifier; add the real example (SKILL.md step 2, Examples)`);
     const text = [s.title, s.given, s.when, expect].filter(Boolean).join(' ');
     if (ROLE_TALK.test(text) && !(text.match(PERM) || []).some(p => !notPerm(p)))
-        warnings.push(`${name}: talks about a role or permission but names no permission string (e.g. "DEV: has things.read, not things.create")`);
+        warnings.push(`${name}: talks about a role or permission but names no permission string (e.g. "VIEWER: has things.read, not things.create")`);
 }
 
 // Evidence: code is the source of truth. Every code scenario names its entry point, its gate and the code behind each expect line.
@@ -273,7 +273,7 @@ for (const m of MMS) {
 }
 
 // Strings: every quoted text in a code scenario's expect is in the code. A value in the quote (a number, ALL_CAPS, a
-// kebab or dotted name) matches any value or placeholder there, so "Version 2.3.3-1 was created." finds `Version ${v} was created.`.
+// kebab or dotted name) matches any value or placeholder there, so "Third thing was created." finds `${name} was created.`.
 // Text built at run time passes when it fills a format string at the line's evidence ("your role %s cannot %s. %s").
 const SKIP_FILE = /(^|\/)(specs|docs|node_modules|vendor|dist|build|coverage|e2e|__tests__|\.git)\/|\.(md|mdx|txt|lock|svg|png|jpe?g|gif|ico|pdf|woff2?|map)$|[._-](test|spec)\.\w+$|_test\.go$|\.feature$|\.pb\.go$|_pb\.\w+$|\.min\.js$|(^|\/)package-lock\.json$/;
 const isValue = w => /\d/.test(w) || /^[A-Z][A-Z0-9_]+$/.test(w) || /^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(w) || /^[a-z]\w*(?:\.\w+)+$/.test(w);

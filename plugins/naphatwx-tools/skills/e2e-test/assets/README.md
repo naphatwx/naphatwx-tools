@@ -17,6 +17,7 @@ Automated tests for the app's scenarios, one test per scenario in a spec's `use-
     - From the repo root, add `--config <path to playwright.config.*>`.
     - Add a file path to run one use case only, or `--grep " (<scenario id>|…) "` to run only one spec's scenarios.
     - The repo's guide may say to run tools another way (for example inside Docker). Follow it.
+    - To watch the browsers live, open the dashboard first with `npx -y @playwright/cli show`, then add `PLAYWRIGHT_DASHBOARD=1` to the command. Each worker's browser shows as `worker-<n>`. Click one to watch it or take over. Needs `@playwright/test` 1.59 or newer.
 
 3. MCP and job scenarios (`*.ai-tests.json`): ask your AI agent to run the `e2e-test` skill, or to play the file with the skill's AI tester prompt. It writes `ai-results-<UC>.json` into the same run folder. Skip this step when you only need the browser and API tests.
 
