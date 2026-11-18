@@ -486,7 +486,7 @@
                 if (!message) return `<div><div class="card-label">${escapeHtml(label)}</div><div class="table-card"><div class="none">no message</div></div></div>`;
                 const className = ["table-card", changeMark(message), external ? "external" : ""].filter(Boolean).join(" ");
                 const rows = message.fields.map(([name, type, number, mark]) => `<div class="row${mark ? " " + mark : ""}">`
-                    + `<span class="column">${escapeHtml(name)}</span><span class="key">${escapeHtml(number)}</span><span class="type">${escapeHtml(type)}</span></div>`).join("");
+                    + `<span class="column">${escapeHtml(name)}</span><span class="key">${escapeHtml(number ?? "")}</span><span class="type">${escapeHtml(type)}</span></div>`).join("");
                 return `<div><div class="card-label">${escapeHtml(label)}</div><div class="${className}" role="group" aria-label="${escapeHtml(label)} ${escapeHtml(message.name)}${message.tag ? ", " + escapeHtml(message.tag) : ""}">`
                     + `<div class="table-card-head"><span class="table-card-name">${escapeHtml(message.name)}</span><span class="tag">${escapeHtml(message.tag || "")}</span></div><div class="rows">${rows}</div></div></div>`;
             };

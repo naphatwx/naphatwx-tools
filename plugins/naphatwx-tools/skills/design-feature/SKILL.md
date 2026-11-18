@@ -188,26 +188,26 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
             - `.relation` lines for every relation between the listed tables.
         - No related table at all → keep the section with one sentence: "This feature has no database changes."
     6. **API changes**: the API contracts link, the facts, then one block per changed API (copy the API block).
-        - Source: the proto / OpenAPI / DTO diff in the spec's contracts.
+        - Source: the proto / OpenAPI / GraphQL schema / DTO diff in the spec's contracts. "API" means one RPC, REST endpoint or GraphQL operation; "message" means its request or response body (REST: path and query params count as request fields).
         - **API contracts ↗** link, inside the `<h2 id="api">` right after its text: `<a class="side-link" href="api/contracts.html" target="_blank" rel="noopener">`. No related API → no page and no link.
         - **Facts** (`dl.facts`), leave out a fact with nothing to say:
-            - `Summary`: count of new / changed RPCs and the service.
-            - `Files`: one file per line with its change count (`+4 RPCs, +8 messages`) or `new file`.
-            - `Compatibility`: wire-compatible or not.
+            - `Summary`: count of new / changed APIs and the service.
+            - `Files`: one file per line with its change count (`+4 APIs, +8 messages`) or `new file`.
+            - `Compatibility`: breaking for existing clients or not (a removed or renamed field, a new required field, a changed type or status code). Protobuf: check it at the wire level.
             - `Unchanged`: existing messages that gain no field.
             - `Permissions`: new permissions, seeds, permission-map entries, snapshots to update.
-            - Other notes (an RPC kept as-is, where it appears): one fact each.
-        - **One block per changed API** (always visible): `<div class="api" id="api-<kebab-name>" data-part="<RpcName>">` — each is one presentation step:
-            - `<h3><code>RpcName</code> <span class="pill">new</span></h3>` (`<span class="pill quiet">` for `changed` / `behaviour`), then `<p class="references">` with the route and permission (`none · system caller` when it has none), joined by ` · `.
-            - A `.tables` grid with two cards headed by the message name alone: the request message first, then the response message. New message → `.table-card.add` + tag `new message` (green card), every field with its number. Removed message → `.table-card.drop` + tag `removed message` (red card), every field it had. Existing message → `.table-card.change` + tag `altered`, only the changed fields: `+ N` add (`.row.add`), `~ N` change (`.row.change`, type `old → new`), `− N` remove (`.row.drop`). No field change → leave the cards out and end the refs line with `no field change`.
-            - Each `.type` holds the type only, the same as on the contracts board: no notes or proto comments. A field's rule (one per call, at least one, order kept) goes in the `Behaviour` bullets below.
+            - Other notes (an API kept as-is, where it appears): one fact each.
+        - **One block per changed API** (always visible): `<div class="api" id="api-<kebab-name>" data-part="<ApiName>">` — each is one presentation step:
+            - `<h3><code>ApiName</code> <span class="pill">new</span></h3>` (`<span class="pill quiet">` for `changed` / `behaviour`), then `<p class="references">` with the route (REST: method and path, GraphQL: `query` / `mutation`) and permission (`none · system caller` when it has none), joined by ` · `.
+            - A `.tables` grid with two cards headed by the message name alone: the request message first, then the response message. New message → `.table-card.add` + tag `new message` (green card), every field with its number (protobuf only; other contracts have no numbers). Removed message → `.table-card.drop` + tag `removed message` (red card), every field it had. Existing message → `.table-card.change` + tag `altered`, only the changed fields: `+ N` add (`.row.add`), `~ N` change (`.row.change`, type `old → new`), `− N` remove (`.row.drop`). No field numbers → the mark alone: `+`, `~`, `−`. No field change → leave the cards out and end the refs line with `no field change`.
+            - Each `.type` holds the type only, the same as on the contracts board: no notes or doc comments. A field's rule (one per call, at least one, order kept) goes in the `Behaviour` bullets below.
             - A rule change without a contract change → `behaviour` pill, no cards.
             - Any runtime rule change (with or without a contract change) → a closed `<details class="more">` under the cards, summary `Behaviour` + `<span class="aside">what changes at runtime</span>`, one bullet per rule (refusals with their code and message, guards, what is or is not stored). Not a plain paragraph.
-        - **Shared types** (`<div class="api" id="api-shared-types" data-part="Shared types">` + `<h3>Shared types</h3>`): new or changed enums and nested messages used by more than one API. Leave the block out when there are none.
-        - When the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
+        - **Shared types** (`<div class="api" id="api-shared-types" data-part="Shared types">` + `<h3>Shared types</h3>`): new or changed enums and nested messages / types used by more than one API. Leave the block out when there are none.
+        - Protobuf: when the contract leaves a field number open (`<16 / 26>`), show it as-is and flag it in Open questions.
         - **API contracts board** (`api/contracts.html`, copied from `assets/api/contracts.html`): every API the feature adds, changes or calls, one numbered block per method (`1. CreateThing` + its tag, then its route and permission), each with its request and response cards side by side. No frame around the pair, no lines between cards. Change only the `<title>`, the `<h1>` and the `API` data object; the page renders the rest.
             - One `apis` entry per API, in the order of the API blocks, then the ones only called: `id` (the `api-<kebab-name>` slug), `name`, `tag` (`new` / `changed` / `behaviour` / `called, unchanged`), `route`, `perm` (`none · system caller` when it has none), `ext: true` when another service owns it.
-            - `req` and `res`: the message `name`, its `tag` (`new message` / `altered` / `removed message` / `unchanged`) and every field in field-number order as `[name, type, number, mark?]`. The type is the type only (`int32`, `optional string`, `repeated ThingResponse`): no notes, no ` · `, no proto comments copied in. Changed fields keep their marks (`add` / `change` / `drop`, number `+ N` / `~ N` / `− N`, type `old → new`). No request or response message → leave it out (the board shows `no message`).
+            - `req` and `res`: the message `name`, its `tag` (`new message` / `altered` / `removed message` / `unchanged`) and every field in contract order (protobuf: field-number order) as `[name, type, number, mark?]`; `number` is `""` when the contract has none. The type is the type only (`int32`, `optional string`, `repeated ThingResponse`): no notes, no ` · `, no doc comments copied in. Changed fields keep their marks (`add` / `change` / `drop`, number `+ N` / `~ N` / `− N`, or `+` / `~` / `−` without numbers, type `old → new`). No request or response message → leave it out (the board shows `no message`).
             - `types`: the shared enums and nested messages, the same shape. They form the last numbered block, `Shared types`.
         - No related API at all → keep the section with one sentence: "This feature has no API changes."
     7. **Errors**: a table of cause → code → what the user sees. No new errors → one sentence saying so.
@@ -217,7 +217,7 @@ If `$ARGUMENTS` above is not filled in (agents other than Claude Code), use the 
     - Use cases: one nested link per use case (`#uc-NN`, `UC<n>` + use case name).
     - Acceptance criteria: the section link alone (`#acceptance`), no nested items.
     - Database: one nested link per changed table card (`#db-<table>`, `5.N` + table name).
-    - API: one nested link per changed API (`#api-<kebab-name>`, `6.N` + RPC name), plus `Shared types` when that block exists.
+    - API: one nested link per changed API (`#api-<kebab-name>`, `6.N` + API name), plus `Shared types` when that block exists.
     - No nested items (no changes) → the section link alone, no nested `<ol>`.
 
 ### 5. Offer the mock
