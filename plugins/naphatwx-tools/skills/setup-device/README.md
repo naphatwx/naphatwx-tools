@@ -1,23 +1,29 @@
 # setup-device
 
-Installs the runtimes, MCP servers and plugins the naphatwx skills use, on a new or existing machine. You paste the secrets yourself.
+Installs your tools by group on a new or existing machine: prerequisites first, then the tools. You paste the secrets yourself.
 
 ## When to use it
 
 - A new laptop, or a teammate setting up.
 - You want to check what is missing, or update what is there.
-- Say: "set up this device", "install my tools", "update my MCP servers".
+- Say: "set up this device", "install my tools", "install the editor tools", "update my MCP servers".
 
 ## What it installs
 
-| Runtime | Through | Version |
-|---------|---------|---------|
-| Node + npm | nvm | 24 LTS |
-| Python | uv | 3.14 |
-| Java | SDKMAN | 25 LTS (Temurin) |
-| uv | its own installer | latest |
+It asks which groups first: `dev`, `editor` or both.
+
+| Prerequisite | Through | Version | Group |
+|--------------|---------|---------|-------|
+| Homebrew | its own installer | latest | editor |
+| ffmpeg | Homebrew | latest | editor |
+| uv | its own installer | latest | dev, editor |
+| Node + npm | nvm | 24 LTS | dev, editor |
+| Python | uv | 3.14 | dev |
+| Java | SDKMAN | 25 LTS (Temurin) | dev |
 
 It installs a missing version manager first, and only adds versions: it never removes one or touches the OS Python.
+
+**Dev**
 
 | Tool | Kind | Used by |
 |------|------|---------|
@@ -29,17 +35,27 @@ It installs a missing version manager first, and only adds versions: it never re
 | [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | plugin | UI design |
 | [impeccable](https://github.com/pbakaus/impeccable) | plugin | UI review |
 
+**Editor**
+
+| Tool | Kind | Install |
+|------|------|---------|
+| [yt-dlp](https://github.com/yt-dlp/yt-dlp) | CLI | `uv tool`, set to use Node for YouTube |
+| [whisper](https://github.com/openai/whisper) | CLI | `uv tool`, Python 3.12, large PyTorch download |
+| [remotion](https://github.com/remotion-dev/remotion) | agent skills | `npx skills`, global |
+| [hyperframes](https://github.com/heygen-com/hyperframes) | agent skills | `npx skills`, global; asks before `media-use` |
+
 ## How it works
 
 ```mermaid
 graph TD
     A[check: runtimes, MCP name + status, plugin list] --> B{mode}
     B -->|check| R[report table]
-    B -->|install| Q[ask: tools, envs, hosts, connections, defaults]
+    B -->|install| G[ask: groups dev / editor]
     B -->|update| U[run each tool's update command]
-    Q --> P[runtimes: manager first nvm / uv / SDKMAN, then the version]
-    P --> I[install plugins, add MCP servers with PASTE_ placeholders]
-    I --> S[you paste secrets into ~/.claude.json]
+    G --> Q[ask: tools, envs, hosts, connections, defaults]
+    Q --> P[prerequisites of the chosen groups, each once: manager first, then the version]
+    P --> I[install tools; MCP servers get PASTE_ placeholders]
+    I --> S[dev only: you paste secrets into ~/.claude.json]
     S --> V[grep PASTE_ count, mcp list] --> R
     U --> R
 ```
@@ -52,10 +68,10 @@ graph TD
 ## Input → output
 
 ```
-setup-device [all | <tool or runtime> ...] [check | update]
+setup-device [all | dev | editor | <tool or prerequisite> ...] [check | update]
 ```
 
-Output: a table per tool (installed, already there, updated, needs secret, skipped, failed) and the steps left for you.
+Output: a table per group and tool (installed, already there, updated, needs secret, skipped, failed) and the steps left for you.
 
 ## Files
 

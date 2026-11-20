@@ -3,18 +3,40 @@
 One section per tool. `<env>` is the name the user picks (`prod`, `dev`, `local`, `shared`).
 Values in `<angle brackets>` come from the user. `PASTE_<VAR>` is a placeholder the user replaces by hand.
 
-## Runtimes
+## Groups
 
-Each runtime goes through its version manager. Install the manager first when it is missing. Order: uv, Node, Python, Java.
+| Group | Prerequisites | Tools |
+|-------|---------------|-------|
+| `dev` | uv, Node, Python, Java | gitlab, jenkins, omnisql, diagram-design, mattpocock-skills, ui-ux-pro-max, impeccable |
+| `editor` | Homebrew, ffmpeg, uv, Node | yt-dlp, whisper, remotion, hyperframes |
 
-| Runtime | Manager | Recommended | Needed by |
-|---------|---------|-------------|-----------|
-| uv | itself | latest | Jenkins MCP (`uvx`), Python |
-| Node + npm | nvm | 24 LTS | GitLab MCP (20+), OmniSQL MCP (`^22.15` or 24+), `npx` installs |
-| Python | uv | 3.14 | ui-ux-pro-max script, diagram-design PNG export |
-| Java | SDKMAN | 25 LTS, Temurin | the user's own projects (no tool here needs it) |
+## Prerequisites
+
+Each runtime goes through its version manager. Install the manager first when it is missing. Order: Homebrew, ffmpeg, uv, Node, Python, Java. Install only the rows the chosen groups need, each once.
+
+| Prerequisite | Manager | Recommended | Group | Needed by |
+|--------------|---------|-------------|-------|-----------|
+| Homebrew | itself | latest | editor | ffmpeg |
+| ffmpeg | Homebrew | latest | editor | yt-dlp, whisper, hyperframes |
+| uv | itself | latest | dev, editor | Jenkins MCP (`uvx`), Python, yt-dlp, whisper |
+| Node + npm | nvm | 24 LTS | dev, editor | GitLab MCP (20+), OmniSQL MCP (`^22.15` or 24+), hyperframes (22+), `npx` installs |
+| Python | uv | 3.14 | dev | ui-ux-pro-max script, diagram-design PNG export |
+| Java | SDKMAN | 25 LTS, Temurin | dev | the user's own projects (no tool here needs it) |
 
 Update the "Recommended" column when a new LTS line is out (Node: even majors, LTS each October; Java: LTS every 2 years).
+
+### Homebrew
+
+- Check: `brew --version`
+- Install manager: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`. It may ask for the sudo password: the user runs it with `! <command>`.
+- Load (Linux only): `eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"`
+- Use it for ffmpeg only, never for a runtime.
+
+### ffmpeg
+
+- Check: `ffmpeg -version`. Any install already there (brew, apt, other) → skip.
+- Install: `brew install ffmpeg`
+- Update: `brew upgrade ffmpeg`
 
 ### uv
 
@@ -46,11 +68,13 @@ Update the "Recommended" column when a new LTS line is out (Node: even majors, L
 - Install: find the newest `25.*-tem` id in `sdk list java`, then `sdk install java <id>`. SDKMAN asks to make it default: answer with the user's choice.
 - Keep older versions: projects may need them.
 
-## MCP servers
+## Dev tools
+
+### MCP servers
 
 Server name: `<tool>-<env>-mcp`, user scope. One server per env.
 
-### gitlab
+#### gitlab
 
 - Repo: https://github.com/zereight/gitlab-mcp (npm `@zereight/mcp-gitlab`)
 - Needs: Node 20+ (`node -v`).
@@ -69,7 +93,7 @@ claude mcp add gitlab-<env>-mcp --transport stdio --scope user \
 - Update: npx may reuse its cache. Run `npx -y @zereight/mcp-gitlab@latest --version` once, or pin a version in the args.
 - Never set `GITLAB_TOOLSETS=all` (very large tool list).
 
-### jenkins
+#### jenkins
 
 - Repo: https://github.com/lanbaoshen/mcp-jenkins (PyPI `mcp-jenkins`)
 - Needs: `uv` (`uv --version`), Python 3.11+.
@@ -89,7 +113,7 @@ claude mcp add jenkins-<env>-mcp --transport stdio --scope user \
 - Check: the `get_item` tool on a known job.
 - Update: `uv cache clean mcp-jenkins`, or pin `mcp-jenkins==<version>`.
 
-### omnisql
+#### omnisql
 
 - Repo: https://github.com/srthkdev/omnisql-mcp (npm `omnisql-mcp`)
 - Needs: Node `^22.15` or 24+ (`node -v`). DuckDB needs the `duckdb` CLI; RDS IAM needs the `aws` CLI.
@@ -110,7 +134,7 @@ claude mcp add omnisql-<env>-mcp --transport stdio --scope user \
 - Check: the `list_connections` and `test_connection` tools.
 - Update: `npm i -g omnisql-mcp@latest`, then restart the agent.
 
-## Plugins
+### Plugins
 
 No secrets. Install one way per agent: a plugin plus an `npx skills` copy gives every skill twice.
 
@@ -128,3 +152,45 @@ Notes:
 - **ui-ux-pro-max**: its search script needs `python3`.
 - **impeccable**: ships a hook that runs outside model approval and may download its engine on first use.
 - Update a plugin: `claude plugin marketplace update <marketplace>`, then `claude plugin update <plugin>@<marketplace>`.
+
+## Editor tools
+
+No secrets.
+
+### yt-dlp
+
+- Repo: https://github.com/yt-dlp/yt-dlp
+- Needs: uv, ffmpeg, Node (YouTube needs a JavaScript runtime).
+- Check: `yt-dlp --version`
+- Install: `uv tool install "yt-dlp[default]"`. `[default]` adds the YouTube challenge solver.
+- Then add the line `--js-runtimes node` to `~/.config/yt-dlp/config` (make the file when missing; skip when the line is there). Without it YouTube warns `No supported JavaScript runtime could be found` and formats may be missing.
+- Update: `uv tool upgrade yt-dlp`
+
+### whisper
+
+- Repo: https://github.com/openai/whisper (PyPI `openai-whisper`)
+- Needs: uv, ffmpeg.
+- Tell the user before install: it pulls in PyTorch, a large download (5.5 GB on Linux, less on macOS). Each model downloads on first use (`tiny` 72 MB, bigger models more).
+- Check: `whisper --help`
+- Install: `uv tool install --python 3.12 openai-whisper`. Pin 3.12: newer Python may not be supported. uv fetches 3.12 itself.
+- Update: `uv tool upgrade openai-whisper`
+
+### remotion
+
+- Repo: https://github.com/remotion-dev/remotion. The app is made per project (`npx create-video`), so only the agent skills install here.
+- Needs: Node.
+- Check: `npx -y skills list -g`, look for `remotion-best-practices`.
+- Install: `npx -y skills add remotion-dev/skills -g -y --agent claude-code`
+- Codex: same with `--agent codex`. Other agents: drop `--agent`, pick in the prompt.
+- Update: `npx -y skills update -g`
+
+### hyperframes
+
+- Repo: https://github.com/heygen-com/hyperframes. The CLI runs per project (`npx hyperframes`), so only the agent skills install here.
+- Needs: Node 22+, ffmpeg.
+- Check: `npx -y skills list -g`, look for `hyperframes`.
+- List the skills first: `npx -y skills add heygen-com/hyperframes --list`
+- Ask before installing `media-use`: when used, it runs `curl -fsSL https://static.heygen.ai/cli/install.sh | bash` (a pipe-to-shell install of HeyGen's CLI).
+- Install the chosen skills: `npx -y skills add heygen-com/hyperframes -g -y --agent claude-code --skill <name> <name> …` (all: `--skill '*'`).
+- Codex: same with `--agent codex`. Other agents: drop `--agent`, pick in the prompt.
+- Update: `npx -y skills update -g`
