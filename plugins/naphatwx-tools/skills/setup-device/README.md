@@ -36,6 +36,7 @@ It installs a missing version manager first, and only adds versions: it never re
 | [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | plugin, opt-in | UI design |
 | [impeccable](https://github.com/pbakaus/impeccable) | plugin, opt-in | UI review |
 | [Mobbin](https://mobbin.com/mcp) | MCP, opt-in | real app UI references |
+| [spec-kit](https://github.com/github/spec-kit) | CLI, opt-in | spec-driven development (`specify init` per repo) |
 | [ponytail](https://github.com/DietrichGebert/ponytail) | plugin, opt-in | smallest-change coding style |
 | [caveman](https://github.com/JuliusBrussee/caveman) | plugin, opt-in | short replies |
 

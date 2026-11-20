@@ -7,7 +7,7 @@ Values in `<angle brackets>` come from the user. `PASTE_<VAR>` is a placeholder 
 
 | Group | Prerequisites | Tools | Opt-in tools |
 |-------|---------------|-------|--------------|
-| `dev` | uv, Node, Python, Java | gitlab, jenkins, omnisql, diagram-design, mattpocock-skills, postman | mobbin, ui-ux-pro-max, impeccable, ponytail, caveman, any other plugin from `claude-plugins-official` |
+| `dev` | uv, Node, Python, Java | gitlab, jenkins, omnisql, diagram-design, mattpocock-skills, postman | mobbin, spec-kit, ui-ux-pro-max, impeccable, ponytail, caveman, any other plugin from `claude-plugins-official` |
 | `editor` | Homebrew, ffmpeg, uv, Node | yt-dlp, whisper, remotion, hyperframes | |
 
 Opt-in tools are offered but not selected by default. Install one only when the user picks it, or names it in the arguments.
@@ -192,6 +192,17 @@ Notes:
 - **impeccable**: ships a hook that runs outside model approval and may download its engine on first use.
 - **ponytail**, **caveman**: each ships hooks that change how the agent writes replies. Needs Node on the non-interactive shell's PATH. Both at once give two reply styles: tell the user before installing the second. Codex: open `/hooks` and trust the hooks, then start a new thread.
 - Update a plugin: `claude plugin marketplace update <marketplace>`, then `claude plugin update <plugin>@<marketplace>`.
+
+### CLIs
+
+#### spec-kit (opt-in)
+
+- Repo: https://github.com/github/spec-kit (PyPI `specify-cli`). Docs: https://github.github.io/spec-kit/installation.html
+- Needs: uv, Python 3.11+.
+- Check: `specify --help`
+- Install: `uv tool install specify-cli`
+- Update: `uv tool upgrade specify-cli`
+- Per project, not here: `specify init . --integration claude` (Codex: `--integration codex`). Tell the user this is their next step in each repo.
 
 ## Editor tools
 
