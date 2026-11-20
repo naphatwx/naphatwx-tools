@@ -40,10 +40,10 @@ Run and keep the results (names and versions only):
 - `claude --version`
 - Prerequisites: the "Check" lines in `references/tools.md` → Prerequisites.
 - Editor tools: their "Check" lines.
-- MCP servers, name and status only. Never run plain `claude mcp list` or `claude mcp get`: they print args and env values, tokens included.
+- MCP servers, name and status only. Never run plain `claude mcp list` or `claude mcp get`: they print args and env values, tokens included. Keep `\1` in the filter: Claude Code replaces `$1` in a skill with the user's arguments.
 
   ```bash
-  claude mcp list | perl -ne 'print "$1 - $2\n" if /^(.*?): .* - ([✔✘!].*)$/'
+  claude mcp list | sed -nE 's/^(([^:]|:[^ ])*): .* - ([✔✘!].*)$/\1 - \3/p'
   ```
 - `claude plugin list`: installed plugins and versions.
 
