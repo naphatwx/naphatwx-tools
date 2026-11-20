@@ -7,7 +7,7 @@ Values in `<angle brackets>` come from the user. `PASTE_<VAR>` is a placeholder 
 
 | Group | Prerequisites | Tools | Opt-in tools |
 |-------|---------------|-------|--------------|
-| `dev` | uv, Node, Python, Java | gitlab, jenkins, omnisql, diagram-design, mattpocock-skills | mobbin, ui-ux-pro-max, impeccable, ponytail, caveman |
+| `dev` | uv, Node, Python, Java | gitlab, jenkins, omnisql, diagram-design, mattpocock-skills, postman | mobbin, ui-ux-pro-max, impeccable, ponytail, caveman, any other plugin from `claude-plugins-official` |
 | `editor` | Homebrew, ffmpeg, uv, Node | yt-dlp, whisper, remotion, hyperframes | |
 
 Opt-in tools are offered but not selected by default. Install one only when the user picks it, or names it in the arguments.
@@ -161,10 +161,13 @@ claude mcp add mobbin-mcp --scope user --transport http https://api.mobbin.com/m
 
 No secrets. Install one way per agent: a plugin plus an `npx skills` copy gives every skill twice.
 
+Required marketplace (Claude Code): `claude-plugins-official` (Anthropic's). Check `claude plugin marketplace list`; missing → `claude plugin marketplace add anthropics/claude-plugins-official`. From it install only `postman` and `mattpocock-skills` by default. Any other plugin there is opt-in: install it only when the user names it (`claude plugin install <name>@claude-plugins-official`).
+
 | Tool | Claude Code | Codex | Other agents |
 |------|-------------|-------|--------------|
 | diagram-design | `claude plugin marketplace add cathrynlavery/diagram-design`<br>`claude plugin install diagram-design@diagram-design` | `codex plugin marketplace add cathrynlavery/diagram-design`<br>`codex plugin add diagram-design@diagram-design` | `npx skills add cathrynlavery/diagram-design` |
 | mattpocock-skills | `claude plugin install mattpocock-skills@claude-plugins-official` | `codex plugin marketplace add mattpocock/skills`<br>`codex plugin add mattpocock-skills@mattpocock` | `npx skills@latest add mattpocock/skills` |
+| postman | `claude plugin install postman@claude-plugins-official` | see docs | see docs |
 | ui-ux-pro-max (opt-in) | `claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`<br>`claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill` | `npm i -g ui-ux-pro-max-cli && uipro init --ai codex --global` | `uipro init --ai universal --global` |
 | impeccable (opt-in) | `claude plugin marketplace add pbakaus/impeccable`<br>`claude plugin install impeccable@impeccable` | `npx impeccable install --providers=codex --scope=global` | same, other `--providers` |
 | ponytail (opt-in) | `claude plugin marketplace add DietrichGebert/ponytail`<br>`claude plugin install ponytail@ponytail` | `codex plugin marketplace add DietrichGebert/ponytail`<br>`codex plugin add ponytail@ponytail` | see https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md |
@@ -174,6 +177,7 @@ Docs:
 
 - diagram-design: https://github.com/cathrynlavery/diagram-design
 - mattpocock-skills: https://github.com/mattpocock/skills
+- postman: https://github.com/postmanlabs/postman-plugin
 - ui-ux-pro-max: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
 - impeccable: https://github.com/pbakaus/impeccable
 - ponytail: https://github.com/DietrichGebert/ponytail
@@ -183,6 +187,7 @@ Notes:
 
 - **diagram-design**: PNG export needs `pip install playwright && playwright install chromium`. Check with `/diagram-design:doctor`.
 - **mattpocock-skills**: after install, run `/setup-matt-pocock-skills` once in each repo.
+- **postman**: adds the `plugin:postman:postman` MCP server. It shows "Needs authentication" until the user runs `/mcp`, picks it and chooses **Authenticate**. Its local-file skills work without sign-in.
 - **ui-ux-pro-max**: its search script needs `python3`.
 - **impeccable**: ships a hook that runs outside model approval and may download its engine on first use.
 - **ponytail**, **caveman**: each ships hooks that change how the agent writes replies. Needs Node on the non-interactive shell's PATH. Both at once give two reply styles: tell the user before installing the second. Codex: open `/hooks` and trust the hooks, then start a new thread.
