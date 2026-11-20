@@ -32,8 +32,13 @@ It installs a missing version manager first, and only adds versions: it never re
 | [omnisql-mcp](https://github.com/srthkdev/omnisql-mcp) | MCP | database questions |
 | [diagram-design](https://github.com/cathrynlavery/diagram-design) | plugin | diagrams |
 | [mattpocock skills](https://github.com/mattpocock/skills) | plugin | ship-task (grilling) |
-| [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | plugin | UI design |
-| [impeccable](https://github.com/pbakaus/impeccable) | plugin | UI review |
+| [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | plugin, opt-in | UI design |
+| [impeccable](https://github.com/pbakaus/impeccable) | plugin, opt-in | UI review |
+| [Mobbin](https://mobbin.com/mcp) | MCP, opt-in | real app UI references |
+| [ponytail](https://github.com/DietrichGebert/ponytail) | plugin, opt-in | smallest-change coding style |
+| [caveman](https://github.com/JuliusBrussee/caveman) | plugin, opt-in | short replies |
+
+Opt-in tools are offered but never selected by default.
 
 **Editor**
 
@@ -51,16 +56,17 @@ graph TD
     A[check: runtimes, MCP name + status, plugin list] --> B{mode}
     B -->|check| R[report table]
     B -->|install| G[ask: groups dev / editor]
-    B -->|update| U[run each tool's update command]
+    B -->|update| U[read each tool's docs, then run its update command]
     G --> Q[ask: tools, envs, hosts, connections, defaults]
-    Q --> P[prerequisites of the chosen groups, each once: manager first, then the version]
+    Q --> D[read each tool's docs: command or config changed? ask which to use]
+    D --> P[prerequisites of the chosen groups, each once: manager first, then the version]
     P --> I[install tools; MCP servers get PASTE_ placeholders]
     I --> S[dev only: you paste secrets into ~/.claude.json]
     S --> V[grep PASTE_ count, mcp list] --> R
     U --> R
 ```
 
-- MCP servers are named `<tool>-<env>-mcp` at user scope: `gitlab-prod-mcp`, `jenkins-prod-mcp`, `omnisql-local-mcp`.
+- MCP servers are named `<tool>-<env>-mcp` at user scope: `gitlab-prod-mcp`, `jenkins-prod-mcp`, `omnisql-local-mcp`. Mobbin has no envs: `mobbin-mcp`, signed in through `/mcp`.
 - It never sees your tokens. It never overwrites a server or plugin you already have.
 - It reads `claude mcp list` as name and status only, so a token in a server's args never shows.
 - The Jenkins token goes in an env var, not in the command args, so `ps` does not show it.

@@ -5,10 +5,12 @@ Values in `<angle brackets>` come from the user. `PASTE_<VAR>` is a placeholder 
 
 ## Groups
 
-| Group | Prerequisites | Tools |
-|-------|---------------|-------|
-| `dev` | uv, Node, Python, Java | gitlab, jenkins, omnisql, diagram-design, mattpocock-skills, ui-ux-pro-max, impeccable |
-| `editor` | Homebrew, ffmpeg, uv, Node | yt-dlp, whisper, remotion, hyperframes |
+| Group | Prerequisites | Tools | Opt-in tools |
+|-------|---------------|-------|--------------|
+| `dev` | uv, Node, Python, Java | gitlab, jenkins, omnisql, diagram-design, mattpocock-skills | mobbin, ui-ux-pro-max, impeccable, ponytail, caveman |
+| `editor` | Homebrew, ffmpeg, uv, Node | yt-dlp, whisper, remotion, hyperframes | |
+
+Opt-in tools are offered but not selected by default. Install one only when the user picks it, or names it in the arguments.
 
 ## Prerequisites
 
@@ -27,6 +29,7 @@ Update the "Recommended" column when a new LTS line is out (Node: even majors, L
 
 ### Homebrew
 
+- Docs: https://docs.brew.sh/Installation
 - Check: `brew --version`
 - Install manager: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`. It may ask for the sudo password: the user runs it with `! <command>`.
 - Load (Linux only): `eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"`
@@ -34,18 +37,21 @@ Update the "Recommended" column when a new LTS line is out (Node: even majors, L
 
 ### ffmpeg
 
+- Docs: https://formulae.brew.sh/formula/ffmpeg
 - Check: `ffmpeg -version`. Any install already there (brew, apt, other) → skip.
 - Install: `brew install ffmpeg`
 - Update: `brew upgrade ffmpeg`
 
 ### uv
 
+- Docs: https://docs.astral.sh/uv/getting-started/installation/
 - Check: `uv --version`
 - Install manager: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - Update: `uv self update` (installer copy). Installed with `brew` → `brew upgrade uv`.
 
 ### Node (nvm)
 
+- Docs: https://github.com/nvm-sh/nvm
 - Load: `export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"`
 - Check: `nvm --version`, `nvm ls`, `node -v`, `npm -v`
 - Install manager: run `install.sh` of the latest release tag at https://github.com/nvm-sh/nvm (`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/<tag>/install.sh | bash`).
@@ -55,6 +61,7 @@ Update the "Recommended" column when a new LTS line is out (Node: even majors, L
 
 ### Python (uv)
 
+- Docs: https://docs.astral.sh/uv/guides/install-python/
 - Check: `uv python list --only-installed`
 - Install: `uv python install 3.14`
 - Default (with a yes): `uv python install 3.14 --default`. It adds `python` and `python3` to `~/.local/bin`. Older uv asks for `--preview` too.
@@ -62,6 +69,7 @@ Update the "Recommended" column when a new LTS line is out (Node: even majors, L
 
 ### Java (SDKMAN)
 
+- Docs: https://sdkman.io/install
 - Load: `. "$HOME/.sdkman/bin/sdkman-init.sh"`
 - Check: `sdk version`, `sdk current java`, `ls ~/.sdkman/candidates/java`
 - Install manager: `curl -s "https://get.sdkman.io" | bash`
@@ -72,7 +80,7 @@ Update the "Recommended" column when a new LTS line is out (Node: even majors, L
 
 ### MCP servers
 
-Server name: `<tool>-<env>-mcp`, user scope. One server per env.
+Server name: `<tool>-<env>-mcp`, user scope. One server per env. A hosted server with no envs (mobbin) is `<tool>-mcp`.
 
 #### gitlab
 
@@ -134,6 +142,21 @@ claude mcp add omnisql-<env>-mcp --transport stdio --scope user \
 - Check: the `list_connections` and `test_connection` tools.
 - Update: `npm i -g omnisql-mcp@latest`, then restart the agent.
 
+#### mobbin (opt-in)
+
+- Docs: https://mobbin.com/mcp. Hosted by Mobbin: nothing installs locally.
+- Needs: a Mobbin account.
+- Secret: none. Sign-in is OAuth in the browser.
+
+```bash
+claude mcp add mobbin-mcp --scope user --transport http https://api.mobbin.com/mcp
+```
+
+- Then: the user runs `/mcp`, picks `mobbin-mcp`, chooses **Authenticate** and signs in.
+- Codex: `codex mcp add mobbin-mcp --url https://api.mobbin.com/mcp`, then `codex mcp login mobbin-mcp`.
+- Update: none (hosted).
+- Never use the npm `mobbin-mcp` package: it is archived.
+
 ### Plugins
 
 No secrets. Install one way per agent: a plugin plus an `npx skills` copy gives every skill twice.
@@ -142,8 +165,19 @@ No secrets. Install one way per agent: a plugin plus an `npx skills` copy gives 
 |------|-------------|-------|--------------|
 | diagram-design | `claude plugin marketplace add cathrynlavery/diagram-design`<br>`claude plugin install diagram-design@diagram-design` | `codex plugin marketplace add cathrynlavery/diagram-design`<br>`codex plugin add diagram-design@diagram-design` | `npx skills add cathrynlavery/diagram-design` |
 | mattpocock-skills | `claude plugin install mattpocock-skills@claude-plugins-official` | `codex plugin marketplace add mattpocock/skills`<br>`codex plugin add mattpocock-skills@mattpocock` | `npx skills@latest add mattpocock/skills` |
-| ui-ux-pro-max | `claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`<br>`claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill` | `npm i -g ui-ux-pro-max-cli && uipro init --ai codex --global` | `uipro init --ai universal --global` |
-| impeccable | `claude plugin marketplace add pbakaus/impeccable`<br>`claude plugin install impeccable@impeccable` | `npx impeccable install --providers=codex --scope=global` | same, other `--providers` |
+| ui-ux-pro-max (opt-in) | `claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`<br>`claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill` | `npm i -g ui-ux-pro-max-cli && uipro init --ai codex --global` | `uipro init --ai universal --global` |
+| impeccable (opt-in) | `claude plugin marketplace add pbakaus/impeccable`<br>`claude plugin install impeccable@impeccable` | `npx impeccable install --providers=codex --scope=global` | same, other `--providers` |
+| ponytail (opt-in) | `claude plugin marketplace add DietrichGebert/ponytail`<br>`claude plugin install ponytail@ponytail` | `codex plugin marketplace add DietrichGebert/ponytail`<br>`codex plugin add ponytail@ponytail` | see https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md |
+| caveman (opt-in) | `claude plugin marketplace add JuliusBrussee/caveman`<br>`claude plugin install caveman@caveman` | the repo's `install.sh --only codex` (download, review, then run) | see https://github.com/JuliusBrussee/caveman/blob/main/INSTALL.md |
+
+Docs:
+
+- diagram-design: https://github.com/cathrynlavery/diagram-design
+- mattpocock-skills: https://github.com/mattpocock/skills
+- ui-ux-pro-max: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+- impeccable: https://github.com/pbakaus/impeccable
+- ponytail: https://github.com/DietrichGebert/ponytail
+- caveman: https://github.com/JuliusBrussee/caveman
 
 Notes:
 
@@ -151,6 +185,7 @@ Notes:
 - **mattpocock-skills**: after install, run `/setup-matt-pocock-skills` once in each repo.
 - **ui-ux-pro-max**: its search script needs `python3`.
 - **impeccable**: ships a hook that runs outside model approval and may download its engine on first use.
+- **ponytail**, **caveman**: each ships hooks that change how the agent writes replies. Needs Node on the non-interactive shell's PATH. Both at once give two reply styles: tell the user before installing the second. Codex: open `/hooks` and trust the hooks, then start a new thread.
 - Update a plugin: `claude plugin marketplace update <marketplace>`, then `claude plugin update <plugin>@<marketplace>`.
 
 ## Editor tools
