@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.318",
+    "version": "1.9.319",
     "description": "My personal commands shared across PCs",
     "commands": [],
     "skills": [
@@ -35,11 +35,6 @@
                         "type": "command",
                         "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/response-rules.sh\" session",
                         "timeout": 10
-                    },
-                    {
-                        "type": "command",
-                        "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/herdr-tab-name.sh\"",
-                        "timeout": 5
                     }
                 ]
             }
@@ -51,17 +46,6 @@
                         "type": "command",
                         "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/response-rules.sh\" prompt",
                         "timeout": 10
-                    }
-                ]
-            }
-        ],
-        "Stop": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/herdr-tab-name.sh\"",
-                        "timeout": 5
                     }
                 ]
             }
