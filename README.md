@@ -96,3 +96,23 @@ The plugin ships a hook that injects chat formatting rules (plain language, shor
 
 - Full rules: `plugins/naphatwx-tools/hooks/response-rules.md` (loaded once at session start).
 - A short reminder is added to every prompt.
+
+## 🏷️ Herdr Tab Name Hook
+
+When Claude Code runs inside [herdr](https://herdr.dev), the herdr tab takes the Claude session name. It is **off by default** and works in Claude Code only.
+
+To turn it on, add this to your `~/.claude/settings.json` and start a new session:
+
+```json
+{
+    "env": {
+        "NAPHATWX_HERDR_TAB_NAME": "1"
+    }
+}
+```
+
+- Name: the title Claude shows in the terminal title: the `/rename` title, else Claude's auto title. The hook reads it from herdr, not from the transcript.
+- Updates at session start and when Claude ends a reply, and only renames when the title changed. A `/rename` shows on the next reply end.
+- Renames only the tab Claude runs in (`$HERDR_TAB_ID`). Outside herdr it does nothing.
+- Needs `bash`, `sed` and herdr. Tested on macOS.
+- Script: `plugins/naphatwx-tools/hooks/herdr-tab-name.sh`.

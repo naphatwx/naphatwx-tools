@@ -10,7 +10,7 @@
 - Skill folders: `scripts/` (code the agent runs), `references/` (docs loaded when needed), `assets/` (files that go into the output or the repo: templates, copied code, preview data). No other folder names.
 - `skills/<name>/README.md` is for people; agents follow `SKILL.md` only. `assets/README.md` ships inside the generated folder.
 - No filler text in any skill or template. Add no intro line, subtitle, legend or note that repeats a heading or explains what the page shows, and no section or example block the user did not ask for. Every page-making `SKILL.md` repeats this as a rule, because agents read only `SKILL.md`.
-- `plugins/naphatwx-tools/hooks/` holds the Claude Code hooks (response rules), always on. They are Claude Code only, wired inline in the Claude `plugin.json`. Don't add a `hooks/hooks.json`: Claude auto-loads it too, and the hook would run twice.
+- `plugins/naphatwx-tools/hooks/` holds the Claude Code hooks: response rules (always on) and herdr tab name (opt-in by `NAPHATWX_HERDR_TAB_NAME=1`). They are Claude Code only, wired inline in the Claude `plugin.json`. Don't add a `hooks/hooks.json`: Claude auto-loads it too, and the hook would run twice.
 
 ## Theme
 
