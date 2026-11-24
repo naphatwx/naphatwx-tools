@@ -26,8 +26,9 @@ graph TD
     P -->|yes| G[get_build]
     L --> G
     G --> B{building?}
-    B -->|yes| S[print one status line, sleep 30s] --> G
-    B -->|over 30 min| R1[report still running + URL]
+    B -->|"yes, first time"| W["avg duration of last 10 builds; sleep avg − elapsed"] --> G
+    B -->|yes| S[print one status line, sleep 60s] --> G
+    B -->|"30 min after first wait"| R1[report still running + URL]
     B -->|no| R{result}
     R -->|SUCCESS| Q{"job runs a quality gate?"}
     Q -->|yes| QS["search console for Quality Gate, FAILED"] --> OK[report success, warn if a gate failed]

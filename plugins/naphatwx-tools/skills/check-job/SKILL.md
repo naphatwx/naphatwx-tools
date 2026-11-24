@@ -68,17 +68,31 @@ If the build does not exist, report that and stop.
 
 ### 3. Poll while running
 
-While `building` is true:
+Skip this step if `building` is false.
 
-1. Print one short line: build number, elapsed time vs. estimated, and the
+**Average build time.** Take the last 10 finished builds before this one
+(`number - 1` down; skip any still building or with `duration` 0). Call
+`get_build` on each and average their `duration`. If none are found, use
+`estimatedDuration`. Tell the user the average and how many builds it used.
+
+**First wait.** Wait = average − time already elapsed (`now - timestamp`).
+If the wait is 0 or less, skip it. Run it as `sleep` calls of at most 300
+seconds each (a single long sleep can hit the shell timeout).
+
+Example: the average is 15 min and the build started 2 min ago → wait 13 min
+before the first check.
+
+**Then every minute.** While `building` is true:
+
+1. Call `get_build`.
+2. Print one short line: build number, elapsed time vs. the average, and the
    current stage if the console tail shows one.
-2. Sleep 30 seconds (`sleep 30`).
-3. Call `get_build` again.
+3. Sleep 60 seconds (`sleep 60`).
 
 Limits:
 
-- Stop polling after 30 minutes. Report "still running" with the last known
-  state and the build URL. Do not keep waiting.
+- Stop polling 30 minutes after the first wait ends. Report "still running"
+  with the last known state and the build URL. Do not keep waiting.
 - If the user interrupts, stop immediately.
 
 ### 4. Verify the result
