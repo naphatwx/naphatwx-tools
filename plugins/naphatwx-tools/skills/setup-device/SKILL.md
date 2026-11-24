@@ -1,6 +1,6 @@
 ---
 name: setup-device
-description: Install the user's tools by group on a new or existing machine, prerequisites first. Dev group - runtimes (Node via nvm, Python via uv, Java via SDKMAN), GitLab, Jenkins and OmniSQL MCP, the claude-plugins-official marketplace with the postman and mattpocock-skills plugins, the diagram-design plugin, and opt-in Mobbin MCP, the spec-kit CLI, ui-ux-pro-max, impeccable, ponytail, caveman and any other claude-plugins-official plugin. Editor group - ffmpeg, yt-dlp, whisper, and the Remotion and HyperFrames agent skills. Secrets are left as placeholders for the user to paste. Use when the user says "set up this device", "install my tools", "install the editor tools" or "update my MCP servers".
+description: Install the user's tools by group on a new or existing machine, prerequisites first. Dev group - runtimes (Node via nvm, Python via uv, Java via SDKMAN), GitLab, Jenkins and OmniSQL MCP, the claude-plugins-official marketplace with the mattpocock-skills plugin, the diagram-design plugin, and opt-in Mobbin MCP, the spec-kit CLI, ui-ux-pro-max, impeccable, ponytail, caveman and any other claude-plugins-official plugin. Editor group - ffmpeg, yt-dlp, whisper, and the Remotion and HyperFrames agent skills. Secrets are left as placeholders for the user to paste. Use when the user says "set up this device", "install my tools", "install the editor tools" or "update my MCP servers".
 argument-hint: "[all | dev | editor | <tool or prerequisite> ...] [check | update]"
 disable-model-invocation: true
 ---

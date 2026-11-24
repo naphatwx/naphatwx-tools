@@ -31,7 +31,6 @@ It installs a missing version manager first, and only adds versions: it never re
 | [mcp-jenkins](https://github.com/lanbaoshen/mcp-jenkins) | MCP | check-job |
 | [omnisql-mcp](https://github.com/srthkdev/omnisql-mcp) | MCP | database questions |
 | [diagram-design](https://github.com/cathrynlavery/diagram-design) | plugin | diagrams |
-| [postman](https://github.com/postmanlabs/postman-plugin) | plugin | API contracts, tests, mocks |
 | [mattpocock skills](https://github.com/mattpocock/skills) | plugin | ship-task (grilling) |
 | [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | plugin, opt-in | UI design |
 | [impeccable](https://github.com/pbakaus/impeccable) | plugin, opt-in | UI review |
@@ -42,7 +41,7 @@ It installs a missing version manager first, and only adds versions: it never re
 
 Opt-in tools are offered but never selected by default.
 
-It adds Anthropic's `claude-plugins-official` marketplace when missing. From it, only `postman` and `mattpocock-skills` install by default; any other plugin there is opt-in.
+It adds Anthropic's `claude-plugins-official` marketplace when missing. From it, only `mattpocock-skills` installs by default; any other plugin there is opt-in.
 
 **Editor**
 
