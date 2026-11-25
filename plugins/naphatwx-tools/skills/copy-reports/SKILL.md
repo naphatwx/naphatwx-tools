@@ -1,6 +1,6 @@
 ---
 name: copy-reports
-description: Copy report output (e2e-test runs, smoke-test results, deploy plans) and ship-task work (tasks/) from a git worktree into the main checkout, so it survives when the worktree is deleted. The worktree copy is never deleted. Run by hand before removing a worktree.
+description: Copy report output (e2e-test runs, smoke-test results, deploy plans) and ship-task work (tasks/, specs/) from a git worktree into the main checkout, so it survives when the worktree is deleted. The worktree copy is never deleted. Run by hand before removing a worktree.
 disable-model-invocation: true
 argument-hint: "[--dry-run] [extra report folder ...]"
 ---

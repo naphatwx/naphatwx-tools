@@ -88,16 +88,15 @@ Write the task folder `tasks/NNN-<slug>/` from the templates. Keep each template
 
 ## 5. Spec verify
 
-Checks that the plan follows the project's rules and the real code: each app's guide, the root guide,
-existing helpers and components. Example: the plan writes a badge inline, the web guide says "a badge is
-its own component" → the plan changes to "add a badge component". It does not judge the requirements;
-the grill settled those.
+Checks that the plan follows the project's rules and the real code: the guides, existing helpers and
+components. Example: the plan builds a piece inline, a guide says "that piece is its own component" →
+the plan changes to "add the component". It does not judge the requirements; the grill settled those.
 
-1. Start one fresh **spec verifier** per changed app (`roles.md`), all at once. They only read.
+1. Start one fresh **spec verifier** per changed scope (`roles.md` → Scope), all at once. They only read.
 2. A plan that touches another repo → one more verifier per repo.
 3. The main agent applies every fix to the plan files itself and notes it under Decisions. A finding it disagrees with → the decider.
 4. A finding that changes scope or a user decision → back to the grill for that one question.
-5. A verifier never becomes that app's owner later.
+5. A verifier never becomes an owner of that scope later.
 
 ## 6. Plan stop
 

@@ -9,6 +9,7 @@ Each skill folder has a `README.md` with diagrams of how it works.
 | Skill | What it does |
 |-------|--------------|
 | [ship-task](plugins/naphatwx-tools/skills/ship-task/) | Carry one task from idea to a merge-ready branch: spec, code, your review, tests, AI review, docs, pre-merge gate |
+| [ship-task-with-speckit](plugins/naphatwx-tools/skills/ship-task-with-speckit/) | The ship-task phases with Spec Kit writing the plan and the code; `setup` installs Spec Kit core in a repo |
 | [design-feature](plugins/naphatwx-tools/skills/design-feature/) | Plan a feature as a browsable HTML folder: acceptance criteria, use cases, diagrams, scenarios, database and API changes |
 | [generate-use-case](plugins/naphatwx-tools/skills/generate-use-case/) | Write a feature's use cases and scenarios to one `use-cases.js` file |
 | [generate-diagram](plugins/naphatwx-tools/skills/generate-diagram/) | Draw one flowchart, sequence diagram or ER diagram as a local file |

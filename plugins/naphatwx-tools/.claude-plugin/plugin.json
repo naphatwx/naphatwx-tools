@@ -1,6 +1,6 @@
 {
     "name": "naphatwx-tools",
-    "version": "1.9.323",
+    "version": "1.9.324",
     "description": "My personal commands shared across PCs",
     "commands": [],
     "skills": [
@@ -24,6 +24,7 @@
         "./skills/e2e-test",
         "./skills/deployment-plan",
         "./skills/ship-task",
+        "./skills/ship-task-with-speckit",
         "./skills/copy-reports",
         "./skills/setup-device"
     ],

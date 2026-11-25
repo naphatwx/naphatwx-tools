@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Copies the theme/ blocks (tokens, base, pdf, font-size, diff, report, disclosure, slide.js, scenario, page-head, seq, pdf.js, diagram scripts) into skill templates between marker comments,
 // so each skill folder stays self-contained (`npx skills add` installs one folder only).
-// Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS), the use-cases.js type (TYPES_COPIES) and the layout review brief (REVIEW_COPIES).
+// Also refreshes design-feature's preview copies of other skills' templates (see PREVIEWS), the use-cases.js type (TYPES_COPIES), the layout review brief (REVIEW_COPIES) and ship-task's shared references (FLOW_COPIES).
 // Usage: node theme/sync.mjs          write the blocks and preview copies
 //        node theme/sync.mjs --check  fail on drift, stale previews, off-palette hex colors, or low contrast
 import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync } from 'node:fs';
@@ -159,6 +159,20 @@ for (const copy of REVIEW_COPIES) {
     copied++;
     if (CHECK) problems.push(`review: ${copy} differs from theme/layout-review.md (run node theme/sync.mjs)`);
     else { mkdirSync(dirname(join(SKILLS, copy)), { recursive: true }); writeFileSync(join(SKILLS, copy), REVIEW); }
+}
+
+// ---- whole-file copies: ship-task's shared flow references, into ship-task-with-speckit ----
+const FLOW_COPIES = ['roles.md', 'profile.md'];
+for (const file of FLOW_COPIES) {
+    const want = `<!-- Synced from ship-task/references/${file} by theme/sync.mjs. Do not edit here. -->\n`
+        + readFileSync(join(SKILLS, 'ship-task/references', file), 'utf8').replace(/\r\n/g, '\n');
+    const copy = `ship-task-with-speckit/references/${file}`;
+    let have = null;
+    try { have = readFileSync(join(SKILLS, copy), 'utf8'); } catch {}
+    if (have === want) continue;
+    copied++;
+    if (CHECK) problems.push(`flow: ${copy} differs from ship-task/references/${file} (run node theme/sync.mjs)`);
+    else writeFileSync(join(SKILLS, copy), want);
 }
 
 if (!CHECK) print(`theme: ${synced} file(s) updated, ${copied} preview copy(ies) refreshed`);

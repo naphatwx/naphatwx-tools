@@ -6,7 +6,7 @@ Carries one feature, bug fix or hotfix from idea to a merge-ready branch, in the
 
 - You start a feature, bug fix or hotfix and want a fixed flow: plan, code, your review, tests, AI review, docs, pre-merge gate.
 - Needs Matt Pocock's `grilling` skill: `/plugin install mattpocock-skills@claude-plugins-official`.
-- You want sub-agents to write the code, one per app, and fresh sub-agents to review it.
+- You want sub-agents to write the code, split the way the repo's rules say, and fresh sub-agents to review it.
 - Run: `/ship-task add CSV export to the users page` (add `auto-answer` to skip the grill after scope), or `/ship-task 043` to resume task 043, or `/ship-task` for status.
 - Slash only. The agent never starts it by itself.
 
@@ -30,18 +30,18 @@ flowchart TD
         PS -->|changes| GR
     end
 
-    P0 --> P2[Phase 2 - Code: tasks by app tag, one owner per app, no tests, no checks]
+    P0 --> P2[Phase 2 - Code: owners split as the repo says, no tests, no checks]
     P2 --> CP{{USER CHECKPOINT - always stops}}
     CP -->|changes| P2
     CP -->|continue| P3[Phase 3 - Tests: owners write unit + integration tests, run nothing]
-    P3 --> P4[Phase 4 - Review: fresh reviewer per app + cross-app check, fix in one batch]
+    P3 --> P4[Phase 4 - Review: fresh reviewers + cross-app check, fix in one batch]
     P4 --> P5[Phase 5 - Docs + final summary]
     P5 --> P6
 
     subgraph P6["Phase 6 - Pre-merge"]
         M[merge the MR target branch] --> N[number check + renumber our files]
-        N --> G[THE gate: one gate runner per changed app + changed integration tests]
-        G -->|FAIL| F[owner fixes → re-gate that app]
+        N --> G[THE gate: gate runners per changed scope + changed integration tests]
+        G -->|FAIL| F[owner fixes → re-gate that scope]
         F --> G
     end
 
@@ -56,11 +56,12 @@ flowchart TD
 - Spec verify checks the plan against the project's rules, not the requirements. The agent fixes what it finds; a decider sub-agent settles disputes.
 - At the checkpoint you try the code first; tests come after you confirm.
 - No build, lint or test runs before Phase 6, unless you ask for a gate.
-- The main agent only orchestrates. App code is changed by the app's owner sub-agent.
+- The main agent only orchestrates. App code is changed by owner sub-agents.
+- How work is split across sub-agents (per app, per folder, one for all) is the repo's rule: the profile's `Agent split`, else the root guide, else one agent per role. Reviewers are always fresh agents.
 
 ## Project profile
 
-The flow reads a `## Flow profile` section in the project's root `AGENTS.md` or `CLAUDE.md`: apps, guides, owner agents, gate commands, integration tests, numbered folders, docs paths. With no profile, it detects what it can, asks you for the rest, and offers to save it. See [references/profile.md](references/profile.md).
+The flow reads a `## Flow profile` section in the project's root `AGENTS.md` or `CLAUDE.md`: apps, guides, agent split, owner agents, gate commands, integration tests, numbered folders, docs paths. With no profile, it detects what it can, asks you for the rest, and offers to save it. See [references/profile.md](references/profile.md).
 
 ## Input → output
 
