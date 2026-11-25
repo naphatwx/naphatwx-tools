@@ -21,12 +21,14 @@ Map the code before asking anything: facts the code answers are never questions.
 Run the `grilling` skill (`mattpocock-skills:grilling` in Claude Code) on the task. Not `grill-me`: that one
 only the user can start. Rounds go on until no decision is left open.
 - Give `grilling` the Rules that apply list when you start it: it sees only what is in its context.
-- **Rule check, each round.** Before the user sees a round, check every question against the Rules that apply
-  list. A question the list does not cover but a lookup could → one read-only sub-agent checks the guides,
-  the ADRs and similar code, for all such questions in the round.
-  - Priority: a written rule (guide, ADR) beats a code pattern. Check the written rules first.
-  - Answered → don't ask. Write it in `decisions.md` as `(rule: <file:line or guide section>)`.
+- **Rule check, each round.** Before the user sees a round, check every question in this order:
+  1. **Rules.** The Rules that apply list, then the guides and ADRs.
+  2. **No rule → a similar feature.** Find an existing feature that solves the same kind of
+     problem (another import, another sync) and see how it settles this point.
+  - One read-only sub-agent does the lookups for all such questions in the round.
+  - Answered → don't ask. Write it in `decisions.md` as `(rule: <guide section, ADR, or feature + file:line>)`.
   - Otherwise → ask. Two sources of the same rank that disagree don't answer it.
+    Where this task differs from the similar feature, that point is a question.
   - Show the settled ones at the top of the round, each with its source, so the user can overrule one.
 - Write each answer in `decisions.md` as `D# <question> → <answer> (user | auto)`.
 - The user may defer a question ("answer later"). Write it under Open questions with who decides and the
