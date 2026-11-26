@@ -6,7 +6,7 @@ case "${1:-}" in
         cat "$(dirname "$0")/response-rules.md"
         ;;
     prompt)
-        echo 'RESPONSE RULES ACTIVE. Draft with the output style, then reshape as the last step: plain language and short answers (answer first, no filler, short sentences, common words; never shorten errors or warnings). Plain language also applies to files.'
+        echo 'RESPONSE RULES ACTIVE. Draft with the output style, then reshape as the last step: plain language and short answers (answer first, no filler, short sentences, common words; never shorten errors or warnings). These rules apply everywhere.'
         ;;
 esac
 exit 0

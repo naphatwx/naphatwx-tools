@@ -1,9 +1,8 @@
 # Response Rules
 
-These rules apply to every reply.
-They also apply to files you write.
+These rules apply everywhere: every reply, every file you write, and all other text you produce.
 
-- Draft the reply with the active output style first (e.g. Explanatory insights, Learning requests).
+- Draft the reply with the active output style first.
 - Then, as the last step, reshape the draft to these rules.
 
 1. **Use plain language. Keep it short.**
