@@ -22,6 +22,7 @@ Each skill folder has a `README.md` with diagrams of how it works.
 | [review-code](plugins/naphatwx-tools/skills/review-code/) | Review only the changed lines of staged changes, files or a GitLab MR |
 | [get-mr-diffs](plugins/naphatwx-tools/skills/get-mr-diffs/) | Helper: fetch a GitLab MR diff, local git first, else GitLab MCP |
 | [generate-changelog](plugins/naphatwx-tools/skills/generate-changelog/) | Write a short changelog from a GitLab MR diff, as one copy-paste code block |
+| [create-merge-request](plugins/naphatwx-tools/skills/create-merge-request/) | Open a GitLab MR for the current branch: target from your guide or asked, you as assignee, delete source branch on |
 | [update-merge-request](plugins/naphatwx-tools/skills/update-merge-request/) | Rewrite a GitLab MR's title and description from its diff, and save them |
 | [commit-staged-changes](plugins/naphatwx-tools/skills/commit-staged-changes/) | Commit staged changes with a conventional commit message written from the diff |
 | [check-job](plugins/naphatwx-tools/skills/check-job/) | Watch a Jenkins build until it ends, then explain any failure |
